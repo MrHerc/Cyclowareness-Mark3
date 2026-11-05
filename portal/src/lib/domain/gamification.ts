@@ -1,3 +1,5 @@
+import { DEFAULT_TIME_ZONE } from "../day";
+
 /**
  * XP, levels, streaks and badges. Pure functions shared by the app, the seed and tests.
  * Level thresholds reproduce the original: 175 XP is level 2 at 50 %.
@@ -25,7 +27,7 @@ export const REPORT_BONUS_DAILY_CAP = 5;
 export const LAB_XP: Record<string, number> = { "inbox-triage": 20, "link-detective": 15, "password-forge": 15, "mfa-fatigue": 15, "phishing-anatomy": 30, "process-hunt": 30, "fake-signin": 25 };
 
 /** ISO day (YYYY-MM-DD) in the organisation's time zone. */
-export function dayKey(date: Date, timeZone = "Asia/Baku"): string {
+export function dayKey(date: Date, timeZone = DEFAULT_TIME_ZONE): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
 }
 

@@ -1,4 +1,6 @@
 import { crc32, deflateRawSync } from "node:zlib";
+import { DEFAULT_TIME_ZONE } from "../../lib/day";
+import { wallClockMs } from "../../lib/time";
 
 /**
  * Minimal, dependency-free .xlsx writer (Office Open XML): one worksheet, inline strings,
@@ -27,17 +29,17 @@ function colName(i: number): string {
   return s;
 }
 
-/** Excel's serial date of a moment, as Baku wall-clock time (fixed +04:00, no daylight saving; see lib/time.ts), the time the app shows. */
-function excelDate(d: Date): number {
-  return (d.getTime() + 4 * 3_600_000) / 86_400_000 + 25569;
+/** Excel's serial date of a moment, as wall-clock time in the organisation's zone (daylight saving included), the time the app shows. */
+function excelDate(d: Date, timeZone: string): number {
+  return wallClockMs(d, timeZone) / 86_400_000 + 25569;
 }
 
-function sheetXml(headers: string[], rows: Cell[][]): string {
+function sheetXml(headers: string[], rows: Cell[][], timeZone: string): string {
   const widths = headers.map((h, i) => Math.min(60, Math.max(h.length, ...rows.slice(0, 200).map((r) => String(r[i] ?? "").length)) + 2));
   const cols = widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join("");
   const cellXml = (v: Cell, ref: string, header = false): string => {
     if (v === null || v === undefined || v === "") return "";
-    if (v instanceof Date) return `<c r="${ref}" s="2"><v>${excelDate(v)}</v></c>`;
+    if (v instanceof Date) return `<c r="${ref}" s="2"><v>${excelDate(v, timeZone)}</v></c>`;
     if (typeof v === "number" && Number.isFinite(v)) return `<c r="${ref}"${header ? ' s="1"' : ""}><v>${v}</v></c>`;
     if (typeof v === "boolean") return `<c r="${ref}" t="b"><v>${v ? 1 : 0}</v></c>`;
     return `<c r="${ref}" t="inlineStr"${header ? ' s="1"' : ""}><is><t xml:space="preserve">${esc(String(v))}</t></is></c>`;
@@ -94,7 +96,7 @@ function zip(files: { name: string; data: Buffer }[]): Buffer {
   return Buffer.concat([...locals, cd, end]);
 }
 
-export function toXlsx(sheetName: string, headers: string[], rows: Cell[][]): Buffer {
+export function toXlsx(sheetName: string, headers: string[], rows: Cell[][], timeZone = DEFAULT_TIME_ZONE): Buffer {
   const name = esc(sheetName.replace(/[\\/?*[\]:]/g, " ").slice(0, 31) || "Report");
   const b = (s: string) => Buffer.from(s, "utf8");
   return zip([
@@ -118,7 +120,7 @@ export function toXlsx(sheetName: string, headers: string[], rows: Cell[][]): Bu
       data: b(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`),
     },
-    { name: "xl/worksheets/sheet1.xml", data: b(sheetXml(headers, rows)) },
+    { name: "xl/worksheets/sheet1.xml", data: b(sheetXml(headers, rows, timeZone)) },
     { name: "xl/styles.xml", data: b(STYLES) },
   ]);
 }

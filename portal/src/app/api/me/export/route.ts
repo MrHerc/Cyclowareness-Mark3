@@ -4,7 +4,7 @@ import { getViewer } from "@/server/auth/viewer";
 import { deniedResponse, rscProbe } from "@/server/auth/api";
 import { audit } from "@/server/services/audit";
 import { rateLimit } from "@/server/rate-limit";
-import { todayInBaku } from "@/lib/time";
+import { todayIn } from "@/lib/time";
 import { riskTitles } from "@/lib/risk-title";
 
 /** "Download my data" (GDPR-style access): profile and learning history as one JSON file. */
@@ -109,7 +109,7 @@ export async function GET(request: Request) {
   return new Response(body, {
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "content-disposition": `attachment; filename="my-data-${todayInBaku()}.json"`,
+      "content-disposition": `attachment; filename="my-data-${todayIn(v.tenant.settings.timeZone)}.json"`,
       "cache-control": "no-store",
     },
   });

@@ -1,5 +1,6 @@
 /** RFC 4180 CSV parsing and writing (quotes, embedded commas and newlines, ; or , delimiter). */
-import { bakuParts } from "./baku-clock";
+import { zonedParts } from "./baku-clock";
+import { DEFAULT_TIME_ZONE } from "./day";
 
 export function parseCsv(input: string): string[][] {
   const text = input.replace(/^﻿/, "");
@@ -39,22 +40,22 @@ export function parseCsv(input: string): string[][] {
   return rows;
 }
 
-/** A moment as Baku wall-clock time, "2026-10-25 12:13": what the app shows, and what spreadsheets read as a date in any language. */
-function bakuDateTime(d: Date): string {
-  const p = bakuParts(d);
+/** A moment as the organisation's wall-clock time, "2026-10-25 12:13": what the app shows, and what spreadsheets read as a date in any language. */
+function zonedDateTime(d: Date, timeZone: string): string {
+  const p = zonedParts(d, timeZone);
   return `${p.date} ${p.time}`;
 }
 
-function cell(v: unknown): string {
+function cell(v: unknown, timeZone: string): string {
   if (v === null || v === undefined) return "";
-  let s = v instanceof Date ? bakuDateTime(v) : String(v);
+  let s = v instanceof Date ? zonedDateTime(v, timeZone) : String(v);
   // Neutralise spreadsheet formulas (CSV injection). An international phone number (+ and digits
   // only) cannot call anything, and the apostrophe would end up in the number when the file comes back.
   if (/^[=+\-@\t\r]/.test(s) && !/^\+\d{8,15}$/.test(s)) s = `'${s}`;
   return /[",\n\r;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-/** CSV with a UTF-8 BOM so Excel opens Azerbaijani and Russian text correctly. */
-export function toCsv(headers: string[], rows: unknown[][]): string {
-  return "﻿" + [headers, ...rows].map((r) => r.map(cell).join(",")).join("\r\n") + "\r\n";
+/** CSV with a UTF-8 BOM so Excel opens Azerbaijani and Russian text correctly; dates and times in `timeZone`, the organisation's. */
+export function toCsv(headers: string[], rows: unknown[][], timeZone = DEFAULT_TIME_ZONE): string {
+  return "﻿" + [headers, ...rows].map((r) => r.map((v) => cell(v, timeZone)).join(",")).join("\r\n") + "\r\n";
 }

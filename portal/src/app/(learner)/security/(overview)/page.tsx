@@ -36,7 +36,8 @@ import { ReportButton } from "@/components/learner/report-button";
 import { Mascot } from "@/components/mascot/mascot";
 import { BandScale, ScoreGauge } from "@/components/learner/security/score-gauge";
 import { riskBand, type RiskBand } from "@/lib/domain/risk";
-import { dayKey, REPORT_BONUS_XP } from "@/lib/domain/gamification";
+import { REPORT_BONUS_XP } from "@/lib/domain/gamification";
+import { dayAt, dayPlus } from "@/lib/time";
 import { cn } from "@/lib/cn";
 import { riskTitle } from "@/lib/risk-title";
 
@@ -71,7 +72,7 @@ export default async function SecurityPage() {
   const locale = await getLocale();
   const [tr, to, tc, format] = await Promise.all([getTranslations("security"), getTranslations("security.overview"), getTranslations("common"), getAppFormatter()]);
   const campaignsOn = v.tenant.features.has("campaigns");
-  const since30 = daysAgoKey(30);
+  const since30 = daysAgoKey(30, v.tenant.settings.timeZone);
   const [risks, catalog, breakdown, reports, [reportTotal], [oldest], sims, [simTotals]] = await Promise.all([
     openRisks(v),
     getCatalog(v, locale),
@@ -116,13 +117,13 @@ export default async function SecurityPage() {
   const open = risks.filter((r) => r.status === "open");
   const closed = risks.filter((r) => r.status === "closed");
   const byModule = new Map(catalog.map((m) => [m.id, m]));
-  const today = daysAgoKey(0);
+  const today = daysAgoKey(0, v.tenant.settings.timeZone);
   const parts = breakdown ? PARTS.map(([key, max]) => ({ key, max, value: breakdown.parts[key] })) : [];
   const top = parts.filter((p) => p.value > 0).sort((a, b) => b.value / b.max - a.value / a.max)[0];
   const delta = oldest ? score - oldest.score : null;
   const bandLabels = { low: tc("risk.low"), medium: tc("risk.medium"), high: tc("risk.high") };
   const dateOf = (d: Date) => format.dateTime(d, { dateStyle: "medium" });
-  const dueOf = (day: string) => dateOf(new Date(`${day}T12:00:00+04:00`));
+  const dueOf = (day: string) => dateOf(dayAt(day, v.tenant.settings.timeZone));
 
   // Strengths: every score part that adds nothing, plus the habits that earn them.
   const clearParts = parts.filter((p) => p.value === 0).map((p) => p.key);
@@ -472,7 +473,7 @@ function TrendPill({ delta, label }: { delta: number | null; label: (key: "trend
   );
 }
 
-/** The Baku day `days` ago, as YYYY-MM-DD (server only: this page is never hydrated). */
-function daysAgoKey(days: number): string {
-  return dayKey(new Date(Date.now() - days * 86_400_000));
+/** The organisation's day `days` ago, as YYYY-MM-DD (server only: this page is never hydrated). */
+function daysAgoKey(days: number, timeZone: string): string {
+  return dayPlus(-days, timeZone);
 }

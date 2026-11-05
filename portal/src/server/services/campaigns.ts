@@ -11,7 +11,8 @@ import { recomputeRisk } from "./risk";
 import { appUrl, env } from "../env";
 import { TEMPLATE_BY_KEY, clickRiskTitle, templateOnPlan, templateText, type CampaignTemplate } from "../../lib/campaigns/templates";
 import { featuresFor, withDefaults } from "../../lib/tenant-defaults";
-import { bakuDayPlus } from "../../lib/time";
+import { dayPlus } from "../../lib/time";
+import { tenantTimeZone } from "./tenants";
 import { dirOf, type Locale } from "../../i18n/config";
 
 const DAY = 86_400_000;
@@ -148,7 +149,7 @@ export async function recordClick(db: DB, token: string, via: "link" | "qr") {
       title: clickRiskTitle(row.c.name),
       sourceRef: row.c.id,
       moduleId: mod?.id ?? null,
-      dueDate: bakuDayPlus(14, now),
+      dueDate: dayPlus(14, await tenantTimeZone(db, row.c.tenantId), now),
     });
     await emitEvent(db, row.c.tenantId, via === "qr" ? "qr.scanned" : "phishing.clicked", { campaign: row.c.name, userId: row.user.id });
     await recomputeRisk(db, row.c.tenantId, [row.user.id]);

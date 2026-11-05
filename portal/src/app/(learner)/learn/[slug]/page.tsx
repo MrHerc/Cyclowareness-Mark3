@@ -21,7 +21,7 @@ import { learningPoints } from "@/lib/content/learning-points";
 import { pickLessonContent } from "@/lib/content/lesson-locale";
 import { safePath } from "@/lib/safe-path";
 import { pick } from "@/i18n/config";
-import { todayInBaku } from "@/lib/time";
+import { dayAt, todayIn } from "@/lib/time";
 import { cn } from "@/lib/cn";
 
 export async function generateMetadata({ params }: PageProps<"/learn/[slug]">) {
@@ -77,7 +77,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
     { icon: Gauge, label: tr("difficulty"), value: tc(`difficulty.${m.difficulty}`), tint: false, meter: true },
   ];
   const attestText = v.tenant.settings.attestationText[locale] ?? pick(DEFAULT_ATTESTATION, locale);
-  const overdue = !!m.due && m.due < todayInBaku() && m.status !== "completed";
+  const overdue = !!m.due && m.due < todayIn(v.tenant.settings.timeZone) && m.status !== "completed";
   const done = m.lessons.filter((l) => l.completed).length;
   const practiceOpen = lessonsDone(m.status);
 
@@ -114,7 +114,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
           ) : m.status === "in_progress" ? (
             <Pill tone="neutral">{tl("complete", { percent: m.percent })}</Pill>
           ) : null}
-          {m.due ? <Pill tone={overdue ? "risk" : "neutral"}>{tr("due", { date: format.dateTime(new Date(`${m.due}T12:00:00+04:00`), { day: "numeric", month: "long" }) })}</Pill> : null}
+          {m.due ? <Pill tone={overdue ? "risk" : "neutral"}>{tr("due", { date: format.dateTime(dayAt(m.due, v.tenant.settings.timeZone), { day: "numeric", month: "long" }) })}</Pill> : null}
         </div>
         <h1 className="mt-3 text-headline font-bold text-balance">{m.title}</h1>
         <p className="mt-2 text-lead text-ink-muted">{m.subtitle}</p>

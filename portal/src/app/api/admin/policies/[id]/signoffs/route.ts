@@ -5,7 +5,7 @@ import { db, t } from "@/server/db";
 import { apiViewer } from "@/server/auth/api";
 import { audit } from "@/server/services/audit";
 import { toCsv } from "@/lib/csv";
-import { todayInBaku } from "@/lib/time";
+import { todayIn } from "@/lib/time";
 
 /** Sign-off list of the current policy version, for auditors, with columns and values in the admin's language. */
 export async function GET(request: Request, { params }: RouteContext<"/api/admin/policies/[id]/signoffs">) {
@@ -31,6 +31,7 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
       const s = by.get(p.id);
       return [p.name, p.email, p.department ?? "", policy.title, version?.version ?? "", s ? tr("yes") : tr("no"), s?.signedAt ?? null, s?.ip ?? ""];
     }),
+    v.tenant.settings.timeZone,
   );
-  return new Response(csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="policy-signoffs-${todayInBaku()}.csv"`, "cache-control": "no-store" } });
+  return new Response(csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="policy-signoffs-${todayIn(v.tenant.settings.timeZone)}.csv"`, "cache-control": "no-store" } });
 }

@@ -31,7 +31,7 @@ export default async function LeaguePage() {
           <p className="mt-1.5 text-body-sm text-ink-muted">{t("sub")}</p>
         </div>
         <Pill tone="reward" className="px-3.5 py-1.5 text-caption">
-          {tc("time.daysLeft", { count: daysLeftInMonth(new Date()) })}
+          {tc("time.daysLeft", { count: daysLeftInMonth(new Date(), v.tenant.settings.timeZone) })}
         </Pill>
       </header>
 

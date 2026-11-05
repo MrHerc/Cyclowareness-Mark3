@@ -6,7 +6,9 @@ import { cache } from "react";
 import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
-import { bakuDayPlus } from "../../lib/time";
+import { DEFAULT_TIME_ZONE } from "../../lib/day";
+import { dayPlus } from "../../lib/time";
+import { tenantTimeZone } from "./tenants";
 
 export type AssignedModule = {
   moduleId: string;
@@ -48,9 +50,9 @@ function personStart(u: UserLite): Date {
   return u.activatedAt && u.activatedAt > u.createdAt ? u.activatedAt : u.createdAt;
 }
 
-/** One assignment's due day (YYYY-MM-DD) for one person: the fixed date, N days after their start, or none. */
-export function dueFor(a: Pick<typeof t.assignments.$inferSelect, "dueKind" | "dueDate" | "dueDays">, u: UserLite): string | null {
-  return a.dueKind === "fixed" ? a.dueDate : a.dueKind === "after_joining" && a.dueDays ? bakuDayPlus(a.dueDays, personStart(u)) : null;
+/** One assignment's due day (YYYY-MM-DD) for one person: the fixed date, N days after their start (counted in the organisation's time zone), or none. */
+export function dueFor(a: Pick<typeof t.assignments.$inferSelect, "dueKind" | "dueDate" | "dueDays">, u: UserLite, timeZone = DEFAULT_TIME_ZONE): string | null {
+  return a.dueKind === "fixed" ? a.dueDate : a.dueKind === "after_joining" && a.dueDays ? dayPlus(a.dueDays, timeZone, personStart(u)) : null;
 }
 
 /** The people one assignment targets: everyone, a department with its sub-departments, or one person. */
@@ -121,7 +123,7 @@ async function moduleIdsBySlug(db: DB, tenantId: string): Promise<Map<string, st
 
 /** Assignments, people, department closure and path contents of a tenant, loaded once. */
 async function loadAssignments(db: DB, tenantId: string, onlyUserIds?: string[]) {
-  const [assignments, departments, users, slugMap] = await Promise.all([
+  const [assignments, departments, users, slugMap, timeZone] = await Promise.all([
     db.select().from(t.assignments).where(eq(t.assignments.tenantId, tenantId)),
     db.select({ id: t.departments.id, parentId: t.departments.parentId }).from(t.departments).where(eq(t.departments.tenantId, tenantId)),
     db
@@ -135,6 +137,7 @@ async function loadAssignments(db: DB, tenantId: string, onlyUserIds?: string[])
         ),
       ),
     moduleIdsBySlug(db, tenantId),
+    tenantTimeZone(db, tenantId),
   ]);
   const pathIds = [...new Set(assignments.map((a) => a.pathId).filter((x): x is string => !!x))];
   const paths = pathIds.length
@@ -143,14 +146,14 @@ async function loadAssignments(db: DB, tenantId: string, onlyUserIds?: string[])
   const pathModules = new Map(paths.map((p) => [p.id, p.moduleSlugs.map((s) => slugMap.get(s)).filter((x): x is string => !!x)]));
   const closure = departmentClosure(departments);
   const modulesOf = (a: (typeof assignments)[number]) => (a.moduleId ? [a.moduleId] : a.pathId ? (pathModules.get(a.pathId) ?? []) : []);
-  return { assignments, users: users as UserLite[], closure, modulesOf };
+  return { assignments, users: users as UserLite[], closure, modulesOf, timeZone };
 }
 
 export async function resolveAssignments(db: DB, tenantId: string, onlyUserIds?: string[]): Promise<Map<string, Map<string, AssignedModule>>> {
   return resolveLoaded(await loadAssignments(db, tenantId, onlyUserIds));
 }
 
-function resolveLoaded({ assignments, users, closure, modulesOf }: Awaited<ReturnType<typeof loadAssignments>>): Map<string, Map<string, AssignedModule>> {
+function resolveLoaded({ assignments, users, closure, modulesOf, timeZone }: Awaited<ReturnType<typeof loadAssignments>>): Map<string, Map<string, AssignedModule>> {
   const result = new Map<string, Map<string, AssignedModule>>();
   for (const u of users) result.set(u.id, new Map());
 
@@ -158,7 +161,7 @@ function resolveLoaded({ assignments, users, closure, modulesOf }: Awaited<Retur
     const moduleIds = modulesOf(a);
     if (!moduleIds.length) continue;
     for (const u of targetsOf(a, users, closure)) {
-      const due = dueFor(a, u);
+      const due = dueFor(a, u, timeZone);
       const since = assignedSince(a, u);
       const map = result.get(u.id)!;
       for (const moduleId of moduleIds) {
@@ -190,19 +193,19 @@ type PathAssignment = Target & Pick<typeof t.assignments.$inferSelect, "pathId" 
  * Only assignments that target the person count: a path assigned to another department is not theirs, even when
  * some of its modules are assigned to them on their own.
  */
-export function pathsAssignedTo(assignments: PathAssignment[], user: UserLite, closure: Map<string, Set<string>>): Map<string, string | null> {
+export function pathsAssignedTo(assignments: PathAssignment[], user: UserLite, closure: Map<string, Set<string>>, timeZone = DEFAULT_TIME_ZONE): Map<string, string | null> {
   const paths = new Map<string, string | null>();
   for (const a of assignments) {
     if (!a.pathId || !targetsOf(a, [user], closure).length) continue;
-    const due = dueFor(a, user);
+    const due = dueFor(a, user, timeZone);
     paths.set(a.pathId, paths.has(a.pathId) ? earlier(paths.get(a.pathId)!, due) : due);
   }
   return paths;
 }
 
 export async function assignedPathsForUser(db: DB, tenantId: string, userId: string): Promise<Map<string, string | null>> {
-  const { assignments, users, closure } = await loadForUser(db, tenantId, userId);
-  return users[0] ? pathsAssignedTo(assignments, users[0], closure) : new Map();
+  const { assignments, users, closure, timeZone } = await loadForUser(db, tenantId, userId);
+  return users[0] ? pathsAssignedTo(assignments, users[0], closure, timeZone) : new Map();
 }
 
 /**

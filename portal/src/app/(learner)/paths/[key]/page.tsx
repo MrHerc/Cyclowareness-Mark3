@@ -10,7 +10,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { moduleIcon } from "@/components/learner/module-icon";
 import { LAB_ICON } from "@/components/learner/lab-visual";
 import { LAB_XP } from "@/lib/domain/gamification";
-import { todayInBaku } from "@/lib/time";
+import { dayAt, todayIn } from "@/lib/time";
 import { cn } from "@/lib/cn";
 import type { CatalogModule } from "@/server/queries/catalog";
 import { pathForPage } from "./path";
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<"/paths/[key]">) {
 }
 
 export default async function PathPage({ params }: PageProps<"/paths/[key]">) {
-  const [{ p }, tr, tc, tl, tm, tlab, format] = await Promise.all([
+  const [{ v, p }, tr, tc, tl, tm, tlab, format] = await Promise.all([
     pathForPage((await params).key),
     getTranslations("learner.paths"),
     getTranslations("common"),
@@ -36,8 +36,9 @@ export default async function PathPage({ params }: PageProps<"/paths/[key]">) {
   const from = `from=${encodeURIComponent(`/paths/${p.key}`)}`;
   // A module whose lessons are all done waits for its confirmation: its row and Continue open the confirm dialog.
   const moduleHref = (m: CatalogModule) => `/learn/${m.slug}?${from}${m.status === "awaiting_attestation" ? "&confirm=1" : ""}`;
-  const today = todayInBaku();
-  const day = (d: string) => format.dateTime(new Date(`${d}T12:00:00+04:00`), { day: "numeric", month: "long" });
+  const tz = v.tenant.settings.timeZone;
+  const today = todayIn(tz);
+  const day = (d: string) => format.dateTime(dayAt(d, tz), { day: "numeric", month: "long" });
   const titleOf = new Map(p.modules.map((m) => [m.slug, m.title]));
   const labsPassed = p.labs.filter((l) => l.passed).length;
   // Once every module is done, Continue goes on to the first open lab that is not passed yet.

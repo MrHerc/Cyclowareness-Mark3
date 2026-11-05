@@ -36,7 +36,7 @@ export default async function AdminLeague() {
             {month.charAt(0).toLocaleUpperCase(locale) + month.slice(1)}
             <Pill tone="brand">
               <CalendarDays />
-              {tc("time.daysLeft", { count: daysLeftInMonth(now) })}
+              {tc("time.daysLeft", { count: daysLeftInMonth(now, v.tenant.settings.timeZone) })}
             </Pill>
             <span className="inline-flex items-center gap-1.5 text-caption font-normal text-ink-muted">
               <span className="size-2 animate-pulse rounded-full bg-safe-500" />

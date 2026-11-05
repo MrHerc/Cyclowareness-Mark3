@@ -3,7 +3,7 @@ import { and, desc, eq, gte, inArray, isNotNull, isNull, or, sql } from "drizzle
 import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { pick } from "../../i18n/config";
-import { dayBoundary, todayInBaku } from "../../lib/time";
+import { dayBoundary, dayPlus } from "../../lib/time";
 
 const DAY = 86_400_000;
 
@@ -34,9 +34,10 @@ export async function trainingModules(tenantId: string, locale: string) {
 export async function opsOverview(v: Viewer) {
   const tid = v.tenant.id;
   const now = Date.now();
-  // Start of the Baku day 13 days ago (14 days including today): the days the chart below is keyed by,
-  // not the server's local midnight. todayInBaku always yields a real day, so dayBoundary cannot be null.
-  const since14 = dayBoundary(todayInBaku(new Date(now - 13 * DAY)))!;
+  const tz = v.tenant.settings.timeZone;
+  // Start of the organisation's day 13 days ago (14 days including today): the days the chart below is keyed by,
+  // not the server's local midnight. dayPlus always yields a real day, so dayBoundary cannot be null.
+  const since14 = dayBoundary(dayPlus(-13, tz, new Date(now)), false, tz)!;
   const since30 = new Date(now - 30 * DAY);
   const since90 = new Date(now - 90 * DAY);
 
@@ -46,7 +47,7 @@ export async function opsOverview(v: Viewer) {
     db().select({ n: sql<number>`count(*)` }).from(t.materials).where(and(eq(t.materials.tenantId, tid), inArray(t.materials.status, ["pending", "second_approval"]))),
     db().select({ stage: t.loops.stage, closedAt: t.loops.closedAt, createdAt: t.loops.createdAt }).from(t.loops).where(eq(t.loops.tenantId, tid)),
     db()
-      .select({ day: sql<string>`to_char(${t.threatReports.createdAt} at time zone 'Asia/Baku', 'YYYY-MM-DD')`, n: sql<number>`count(*)` })
+      .select({ day: sql<string>`to_char(${t.threatReports.createdAt} at time zone ${tz}, 'YYYY-MM-DD')`, n: sql<number>`count(*)` })
       .from(t.threatReports)
       .where(and(eq(t.threatReports.tenantId, tid), gte(t.threatReports.createdAt, since14), isNull(t.threatReports.campaignRecipientId)))
       .groupBy(sql`1`),
@@ -85,8 +86,7 @@ export async function opsOverview(v: Viewer) {
   const byDay = new Map(reports14.map((r) => [r.day, Number(r.n)]));
   const days: { day: string; value: number }[] = [];
   for (let i = 0; i < 14; i++) {
-    const d = new Date(since14.getTime() + i * DAY + 12 * 3_600_000);
-    const key = d.toLocaleDateString("en-CA", { timeZone: "Asia/Baku" });
+    const key = dayPlus(i - 13, tz, new Date(now));
     days.push({ day: key, value: byDay.get(key) ?? 0 });
   }
 

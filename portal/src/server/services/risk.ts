@@ -8,6 +8,7 @@ import * as t from "../db/schema";
 import { resolveAssignments } from "./assignments";
 import { riskScore, type RiskBreakdown, type Severity } from "../../lib/domain/risk";
 import { dayKey } from "../../lib/domain/gamification";
+import { tenantTimeZone } from "./tenants";
 
 const DAY = 86_400_000;
 
@@ -16,7 +17,7 @@ export type RiskEvidence = Map<string, RiskBreakdown>;
 export async function computeTenantRisk(db: DB, tenantId: string, now = new Date(), onlyUserIds?: string[]): Promise<RiskEvidence> {
   const since90 = new Date(now.getTime() - 90 * DAY);
   const since180 = new Date(now.getTime() - 180 * DAY);
-  const today = dayKey(now);
+  const today = dayKey(now, await tenantTimeZone(db, tenantId));
   const users = await db
     .select({ id: t.users.id })
     .from(t.users)
@@ -175,7 +176,7 @@ export async function tenantKpis(db: DB, tenantId: string, now = new Date()) {
 
 export async function snapshotTenant(db: DB, tenantId: string, now = new Date()) {
   const k = await tenantKpis(db, tenantId, now);
-  const day = dayKey(now);
+  const day = dayKey(now, await tenantTimeZone(db, tenantId));
   await db
     .insert(t.riskSnapshots)
     .values({ tenantId, day, avgRisk: k.avgRisk, completion: k.completion, reportRate: k.reportRate, clickRate: k.clickRate })

@@ -19,7 +19,7 @@ import { DeletePersonButton, PersonActions } from "@/components/admin/person-act
 import { TEMPLATES } from "@/lib/campaigns/templates";
 import { levelFor, dayKey, liveStreak } from "@/lib/domain/gamification";
 import { riskBand } from "@/lib/domain/risk";
-import { requestNow } from "@/lib/time";
+import { dayAt, dayPlus, requestNow } from "@/lib/time";
 import { isLocale, pick } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { riskTitle } from "@/lib/risk-title";
@@ -50,6 +50,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
   ]);
   const now = requestNow();
   const since30 = new Date(now.getTime() - 30 * DAY);
+  const tz = v.tenant.settings.timeZone;
 
   const [progress, lessonsAgg, answers, byCategory, sims, phishing, qrScans, xpDays, risks, attests, certs, recent, badges, evidence, departments, firstXp, modules, assigned, riskDays] = await Promise.all([
     db().select({ p: t.moduleProgress, title: t.modules.title, slug: t.modules.slug }).from(t.moduleProgress).innerJoin(t.modules, eq(t.modules.id, t.moduleProgress.moduleId)).where(eq(t.moduleProgress.userId, u.id)).orderBy(desc(t.moduleProgress.percent)),
@@ -76,7 +77,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
       .orderBy(desc(t.campaignRecipients.clickedAt))
       .limit(10),
     db()
-      .select({ day: sql<string>`to_char(${t.xpEvents.at} at time zone 'Asia/Baku', 'YYYY-MM-DD')`, xp: sql<number>`sum(${t.xpEvents.amount})` })
+      .select({ day: sql<string>`to_char(${t.xpEvents.at} at time zone ${tz}, 'YYYY-MM-DD')`, xp: sql<number>`sum(${t.xpEvents.amount})` })
       .from(t.xpEvents)
       .where(and(eq(t.xpEvents.userId, u.id), gte(t.xpEvents.at, since30)))
       .groupBy(sql`1`),
@@ -100,7 +101,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
     db()
       .select({ day: t.userRiskSnapshots.day, score: t.userRiskSnapshots.score })
       .from(t.userRiskSnapshots)
-      .where(and(eq(t.userRiskSnapshots.userId, u.id), gte(t.userRiskSnapshots.day, dayKey(since30)))),
+      .where(and(eq(t.userRiskSnapshots.userId, u.id), gte(t.userRiskSnapshots.day, dayKey(since30, tz)))),
   ]);
   const pathIds = [...new Set([...assigned.values()].map((a) => a.pathId).filter((p): p is string => !!p))];
   const paths = pathIds.length
@@ -110,8 +111,8 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
   const dayMap = new Map(xpDays.map((d) => [d.day, Number(d.xp)]));
   // The charts' hidden data tables read the label aloud, so it is a date in the interface language; `day` stays the lookup key.
   const days = Array.from({ length: 30 }, (_, i) => {
-    const day = dayKey(new Date(now.getTime() - (29 - i) * DAY));
-    return { day, label: format.dateTime(new Date(`${day}T12:00:00+04:00`), { day: "numeric", month: "short" }), value: dayMap.get(day) ?? 0 };
+    const day = dayPlus(i - 29, tz, now);
+    return { day, label: format.dateTime(dayAt(day, tz), { day: "numeric", month: "short" }), value: dayMap.get(day) ?? 0 };
   });
   // Days without a snapshot (before the history began) show today's score, so the line stays flat there.
   const riskByDay = new Map(riskDays.map((r) => [r.day, r.score]));
@@ -131,7 +132,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
   const ph = phishing[0];
   const hours = Math.round(Number(lessonsAgg[0].secs) / 360) / 10;
   const firstActive: Date | null = firstXp[0]?.at ?? null;
-  const streak = liveStreak(u.streakCurrent, u.streakLastDay, dayKey(new Date()), u.streakFreezes);
+  const streak = liveStreak(u.streakCurrent, u.streakLastDay, dayKey(now, tz), u.streakFreezes);
   const activeDays = days.filter((d) => d.value > 0).length;
   // A tenant's own module with the same slug replaces the library one.
   const moduleBySlug = new Map<string, (typeof modules)[number]>();

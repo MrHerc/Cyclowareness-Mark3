@@ -8,7 +8,8 @@ import { notifyUsers, type Localized } from "./notify";
 import { recomputeRisk } from "./risk";
 import { insertNumbered } from "./threats";
 import { LOCALES, pick } from "../../i18n/config";
-import { bakuDayPlus, todayInBaku } from "../../lib/time";
+import { dayPlus, todayIn } from "../../lib/time";
+import { tenantTimeZone } from "./tenants";
 import { encodeRiskTitle } from "../../lib/risk-title";
 
 /* ───────── closed loops ───────── */
@@ -106,7 +107,7 @@ export async function targetTraining(
   const targetPeople = people.filter((u) => !skip.has(u.id));
   const targets = targetPeople.map((u) => u.id);
   if (!targets.length) return [];
-  const due = p.dueDate ?? bakuDayPlus(7);
+  const due = p.dueDate ?? dayPlus(7, await tenantTimeZone(db, p.tenantId));
   const titleFor = (locale: string) => (typeof p.title === "function" ? p.title(locale) : p.title);
   // A title written by the system is stored in every UI language; one typed by a person (incident, material) as it is.
   const stored = typeof p.title === "function" ? encodeRiskTitle(Object.fromEntries(LOCALES.map((l) => [l, titleFor(l)]))) : p.title.slice(0, 300);
@@ -208,7 +209,7 @@ export async function assignIncidentTraining(db: DB, p: { tenantId: string; inci
     // Confidential incidents show a neutral title to the people being trained.
     title: inc.confidential ? `IR-${inc.number}` : `IR-${inc.number}: ${inc.title}`,
     sourceRef: `IR-${inc.number}`,
-    dueDate: inc.dueDate && inc.dueDate >= todayInBaku() ? inc.dueDate : null,
+    dueDate: inc.dueDate && inc.dueDate >= todayIn(await tenantTimeZone(db, p.tenantId)) ? inc.dueDate : null,
   });
   await db.update(t.incidents).set({ autoTrainingAt: new Date() }).where(eq(t.incidents.id, inc.id));
   if (assigned.length) {

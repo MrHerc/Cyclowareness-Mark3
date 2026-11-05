@@ -228,7 +228,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
         <Card>
           <CardHeader
             title={tr("leagueTitle")}
-            description={tc("time.daysLeft", { count: daysLeftInMonth(new Date()) })}
+            description={tc("time.daysLeft", { count: daysLeftInMonth(new Date(), v.tenant.settings.timeZone) })}
             action={
               <ButtonLink href="/admin/league" size="sm" variant="secondary" icon={<Monitor />}>
                 {tr("showOnScreen")}

@@ -14,7 +14,7 @@ const events = z.array(z.union([z.tuple([z.string().max(24)]), z.tuple([z.string
 
 /**
  * Stores a finished virtual-machine lab the same way as the lab games (playLabAction): one lab_attempts row
- * per run and the lab's XP, scaled by the score, on the first run of the day in Baku. The browser sends the
+ * per run and the lab's XP, scaled by the score, on the first run of the organisation's day. The browser sends the
  * learner's actions, not a score: the server replays them through the lab's own state machine.
  */
 export async function completeVmLabAction(lab: string, log: unknown): Promise<VmLabResult> {

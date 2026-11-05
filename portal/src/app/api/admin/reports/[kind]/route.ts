@@ -10,7 +10,7 @@ import { REPORT_KINDS, type ReportKind } from "@/server/db/schema";
 import { toCsv } from "@/lib/csv";
 import { parseDay } from "@/lib/day";
 import { isUuid } from "@/lib/ids";
-import { todayInBaku } from "@/lib/time";
+import { todayIn } from "@/lib/time";
 
 /** Report download: /api/admin/reports/{kind}?format=csv|xlsx&from&to&d */
 export async function GET(request: Request, { params }: RouteContext<"/api/admin/reports/[kind]">) {
@@ -36,9 +36,10 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
   const filters = { from, to, departmentId };
   const report = await buildReport(v, kind as ReportKind, filters, await getLocale());
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "report.downloaded", meta: { kind, format, ...filters } });
-  const stamp = todayInBaku();
+  const tz = v.tenant.settings.timeZone;
+  const stamp = todayIn(tz);
   if (format === "xlsx") {
-    return new Response(new Uint8Array(toXlsx(report.title, report.headers, report.rows)), {
+    return new Response(new Uint8Array(toXlsx(report.title, report.headers, report.rows, tz)), {
       headers: {
         "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "content-disposition": `attachment; filename="${kind}-${stamp}.xlsx"`,
@@ -46,7 +47,7 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
       },
     });
   }
-  return new Response(toCsv(report.headers, report.rows), {
+  return new Response(toCsv(report.headers, report.rows, tz), {
     headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="${kind}-${stamp}.csv"`, "cache-control": "no-store" },
   });
 }

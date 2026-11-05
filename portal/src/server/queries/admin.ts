@@ -7,7 +7,7 @@ import { departmentClosure, resolveAssignments } from "../services/assignments";
 import { departmentLeague } from "../services/league";
 import { riskBand } from "../../lib/domain/risk";
 import { pick } from "../../i18n/config";
-import { bakuDayPlus } from "../../lib/time";
+import { dayPlus } from "../../lib/time";
 
 const DAY = 86_400_000;
 
@@ -98,7 +98,7 @@ export async function overviewData(v: Viewer, locale: string, departmentFilter: 
     db()
       .select()
       .from(t.riskSnapshots)
-      .where(and(eq(t.riskSnapshots.tenantId, v.tenant.id), gte(t.riskSnapshots.day, bakuDayPlus(-31, now))))
+      .where(and(eq(t.riskSnapshots.tenantId, v.tenant.id), gte(t.riskSnapshots.day, dayPlus(-31, v.tenant.settings.timeZone, now))))
       .orderBy(asc(t.riskSnapshots.day)),
     resolveAssignments(db(), v.tenant.id, ids),
     departmentLeague(db(), v.tenant.id),

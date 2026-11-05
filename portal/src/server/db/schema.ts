@@ -53,6 +53,8 @@ export type TemplateKind = (typeof TEMPLATE_KINDS)[number];
 export type TenantSettings = {
   defaultLocale: string;
   locales: string[];
+  /** IANA time zone of the organisation's days, due dates, reports and displayed times (lib/day.ts DEFAULT_TIME_ZONE when never chosen). */
+  timeZone: string;
   protection: { contentProtection: boolean; watermark: boolean; androidScreenBlock?: boolean };
   learning: { timeLimits: boolean; refresher: boolean; riskThreshold: number; dailyGoalXp: number };
   attestationText: Record<string, string>;

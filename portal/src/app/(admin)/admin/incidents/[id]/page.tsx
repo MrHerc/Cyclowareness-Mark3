@@ -15,7 +15,7 @@ import { CopyText, IncidentControls, IncidentTrainingEditor } from "@/components
 import { formOptions } from "@/server/queries/secops-options";
 import { defang } from "@/lib/defang";
 import { pick } from "@/i18n/config";
-import { bakuDayPlus } from "@/lib/time";
+import { dayPlus } from "@/lib/time";
 import { incidentForPage } from "./incident";
 
 const SEV_TONE = { low: "neutral", medium: "warn", high: "risk", critical: "risk" } as const;
@@ -116,7 +116,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                       modules={options.modules}
                       departments={options.departments}
                       people={options.people}
-                      defaultDue={bakuDayPlus(7)}
+                      defaultDue={dayPlus(7, v.tenant.settings.timeZone)}
                     />
                   ) : null}
                 </span>

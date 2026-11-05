@@ -3,6 +3,7 @@
 import { type DateTimeFormatOptions, type NumberFormatOptions, useFormatter, useLocale, useTimeZone } from "next-intl";
 import { type AzDateOptions, formatAzDate, formatAzNumber, formatAzRelative, relativeUnit } from "./az-format";
 import { formatKaDate, formatKaRelative } from "./ka-format";
+import { DEFAULT_TIME_ZONE } from "./day";
 
 /**
  * Date, time and relative-time formatting for client components. Azerbaijani is formatted by
@@ -13,6 +14,11 @@ import { formatKaDate, formatKaRelative } from "./ka-format";
  */
 
 export type ClientDateOptions = AzDateOptions;
+
+/** The organisation's time zone, set on the server (i18n/request.ts), so server and browser render the same times. */
+export function useOrgTimeZone(): string {
+  return useTimeZone() ?? DEFAULT_TIME_ZONE;
+}
 
 /** Intl rejects `timeStyle` next to field options, so the numeric-with-time shape is spelled out for it. */
 function intlOptions(o: ClientDateOptions): DateTimeFormatOptions {

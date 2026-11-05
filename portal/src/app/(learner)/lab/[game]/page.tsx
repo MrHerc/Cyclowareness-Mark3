@@ -14,9 +14,9 @@ export async function generateMetadata({ params }: PageProps<"/lab/[game]">) {
   return { title: isGame(game) || isVmLab(game) ? tr(`games.${game}.title`) : tr("title") };
 }
 
-/** Today in Baku, for the dates inside a lab machine (certificate validity, whois records, mail headers). */
-function bakuToday() {
-  return dayKey(new Date());
+/** Today in the organisation's time zone, for the dates inside a lab machine (certificate validity, whois records, mail headers). */
+function orgToday(timeZone: string) {
+  return dayKey(new Date(), timeZone);
 }
 
 export default async function GamePage({ params }: PageProps<"/lab/[game]">) {
@@ -27,7 +27,7 @@ export default async function GamePage({ params }: PageProps<"/lab/[game]">) {
     return (
       <div className="grid gap-2">
         <PageHeader title={tr(`games.${game}.title`)} subtitle={tr(`games.${game}.body`)} back={{ href: "/lab", label: tr("back") }} className="sm:mb-6" />
-        <VmLab lab={game} today={bakuToday()} />
+        <VmLab lab={game} today={orgToday(v.tenant.settings.timeZone)} />
       </div>
     );
   }

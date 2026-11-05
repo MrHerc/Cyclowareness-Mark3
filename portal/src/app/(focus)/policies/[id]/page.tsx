@@ -78,7 +78,7 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
         <article className="protected mx-auto w-full max-w-(--container-reading)">
           <div className="flex flex-wrap items-center gap-2">
             <Pill tone="brand">{tr("version", { version: version.version })}</Pill>
-            {version.publishedAt ? <span className="text-caption text-ink-muted">{tr("published", { date: numericDate(version.publishedAt) })}</span> : null}
+            {version.publishedAt ? <span className="text-caption text-ink-muted">{tr("published", { date: numericDate(version.publishedAt, v.tenant.settings.timeZone) })}</span> : null}
           </div>
           <h1 {...textAttrs} className="mt-4 text-headline font-bold text-balance">
             {title}

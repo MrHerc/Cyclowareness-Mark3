@@ -4,6 +4,7 @@ import { and, asc, count, desc, eq, gte, inArray, isNull, sql } from "drizzle-or
 import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { dayKey } from "../../lib/domain/gamification";
+import { dayPlus } from "../../lib/time";
 import { departmentLeague } from "../services/league";
 import { computeTenantRisk } from "../services/risk";
 
@@ -45,11 +46,12 @@ export const getPolicies = cache(async (v: Viewer, locale: string) => {
 });
 
 export async function todayXp(v: Viewer): Promise<number> {
-  const today = dayKey(new Date());
+  const tz = v.tenant.settings.timeZone;
+  const today = dayKey(new Date(), tz);
   const [row] = await db()
     .select({ n: sql<number>`coalesce(sum(${t.xpEvents.amount}), 0)` })
     .from(t.xpEvents)
-    .where(and(eq(t.xpEvents.userId, v.user.id), gte(t.xpEvents.at, new Date(Date.now() - 2 * 86_400_000)), sql`to_char(${t.xpEvents.at} at time zone 'Asia/Baku', 'YYYY-MM-DD') = ${today}`));
+    .where(and(eq(t.xpEvents.userId, v.user.id), gte(t.xpEvents.at, new Date(Date.now() - 2 * 86_400_000)), sql`to_char(${t.xpEvents.at} at time zone ${tz}, 'YYYY-MM-DD') = ${today}`));
   return Number(row?.n ?? 0);
 }
 
@@ -102,14 +104,15 @@ export async function myRiskBreakdown(v: Viewer) {
 
 export async function xpByDay(v: Viewer, days = 30) {
   const since = new Date(Date.now() - days * 86_400_000);
+  const tz = v.tenant.settings.timeZone;
   const rows = await db()
-    .select({ day: sql<string>`to_char(${t.xpEvents.at} at time zone 'Asia/Baku', 'YYYY-MM-DD')`, xp: sql<number>`sum(${t.xpEvents.amount})` })
+    .select({ day: sql<string>`to_char(${t.xpEvents.at} at time zone ${tz}, 'YYYY-MM-DD')`, xp: sql<number>`sum(${t.xpEvents.amount})` })
     .from(t.xpEvents)
     .where(and(eq(t.xpEvents.userId, v.user.id), gte(t.xpEvents.at, since)))
     .groupBy(sql`1`);
   const map = new Map(rows.map((r) => [r.day, Number(r.xp)]));
   return Array.from({ length: days }, (_, i) => {
-    const day = dayKey(new Date(Date.now() - (days - 1 - i) * 86_400_000));
+    const day = dayPlus(-(days - 1 - i), tz);
     return { label: day, value: map.get(day) ?? 0 };
   });
 }

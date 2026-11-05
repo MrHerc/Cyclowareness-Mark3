@@ -25,7 +25,8 @@ import { recomputeRisk, snapshotTenant } from "./services/risk";
 import { targetTraining } from "./services/secops";
 import { dayKey } from "../lib/domain/gamification";
 import { featuresFor, withDefaults } from "../lib/tenant-defaults";
-import { bakuDayPlus, todayInBaku } from "../lib/time";
+import { dayPlus, todayIn, zonedTime } from "../lib/time";
+import { zonedParts } from "../lib/baku-clock";
 import { LOCALES, isLocale, pick, type Locale } from "../i18n/config";
 import { messagesFor } from "../i18n/translator";
 
@@ -38,8 +39,8 @@ const DAY = 86_400_000;
 const HOUR = 3_600_000;
 /** Time budget per tick for each delivery step (mail, SMS, webhooks/syslog), so one unreachable server cannot hold up the tick. */
 const DELIVERY_BUDGET_MS = 20_000;
-/** End of a YYYY-MM-DD due day, Baku time. */
-const dueEnd = (due: string) => new Date(`${due}T23:59:59+04:00`);
+/** End of a YYYY-MM-DD due day in the organisation's time zone (daylight saving included). */
+export const dueEnd = (due: string, timeZone: string) => zonedTime(due, "23:59:59", timeZone);
 
 export async function runJobs(db: DB, now = new Date()): Promise<Record<string, number>> {
   const out: Record<string, number> = {};
@@ -60,7 +61,7 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
   const tenants = await db.select({ id: t.tenants.id, name: t.tenants.name, settings: t.tenants.settings, branding: t.tenants.branding }).from(t.tenants);
   for (const row of tenants) {
     const tenant = { ...row, settings: withDefaults(row.settings) };
-    await step(`snapshot:${tenant.id}`, () => dailySnapshot(db, tenant.id, now));
+    await step(`snapshot:${tenant.id}`, () => dailySnapshot(db, tenant.id, tenant.settings.timeZone, now));
     await step(`reminders:${tenant.id}`, () => reminders(db, tenant, now));
     await step(`managers:${tenant.id}`, () => managerAlerts(db, tenant, now));
     await step(`refreshers:${tenant.id}`, () => refreshers(db, tenant, now));
@@ -378,8 +379,8 @@ async function cleanup(db: DB, now: Date): Promise<number> {
 /* ───────── daily risk snapshot ───────── */
 
 /** Recomputes every score once a day, then keeps one row per active person (the person page sparkline) and the organisation KPIs. */
-async function dailySnapshot(db: DB, tenantId: string, now: Date): Promise<number> {
-  const day = dayKey(now);
+async function dailySnapshot(db: DB, tenantId: string, timeZone: string, now: Date): Promise<number> {
+  const day = dayKey(now, timeZone);
   const [today] = await db.select({ id: t.riskSnapshots.id }).from(t.riskSnapshots).where(and(eq(t.riskSnapshots.tenantId, tenantId), eq(t.riskSnapshots.day, day)));
   if (today) return 0;
   await recomputeRisk(db, tenantId, undefined, now);
@@ -442,7 +443,7 @@ async function reminders(db: DB, tenant: TenantLite, now: Date): Promise<number>
   let earliest = now.getTime();
   for (const p of pending) {
     earliest = Math.min(earliest, p.since.getTime());
-    if (p.due) earliest = Math.min(earliest, dueEnd(p.due).getTime() - n.urgentReminderHours * HOUR);
+    if (p.due) earliest = Math.min(earliest, dueEnd(p.due, tenant.settings.timeZone).getTime() - n.urgentReminderHours * HOUR);
   }
   const hrefs = [...new Set(pending.map((p) => `/learn/${modById.get(p.moduleId)!.slug}`))];
   const pendingUsers = [...new Set(pending.map((p) => p.userId))];
@@ -469,7 +470,7 @@ async function reminders(db: DB, tenant: TenantLite, now: Date): Promise<number>
     const mod = modById.get(p.moduleId)!;
     const history = sentBy.get(`${p.userId}:/learn/${mod.slug}`) ?? [];
     const since = (at: Date) => history.filter((h) => h.at >= at);
-    const dueAt = p.due ? dueEnd(p.due) : null;
+    const dueAt = p.due ? dueEnd(p.due, tenant.settings.timeZone) : null;
     let kind: "reminder" | "overdue" | null = null;
     if (dueAt && now > dueAt) {
       if (n.overdueNotice && !since(dueAt).some((h) => h.kind === "overdue")) kind = "overdue";
@@ -534,7 +535,7 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
   const assigned = await resolveAssignments(db, tenant.id);
   const overdue: { userId: string; moduleId: string }[] = [];
   for (const [userId, mods] of assigned) {
-    for (const m of mods.values()) if (m.due && now.getTime() - dueEnd(m.due).getTime() > n.overdueDays * DAY) overdue.push({ userId, moduleId: m.moduleId });
+    for (const m of mods.values()) if (m.due && now.getTime() - dueEnd(m.due, tenant.settings.timeZone).getTime() > n.overdueDays * DAY) overdue.push({ userId, moduleId: m.moduleId });
   }
   if (overdue.length) {
     const done = await db
@@ -589,7 +590,7 @@ const REFRESHER_TITLE: Record<string, string> = {
 async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number> {
   const l = tenant.settings.learning;
   if (!l.refresher) return 0;
-  const month = todayInBaku(now).slice(0, 7);
+  const month = todayIn(tenant.settings.timeZone, now).slice(0, 7);
   const ref = `REFRESH-${month}`;
   const risky = await db
     .select({ id: t.users.id })
@@ -632,7 +633,7 @@ async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number
       kind: "path",
       title: (locale) => REFRESHER_TITLE[locale] ?? REFRESHER_TITLE.en,
       sourceRef: ref,
-      dueDate: bakuDayPlus(14, now),
+      dueDate: dayPlus(14, tenant.settings.timeZone, now),
     });
     count += got.length;
   }
@@ -641,20 +642,22 @@ async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number
 
 /* ───────── scheduled reports ───────── */
 
-/** Notice with a sign-in link to the period's report, on the schedule's weekday (weekly) or day of the month (monthly) at 08:00 Baku time. */
-async function scheduledReports(db: DB, tenant: TenantLite, now: Date): Promise<number> {
+/** Notice with a sign-in link to the period's report, on the schedule's weekday (weekly) or day of the month (monthly) at 08:00 in the organisation's time zone. */
+export async function scheduledReports(db: DB, tenant: TenantLite, now: Date): Promise<number> {
   // Without email delivery nothing would leave the server; the first send happens on the next due day after it is enabled.
   if (!tenant.settings.email.enabled) return 0;
+  const tz = tenant.settings.timeZone;
   const schedules = await db.select().from(t.reportSchedules).where(eq(t.reportSchedules.tenantId, tenant.id));
-  const local = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Baku" }));
-  const weekday = ((local.getDay() + 6) % 7) + 1; // 1 = Monday … 7 = Sunday
+  // The organisation's wall clock, whatever the server's own zone.
+  const local = zonedParts(now, tz);
+  const weekday = ((new Date(`${local.date}T12:00:00Z`).getUTCDay() + 6) % 7) + 1; // 1 = Monday … 7 = Sunday
   let count = 0;
   for (const s of schedules) {
-    const dueToday = s.frequency === "weekly" ? weekday === s.day : local.getDate() === s.day;
+    const dueToday = s.frequency === "weekly" ? weekday === s.day : Number(local.date.slice(8)) === s.day;
     const minGap = s.frequency === "weekly" ? 6 * DAY : 27 * DAY;
-    if (!dueToday || local.getHours() < 8 || (s.lastSentAt && now.getTime() - s.lastSentAt.getTime() < minGap)) continue;
-    const from = bakuDayPlus(-(s.frequency === "weekly" ? 7 : 30), now);
-    const to = todayInBaku(now);
+    if (!dueToday || local.time < "08:00" || (s.lastSentAt && now.getTime() - s.lastSentAt.getTime() < minGap)) continue;
+    const from = dayPlus(-(s.frequency === "weekly" ? 7 : 30), tz, now);
+    const to = todayIn(tz, now);
     // Opened while signed out, the link leads through sign-in (in the reader's language) to the download.
     const link = `${appUrl()}/api/admin/reports/${s.kind}?format=${s.format}&from=${from}&to=${to}${s.departmentId ? `&d=${s.departmentId}` : ""}`;
     // Each recipient in their own language: a person of the organisation in their profile language, an
@@ -669,7 +672,7 @@ async function scheduledReports(db: DB, tenant: TenantLite, now: Date): Promise<
     const [creator] = s.createdBy ? await db.select({ locale: t.users.locale }).from(t.users).where(eq(t.users.id, s.createdBy)) : [];
     for (const recipient of s.recipients) {
       const lang = [localeOf.get(recipient.toLowerCase()), creator?.locale, tenant.settings.defaultLocale].find(isLocale) ?? "en";
-      const tr = createTranslator({ ...(await messagesFor(lang)), namespace: "admin.reports" });
+      const tr = createTranslator({ ...(await messagesFor(lang, tz)), namespace: "admin.reports" });
       const report = tr(`kinds.${s.kind}.title`);
       const text = tr("mail.body", { report, link });
       await queueEmail(

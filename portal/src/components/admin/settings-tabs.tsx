@@ -45,6 +45,7 @@ import {
   saveLearningAction,
   saveNotificationsAction,
   saveProtectionAction,
+  saveTimeZoneAction,
   resendFailedMailAction,
   sendTestEventAction,
   setLogoAction,
@@ -371,12 +372,14 @@ export function BrandingTab({
 
 /* ───────── languages ───────── */
 
-export function LanguagesTab({ defaultLocale, locales }: { defaultLocale: string; locales: string[] }) {
+/** `timeZones` comes from the server: the browser's own list can differ and would not hydrate. */
+export function LanguagesTab({ defaultLocale, locales, timeZone, timeZones }: { defaultLocale: string; locales: string[]; timeZone: string; timeZones: readonly string[] }) {
   const t = useTranslations("settings.languages");
   const tc = useTranslations("common");
   const { pending, save } = useSave();
   const [def, setDef] = useState(defaultLocale);
   const [on, setOn] = useState(new Set(locales));
+  const [zone, setZone] = useState(timeZone);
   return (
     <div className="grid gap-5">
       <Card>
@@ -419,7 +422,30 @@ export function LanguagesTab({ defaultLocale, locales }: { defaultLocale: string
           ))}
         </CardBody>
       </Card>
-      <SaveBar pending={pending} onSave={() => save(() => saveLanguagesAction(def, [...on]), { defaultLocale: "lg-default" })} />
+      <Card>
+        <CardHeader title={t("timeZoneTitle")} description={t("timeZoneBody")} />
+        <CardBody>
+          <Select id="lg-timezone" value={zone} onChange={(e) => setZone(e.target.value)} className="max-w-xs" aria-label={t("timeZoneTitle")}>
+            {timeZones.map((z) => (
+              <option key={z} value={z}>
+                {z.replaceAll("_", " ")}
+              </option>
+            ))}
+          </Select>
+        </CardBody>
+      </Card>
+      <SaveBar
+        pending={pending}
+        onSave={() =>
+          save(
+            async () => {
+              const res = await saveLanguagesAction(def, [...on]);
+              return res.ok ? saveTimeZoneAction(zone) : res;
+            },
+            { defaultLocale: "lg-default", timeZone: "lg-timezone" },
+          )
+        }
+      />
     </div>
   );
 }

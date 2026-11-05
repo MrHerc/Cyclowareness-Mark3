@@ -10,12 +10,8 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { Notice, PageHeader } from "@/components/ui/layout";
 import { CompliancePack, ReportFilters, Schedules } from "@/components/admin/reports-client";
-import { dayRange, requestNow } from "@/lib/time";
+import { dayPlus, dayRange, requestNow, todayIn } from "@/lib/time";
 import { pick } from "@/i18n/config";
-
-const DAY = 86_400_000;
-/** YYYY-MM-DD in Baku time, the format the date inputs and report filters use. */
-const isoDay = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Baku", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -51,7 +47,8 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
   // (the filter always writes both; an empty one means "no bound"), the default never fills in the other
   // side, so it cannot turn a chosen end date into a reversed range.
   const hasDates = sp.from !== undefined || sp.to !== undefined;
-  const range = hasDates ? dayRange(str("from"), str("to")) : dayRange(isoDay(new Date(now.getTime() - 30 * DAY)), isoDay(now));
+  const tz = v.tenant.settings.timeZone;
+  const range = hasDates ? dayRange(str("from"), str("to"), tz) : dayRange(dayPlus(-30, tz, now), todayIn(tz, now), tz);
   const from = range.fromDay;
   const to = range.toDay;
   // Values the reports would ignore (impossible days, a range ending before it starts, a department the
@@ -125,7 +122,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
       </Card>
 
       <Card>
-        <CardHeader title={tr("scheduled")} description={tr("scheduledSub")} />
+        <CardHeader title={tr("scheduled")} description={tr("scheduledSub", { zone: tz })} />
         <CardBody className="grid gap-4 pt-3">
           {!v.tenant.settings.email.enabled ? (
             <Notice
