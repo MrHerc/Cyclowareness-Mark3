@@ -48,7 +48,7 @@ const finish = (slug: string, lessonKey: string, answers: Parameters<typeof lear
 describe("completing lessons", () => {
   it("walks a module lesson by lesson to the attestation, storing answers and the new risk score", async () => {
     const { tenant, user } = await setup();
-    const mod = await addModule(db, { xp: 90, category: "passwords" });
+    const mod = await addModule(db, { xp: 90, category: "accounts" });
     const first = await finish(mod.slug, "lesson-1", [
       { sceneId: "q1", correct: true, firstTry: true },
       { sceneId: "sim", itemId: "link", correct: false, firstTry: true, outcome: "risky" },
@@ -56,7 +56,7 @@ describe("completing lessons", () => {
     expect(first).toEqual({ ok: true, xp: 30, moduleStatus: "in_progress", nextKey: "lesson-2" });
     const answers = await db.select().from(t.answers).where(eq(t.answers.userId, user.id));
     expect(answers).toHaveLength(2);
-    expect(answers.find((a) => a.sceneId === "sim")).toMatchObject({ tenantId: tenant.id, itemId: "link", outcome: "risky", category: "passwords", correct: false });
+    expect(answers.find((a) => a.sceneId === "sim")).toMatchObject({ tenantId: tenant.id, itemId: "link", outcome: "risky", category: "accounts", correct: false });
     await finish(mod.slug, "lesson-2");
     const last = await finish(mod.slug, "lesson-3");
     expect(last).toEqual({ ok: true, xp: 30, moduleStatus: "awaiting_attestation", nextKey: null });

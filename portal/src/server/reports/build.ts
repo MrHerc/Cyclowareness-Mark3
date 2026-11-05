@@ -115,8 +115,15 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
     case "modules": {
       const assigned = await resolveAssignments(db(), v.tenant.id, ids);
       const progress = ids.length ? await db().select().from(t.moduleProgress).where(and(inArray(t.moduleProgress.userId, ids), eq(t.moduleProgress.status, "completed"))) : [];
+      // "Completed" counts everyone who finished the module, also on their own; "Completion %" is the share of the
+      // people it is assigned to who finished it, which would pass 100 % if the others were counted as well.
       const doneBy = new Map<string, number>();
-      for (const p of progress) if (within(p.completedAt, r)) doneBy.set(p.moduleId, (doneBy.get(p.moduleId) ?? 0) + 1);
+      const doneAssignedBy = new Map<string, number>();
+      for (const p of progress) {
+        if (!within(p.completedAt, r)) continue;
+        doneBy.set(p.moduleId, (doneBy.get(p.moduleId) ?? 0) + 1);
+        if (assigned.get(p.userId)?.has(p.moduleId)) doneAssignedBy.set(p.moduleId, (doneAssignedBy.get(p.moduleId) ?? 0) + 1);
+      }
       const assignedBy = new Map<string, number>();
       for (const m of assigned.values()) for (const a of m.values()) assignedBy.set(a.moduleId, (assignedBy.get(a.moduleId) ?? 0) + 1);
       const scores = ids.length
@@ -139,7 +146,8 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
         .map((m) => {
           const a = assignedBy.get(m.id) ?? 0;
           const d = doneBy.get(m.id) ?? 0;
-          return [pick(m.title, locale), tc(`categories.${m.category as "email"}`), tc(`difficulty.${m.difficulty}`), a, d, a ? Math.round((d / a) * 100) : null, sm.get(m.id) ?? null, rm.has(m.id) ? Math.round(rm.get(m.id)! * 10) / 10 : null];
+          const share = a ? Math.round(((doneAssignedBy.get(m.id) ?? 0) / a) * 100) : null;
+          return [pick(m.title, locale), tc(`categories.${m.category as "email"}`), tc(`difficulty.${m.difficulty}`), a, d, share, sm.get(m.id) ?? null, rm.has(m.id) ? Math.round(rm.get(m.id)! * 10) / 10 : null];
         });
       return { title, headers: [c("module"), c("category"), c("difficulty"), c("assigned"), c("completed"), c("completion"), c("score"), c("rating")], rows };
     }

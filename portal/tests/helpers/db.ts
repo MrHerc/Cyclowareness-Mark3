@@ -54,7 +54,7 @@ export async function addModule(db: DB, o: Partial<typeof t.modules.$inferInsert
   const n = next();
   const [mod] = await db
     .insert(t.modules)
-    .values({ slug: `module-${n}`, category: "phishing", audiences: ["everyone"], title: { en: `Module ${n}`, az: `Modul ${n}` }, subtitle: { en: "" }, minutes: 10, xp: 100, difficulty: "Easy", ...values })
+    .values({ slug: `module-${n}`, category: "email", audiences: ["everyone"], title: { en: `Module ${n}`, az: `Modul ${n}` }, subtitle: { en: "" }, minutes: 10, xp: 100, difficulty: "Easy", ...values })
     .returning();
   const rows = lessons
     ? await db

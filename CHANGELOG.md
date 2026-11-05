@@ -56,3 +56,8 @@ All notable changes to this project are recorded here. The format follows
   others' from the app server, so with the clocks out of step the new one could be "oldest" and
   nothing was removed. The new session is now left out before the oldest of the others are signed
   out. (`portal/src/server/auth/session.ts`, test: `tests/sessions-viewer.test.ts`)
+- **The Modules report could show a completion above 100 %.** "Completion %" divided everyone who
+  completed a module by the number of people it is assigned to, so a module assigned to two
+  people and also taken by others on their own showed 150 %. It is now the share of the assigned
+  people who completed it; "Completed" still counts everyone. (`portal/src/server/reports/build.ts`,
+  test: `tests/reports-build.test.ts`)
