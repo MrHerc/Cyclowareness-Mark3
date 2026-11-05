@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import arPlayer from "../messages/ar/player.json";
+import enPlayer from "../messages/en/player.json";
 
 /** The seeded demo accounts (scripts/seed-data.ts, scripts/seed.ts); playwright.config.ts resolves the password. */
 const password = process.env.SEED_PASSWORD!;
@@ -38,9 +40,10 @@ test("learner: Home, a module and a lesson scene", async ({ page }) => {
   await page.locator(`main a[href^='${moduleHref}/']`).first().click();
   await expect(page).toHaveURL(new RegExp(`${moduleHref}/[^/]+$`));
   const player = page.locator("main#main");
-  // The intro shows the lesson title (h1) and Start (or Continue) first; a scene replaces it.
+  // The intro shows the lesson title (h1) and Start (Continue, or Review again); a scene replaces it.
   await expect(player.locator("h1")).toBeVisible();
-  await player.getByRole("button").first().click();
+  const m = { en: enPlayer, ar: arPlayer }[test.info().project.use.locale as "en" | "ar"];
+  await player.getByRole("button", { name: new RegExp(`^(${[m.start, m.continue, m.review].join("|")})$`) }).first().click();
   await expect(player.locator("h1")).toHaveCount(0);
   await expect(player.locator("h2, ol").first()).toBeVisible();
 });

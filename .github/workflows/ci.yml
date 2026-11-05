@@ -116,8 +116,10 @@ jobs:
 
       - name: Schema and migrations agree
         # A schema.ts change without its committed migration makes drizzle-kit write a new one here.
+        # An ambiguous change (a rename or a drop and add) makes drizzle-kit prompt: no stdin and a short timeout keep it from holding the job.
+        timeout-minutes: 5
         run: |
-          npx drizzle-kit generate --name drift_check
+          npx drizzle-kit generate --name drift_check < /dev/null
           git add --intent-to-add drizzle
           git diff --exit-code --stat -- drizzle
 
