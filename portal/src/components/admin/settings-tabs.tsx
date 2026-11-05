@@ -175,7 +175,7 @@ export function BrandingTab({
     startCheck(async () => {
       const res = await verifyDomainAction(proofDomain);
       if (!res.ok) {
-        toast(t("checkInvalid"), "error");
+        toast(res.error === "rateLimited" ? tc("errors.rateLimited") : t("checkInvalid"), "error");
         return;
       }
       if (res.verified && res.verifiedOn) {
@@ -792,6 +792,7 @@ export function IdentityTab({
 
 export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: EmailView; viewerEmail: string; outbox: { id: string; to: string; subject: string; status: string; createdAt: string; error: string | null; resendable: boolean; cancelled: boolean }[]; failedCount: number }) {
   const t = useTranslations("settings.email");
+  const tc = useTranslations("common");
   const { pending, save } = useSave();
   const [resending, startResend] = useTransition();
   const resend = (id?: string) =>
@@ -919,7 +920,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
                 onClick={() =>
                   startTest(async () => {
                     const res = await testEmailAction(to);
-                    toast(res.ok ? t("testOk") : t("testFailed", { error: t(`testErrors.${(res.error ?? "send_failed") as "send_failed"}`) }), res.ok ? "success" : "error");
+                    toast(res.ok ? t("testOk") : res.error === "rateLimited" ? tc("errors.rateLimited") : t("testFailed", { error: t(`testErrors.${(res.error ?? "send_failed") as "send_failed"}`) }), res.ok ? "success" : "error");
                   })
                 }
               >

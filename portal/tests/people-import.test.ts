@@ -158,3 +158,44 @@ describe("Add person", () => {
     expect(await addPersonAction(undefined, form("tural@acme.test"))).toEqual({ error: "emailTaken" });
   });
 });
+
+describe("Existence oracle and limits", () => {
+  const add = (values: Record<string, string>) => {
+    const f = new FormData();
+    for (const [k, v] of Object.entries({ name: "Nigar Aliyeva", role: "learner", locale: "en", ...values })) f.set(k, v);
+    return f;
+  };
+
+  it("names an account only within the organisation; outside it the address or number just cannot be added", async () => {
+    const [other] = await db.insert(t.tenants).values({ slug: "other", name: "Other", branding: {} as never, settings: {} as never }).returning();
+    await db.insert(t.users).values({ tenantId: other.id, email: "guest@other.test", name: "Guest", phone: "+994501234599" });
+    await db.insert(t.users).values({ tenantId, email: "ours@acme.test", name: "Ours", phone: "+994501234588" });
+    const csv = toCsv(
+      ["name", "email", "phone"],
+      [
+        ["A", "guest@other.test", ""],
+        ["B", "ours@acme.test", ""],
+        ["C", "c@acme.test", "+994501234599"],
+        ["D", "d@acme.test", "+994501234588"],
+      ],
+    );
+    expect((await importPeopleAction(csv, false)).problems).toEqual([
+      { line: 2, problem: "cannotAdd" },
+      { line: 3, problem: "exists" },
+      { line: 4, problem: "cannotAdd" },
+      { line: 5, problem: "phoneTaken" },
+    ]);
+    expect(await addPersonAction(undefined, add({ email: "guest@other.test" }))).toEqual({ error: "cannotAdd" });
+    expect(await addPersonAction(undefined, add({ email: "ours@acme.test" }))).toEqual({ error: "emailTaken" });
+    expect(await addPersonAction(undefined, add({ email: "e@acme.test", phone: "+994501234599" }))).toEqual({ error: "cannotAdd" });
+    expect(await addPersonAction(undefined, add({ email: "e@acme.test", phone: "+994501234588" }))).toEqual({ error: "phoneTaken" });
+  });
+
+  it("limits checks and additions per administrator", async () => {
+    const { rateLimit } = await import("../src/server/rate-limit");
+    for (let i = 0; i < 20; i++) await rateLimit("people-import:00000000-0000-4000-8000-000000000001", 1000, 60 * 60_000);
+    expect(await importPeopleAction("name,email\nX,x@acme.test", false)).toMatchObject({ ok: false, error: "rateLimited" });
+    for (let i = 0; i < 60; i++) await rateLimit("people-add:00000000-0000-4000-8000-000000000001", 1000, 60 * 60_000);
+    expect(await addPersonAction(undefined, add({ email: "x@acme.test" }))).toEqual({ error: "rateLimited" });
+  });
+});

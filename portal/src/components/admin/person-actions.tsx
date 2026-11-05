@@ -3,8 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Building2, KeyRound, Link2, Pencil, ShieldCheck, ShieldOff, Trash2, UserCheck, UserX } from "lucide-react";
-import { changeRoleAction, createLinkAction, deletePersonAction, moveDepartmentAction, resetTwoFactorAction, setStatusAction, updatePersonAction } from "@/server/actions/people";
+import { Building2, KeyRound, Link2, Pencil, ShieldCheck, ShieldOff, Trash2, Unlink, UserCheck, UserX } from "lucide-react";
+import { changeRoleAction, createLinkAction, deletePersonAction, moveDepartmentAction, resetTwoFactorAction, setStatusAction, unlinkSsoAction, updatePersonAction } from "@/server/actions/people";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select } from "@/components/ui/field";
@@ -19,7 +19,7 @@ export function PersonActions({
   locales,
   isSelf,
 }: {
-  person: { id: string; name: string; jobTitle: string | null; phone: string | null; locale: string; role: string; status: string; departmentId: string | null; totpEnabled: boolean };
+  person: { id: string; name: string; jobTitle: string | null; phone: string | null; locale: string; role: string; status: string; departmentId: string | null; totpEnabled: boolean; ssoLinked: boolean };
   departments: { id: string; name: string }[];
   /** The organisation's available languages (Settings → Languages). */
   locales: string[];
@@ -84,6 +84,11 @@ export function PersonActions({
           {t("resetTwoFactor")}
         </Button>
       ) : null}
+      {person.ssoLinked ? (
+        <Button size="sm" variant="secondary" icon={<Unlink />} disabled={pending} onClick={() => start(async () => void ((await unlinkSsoAction(person.id)).ok ? done(t("ssoUnlinked")) : toast(tc("errors.forbidden"), "error")))}>
+          {t("unlinkSso")}
+        </Button>
+      ) : null}
       {!isSelf ? (
         person.status === "suspended" ? (
           <Button size="sm" variant="secondary" icon={<UserCheck />} disabled={pending} onClick={() => start(async () => void ((await setStatusAction([person.id], "active")).ok && done(t("reactivated"))))}>
@@ -103,7 +108,7 @@ export function PersonActions({
             e.preventDefault();
             start(async () => {
               const res = await updatePersonAction(person.id, { name, jobTitle, phone, locale: locale as "az" });
-              const phoneProblem = res.error === "phoneTaken" ? tp("phoneTaken") : res.fields?.includes("phone") ? tp("invalidPhone") : null;
+              const phoneProblem = res.error === "phoneTaken" ? tp("phoneTaken") : res.error === "cannotAdd" ? tp("cannotAdd") : res.fields?.includes("phone") ? tp("invalidPhone") : null;
               setPhoneError(res.ok ? null : phoneProblem);
               if (res.ok) done();
               else if (!phoneProblem || (res.fields?.length ?? 0) > 1) toast(tc("errors.invalid"), "error");

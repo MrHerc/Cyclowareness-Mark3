@@ -32,10 +32,7 @@ const nextConfig: NextConfig = {
   outputFileTracingExcludes: { "**": ["./.data/**/*"] },
   outputFileTracingIncludes: { "**": ["./content/**/*"] },
   serverExternalPackages: ["@electric-sql/pglite", "@node-rs/argon2", "pg", "nodemailer"],
-  experimental: {
-    // Sandbox uploads are up to 10 MB.
-    serverActions: { bodySizeLimit: "11mb" },
-  },
+  // Server Actions keep Next's default 1 MB body limit; sandbox files go through /api/sandbox/upload.
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore, useTransition } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, ChevronRight, Copy, Download, ImagePlus, KeyRound, MessageSquareWarning, MonitorSmartphone, ShieldCheck, ShieldOff, Signpost, Trash2 } from "lucide-react";
@@ -14,6 +14,7 @@ import { ProblemForm } from "@/components/learner/problem-form";
 import { setPreferencesAction } from "@/server/actions/preferences";
 import {
   cancelDeletionAction,
+  changePasswordAction,
   confirmTotpAction,
   disableTotpAction,
   regenerateBackupCodesAction,
@@ -24,6 +25,7 @@ import {
   startTotpAction,
 } from "@/server/actions/profile";
 import { hapticsEnabled, hapticsSupported, setHapticsEnabled, vibrate } from "@/lib/haptics";
+import { checkPassword } from "@/lib/password-strength";
 import { cn } from "@/lib/cn";
 
 export function PhotoEditor({ name, src }: { name: string; src: string | null }) {
@@ -439,6 +441,89 @@ export function OtherDevices() {
       <Button variant="secondary" size="sm" disabled={pending} onClick={() => start(async () => void (await signOutOtherDevicesAction(), toast(t("signedOutOthers"))))}>
         {t("signOutOthers")}
       </Button>
+    </div>
+  );
+}
+
+const PASSWORD_MIN = 10;
+
+/** Profile → Security: replace the password (current one first), as setting it from a link, with the same rules. */
+export function ChangePassword({ email, name }: { email: string; name: string }) {
+  const t = useTranslations("learner.profile");
+  const ta = useTranslations("auth.account");
+  const t2 = useTranslations("learner.twoFactor");
+  const tc = useTranslations("common");
+  const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, start] = useTransition();
+  const score = useMemo(() => (next ? checkPassword(next, [email, name]).score : 0), [next, email, name]);
+  const rules = [
+    { ok: next.length >= PASSWORD_MIN, label: ta("rules.length", { min: PASSWORD_MIN }) },
+    { ok: next.length > 0 && score >= 3, label: ta("rules.strength") },
+    { ok: next.length > 0 && next.toLowerCase() !== email.toLowerCase(), label: ta("rules.notEmail") },
+    { ok: next.length > 0 && next === confirm, label: ta("rules.match") },
+  ];
+  const close = () => {
+    setOpen(false);
+    setCurrent("");
+    setNext("");
+    setConfirm("");
+    setError(null);
+  };
+  const errText = (e: string) => (e === "wrongPassword" ? t2("errors.wrongPassword") : ["required", "tooShort", "tooLong", "sameAsEmail", "mismatch", "weak"].includes(e) ? ta(`errors.${e as "weak"}`, { min: PASSWORD_MIN }) : tc("errors.generic"));
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-start gap-3">
+        <span className="grid size-10 place-items-center rounded-sm bg-sunken text-ink-subtle">
+          <KeyRound className="size-5" />
+        </span>
+        <div>
+          <p className="text-body-sm font-semibold">{t("changePassword")}</p>
+          <p className="text-caption text-ink-muted">{t("changePasswordBody")}</p>
+        </div>
+      </div>
+      <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
+        {t("changePassword")}
+      </Button>
+      <Dialog open={open} onClose={close} title={t("changePassword")} description={t("changePasswordBody")} size="sm">
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            start(async () => {
+              const res = await changePasswordAction(current, next, confirm);
+              if (!res.ok) return setError(errText(res.error ?? "generic"));
+              toast(t("passwordChanged"), "success");
+              close();
+            });
+          }}
+        >
+          <input type="text" name="username" autoComplete="username" value={email} readOnly hidden />
+          <Field label={t("currentPassword")} htmlFor="pw-current" error={error === errText("wrongPassword") ? error : null}>
+            <Input id="pw-current" type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} autoFocus />
+          </Field>
+          <Field label={ta("passwordLabel")} htmlFor="pw-next">
+            <Input id="pw-next" type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} />
+          </Field>
+          <Field label={ta("confirmLabel")} htmlFor="pw-confirm" error={error && error !== errText("wrongPassword") ? error : null}>
+            <Input id="pw-confirm" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} aria-invalid={!!error && error !== errText("wrongPassword")} />
+          </Field>
+          <ul aria-label={ta("rules.label")} className="grid gap-1.5 text-caption">
+            {rules.map((r) => (
+              <li key={r.label} className={cn("flex items-center gap-2", r.ok ? "text-safe-700" : "text-ink-muted")}>
+                <Check aria-hidden className={cn("size-3.5", r.ok ? "" : "opacity-30")} />
+                {r.label}
+              </li>
+            ))}
+          </ul>
+          <Button type="submit" disabled={!current || !next || !confirm || pending}>
+            {t("changePassword")}
+          </Button>
+        </form>
+      </Dialog>
     </div>
   );
 }

@@ -177,7 +177,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                 isSelf={u.id === v.user.id}
                 departments={departments.map((d) => ({ id: d.id, name: d.name }))}
                 locales={v.tenant.settings.locales}
-                person={{ id: u.id, name: u.name, jobTitle: u.jobTitle, phone: u.phone, locale: u.locale, role: u.role, status: u.status, departmentId: u.departmentId, totpEnabled: u.totpEnabled }}
+                person={{ id: u.id, name: u.name, jobTitle: u.jobTitle, phone: u.phone, locale: u.locale, role: u.role, status: u.status, departmentId: u.departmentId, totpEnabled: u.totpEnabled, ssoLinked: !!u.ssoSubject }}
               />
             </div>
           ) : null}

@@ -264,6 +264,37 @@ describe("two-step setup", () => {
   });
 });
 
+describe("time-based codes", () => {
+  it("takes a code once: the same code is refused on reuse", async () => {
+    const key = newTotpKey();
+    const u = await person({ email: "replay@acme.test", totpEnabled: true, totpSecret: key.encrypted, totpRecovery: [] });
+    h.session = { user: { id: u.id }, sessionId: "pending" };
+    const code = generateTOTP(decodeBase32IgnorePadding(key.base32), 30, 6);
+    expect(await outcome(auth.verifySecondFactorAction(undefined, form({ mode: "totp", code })))).toBe("signed-in");
+    expect(await outcome(auth.verifySecondFactorAction(undefined, form({ mode: "totp", code })))).toBe("invalidCode");
+    const [row] = await db().select({ step: t.users.totpLastStep }).from(t.users).where(eq(t.users.id, u.id));
+    expect(row.step).toBe(Math.floor(Date.now() / 30_000));
+  });
+});
+
+describe("changing the password", () => {
+  it("needs the current password, applies the password rules and signs the other devices out", async () => {
+    const { changePasswordAction } = await import("../src/server/actions/profile");
+    const u = await person({ email: "change@acme.test", passwordHash: "old" });
+    const now = new Date(Date.now() + 86_400_000);
+    await db().insert(t.sessions).values(["mine", "theirs"].map((id) => ({ id, userId: u.id, tenantId, expiresAt: now, twoFactorVerified: true })));
+    h.session = { user: { id: u.id, email: u.email, name: u.name, role: "learner" }, sessionId: "mine", tenant: { id: tenantId, name: "Acme", settings: defaultSettings("en") } };
+    expect(await changePasswordAction("wrong password", "N3w-passw0rd-long", "N3w-passw0rd-long")).toEqual({ ok: false, error: "wrongPassword" });
+    expect(await changePasswordAction("right password", "N3w-passw0rd-long", "other")).toEqual({ ok: false, error: "mismatch" });
+    expect(await changePasswordAction("right password", "Change@Acme.test", "Change@Acme.test")).toEqual({ ok: false, error: "sameAsEmail" });
+    expect(await changePasswordAction("right password", "N3w-passw0rd-long", "N3w-passw0rd-long")).toEqual({ ok: true });
+    const [row] = await db().select({ hash: t.users.passwordHash }).from(t.users).where(eq(t.users.id, u.id));
+    expect(row.hash).toBe("hash");
+    const left = await db().select({ id: t.sessions.id }).from(t.sessions).where(eq(t.sessions.userId, u.id));
+    expect(left.map((s) => s.id)).toEqual(["mine"]);
+  });
+});
+
 describe("deletion request", () => {
   it("notifies the administrators once while a request is pending", async () => {
     const { requestDeletionAction } = await import("../src/server/actions/profile");

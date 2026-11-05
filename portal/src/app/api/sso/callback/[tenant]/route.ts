@@ -45,7 +45,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
   }
 
   const [row] = await db()
-    .select({ id: t.tenants.id, slug: t.tenants.slug, domain: t.tenants.domain, plan: t.tenants.plan, features: t.tenants.features, settings: t.tenants.settings })
+    .select({ id: t.tenants.id, slug: t.tenants.slug, domain: t.tenants.domain, domainVerifiedAt: t.tenants.domainVerifiedAt, plan: t.tenants.plan, features: t.tenants.features, settings: t.tenants.settings })
     .from(t.tenants)
     .where(eq(t.tenants.slug, slug));
   const tenant = row ? { ...row, settings: withDefaults(row.settings) } : undefined;
@@ -54,6 +54,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
 
   let email: string | null = null;
   let name = "";
+  /** The provider's account, "<issuer> <sub>": the person's identity, bound to the account at the first sign-in. */
+  let subject = "";
   let reason = "";
   /** The provider's `locale` claim ("ru", "en-GB"), as a language code. */
   let claimedLocale = "";
@@ -72,8 +74,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
       verifier: state.verifier,
     });
     const claims = await verifyIdToken(provider, idToken, { clientId: sso.clientId, nonce: state.nonce });
+    if (typeof claims.sub !== "string" || !claims.sub || claims.sub.length > 255) throw new Error("no_subject");
+    subject = `${sso.issuer} ${claims.sub}`;
     const claimName = sso.emailClaim?.trim() || "email";
-    // The standard claim counts only when the provider vouches for it; naming another claim in Settings is the organisation's explicit trust in it.
+    // The standard claim counts only when the provider vouches for it (email_verified). Naming another claim in Settings
+    // is the organisation's explicit trust in it and skips that check; the subject binding below still ties the account
+    // to one provider identity, so a reassigned address alone no longer opens someone else's account.
     if (claimName === "email" && claims.email_verified !== true) throw new Error("email_not_verified");
     const value = claims[claimName];
     const parsed = emailSchema.safeParse(typeof value === "string" ? value.trim().toLowerCase() : "");
@@ -97,12 +103,18 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
   };
   if (!email) return refuse(reason);
   if (!tenant.settings.identity.ssoEnabled || !featuresFor(tenant.plan, tenant.features).has("sso")) return refuse("sso_off");
+  // The provider vouches for the organisation's addresses only while the organisation holds the domain proof (the
+  // sign-in page already sends people of an unproven domain to the password step); no account is looked up before it.
+  if (!tenant.domainVerifiedAt) return refuse("domain_unproven");
 
   let [user] = await db().select().from(t.users).where(eq(t.users.email, email));
   // Accounts of another organisation are never touched; administrators always use their password.
   if (user && user.tenantId !== tenant.id) return refuse("other_organisation");
   if (user && isPrivileged(user.role)) return refuse("administrator", user.id);
   if (user && user.status !== "active" && user.status !== "invited") return refuse(user.status, user.id);
+  // The address alone does not identify the person: once bound, only the same provider account signs in to it, until an
+  // administrator unlinks it (Person → Unlink single sign-on).
+  if (user && user.ssoSubject && user.ssoSubject !== subject) return refuse("subject_changed", user.id);
   if (!user) {
     if (!sso.autoCreate) return refuse("unknown_person");
     // The provider vouches only for the organisation's own proven domain.
@@ -111,11 +123,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
     const enabled = (l: string | undefined): l is Locale => isLocale(l) && tenant.settings.locales.includes(l);
     const locale = [claimedLocale, jar.get(LOCALE_COOKIE)?.value].find(enabled) ?? (isLocale(tenant.settings.defaultLocale) ? tenant.settings.defaultLocale : DEFAULT_LOCALE);
     // Created active, so this is also its activation (setStatusAction tells never-activated accounts apart by it).
-    [user] = await db().insert(t.users).values({ tenantId: tenant.id, email, name, role: "learner", status: "active", locale, activatedAt: new Date() }).returning();
+    [user] = await db().insert(t.users).values({ tenantId: tenant.id, email, name, role: "learner", status: "active", locale, ssoSubject: subject, activatedAt: new Date() }).returning();
     await audit(db(), { tenantId: tenant.id, actorId: user.id, action: "sso.person_created", targetType: "user", targetId: user.id, ip });
   } else if (user.status === "invited") {
     // The organisation's identity provider vouches for the person, so the invitation is complete.
-    await db().update(t.users).set({ status: "active", activatedAt: new Date() }).where(eq(t.users.id, user.id));
+    await db().update(t.users).set({ status: "active", activatedAt: new Date(), ssoSubject: subject }).where(eq(t.users.id, user.id));
+  } else if (!user.ssoSubject) {
+    // First single sign-on of an existing account: bound to this provider identity from now on.
+    await db().update(t.users).set({ ssoSubject: subject }).where(eq(t.users.id, user.id));
   }
 
   const { token, expiresAt } = await createSession({

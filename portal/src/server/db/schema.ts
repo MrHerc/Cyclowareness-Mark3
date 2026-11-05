@@ -170,8 +170,12 @@ export const users = pgTable(
     managerId: uuid("manager_id"),
     locale: text("locale").notNull().default("az"),
     passwordHash: text("password_hash"),
+    /** "<issuer> <sub>" of the identity provider's account, bound at the first SSO sign-in; null until then or once an administrator unlinks it. */
+    ssoSubject: text("sso_subject"),
     totpSecret: text("totp_secret"),
     totpEnabled: boolean("totp_enabled").notNull().default(false),
+    /** The last TOTP time step accepted, so a code seen once is not taken again. */
+    totpLastStep: integer("totp_last_step"),
     /** sha256 hashes of unused backup codes. */
     totpRecovery: jsonb("totp_recovery").$type<string[]>(),
     avatarUrl: text("avatar_url"),

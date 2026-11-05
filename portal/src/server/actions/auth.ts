@@ -14,7 +14,7 @@ import type { Role } from "../db/schema";
 import { hashPassword, passwordProblem, verifyPassword } from "../auth/password";
 import { clearSessionCookie, createSession, invalidateSession, invalidateUserSessions, readSessionToken, sessionIdFromToken, setSessionCookie } from "../auth/session";
 import { getSession } from "../auth/viewer";
-import { hashBackupCode, legacyBackupHash, verifyTotp } from "../auth/totp";
+import { hashBackupCode, legacyBackupHash, verifyTotpOnce } from "../auth/totp";
 import { isConsoleRole } from "../auth/permissions";
 import { decideSignInStep, emailDomain, type SignInStep } from "../auth/sso-routing";
 import { featuresFor, withDefaults } from "../../lib/tenant-defaults";
@@ -318,7 +318,7 @@ async function verifySecondFactor(_: AuthState, form: FormData): Promise<AuthSta
   let ok: boolean;
   if (mode === "totp") {
     const [user] = await db().select({ totpSecret: t.users.totpSecret }).from(t.users).where(eq(t.users.id, session.user.id));
-    ok = verifyTotp(user?.totpSecret ?? null, code);
+    ok = await verifyTotpOnce(session.user.id, user?.totpSecret ?? null, code);
   } else ok = await spendBackupCode(session.user.id, code);
   if (!ok) return { error: mode === "backup" ? "invalidBackupCode" : "invalidCode", step: mode };
   await passed(claimed);

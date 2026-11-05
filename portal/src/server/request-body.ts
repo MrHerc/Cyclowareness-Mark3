@@ -7,9 +7,15 @@ import "server-only";
  * chunked or understated body is cut off as soon as the running count passes the limit.
  */
 export async function readBodyCapped(request: Request, limit: number): Promise<string | null> {
+  const bytes = await readBytesCapped(request, limit);
+  return bytes && new TextDecoder().decode(bytes);
+}
+
+/** The same cap for a binary body (a multipart upload), as bytes. */
+export async function readBytesCapped(request: Request, limit: number): Promise<Uint8Array<ArrayBuffer> | null> {
   const declared = Number(request.headers.get("content-length"));
   if (Number.isFinite(declared) && declared > limit) return null;
-  if (!request.body) return "";
+  if (!request.body) return new Uint8Array();
   const reader = request.body.getReader();
   const chunks: Uint8Array[] = [];
   let size = 0;
@@ -29,5 +35,5 @@ export async function readBodyCapped(request: Request, limit: number): Promise<s
     bytes.set(c, offset);
     offset += c.byteLength;
   }
-  return new TextDecoder().decode(bytes);
+  return bytes;
 }

@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 
   // Anything that is not a slug (empty, too long, a NUL byte the database rejects) is no organisation.
   const [row] = TENANT_SLUG_RE.test(slug)
-    ? await db().select({ slug: t.tenants.slug, plan: t.tenants.plan, features: t.tenants.features, settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.slug, slug))
+    ? await db().select({ slug: t.tenants.slug, plan: t.tenants.plan, features: t.tenants.features, settings: t.tenants.settings, domainVerifiedAt: t.tenants.domainVerifiedAt }).from(t.tenants).where(eq(t.tenants.slug, slug))
     : [];
   const tenant = row ? { ...row, settings: withDefaults(row.settings) } : undefined;
   if (test) {
@@ -39,7 +39,8 @@ export async function GET(request: Request) {
   }
   const sso = tenant?.settings.identity.sso;
   if (!tenant || !sso || sso.protocol !== "oidc" || !sso.issuer || !sso.clientId) redirect(failed);
-  if (!featuresFor(tenant.plan, tenant.features).has("sso") || (!test && !tenant.settings.identity.ssoEnabled)) redirect(failed);
+  // Sign-in needs the domain proof (as the sign-in page does); the administrator's test may run before the proof lands.
+  if (!featuresFor(tenant.plan, tenant.features).has("sso") || (!test && (!tenant.settings.identity.ssoEnabled || !tenant.domainVerifiedAt))) redirect(failed);
 
   const state = randomValue();
   const nonce = randomValue();

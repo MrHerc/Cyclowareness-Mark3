@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, isNotNull } from "drizzle-orm";
 import { Award, ChevronRight, FileText, LogOut } from "lucide-react";
 import { db, t } from "@/server/db";
 import { requireViewer } from "@/server/auth/viewer";
@@ -13,7 +13,7 @@ import { ButtonLink, buttonClass, textLinkClass } from "@/components/ui/button";
 import { EmptyState, Notice } from "@/components/ui/layout";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { pick } from "@/i18n/config";
-import { DataSection, OtherDevices, Preferences, PhotoEditor, ProblemButton, TourReset, TwoFactor } from "./profile-client";
+import { ChangePassword, DataSection, OtherDevices, Preferences, PhotoEditor, ProblemButton, TourReset, TwoFactor } from "./profile-client";
 
 export async function generateMetadata() {
   const tr = await getTranslations("learner.profile");
@@ -25,7 +25,7 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
   const v = await requireViewer();
   const locale = await getLocale();
   const [tr, tc, th, format] = await Promise.all([getTranslations("learner.profile"), getTranslations("common"), getTranslations("learner.home"), getFormatter()]);
-  const [policies, certs, dept, problems] = await Promise.all([
+  const [policies, certs, dept, problems, [credentials]] = await Promise.all([
     getPolicies(v, locale),
     db()
       .select({ token: t.certificates.publicToken, issuedAt: t.certificates.issuedAt, moduleTitle: t.modules.title, pathTitle: t.learningPaths.title })
@@ -36,6 +36,8 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
       .orderBy(desc(t.certificates.issuedAt)),
     v.user.departmentId ? db().select({ name: t.departments.name }).from(t.departments).where(eq(t.departments.id, v.user.departmentId)) : Promise.resolve([]),
     db().select().from(t.problemReports).where(eq(t.problemReports.userId, v.user.id)).orderBy(desc(t.problemReports.createdAt)).limit(5),
+    // Only people who sign in with a password here can change it (not SSO or phone-only accounts).
+    db().select({ hasPassword: isNotNull(t.users.passwordHash) }).from(t.users).where(eq(t.users.id, v.user.id)),
   ]);
   const toSign = policies.filter((p) => !p.signedAt);
   const signed = policies.filter((p) => p.signedAt);
@@ -172,6 +174,11 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
         <Card>
           <CardBody className="grid gap-5">
             <TwoFactor enabled={v.user.totpEnabled} required={required} />
+            {credentials?.hasPassword ? (
+              <div className="border-t border-line pt-5">
+                <ChangePassword email={v.user.email} name={v.user.name} />
+              </div>
+            ) : null}
             <div className="border-t border-line pt-5">
               <OtherDevices />
             </div>
