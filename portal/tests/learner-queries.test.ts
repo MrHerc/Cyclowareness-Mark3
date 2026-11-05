@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
+import { eq } from "drizzle-orm";
 import * as t from "../src/server/db/schema";
 import type { Viewer } from "../src/server/auth/viewer";
 import { featuresFor, withDefaults } from "../src/lib/tenant-defaults";
@@ -195,12 +196,11 @@ describe("learner home queries", () => {
   it("finds the person's own department in the league and explains their risk score", async () => {
     const { tenant, user, v } = await person();
     const dept = await addDepartment(db, tenant.id, "Sales");
-    await db.update(t.users).set({ departmentId: dept.id });
+    await db.update(t.users).set({ departmentId: dept.id }).where(eq(t.users.id, user.id));
     (v.user as { departmentId: string | null }).departmentId = dept.id;
     const { rows, mine } = await learner.myLeagueRow(v);
     expect(rows.map((r) => r.id)).toEqual([dept.id]);
     expect(mine?.id).toBe(dept.id);
     expect(await learner.myRiskBreakdown(v)).toMatchObject({ score: 16 });
-    void user;
   });
 });

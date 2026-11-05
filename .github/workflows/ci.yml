@@ -1,9 +1,12 @@
 name: CI
 
+# Pull requests and main only: a push to a branch with an open pull request would otherwise run twice.
+# A branch without a pull request runs through workflow_dispatch.
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
+  workflow_dispatch:
 
 # A newer push to the same branch cancels the run still going for the older one.
 concurrency:
@@ -29,12 +32,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           # The version the production image runs (portal/Dockerfile: node:24).
-          node-version: 24
+          node-version-file: portal/.nvmrc
           cache: npm
           cache-dependency-path: portal/package-lock.json
 
@@ -42,7 +47,7 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Lint
-        run: npx eslint src tests scripts --max-warnings=0
+        run: npx eslint src tests scripts e2e --max-warnings=0
 
       - name: Typecheck
         run: npm run typecheck
@@ -51,23 +56,95 @@ jobs:
         run: npx tsx scripts/check-lesson-locales.ts --coverage
 
       - name: Tests
-        run: npx vitest run --reporter=default
+        # --coverage fails the step below the line floor in vitest.config.ts.
+        run: npx vitest run --coverage --reporter=default
         env:
           VITE_CONFIG_NATIVE_IGNORE_WARNING: "true"
+
+      - name: Keep the coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: coverage
+          path: portal/coverage
+          retention-days: 14
+
+  migrations:
+    name: Migrations on PostgreSQL 16
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        # The image docker-compose.yml runs.
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: portal
+          POSTGRES_PASSWORD: portal
+          POSTGRES_DB: portal
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U portal"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://portal:portal@localhost:5432/portal
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: portal/.nvmrc
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Migrate, then migrate again (the upgrade of an existing database)
+        # scripts/migrate.mjs is what the production image runs on every start (scripts/docker-entrypoint.sh).
+        run: |
+          set -euo pipefail
+          node scripts/migrate.mjs
+          applied() { psql "$DATABASE_URL" -tAc 'select count(*) from drizzle.__drizzle_migrations'; }
+          first=$(applied)
+          test "$first" = "$(node -p "require('./drizzle/meta/_journal.json').entries.length")"
+          node scripts/migrate.mjs
+          test "$(applied)" = "$first"
+
+      - name: Schema and migrations agree
+        # A schema.ts change without its committed migration makes drizzle-kit write a new one here.
+        # An ambiguous change (a rename or a drop and add) makes drizzle-kit prompt: no stdin and a short timeout keep it from holding the job.
+        timeout-minutes: 5
+        run: |
+          npx drizzle-kit generate --name drift_check < /dev/null
+          git add --intent-to-add drizzle
+          git diff --exit-code --stat -- drizzle
 
   build:
     name: Production build
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The version the production image runs (portal/Dockerfile: node:24).
-          node-version: 24
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: portal/.nvmrc
           cache: npm
           cache-dependency-path: portal/package-lock.json
+
+      - name: Next.js build cache
+        # hashFiles paths are relative to the workspace, not to defaults.run.working-directory.
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: portal/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('portal/package-lock.json') }}-${{ hashFiles('portal/src/**', 'portal/messages/**', 'portal/next.config.*') }}
+          restore-keys: nextjs-${{ runner.os }}-${{ hashFiles('portal/package-lock.json') }}-
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
@@ -76,3 +153,58 @@ jobs:
         # `postbuild` (scripts/check-build.mjs) fails the build when prerendered output embeds the
         # build-time fallback address.
         run: npm run build
+
+      - name: Docker image
+        # --pull: the current node base image, not one cached on the runner.
+        run: docker build --pull -t portal .
+
+  e2e:
+    name: Browser smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: portal/.nvmrc
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Next.js build cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: portal/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('portal/package-lock.json') }}-${{ hashFiles('portal/src/**', 'portal/messages/**', 'portal/next.config.*') }}
+          restore-keys: nextjs-${{ runner.os }}-${{ hashFiles('portal/package-lock.json') }}-
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Demo password for this run
+        # Its own value per run, never the published one: e2e/server.mjs seeds with it and the tests sign in with it.
+        run: |
+          password="$(openssl rand -base64 24)"
+          echo "::add-mask::$password"
+          echo "SEED_PASSWORD=$password" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke tests (production server, seeded embedded database)
+        run: npx playwright test
+
+      - name: Keep traces and the report
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright
+          path: |
+            portal/test-results
+            portal/playwright-report
+          retention-days: 7
