@@ -333,11 +333,11 @@ The sum is capped between 0 and 100. Bands are low (0 to 33), medium (34 to 66) 
 |---|---|
 | Threat intake | Employees report messages, calls, links, files or in-person attempts. Analysts triage, dismiss, sandbox the URL, or convert the report into a closed loop or an incident |
 | Closed loops | A loop follows one threat through seven stages: intake, analysis, conversion, approval, targeting, training, feedback. Stages only move forward, and every move is logged in `loop_events` (`src/server/services/secops.ts`) |
-| Approvals | Training material from AI, a template or an analyst waits for approval. A material can require a second approval. Only approved material reaches employees |
+| Approvals | Training material from AI, a template or an analyst waits for approval. A material can require a second approval. Only approved material reaches employees; approval moves its loop to the training stage, and a rejection sends nothing |
 | Incidents | Severity, status, indicators of compromise, MITRE ATT&CK technique ids, a confidential flag, and an optional training module with target people, due date and pass score. Auto-training assigns that module to the targets |
 | Sandbox | Static analysis of URLs and uploaded files up to 10 MB: URL heuristics, file type detection, ZIP and Office archive inspection, macros, entropy, indicator extraction and MITRE mapping. Nothing is executed or fetched, and file bytes are never stored, only the SHA-256 (`src/server/sandbox/analyze.ts`). Results export as STIX 2.1 |
 | Intelligence | Threat and policy items can be triaged and converted into loops or policy updates. There is no feed connector: in the demo data the items come from the seed |
-| Leadership | A board for executives with risk and completion trends |
+| Leadership | A board for executives: completion, reporting rate, policy coverage, risk trend, incidents opened and resolved, people trained through closed loops, and a department breakdown |
 | Support desk | Tickets with categories, priorities and an SLA view; problem reports from lessons; lesson feedback |
 
 ## 11. AI features
@@ -412,7 +412,7 @@ Tenant administrators configure SMTP servers, webhook addresses, syslog servers 
 
 **Mail.** Each organisation uses its own SMTP server (Settings, Email). Every message passes through the `outbox` table, which is also the delivery log. Platform mail that belongs to no organisation, such as demo requests, uses the `PLATFORM_SMTP_*` settings.
 
-**SMS.** The only provider type is a generic webhook, configured by the platform operator through environment variables. Its request format is in [API.md](API.md#sms-gateway-contract).
+**SMS.** The only provider type is a generic webhook, configured by the platform operator through environment variables. Its request format is in [API.md](API.md#8-sms-gateway-contract).
 
 ## 14. Languages
 
