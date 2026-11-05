@@ -5,6 +5,7 @@ import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
 import { drizzle as drizzlePg, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import * as schema from "./schema";
+import { logFailure } from "./errors";
 
 export type DB = NodePgDatabase<typeof schema>;
 
@@ -43,11 +44,11 @@ export function createDb(): DbHandle {
     const pool = new pg.Pool({ connectionString: url, max: poolMax(), connectionTimeoutMillis: 10_000, idleTimeoutMillis: 30_000 });
     // An idle client whose backend went away (restart, failover, network) is reported here; without
     // a listener the EventEmitter would throw and take the whole process down. The pool replaces it.
-    pool.on("error", (error) => console.error("[db] idle client error", error));
+    pool.on("error", (error) => logFailure("[db] idle client error", error));
     // A checked-out client (a transaction, the job runner's lock connection) has no pool listener;
     // its 'error' would be thrown as well. The failed query rejects normally, and pg-pool discards
     // the broken client when it is released.
-    pool.on("connect", (client) => client.on("error", (error) => console.error("[db] client error", error)));
+    pool.on("connect", (client) => client.on("error", (error) => logFailure("[db] client error", error)));
     return { db: drizzlePg(pool, { schema }), driver: "pg", pool, close: () => pool.end() };
   }
   // A production server without DATABASE_URL must not quietly open (or create) a local database file.

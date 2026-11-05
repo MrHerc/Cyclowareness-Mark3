@@ -1,4 +1,5 @@
 import { env } from "./env";
+import { log } from "./log";
 
 /**
  * Text messages (sign-in codes, SMS simulations). The provider is chosen by SMS_PROVIDER
@@ -20,7 +21,7 @@ export async function sendSms(to: string, text: string): Promise<SmsResult> {
   const provider = env.SMS_PROVIDER;
   if (!provider) {
     if (env.isProd) return { ok: false, error: "unavailable" };
-    console.info(`[sms:simulated] to=${to.replace(/\d(?=\d{4})/g, "•")} text="${text}"`);
+    log.info(`[sms:simulated] to=${to.replace(/\d(?=\d{4})/g, "•")} text="${text}"`);
     return { ok: true, simulated: true };
   }
   if (provider === "webhook" && env.SMS_WEBHOOK_URL) {

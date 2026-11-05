@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { log } from "./log";
 
 /**
  * Validated server configuration. Every variable is documented in `.env.example`.
@@ -97,17 +98,23 @@ if (data.NODE_ENV === "production" && !building) {
   const problem = appUrlProblem(blank(process.env.APP_URL) === undefined ? undefined : data.APP_URL, data.ALLOW_HTTP_APP_URL === "1");
   if (problem) throw new Error(`APP_URL ${problem}. It is the public address in every email, SMS, certificate, simulation and sign-in redirect.`);
   if (data.TRUST_PROXY === 0) {
-    console.warn(
+    log.warn(
       "[env] TRUST_PROXY=0: behind a reverse proxy client addresses are unknown, so the per-address sign-in lockout and audit IPs are off and the public demo form falls back to a per-email limit with a site-wide ceiling on the sales mail. Set TRUST_PROXY to the number of proxies in front.",
+    );
+  } else {
+    // A wrong hop count locks everyone out behind the proxy's address or lets clients pick their own: say what is trusted.
+    log.info(
+      `[env] TRUST_PROXY=${data.TRUST_PROXY}: the client address is ${data.CLIENT_IP_HEADER === "x-real-ip" ? "the X-Real-IP header" : `entry ${data.TRUST_PROXY} from the right of X-Forwarded-For`}. Check it with GET /api/health signed in as the platform operator (docs/OPERATIONS.md).`,
+      { trustProxy: data.TRUST_PROXY, clientIpHeader: data.CLIENT_IP_HEADER },
     );
   }
   if (data.SMS_WEBHOOK_URL?.startsWith("http://")) {
-    console.warn(
+    log.warn(
       "[env] SMS_WEBHOOK_URL uses plain http://: every sign-in code and SMS_WEBHOOK_TOKEN cross the network unencrypted. Use an https:// gateway address.",
     );
   }
   if (data.SALES_EMAIL && !data.PLATFORM_SMTP_HOST) {
-    console.warn("[env] SALES_EMAIL is set but PLATFORM_SMTP_HOST is not: demo requests are stored for the operator console but not emailed.");
+    log.warn("[env] SALES_EMAIL is set but PLATFORM_SMTP_HOST is not: demo requests are stored for the operator console but not emailed.");
   }
 }
 

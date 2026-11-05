@@ -2,6 +2,7 @@ import "server-only";
 import { and, eq, gt, isNull, ne, sql } from "drizzle-orm";
 import { db, dbHandle, t, type DB } from "./db";
 import { env } from "./env";
+import { log } from "./log";
 import { CONTENT_SYNC_LOCK_KEY, syncLibrary, syncPaths } from "./services/library";
 import { createTenantWithAdmin } from "./services/tenants";
 import { issueAccountLink } from "./auth/links";
@@ -46,7 +47,7 @@ async function ensureOperator(tx: DB, email: string): Promise<string | null> {
   const [existing] = await tx.select({ id: t.users.id, role: t.users.role, status: t.users.status }).from(t.users).where(eq(t.users.email, email));
   if (existing) {
     if (existing.role !== "super_admin") {
-      console.error(`[bootstrap] ${email} is an organisation account, not a platform operator; BOOTSTRAP_OPERATOR_EMAIL is ignored.`);
+      log.error(`[bootstrap] ${email} is an organisation account, not a platform operator; BOOTSTRAP_OPERATOR_EMAIL is ignored.`);
       return null;
     }
     return existing.status === "invited" ? existing.id : null;
@@ -57,7 +58,7 @@ async function ensureOperator(tx: DB, email: string): Promise<string | null> {
     .where(and(eq(t.users.role, "super_admin"), ne(t.users.status, "deleted")))
     .limit(1);
   if (operator) {
-    console.info("[bootstrap] a platform operator already exists; BOOTSTRAP_OPERATOR_EMAIL is not used.");
+    log.info("[bootstrap] a platform operator already exists; BOOTSTRAP_OPERATOR_EMAIL is not used.");
     return null;
   }
   // Greeted and audited under a name taken from the address ("safar.safarli@…" is Safar Safarli) until they change it in their profile.
@@ -83,7 +84,7 @@ async function ensureOperator(tx: DB, email: string): Promise<string | null> {
     }));
   }
   await audit(tx, { tenantId, actorId: null, action: "tenant.created", targetType: "tenant", targetId: tenantId, meta: { name: "Cyclowareness", by: "bootstrap", operator: email } });
-  console.info(`[bootstrap] platform operator ${email} created.`);
+  log.info(`[bootstrap] platform operator ${email} created.`);
   return adminId;
 }
 
@@ -92,7 +93,7 @@ export async function bootstrap(): Promise<void> {
   const pending = await locked(async (tx) => {
     const lib = await syncLibrary(tx);
     const paths = await syncPaths(tx);
-    console.info(`[bootstrap] library synced: ${lib.modules} modules, ${lib.lessons} lessons (texts: ${Object.entries(lib.locales).map(([l, n]) => `${l} ${n}`).join(", ")}), ${paths} paths.`);
+    log.info(`[bootstrap] library synced: ${lib.modules} modules, ${lib.lessons} lessons (texts: ${Object.entries(lib.locales).map(([l, n]) => `${l} ${n}`).join(", ")}), ${paths} paths.`);
     return email ? ensureOperator(tx, email) : null;
   });
   // After the commit: the link's token row refers to the operator created above.
@@ -103,10 +104,10 @@ export async function bootstrap(): Promise<void> {
       .where(and(eq(t.authTokens.userId, pending), eq(t.authTokens.kind, "invite"), isNull(t.authTokens.usedAt), gt(t.authTokens.expiresAt, new Date())))
       .limit(1);
     if (live) {
-      console.info(`[bootstrap] ${email}: the operator password is not set yet. Use the one-time link printed when it was issued; it works until ${live.expiresAt.toISOString()}, and a start after that prints a new one.`);
+      log.info(`[bootstrap] ${email}: the operator password is not set yet. Use the one-time link printed when it was issued; it works until ${live.expiresAt.toISOString()}, and a start after that prints a new one.`);
       return;
     }
     const link = await issueAccountLink(pending, "invite");
-    console.info(`[bootstrap] ${email}: set the operator password with this one-time link (valid 14 days, printed only this once, keep it private): ${link}`);
+    log.info(`[bootstrap] ${email}: set the operator password with this one-time link (valid 14 days, printed only this once, keep it private): ${link}`);
   }
 }

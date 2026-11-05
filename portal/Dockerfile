@@ -19,6 +19,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Windows checkouts may turn the entrypoint into CRLF, which /bin/sh cannot run.
 RUN sed -i 's/\r$//' scripts/docker-entrypoint.sh
+# Every lesson file and translation is checked here (schema, integrity, parity with English): a bad
+# file fails `docker build` instead of the start-up import of a running deployment.
+RUN npx tsx scripts/check-lesson-locales.ts --coverage
 RUN npm run build
 
 # 3. Runtime: the standalone server plus everything the app reads from disk at runtime

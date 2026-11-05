@@ -5,6 +5,7 @@ import { z } from "zod";
 import { db, t } from "./db";
 import { env } from "./env";
 import { sha256Hex } from "./crypto";
+import { log } from "./log";
 import { plain, type ChatArtifact, type Scene } from "@/lib/content/types";
 
 /**
@@ -217,11 +218,11 @@ export function translateOnce(id: string, lessonId: string, sourceLocale: string
   const job = cachedSubtitles(id, lines)
     .then((cached) => cached ?? translateSubtitles(id, lessonId, sourceLocale, target, lines))
     .then((translated) => {
-      if (!translated) console.warn(`[subtitles] no usable translation into ${target}`);
+      if (!translated) log.warn(`[subtitles] no usable translation into ${target}`);
       return translated;
     })
     .catch((e: unknown) => {
-      console.warn(`[subtitles] translation into ${target} failed: ${failure(e)}`);
+      log.warn(`[subtitles] translation into ${target} failed: ${failure(e)}`);
       return null;
     })
     .finally(() => running.delete(id));

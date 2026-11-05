@@ -498,3 +498,5 @@ These are open in the code at this commit. Most are also tracked in [`docs/build
 - **Narration.** No narration clips are generated yet. Lessons are read by the browser's speech engine.
 - **Unverified integrations.** Real SMTP, SMS, Anthropic and identity-provider integrations have not been tested against live accounts.
 - **Translation review.** Seven of the ten languages and the legal texts were translated and edited by AI agents. They still need native-speaker and legal review.
+- **Content import at start.** The production server imports the whole lesson library (about 1,060 files) on every start, so start-up time grows with the library. A broken lesson file or translation fails the image build (`scripts/check-lesson-locales.ts --coverage` in the Dockerfile builder stage) rather than the start of a deployment; content changes still need a new image.
+- **Observability.** Logs are JSON lines and `/api/health` reports the job runner and the delivery backlog, but there is no hosted error tracker, metrics or tracing, and request ids are not generated yet.

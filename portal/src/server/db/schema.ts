@@ -1044,6 +1044,13 @@ export const webhookDeliveries = pgTable(
   (t) => [index("deliveries_status_idx").on(t.status, t.createdAt), index("deliveries_tenant_idx").on(t.tenantId, t.createdAt)],
 );
 
+/** Heartbeat of the job runner: one row per job ("tick"), upserted at the end of each run; /api/health reports it stale. */
+export const jobTicks = pgTable("job_ticks", {
+  job: text("job").primaryKey(),
+  ranAt: ts("ran_at").notNull(),
+  durationMs: integer("duration_ms").notNull(),
+});
+
 export const tutorCache = pgTable("tutor_cache", {
   id: text("id").primaryKey(), // sha256 of locale, lesson, scene and the normalised question
   tenantId: tenantRef(),

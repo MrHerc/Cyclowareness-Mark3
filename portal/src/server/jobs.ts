@@ -12,6 +12,7 @@ import * as t from "./db/schema";
 import type { TenantSettings } from "./db/schema";
 import { logFailure } from "./db/errors";
 import { campaignTick, sendQueuedSms } from "./services/campaigns";
+import { advanceDrill } from "./services/drill";
 import { retryQueued, queueEmail, renderEmailHtml } from "./mail";
 import { decryptSecret, hmac } from "./crypto";
 import { guardedRequest, pinnedLookup, vetDestination } from "./net-guard";
@@ -42,6 +43,7 @@ const DELIVERY_BUDGET_MS = 20_000;
 const dueEnd = (due: string) => new Date(`${due}T23:59:59+04:00`);
 
 export async function runJobs(db: DB, now = new Date()): Promise<Record<string, number>> {
+  const started = Date.now();
   const out: Record<string, number> = {};
   const step = async (name: string, fn: () => Promise<number>) => {
     try {
@@ -52,6 +54,12 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
     }
   };
   await step("campaigns", async () => (await campaignTick(db), 0));
+  // A drill whose dashboard nobody has open still plays to its end (advanceDrill is lease-safe against open dashboards).
+  await step("drills", async () => {
+    const open = await db.select({ id: t.drillRuns.id, tenantId: t.drillRuns.tenantId }).from(t.drillRuns).where(isNull(t.drillRuns.finishedAt));
+    for (const d of open) await advanceDrill(db, d.tenantId, d.id, now);
+    return open.length;
+  });
   await step("mail", () => retryQueued(db, { budgetMs: DELIVERY_BUDGET_MS, now }));
   await step("sms", () => sendQueuedSms(db, { budgetMs: DELIVERY_BUDGET_MS, now }));
   await step("events", () => deliverEvents(db, now));
@@ -66,6 +74,11 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
     await step(`refreshers:${tenant.id}`, () => refreshers(db, tenant, now));
     await step(`reports:${tenant.id}`, () => scheduledReports(db, tenant, now));
   }
+  await step("tick", async () => {
+    const row = { ranAt: now, durationMs: Date.now() - started };
+    await db.insert(t.jobTicks).values({ job: "tick", ...row }).onConflictDoUpdate({ target: t.jobTicks.job, set: row });
+    return 1;
+  });
   return out;
 }
 
@@ -345,8 +358,9 @@ async function deleteInBatches(db: DB, table: PgTable, key: PgColumn, where: Ret
 /**
  * Once a day per process: sign-in attempts past every lockout window, ended rate-limit windows,
  * expired sessions and sign-in links, watermark codes of ended sessions after 90 days, delivered or
- * finished mail and integration deliveries after 90 days, and read notifications after 400 days
- * (the reminder history needs a year).
+ * finished mail and integration deliveries after 90 days, read notifications after 400 days
+ * (the reminder history needs a year), cached tutor answers after a year, and demo requests after
+ * 24 months (the privacy policy's promise).
  */
 async function cleanup(db: DB, now: Date): Promise<number> {
   const day = dayKey(now);
@@ -370,6 +384,8 @@ async function cleanup(db: DB, now: Date): Promise<number> {
   total += await deleteInBatches(db, t.outbox, t.outbox.id, and(inArray(t.outbox.status, ["sent", "logged", "failed"]), lt(t.outbox.createdAt, ago(90 * DAY))), deadline);
   total += await deleteInBatches(db, t.webhookDeliveries, t.webhookDeliveries.id, and(inArray(t.webhookDeliveries.status, ["delivered", "failed"]), lt(t.webhookDeliveries.createdAt, ago(90 * DAY))), deadline);
   total += await deleteInBatches(db, t.notifications, t.notifications.id, and(isNotNull(t.notifications.readAt), lt(t.notifications.createdAt, ago(400 * DAY))), deadline);
+  total += await deleteInBatches(db, t.tutorCache, t.tutorCache.id, and(lt(t.tutorCache.createdAt, ago(365 * DAY))), deadline);
+  total += await deleteInBatches(db, t.demoRequests, t.demoRequests.id, and(lt(t.demoRequests.createdAt, ago(730 * DAY))), deadline);
   // Done for today only when everything fit in the time budget; otherwise the next tick continues.
   if (Date.now() <= deadline) globalThis.__jobsCleanupDay = day;
   return total;

@@ -75,7 +75,7 @@ A malformed or `null` Origin is refused with `403`.
 
 | Method | Path | Access | Returns |
 |---|---|---|---|
-| GET | `/api/health` | Public | `ok` or `unavailable` |
+| GET | `/api/health` | Public (client address: platform operator) | JSON: database, job runner, delivery backlog |
 | GET | `/api/assets/{id}` | Public | Organisation logo image |
 | GET | `/api/qr/{token}` | Public, token | QR code PNG for a simulation |
 | GET | `/api/t/{token}/open` | Public, token | 1×1 GIF, records an open |
@@ -97,14 +97,16 @@ A malformed or `null` Origin is refused with `403`.
 
 ### GET /api/health
 
-Liveness and readiness check for the container health check and load balancers. The server runs `select 1` against the database, with a 3-second timeout.
+Liveness and readiness check for the container health check, load balancers and an external uptime monitor. The server runs `select 1` against the database, then reads the job runner's heartbeat and the delivery queues, all within a 3-second timeout. `Cache-Control: no-store`.
 
 | Status | Body |
 |---|---|
-| `200` | `ok` |
-| `503` | `unavailable` |
+| `200` | `{"db":"ok","jobs":{"lastTickAt":"2026-11-05T10:00:00.000Z","stale":false},"backlog":{"mail":0,"webhooks":0}}` |
+| `503` | `{"db":"unavailable"}`: the database did not answer within 3 seconds, or a query failed |
 
-The answer contains no other detail, because the endpoint is public.
+- **`jobs.lastTickAt`** is the start time of the last job-runner tick that ran to its end (table `job_ticks`), or `null` before the first one. **`jobs.stale`** is `true` when there is none or it is older than 5 minutes; ticks run every minute. A stale runner keeps the status at 200, so the container healthcheck never restarts a web server because the worker is down: a monitor alerts on the field instead.
+- **`backlog.mail`** counts outbox messages with status `queued` (waiting for their first attempt or a retry). **`backlog.webhooks`** counts queued webhook and syslog deliveries. Both are usually 0. A number that keeps growing means a mail server, a receiver or the runner is down.
+- **`client`** is added only for a signed-in platform operator who has two-step verification: `{"address": "<the client address the server derives>", "forwardedFor": "<raw X-Forwarded-For>", "realIp": "<raw X-Real-IP>", "trustProxy": <TRUST_PROXY>}`. Operators use it to check `TRUST_PROXY` ([`OPERATIONS.md`](OPERATIONS.md)). Other callers never see request details.
 
 ### GET /api/assets/{id}
 
