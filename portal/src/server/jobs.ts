@@ -57,7 +57,14 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
   // A drill whose dashboard nobody has open still plays to its end (advanceDrill is lease-safe against open dashboards).
   await step("drills", async () => {
     const open = await db.select({ id: t.drillRuns.id, tenantId: t.drillRuns.tenantId }).from(t.drillRuns).where(isNull(t.drillRuns.finishedAt));
-    for (const d of open) await advanceDrill(db, d.tenantId, d.id, now);
+    for (const d of open) {
+      // One drill that throws must not hold up the others on every tick.
+      try {
+        await advanceDrill(db, d.tenantId, d.id, now);
+      } catch (error) {
+        logFailure("[jobs] drill failed", error, { tenantId: d.tenantId, drillId: d.id });
+      }
+    }
     return open.length;
   });
   await step("mail", () => retryQueued(db, { budgetMs: DELIVERY_BUDGET_MS, now }));

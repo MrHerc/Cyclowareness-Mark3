@@ -1,7 +1,7 @@
 #!/bin/sh
 # Nightly PostgreSQL dump of the compose stack (custom format, for pg_restore), then pruning.
 # Run from the portal folder (where docker-compose.yml is), for example from cron:
-#   15 2 * * * cd /srv/portal && sh scripts/backup.sh >> backups/backup.log 2>&1
+#   15 2 * * * cd /srv/portal && mkdir -p backups && sh scripts/backup.sh >> backups/backup.log 2>&1
 # BACKUP_DIR (default ./backups) and BACKUP_KEEP_DAYS (default 14) change where and how long.
 # Copy the dumps off this host, together with APP_SECRET from .env: without it the stored
 # secrets (SMTP, SSO, webhook secrets, authenticator keys) in a restored database are unreadable.
@@ -12,7 +12,10 @@ keep="${BACKUP_KEEP_DAYS:-14}"
 mkdir -p "$dir"
 file="$dir/portal-$(date -u +%Y%m%d-%H%M%S).dump"
 
-# Written under a temporary name, so a failed or interrupted dump never looks like a good one.
+# Written under a temporary name, so a failed or interrupted dump never looks like a good one,
+# and removed on failure, so partial dumps neither pile up nor get copied off the host.
+trap 'rm -f "$file.part"' EXIT
+trap 'exit 1' INT TERM
 docker compose exec -T db pg_dump -U portal -d portal -Fc > "$file.part"
 mv "$file.part" "$file"
 echo "backup: $file ($(wc -c < "$file") bytes)"

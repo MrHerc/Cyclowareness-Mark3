@@ -9,8 +9,8 @@ import { clientIpFrom } from "@/server/request";
  * Liveness and readiness for the container healthcheck and load balancers: 200 when the server can
  * run a query, 503 otherwise. The JSON body adds what an uptime monitor alerts on: when the job runner
  * last finished a tick (stale after 5 minutes) and how much mail and webhook delivery is waiting. A
- * stopped job runner does not turn the answer into 503, so the healthcheck never restarts a server
- * for it. The signed-in platform operator also sees the client address the server derives, to check
+ * stopped job runner does not turn the answer into 503, so the healthcheck never marks a web server
+ * unhealthy for it. The signed-in platform operator also sees the client address the server derives, to check
  * TRUST_PROXY (docs/OPERATIONS.md).
  */
 export const dynamic = "force-dynamic";

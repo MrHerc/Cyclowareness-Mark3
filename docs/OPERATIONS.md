@@ -29,7 +29,10 @@ are told the response times above, not 24/7 cover.
 - **Logs.** `docker compose logs app` (and `worker`). In production every line is one JSON object with
   `ts`, `level`, `msg` and, where known, `tenantId` and `userId`; ship them to a log store if the host
   offers one and alert on `"level":"error"`.
-- **Container restarts.** The Docker healthcheck restarts the app when `/api/health` answers 503.
+- **Unhealthy container.** When `/api/health` answers 503 the Docker healthcheck marks the container
+  unhealthy, which a load balancer or the uptime monitor sees. Docker and compose do not restart it for
+  that (`restart: unless-stopped` acts only when the process exits): restart it by hand
+  (`docker compose restart app`), or let an orchestrator or an autoheal container do it.
   A container that exits at start has a failed migration or start-up import: `docker compose logs app`.
 - **Audit log.** Every organisation's administrators see their audit log in the console; the operator
   checks it after any security incident.
@@ -93,13 +96,14 @@ sends something nobody meant to send (a simulation to the wrong people, a wrong 
 
 - **Nightly dump.** From the `portal` folder: `sh scripts/backup.sh` writes
   `backups/portal-<UTC time>.dump` (`pg_dump -Fc`) and deletes dumps older than `BACKUP_KEEP_DAYS`
-  (14). Cron: `15 2 * * * cd /srv/portal && sh scripts/backup.sh >> backups/backup.log 2>&1`.
+  (14). Cron: `15 2 * * * cd /srv/portal && mkdir -p backups && sh scripts/backup.sh >> backups/backup.log 2>&1`.
 - **Off-host copy.** Copy `backups/` every day to `<storage account at another provider>`. Keep
   `APP_SECRET` (from `.env`) in `<password manager / sealed escrow>`, apart from the dumps: a dump is
   useless without it, and it must not travel with them.
 - **Restore.** `sh scripts/restore.sh backups/<file>.dump`: asks for confirmation, stops `app` and
-  `worker`, replaces every table in one transaction (a failed restore changes nothing) and starts
-  `app`. `.env` must hold the `APP_SECRET` that was in use when the dump was made.
+  `worker`, empties the database and loads the dump in one transaction (a failed restore changes
+  nothing; tables from migrations newer than the dump are dropped, so the next start re-applies them)
+  and starts `app`. `.env` must hold the `APP_SECRET` that was in use when the dump was made.
 - **Quarterly restore drill.** Restore the latest dump into a throwaway stack (another folder, another
   `POSTGRES_PASSWORD`), sign in, open one organisation's dashboard, and note the time it took.
 - **Objectives.** RPO 24 hours (nightly dumps). RTO: the restore time measured in the first drill,
@@ -116,17 +120,19 @@ further left was sent by the client and can be anything.
 - `1`: one proxy on the same host (nginx, Caddy, Traefik), the compose default.
 - `2`: a load balancer or CDN in front of that proxy, and so on.
 
-Too low a value makes the server take an address the client chose, so an attacker can sidestep the
-lockout and the rate limits. Too high a value makes every visitor look like the proxy's address, so
-one person's failed sign-ins can lock everyone out. The server logs the value it uses at start
+Too low a value makes every visitor look like the nearest outer proxy's address, so they all share
+one lockout and one person's failed sign-ins can lock everyone out. Too high a value makes the server
+take an entry the client sent, so an attacker can choose the address and sidestep the lockout and the
+rate limits. With `CLIENT_IP_HEADER=x-real-ip` the address is that header, which the proxy next to the server
+must overwrite with the peer it saw; `TRUST_PROXY` then only has to be at least `1`. The server logs the value it uses at start
 (`[env] TRUST_PROXY=…`).
 
 **Validate it once per deployment** and after any change in front of the server: sign in as the
 platform operator from a known network, open `https://<host>/api/health` in the same browser and
 compare `client.address` with your public address (for example from `<what-is-my-ip service>`).
 `client.forwardedFor` shows the raw header: with the right value, `address` is your address and
-everything to its right is your proxies. If `address` is a proxy's address, `TRUST_PROXY` is too high;
-if it is something you could have sent yourself, it is too low. Only a signed-in platform operator sees
+everything to its right is your proxies. If `address` is a proxy's address, `TRUST_PROXY` is too low:
+raise it; if it is something you could have sent yourself, it is too high: lower it. Only a signed-in platform operator sees
 the `client` field.
 
 ## Quarterly access review
