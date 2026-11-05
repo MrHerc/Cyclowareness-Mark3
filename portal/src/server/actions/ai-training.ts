@@ -8,7 +8,7 @@ import { db, t } from "../db";
 import { actionViewer } from "../auth/viewer";
 import { audit } from "../services/audit";
 import { aiEnabled, anthropicTrainingModel } from "../ai";
-import { generateVerified, matchLibrary, schemaCheck, safetyIssues, TRAINING_LOCALES, verifyDraft, type TrainingDraft, type Verification } from "../ai-verify";
+import { draftWithinLimit, generateVerified, matchLibrary, schemaCheck, safetyIssues, TRAINING_LOCALES, verifyDraft, type TrainingDraft, type Verification } from "../ai-verify";
 import { rateLimit } from "../rate-limit";
 import { AUDIENCES, CATEGORIES } from "../../lib/domain/catalog";
 import { sharedContentLocale } from "../../lib/content/lesson-locale";
@@ -93,7 +93,7 @@ export async function libraryTrainingAction(input: TrainingInput): Promise<Train
 }
 
 const saveSchema = z.object({
-  draft: z.unknown(),
+  draft: z.unknown().refine(draftWithinLimit),
   /** The language of the draft's text (titles and scenes alike): the chosen one, or English for a library draft without that translation. */
   contentLocale: z.enum(TRAINING_LOCALES),
   category: z.enum(CATEGORIES),

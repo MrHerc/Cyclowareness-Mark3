@@ -237,3 +237,15 @@ describe("library fallback matcher", () => {
     expect(matchLibrary("quantum chromodynamics", modules, "en")).toBeNull();
   });
 });
+
+describe("draftWithinLimit", () => {
+  it("accepts a real draft and refuses one padded past the limit or one that cannot be serialised", async () => {
+    const { DRAFT_MAX_CHARS, draftWithinLimit } = await import("../src/server/ai-verify");
+    expect(draftWithinLimit(good())).toBe(true);
+    expect(draftWithinLimit({ ...good(), extra: "x".repeat(DRAFT_MAX_CHARS) })).toBe(false);
+    const cyclic: Record<string, unknown> = { ...good() };
+    cyclic.self = cyclic;
+    expect(draftWithinLimit(cyclic)).toBe(false);
+    expect(draftWithinLimit(undefined)).toBe(true);
+  });
+});

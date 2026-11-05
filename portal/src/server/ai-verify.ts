@@ -107,6 +107,21 @@ function integrityIssue(lesson: LessonFile, li: number, e: string): Issue {
   return { severity: "blocking", message: e, where: `lessons.${li}`, code: "structure" };
 }
 
+/**
+ * A saved draft is stored as is and sent to every learner who opens it. The largest library lesson is about 32 KB of
+ * JSON, so a whole draft above this is not a training but extra data riding along (the lesson schema lets unknown keys through).
+ */
+export const DRAFT_MAX_CHARS = 512 * 1024;
+
+/** Whether the client's draft serialises to at most DRAFT_MAX_CHARS (a value that cannot be serialised is refused). */
+export function draftWithinLimit(draft: unknown): boolean {
+  try {
+    return (JSON.stringify(draft ?? null)?.length ?? 0) <= DRAFT_MAX_CHARS;
+  } catch {
+    return false;
+  }
+}
+
 export function schemaCheck(raw: unknown): { draft: TrainingDraft | null; issues: Issue[] } {
   const p = trainingDraftSchema.safeParse(raw);
   if (!p.success) {
