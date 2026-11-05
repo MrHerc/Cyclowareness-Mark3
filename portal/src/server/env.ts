@@ -51,8 +51,6 @@ const schema = z
     SMS_PROVIDER: z.preprocess(blank, z.enum(["webhook"]).optional()),
     SMS_WEBHOOK_URL: z.preprocess(blank, z.url().optional()),
     SMS_WEBHOOK_TOKEN: z.preprocess(blank, z.string().optional()),
-    /** Voice-call simulations need a provider; without one, voice campaigns cannot launch in production. */
-    VOICE_PROVIDER: z.preprocess(blank, z.string().optional()),
     /** First start of an empty installation: creates the platform operator (invited) and prints a one-time invitation link. */
     BOOTSTRAP_OPERATOR_EMAIL: z.preprocess(blank, z.email().optional()),
     /** Strict-Transport-Security extras; only for organisations that want every subdomain on HTTPS (and preload listing). */

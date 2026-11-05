@@ -40,7 +40,8 @@ export async function launchBlocker(db: DB, tenantId: string, channel: CampaignT
     if (prod && !(tenant && withDefaults(tenant.settings).email.enabled)) return "mail";
   }
   if (channel === "sms" && !smsAvailable()) return "sms";
-  if (channel === "voice" && prod && !env.VOICE_PROVIDER) return "voice";
+  // No telephony adapter exists: a voice launch would record calls as sent that were never placed.
+  if (channel === "voice") return "voice";
   return null;
 }
 

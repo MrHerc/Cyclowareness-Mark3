@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useClientFormat } from "@/lib/client-format";
-import { Building2, Calendar, Check, Clock, Globe, Mail, MessageSquare, Phone, Usb } from "lucide-react";
+import { Building2, Calendar, Check, Clock, Globe, Mail, MessageSquare, Usb } from "lucide-react";
 import { saveCampaignAction } from "@/server/actions/campaigns";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
@@ -18,7 +18,6 @@ import { bakuParts, fromBakuParts } from "@/lib/baku-clock";
 const CHANNELS: { key: Channel; icon: typeof Mail }[] = [
   { key: "email", icon: Mail },
   { key: "sms", icon: MessageSquare },
-  { key: "voice", icon: Phone },
   { key: "usb", icon: Usb },
 ];
 
@@ -47,7 +46,8 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
   const [name, setName] = useState(initial?.name ?? "");
   const [pending, start] = useTransition();
   // QR traps only on a plan with the qr_trap feature (the server refuses them otherwise).
-  const offered = useMemo(() => TEMPLATES.filter((x) => qrTrap || !x.qr), [qrTrap]);
+  // Voice templates stay defined but are not offered: no telephony adapter places calls (launchBlocker refuses them).
+  const offered = useMemo(() => TEMPLATES.filter((x) => x.channel !== "voice" && (qrTrap || !x.qr)), [qrTrap]);
   const templates = useMemo(() => offered.filter((x) => x.channel === channel), [offered, channel]);
   const tpl = TEMPLATES.find((x) => x.key === templateKey) ?? null;
   const dept = departments.find((d) => d.id === departmentId);
@@ -82,7 +82,7 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
           <h2 className="text-title font-bold">{tw("q1")}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {CHANNELS.map(({ key, icon: Icon }) => {
-              const disabled = (key === "sms" || key === "voice") && !smsVoice;
+              const disabled = key === "sms" && !smsVoice;
               return (
                 <button key={key} type="button" className={card(channel === key, disabled)} onClick={() => (setChannel(key), setTemplateKey(null))}>
                   <span className="grid size-11 shrink-0 place-items-center rounded-md bg-brand-50 text-brand-600">

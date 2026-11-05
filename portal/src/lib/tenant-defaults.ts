@@ -285,7 +285,7 @@ export function withDefaults(raw: unknown): TenantSettings {
 /** Plans (docs/business pricing): each adds to the one before. */
 export const PLAN_FEATURES = {
   essentials: ["learning", "league", "certificates", "policies", "campaigns", "reports", "lab", "paths", "support", "feedback", "live_sessions"],
-  professional: ["ai_tutor", "tutor_voice", "sms_voice", "qr_trap", "sandbox", "threat_intake", "incidents", "risk_profiles", "sso", "ldap", "integrations", "compliance_pack", "studio"],
+  professional: ["ai_tutor", "tutor_voice", "sms_voice", "qr_trap", "sandbox", "threat_intake", "incidents", "risk_profiles", "sso", "integrations", "compliance_pack", "studio"],
   enterprise_hrm: ["closed_loops", "approvals", "threat_intel", "policy_intel", "leadership", "ops_center"],
 } as const;
 export type Feature =

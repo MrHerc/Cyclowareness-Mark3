@@ -6,7 +6,8 @@ import { and, eq, gte, inArray, isNotNull, ne, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { resolveAssignments } from "./assignments";
-import { riskScore, type RiskBreakdown, type Severity } from "../../lib/domain/risk";
+import { emitEvent } from "./events";
+import { riskBand, riskScore, type RiskBreakdown, type Severity } from "../../lib/domain/risk";
 import { dayKey } from "../../lib/domain/gamification";
 
 const DAY = 86_400_000;
@@ -117,8 +118,14 @@ export async function computeTenantRisk(db: DB, tenantId: string, now = new Date
 /** Persists fresh scores. Call after any event that can move a score. */
 export async function recomputeRisk(db: DB, tenantId: string, userIds?: string[], now = new Date()): Promise<RiskEvidence> {
   const evidence = await computeTenantRisk(db, tenantId, now, userIds);
+  const ids = [...evidence.keys()];
+  const before = new Map(ids.length ? (await db.select({ id: t.users.id, score: t.users.riskScore }).from(t.users).where(inArray(t.users.id, ids))).map((u) => [u.id, u.score]) : []);
   for (const [userId, b] of evidence) {
     await db.update(t.users).set({ riskScore: b.score }).where(eq(t.users.id, userId));
+    // Comparing with the stored score gives one event per rise into the high band, none while it stays there.
+    if (riskBand(before.get(userId) ?? 0) !== "high" && riskBand(b.score) === "high") {
+      await emitEvent(db, tenantId, "risk.threshold_crossed", { userId, score: b.score, band: "high" });
+    }
   }
   return evidence;
 }
