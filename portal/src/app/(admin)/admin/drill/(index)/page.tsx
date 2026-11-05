@@ -22,7 +22,7 @@ export default async function DrillIndexPage() {
   const v = await requirePermission("campaigns.write");
   if (!hasFeature(v, "live_drill")) notFound();
   const locale = await getLocale();
-  const [tr, tc, format] = await Promise.all([getTranslations("admin.drill"), getTranslations("common"), getFormatter()]);
+  const [tr, tc, tcmp, format] = await Promise.all([getTranslations("admin.drill"), getTranslations("common"), getTranslations("admin.campaigns"), getFormatter()]);
   const [departments, [everyone], history] = await Promise.all([
     db().select({ id: t.departments.id, name: t.departments.name, parentId: t.departments.parentId }).from(t.departments).where(eq(t.departments.tenantId, v.tenant.id)).orderBy(t.departments.name),
     db()
@@ -82,7 +82,7 @@ export default async function DrillIndexPage() {
                     <span className="text-caption text-ink-muted tabular-nums">
                       {tr("historyResult", { clicked: `${format.number(h.totals.clicked)} (${tc("units.percent", { value: format.number(percent(h.totals.clicked, h.totals.delivered)) })})`, reported: format.number(h.totals.reported), trained: format.number(h.totals.trained) })}
                     </span>
-                    <Pill tone={h.finished ? "safe" : "risk"}>{h.finished ? tr("finished") : tr("live")}</Pill>
+                    {h.cancelled ? <Pill>{tcmp("status.cancelled")}</Pill> : <Pill tone={h.finished ? "safe" : "risk"}>{h.finished ? tr("finished") : tr("live")}</Pill>}
                     <ChevronRight aria-hidden className="size-4 text-ink-subtle rtl:rotate-180" />
                   </Link>
                 </li>

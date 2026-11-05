@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition, type ComponentType } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, FastForward, GraduationCap, KeyRound, Mail, MailOpen, Megaphone, MessageSquareText, MousePointerClick, RotateCcw, ShieldCheck, Sparkles, Timer, TrendingDown, TrendingUp, Users, Zap } from "lucide-react";
 import type { DrillFeedItem, DrillView } from "@/server/services/drill";
@@ -17,7 +18,7 @@ import { cn } from "@/lib/cn";
 
 const POLL_MS = 1_000;
 
-type SelKey = "waiting" | DrillFeedItem["kind"] | "finished";
+type SelKey = "waiting" | DrillFeedItem["kind"] | "finished" | "cancelled";
 
 /** AI Sel reacts to the latest thing that happened. */
 const SEL: Record<SelKey, { mood: MascotMood; gesture: MascotGesture }> = {
@@ -27,6 +28,7 @@ const SEL: Record<SelKey, { mood: MascotMood; gesture: MascotGesture }> = {
   report: { mood: "happy", gesture: "cheer" },
   train: { mood: "proud", gesture: "nod" },
   finished: { mood: "celebrate", gesture: "hop" },
+  cancelled: { mood: "think", gesture: "shrug" },
 };
 
 const TILE: Record<DrillView["people"][number]["outcome"], string> = {
@@ -39,6 +41,14 @@ const TILE: Record<DrillView["people"][number]["outcome"], string> = {
 };
 
 const FEED_ICON = { click: MousePointerClick, submit: KeyRound, report: Megaphone, train: GraduationCap } as const;
+
+/** A glyph per outcome on the person tiles and in their legend, so the state never rests on colour alone. */
+const OUTCOME_ICON: Partial<Record<DrillView["people"][number]["outcome"], ComponentType<{ className?: string }>>> = {
+  opened: MailOpen,
+  clicked: MousePointerClick,
+  submitted: KeyRound,
+  reported: Megaphone,
+};
 const FEED_TONE = { click: "bg-warn-50 text-warn-700", submit: "bg-risk-50 text-risk-600", report: "bg-safe-50 text-safe-600", train: "bg-brand-50 text-brand-600" } as const;
 
 export function LiveDrill({ initial, canLeadership }: { initial: DrillView; canLeadership: boolean }) {
@@ -49,6 +59,7 @@ export function LiveDrill({ initial, canLeadership }: { initial: DrillView; canL
   const [offline, setOffline] = useState(false);
   const [elapsed, setElapsed] = useState(initial.elapsedMs);
   const [pending, start] = useTransition();
+  const router = useRouter();
   // Where the server's clock was at the last answer, against this tab's clock, so the dial keeps moving between polls.
   const anchor = useRef<{ server: number; local: number } | null>(null);
   const finished = view.status === "finished";
@@ -60,6 +71,11 @@ export function LiveDrill({ initial, canLeadership }: { initial: DrillView; canL
     const poll = async () => {
       try {
         const res = await fetch(`/api/admin/drill/${view.id}`, { cache: "no-store", headers: { accept: "application/json" } });
+        // Signed out, no longer allowed, or the drill is gone: stop and let the page's own checks decide (sign-in, 404).
+        if (res.status === 401 || res.status === 403 || res.status === 404) {
+          if (!stopped) router.refresh();
+          return;
+        }
         if (!res.ok) throw new Error(String(res.status));
         const next = (await res.json()) as DrillView;
         if (stopped) return;
@@ -77,7 +93,7 @@ export function LiveDrill({ initial, canLeadership }: { initial: DrillView; canL
       stopped = true;
       clearTimeout(timer);
     };
-  }, [view.id, finished]);
+  }, [view.id, finished, router]);
 
   useEffect(() => {
     if (finished) return;
@@ -91,14 +107,15 @@ export function LiveDrill({ initial, canLeadership }: { initial: DrillView; canL
 
   const sim = finished ? view.simNow : Math.max(view.simNow, msToSim(elapsed, view.durationMs, view.simMinutes));
   const latest = view.feed[0];
-  const selKey: SelKey = finished ? "finished" : (latest?.kind ?? "waiting");
+  const selKey: SelKey = view.cancelled ? "cancelled" : finished ? "finished" : (latest?.kind ?? "waiting");
   const pct = (n: number) => tc("units.percent", { value: format.number(n) });
   const totals = view.totals;
 
   const skip = () =>
     start(async () => {
-      await skipDrillAction(view.id);
+      // A failure (network, server) keeps the dashboard: the polling loop carries on from where the drill is.
       try {
+        await skipDrillAction(view.id);
         const res = await fetch(`/api/admin/drill/${view.id}`, { cache: "no-store" });
         if (res.ok) setView((await res.json()) as DrillView);
       } catch {
@@ -194,7 +211,7 @@ function Hero({ view, sim, finished, offline, pending, onSkip }: { view: DrillVi
             {t("clockValue", { hours, minutes })}
             <span className="ms-2 text-body-sm font-semibold text-ink-subtle">{t("clockOf", { hours: view.simMinutes / 60 })}</span>
           </p>
-          <ProgressBar value={(sim / view.simMinutes) * 100} tone={finished ? "safe" : "brand"} shimmer={!finished} decorative />
+          <ProgressBar value={(sim / view.simMinutes) * 100} tone={finished && !view.cancelled ? "safe" : "brand"} shimmer={!finished} decorative />
           <div className="mt-2 flex flex-wrap gap-2">
             {!finished ? (
               <Button size="sm" variant="secondary" icon={<FastForward />} disabled={pending} onClick={onSkip}>
@@ -313,6 +330,16 @@ function Funnel({ view, pct }: { view: DrillView; pct: (n: number) => string }) 
   );
 }
 
+function OutcomeGlyph({ outcome, className }: { outcome: DrillView["people"][number]["outcome"]; className?: string }) {
+  const Icon = OUTCOME_ICON[outcome];
+  if (!Icon) return null;
+  return (
+    <span aria-hidden className={cn("grid size-4 shrink-0 place-items-center rounded-full bg-surface text-ink shadow-xs ring-1 ring-line", className)}>
+      <Icon className="size-2.5" />
+    </span>
+  );
+}
+
 function People({ view }: { view: DrillView }) {
   const t = useTranslations("admin.drill");
   const format = useClientFormat();
@@ -348,6 +375,7 @@ function People({ view }: { view: DrillView }) {
                   >
                     <span aria-hidden>{p.initials}</span>
                     <span className="sr-only">{t("personState", { name: p.name, state: stateOf(p) })}</span>
+                    <OutcomeGlyph outcome={p.outcome} className="absolute -end-1.5 -bottom-1.5" />
                     {p.trained ? (
                       <span aria-hidden className="absolute -end-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-safe-600 text-white ring-2 ring-surface motion-ok:animate-reveal">
                         <Check className="size-3" />
@@ -369,12 +397,16 @@ function People({ view }: { view: DrillView }) {
             .map((o) => (
               <li key={o} className="flex items-center gap-1.5">
                 <span aria-hidden className={cn("size-3 rounded-[0.25rem]", TILE[o])} />
-                {t(`states.${o}`)}
+                  <OutcomeGlyph outcome={o} className="-ms-1" />
+                  {t(`states.${o}`)}
               </li>
             ))}
           <li className="flex items-center gap-1.5">
             <span aria-hidden className="size-3 rounded-[0.25rem] bg-sunken ring-2 ring-safe-500 ring-offset-1 ring-offset-surface" />
-            {t("states.trained")}
+              <span aria-hidden className="-ms-1 grid size-4 place-items-center rounded-full bg-safe-600 text-white">
+                <Check className="size-2.5" />
+              </span>
+              {t("states.trained")}
           </li>
         </ul>
       </CardBody>
@@ -388,24 +420,22 @@ function Feed({ view }: { view: DrillView }) {
     <Card>
       <CardHeader title={t("feedTitle")} icon={<Zap />} />
       <CardBody className="pt-3">
-        {view.feed.length ? (
-          <ol role="log" aria-live="polite" aria-relevant="additions" className="grid gap-1">
-            {view.feed.map((e) => {
-              const Icon = FEED_ICON[e.kind];
-              return (
-                <li key={e.n} className="flex gap-3 rounded-md py-2 motion-ok:animate-reveal">
-                  <span className={cn("grid size-8 shrink-0 place-items-center rounded-full [&_svg]:size-4", FEED_TONE[e.kind])}>
-                    <Icon aria-hidden />
-                  </span>
-                  <span className="min-w-0 flex-1 text-caption text-ink">{t(`feed.${e.kind}`, { name: e.name, module: view.template.moduleTitle ?? "" })}</span>
-                  <span className="shrink-0 text-tab text-ink-subtle tabular-nums">{t("feedTime", { minutes: Math.max(1, Math.round(e.sim)) })}</span>
-                </li>
-              );
-            })}
-          </ol>
-        ) : (
-          <p className="text-body-sm text-ink-muted">{t("feedEmpty")}</p>
-        )}
+        {/* The live region is there from the start: content inserted together with a new region is not announced. */}
+        <ol role="log" aria-live="polite" aria-relevant="additions" className="grid gap-1">
+          {view.feed.map((e) => {
+            const Icon = FEED_ICON[e.kind];
+            return (
+              <li key={e.n} className="flex gap-3 rounded-md py-2 motion-ok:animate-reveal">
+                <span className={cn("grid size-8 shrink-0 place-items-center rounded-full [&_svg]:size-4", FEED_TONE[e.kind])}>
+                  <Icon aria-hidden />
+                </span>
+                <span className="min-w-0 flex-1 text-caption text-ink">{t(`feed.${e.kind}`, { name: e.name, module: view.template.moduleTitle ?? "" })}</span>
+                <span className="shrink-0 text-tab text-ink-subtle tabular-nums">{t("feedTime", { minutes: Math.max(1, Math.round(e.sim)) })}</span>
+              </li>
+            );
+          })}
+        </ol>
+        {view.feed.length ? null : <p className="text-body-sm text-ink-muted">{t("feedEmpty")}</p>}
       </CardBody>
     </Card>
   );

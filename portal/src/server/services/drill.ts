@@ -226,6 +226,9 @@ export async function advanceDrill(db: DB, tenantId: string, drillId: string, no
       // Whether this request still holds the drill: each step is recorded with a compare-and-set, and a request
       // that stalled past its lease (another one took over) stops instead of applying the same steps again.
       let held = true;
+      // Points for the risk curve: one after every step that can move a score, when the average actually moved.
+      const points: { sim: number; risk: number }[] = [];
+      let lastRisk = run.riskTrail.at(-1)?.risk ?? run.baseline.avgRisk;
       try {
         while (applied < due) {
           const e = run.events[applied];
@@ -245,14 +248,18 @@ export async function advanceDrill(db: DB, tenantId: string, drillId: string, no
             break;
           }
           applied++;
+          if (e.kind !== "deliver" && e.kind !== "open") {
+            const risk = await audienceRisk(db, run);
+            if (risk !== lastRisk) points.push({ sim: e.sim, risk });
+            lastRisk = risk;
+          }
         }
-        // One point on the risk curve per batch: clicks push it up, reports and finished trainings pull it down.
-        const last = held ? run.events[applied - 1] : undefined;
-        if (last) {
-          const point = { sim: last.sim, risk: await audienceRisk(db, run) };
+        // Clicks and passwords push the curve up, reports and finished trainings pull it down. Written per batch, so
+        // "Skip to the end" (one batch) keeps the curve's shape.
+        if (held && points.length) {
           await db
             .update(t.drillRuns)
-            .set({ riskTrail: sql`${t.drillRuns.riskTrail} || ${JSON.stringify([point])}::jsonb` })
+            .set({ riskTrail: sql`${t.drillRuns.riskTrail} || ${JSON.stringify(points)}::jsonb` })
             .where(eq(t.drillRuns.id, run.id));
         }
       } finally {
@@ -404,13 +411,19 @@ export async function drillById(db: DB, tenantId: string, id: string): Promise<R
 
 /** The organisation's recent drills, newest first, with their outcome so far. */
 export async function drillHistory(db: DB, tenantId: string, locale: string, limit = 8) {
-  const runs = await db.select().from(t.drillRuns).where(eq(t.drillRuns.tenantId, tenantId)).orderBy(desc(t.drillRuns.createdAt)).limit(limit);
-  return runs.map((run) => {
+  const rows = await db
+    .select({ run: t.drillRuns, status: t.campaigns.status })
+    .from(t.drillRuns)
+    .innerJoin(t.campaigns, eq(t.campaigns.id, t.drillRuns.campaignId))
+    .where(eq(t.drillRuns.tenantId, tenantId))
+    .orderBy(desc(t.drillRuns.createdAt))
+    .limit(limit);
+  return rows.map(({ run, status }) => {
     const tpl = TEMPLATE_BY_KEY.get(run.templateKey);
     const ids = [...new Set(run.events.map((e) => e.recipientId))];
     const audience = Object.keys(run.baseline.scores).length;
     const { totals } = drillProgress(run.events, run.appliedUntil, ids);
     // createdAt, not startedAt: "Skip to the end" moves startedAt back so every step falls due.
-    return { id: run.id, campaignId: run.campaignId, name: tpl ? templateText(tpl.name, locale) : run.templateKey, startedAt: run.createdAt, finished: !!run.finishedAt, audience, totals };
+    return { id: run.id, campaignId: run.campaignId, name: tpl ? templateText(tpl.name, locale) : run.templateKey, startedAt: run.createdAt, finished: !!run.finishedAt, cancelled: status === "cancelled", audience, totals };
   });
 }

@@ -39,9 +39,10 @@ Then:
 | `npm --prefix portal run demo -- --prod` | Production build, then the standalone server. Pages are fastest, but the build takes a few minutes. Use it for a recorded demo. |
 | `npm --prefix portal run demo -- --port 3005` | Another port. |
 | `npm --prefix portal run demo -- --keep-data` | Keep the current demo database, including earlier drills, instead of rebuilding it. |
-| `npm --prefix portal run demo -- --host 0.0.0.0` | Let other devices on the network open the demo, for example a tablet. By default only this computer can, because the demo password is public. |
 
-Ctrl+C stops the server. Running the command again gives a fresh organisation.
+Ctrl+C stops the server. Running the command again gives a fresh organisation. The demo answers on this
+computer only, because every demo account shares a published password. To show it on a big screen, mirror
+or share this screen.
 
 ### With Docker instead
 
@@ -52,10 +53,10 @@ docker compose -f portal/docker-compose.demo.yml up --build
 ```
 
 The stack uses fixed demo secrets and empties the database on every start, so it is for demos only.
-Remove it with:
+Remove it, including the database volume, with:
 
 ```bash
-docker compose -f portal/docker-compose.demo.yml down
+docker compose -f portal/docker-compose.demo.yml down -v
 ```
 
 ## The talk track (3 minutes)
@@ -66,8 +67,8 @@ docker compose -f portal/docker-compose.demo.yml down
 | 0:10 | Live dashboard, top | Point at the funnel and the tiles lighting up by department. | "Delivered, opened, clicked. That orange tile is someone who just clicked. Most clicks come within a minute of opening; the industry median is 21 seconds." |
 | 0:30 | Feed and AI Sel | Point at the feed. | "Here is what the platform did on its own. The moment someone clicks, they see what gave the email away, and the matching training is assigned with a due date. Nobody on the security team lifted a finger." |
 | 0:50 | Click-vs-report card | Point at first click and first report. | "This is the race that matters: how fast the first person reports it compared with the first click. Reports are matched to the simulation automatically and earn XP." |
-| 1:10 | Risk card | Point at the curve. | "Average risk jumped when people clicked. Now watch it come back down as reports arrive and people finish their training. That's the loop closing by itself." |
-| 1:35 | Drill report | Wait for the report, or press **Skip to the end**. | "Their click rate against the untrained baseline of 33 percent. The resilience ratio, reports per click. How many trainings were assigned and finished." |
+| 1:10 | Risk card | Point at the curve. | "Average risk jumps with every click, and more with every password typed into the fake page. Reports and finished trainings pull it back down. The click itself stays on the person's record for 90 days, which is the evidence an auditor asks for." |
+| 1:35 | Drill report | Wait for the report, or press **Skip to the end**. | "Their click rate against the untrained baseline of 33 percent. The resilience ratio: reports per click. How many trainings were assigned and finished, and where risk peaked." |
 | 2:15 | Campaign page | Press **Open the campaign**. | "None of that was a slideshow. This is the campaign record, with per-person timestamps for opened, clicked, entered a password and reported." |
 | 2:35 | Leadership panel | Press **Leadership panel** on the report. | "The board view already includes today's drill: risk trend, report rate, training completion, policy coverage." |
 | 2:50 | Close | | "Phish, teach, measure, repeat, automatically, in ten languages including right-to-left Arabic." |
@@ -114,6 +115,10 @@ started" and "Live drill finished") stay in the database like any campaign's.
 - **Time.** A drill covers the first 4 hours after delivery. The playback clock is warped: the first
   minutes, when clicks and reports happen, play slower than the later hours, so the 90 seconds stay busy.
 
+Risk can end above where it started: a click and, more so, a typed password stay in the 90-day risk
+model, while a finished training removes only the open risk the click created. The dashboard shows
+before, peak and now, and the report says which happened, instead of claiming a reduction.
+
 ## Safety
 
 - The drill is the operator-only feature `live_drill`. No plan includes it. Only the demo seed switches it
@@ -129,8 +134,7 @@ started" and "Live drill finished") stay in the database like any campaign's.
 
 | Problem | Fix |
 |---|---|
-| `Port 3000 is in use` | Stop the other server, or pass `--port 3005`. |
-| The database is locked, or `db:reset` fails | Another process (`npm run dev`, an earlier demo) holds the embedded database. Stop it and run again. |
+| `Port 3000 is in use` | If it is `npm run dev` or an earlier demo from this folder, stop it first: both use the embedded database in `portal/.data/pg`, which only one process may open. Use `--port 3005` only when an unrelated program holds port 3000. |
 | The first page is slow | The development server compiles a page on first use. The script pre-compiles the walkthrough. For a recorded demo use `--prod`. |
 | The interface is in Azerbaijani | The demo administrator's language is az. Use the language picker at the top. All ten languages are complete. |
 | A drill shows very few clicks | That happens with "Easy to spot" lures, and it is realistic. For a livelier story pick a "Hard to spot" lure, such as "Changed bank details" or "Keynote invitation (executives)". |

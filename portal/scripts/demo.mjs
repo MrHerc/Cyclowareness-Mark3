@@ -9,7 +9,6 @@
  *   npm run demo -- --prod            production build, then the standalone server (fastest pages; the build takes minutes)
  *   npm run demo -- --port 3005       another port
  *   npm run demo -- --keep-data       keep the current demo database (drills already run stay)
- *   npm run demo -- --host 0.0.0.0    reachable from other devices (default: this computer only; the demo password is public)
  *
  * Only Node.js built-ins are used here, so it runs before `npm ci`.
  */
@@ -30,14 +29,17 @@ const option = (name, fallback) => {
 const prod = flag("prod");
 const keepData = flag("keep-data");
 const port = Number(option("port", process.env.PORT ?? "3000"));
-// Loopback by default: the demo accounts share a published password. --host 0.0.0.0 shows it to another device on purpose.
-const host = option("host", "127.0.0.1");
+// This computer only: the demo accounts share a published password, and the session cookie needs localhost over HTTP.
+const host = "127.0.0.1";
 const npm = process.platform === "win32" ? "npm.cmd" : "npm";
 const npx = process.platform === "win32" ? "npx.cmd" : "npx";
 
 const say = (line) => console.log(`\x1b[36m[demo]\x1b[0m ${line}`);
+/** The portal's server process once started; stopped on any exit so it never outlives this script. */
+let child = null;
 const fail = (line) => {
   console.error(`\x1b[31m[demo]\x1b[0m ${line}`);
+  if (child && !child.killed) child.kill("SIGTERM");
   process.exit(1);
 };
 
@@ -46,13 +48,18 @@ function run(cmd, cmdArgs, opts = {}) {
   if (res.status !== 0) fail(`\`${cmd} ${cmdArgs.join(" ")}\` failed (exit code ${res.status}).`);
 }
 
-function portFree(p) {
+function portFreeOn(p, address) {
   return new Promise((resolve) => {
     const server = net.createServer();
     server.once("error", () => resolve(false));
     server.once("listening", () => server.close(() => resolve(true)));
-    server.listen(p, "0.0.0.0");
+    server.listen(p, address);
   });
+}
+
+/** Free on the loopback address the server binds and on the wildcard (macOS lets both coexist, Linux does not). */
+async function portFree(p) {
+  return (await portFreeOn(p, "127.0.0.1")) && (await portFreeOn(p, "0.0.0.0"));
 }
 
 async function waitFor(url, timeoutMs, cookie = "") {
@@ -73,7 +80,11 @@ async function waitFor(url, timeoutMs, cookie = "") {
 const [major] = process.versions.node.split(".").map(Number);
 if (major < 22) fail(`Node.js 22 or newer is needed (this is ${process.versions.node}).`);
 if (!Number.isInteger(port) || port < 1 || port > 65535) fail(`Not a port: ${option("port")}`);
-if (!(await portFree(port))) fail(`Port ${port} is in use. Stop what runs there (an earlier demo or \`npm run dev\`) or pass --port <another>.`);
+if (!(await portFree(port))) {
+  fail(
+    `Port ${port} is in use. If it is an earlier demo or \`npm run dev\` from this folder, stop it first: both use the embedded database in .data/pg, which only one process may open. If it is an unrelated program, pass --port <another>.`,
+  );
+}
 
 /* 2. Dependencies and configuration */
 if (!fs.existsSync(path.join(root, "node_modules", "next"))) {
@@ -103,15 +114,20 @@ if (!warmToken) say("Could not create the warm-up session; pages behind sign-in 
 /* 5. Start the portal */
 const appUrl = `http://localhost:${port}`;
 // The warm-up calls the address the server binds to ("localhost" may resolve to ::1 first).
-const warmBase = `http://${host === "0.0.0.0" || host === "::" ? "127.0.0.1" : host}:${port}`;
-let child;
+const warmBase = `http://${host}:${port}`;
 if (prod) {
+  // The standalone server runs from .next/standalone, so its embedded database lives next to it, and the build
+  // deletes that folder. With --keep-data the previous production run's database (and its drills) is set aside first.
+  const target = path.join(root, ".next", "standalone", ".data", "pg");
+  const kept = path.join(root, ".data", "pg-standalone-kept");
+  fs.rmSync(kept, { recursive: true, force: true });
+  if (keepData && fs.existsSync(target)) fs.renameSync(target, kept);
   say("Production build (takes a few minutes)…");
   run(npm, ["run", "build"]);
-  // The standalone server runs from .next/standalone, so the embedded database goes next to it.
-  const target = path.join(root, ".next", "standalone", ".data", "pg");
   fs.rmSync(target, { recursive: true, force: true });
-  fs.cpSync(path.join(root, ".data", "pg"), target, { recursive: true });
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  if (fs.existsSync(kept)) fs.renameSync(kept, target);
+  else fs.cpSync(path.join(root, ".data", "pg"), target, { recursive: true });
   const env = {
     ...process.env,
     NODE_ENV: "production",
@@ -129,10 +145,13 @@ if (prod) {
   say(`Starting the development server on ${appUrl}…`);
   child = spawn(npx, ["next", "dev", "--webpack", "-H", host, "-p", String(port)], { cwd: root, env: { ...process.env, PORT: String(port) }, stdio: "inherit", shell: process.platform === "win32" });
 }
-const stop = () => child.kill("SIGTERM");
+const stop = () => child?.kill("SIGTERM");
 process.on("SIGINT", stop);
 process.on("SIGTERM", stop);
 child.on("exit", (code) => process.exit(code ?? 0));
+process.on("exit", () => {
+  if (child && !child.killed && child.exitCode === null) child.kill("SIGTERM");
+});
 
 /* 6. Warm up the walkthrough's pages (each compiles on its first request in development) */
 if (!(await waitFor(`${warmBase}/sign-in`, 300_000))) fail("The server did not answer within 5 minutes.");

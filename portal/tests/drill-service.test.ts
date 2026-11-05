@@ -114,6 +114,11 @@ describe("live drill", () => {
     // The risk curve starts at the baseline and has a point per applied batch; the peak is its highest point.
     expect(run.riskTrail[0]).toEqual({ sim: 0, risk: run0.baseline.avgRisk });
     expect(run.riskTrail.length).toBeGreaterThanOrEqual(3);
+    // One point per change of the average, in simulated order.
+    for (let i = 1; i < run.riskTrail.length; i++) {
+      expect(run.riskTrail[i].risk).not.toBe(run.riskTrail[i - 1].risk);
+      expect(run.riskTrail[i].sim).toBeGreaterThanOrEqual(run.riskTrail[i - 1].sim);
+    }
     expect(view.risk.peak).toBe(Math.max(...run.riskTrail.map((p) => p.risk), view.risk.now));
     expect(view.risk.peak).toBeGreaterThanOrEqual(view.risk.before);
 
@@ -125,6 +130,8 @@ describe("live drill", () => {
     const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "keynote", audience: "all", departmentId: null, speed: "quick", campaignName: "Replay" });
     if (!started.ok) throw new Error(started.reason);
     const done = (await skipDrill(db, tenantId, started.id))!;
+    // A skip is one batch, but the curve still has a point for each change on the way.
+    expect(done.riskTrail.length).toBeGreaterThan(2);
     const reportAt = done.events.findIndex((e) => e.kind === "report");
     expect(reportAt).toBeGreaterThanOrEqual(0);
     const count = async () => (await db.select().from(t.threatReports).where(eq(t.threatReports.tenantId, tenantId))).length;

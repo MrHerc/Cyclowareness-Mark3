@@ -54,9 +54,14 @@ export function DrillSetup({
 
   const submit = () =>
     start(async () => {
-      const res = await startDrillAction({ templateKey, audience: scope, departmentId: scope === "department" ? departmentId : null, speed });
-      if (res.ok) router.push(`/admin/drill/${res.id}`);
-      else toast(t(`errors.${res.reason}`), "error");
+      try {
+        const res = await startDrillAction({ templateKey, audience: scope, departmentId: scope === "department" ? departmentId : null, speed });
+        if (res.ok) router.push(`/admin/drill/${res.id}`);
+        else toast(t(`errors.${res.reason}`), "error");
+      } catch {
+        // Network or server failure: the form stays, with a message instead of the error page.
+        toast(t("errors.unknown"), "error");
+      }
     });
 
   return (
