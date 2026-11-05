@@ -42,7 +42,7 @@ Cyclowareness gives each group in the organisation one place to work.
 
 Each point below describes code that exists in this repository.
 
-1. **Real threats become training.** A reported threat, sandbox verdict, incident or intelligence item can start a *closed loop*: intake, analysis, conversion, approval, targeting, training, feedback. Material produced along the way needs human approval, optionally from two people, before it reaches anyone.
+1. **Real threats become training.** A threat reported by an employee, or an intelligence item, can start a *closed loop*: intake, analysis, conversion, approval, targeting, training, feedback. Material produced along the way needs human approval, optionally from two people, before it reaches anyone.
 2. **Simulations count only people.** Clicks from mail security scanners and link prefetchers are not recorded. The fake sign-in form never sends what was typed; only the fact of submission is stored.
 3. **Risk is explained.** Every score from 0 to 100 is the sum of five visible parts: training, overdue work, simulations, open risks and knowledge. The administrator's person page and the employee's own security page show each part.
 4. **The AI tutor knows the lesson, not the learner.** Only the lesson's text and the question go to the model. Without an API key the tutor still answers, from the lesson text.
@@ -71,7 +71,7 @@ flowchart LR
   - Captions in the ten languages, plus AI-translated captions in 65 more.
   - A transcript, keyboard shortcuts and a full, calm or still motion setting.
 - **AI tutor.** AI Sel, the mascot, answers questions about the current lesson, by text or by voice.
-- **Learning paths and labs.** Five learning paths, and seven practice labs that open once the related lessons are done.
+- **Learning paths and labs.** Five learning paths and seven practice labs. Paths show each lab after the lessons it practises, and the lab area stays open for free practice.
 - **Motivation and proof.** XP, levels, daily streaks with streak freezes, a department league, and certificates with a public verification page.
 - **Reporting and checks.** A button to report suspicious messages, a personal risk view, and a sandbox check for links and files.
 - **Everything else.** Policies to read and sign, support tickets, live sessions, and a "download my data" export.
@@ -81,8 +81,9 @@ flowchart LR
 
 - **People.** People and departments in a hierarchy, CSV import, invitation links and roles.
 - **Assignments.** Due dates, automatic reminders, manager alerts, and monthly refreshers for people at or above the risk threshold.
-- **Phishing simulations.** Twelve templates for email, SMS, QR code and USB drop, plus voice-call templates that still need a telephony adapter. Scheduling, an open, click, submit and report funnel, and a teachable moment after each click.
+- **Phishing simulations.** Twelve templates for email, SMS, QR code, USB drop and voice call; the two voice-call templates still need a telephony adapter to place calls. Scheduling, an open, click, submit and report funnel, and a teachable moment after each click.
 - **Policies.** Versions and translations, with a sign-off export for auditors.
+- **Studio.** Content creators draft new courses with AI, or from the closest library module when no AI key is set. They review each draft and publish it themselves.
 - **Reports.** Eight report types as CSV or XLSX, scheduled report emails, and printable reports and a compliance pack.
 - **Settings.**
   - Branding, languages, email delivery and notification templates.
@@ -105,11 +106,11 @@ flowchart LR
 
 - A leadership board with completion, reporting rate, policy coverage, the risk trend, incidents, closed loops and a department breakdown.
 - An operator console to create organisations, assign plans, switch single features on or off, record domain proofs and review demo requests.
-- Three plans, Essentials, Professional and Enterprise, each adding features to the one before. The full list is in [ARCHITECTURE.md](docs/ARCHITECTURE.md#4-tenancy-and-access-control).
+- Three plans, Essentials, Professional and Enterprise HRM, each adding features to the one before. The full list is in [ARCHITECTURE.md](docs/ARCHITECTURE.md#4-tenancy-and-access-control).
 
 ## Architecture
 
-Cyclowareness is one Next.js application with one PostgreSQL database. Pages are rendered on the server, every write goes through a server action that checks the person's role and plan, and every row carries its organisation's id. Background work runs in the same process, or in an optional worker. There is no message queue or cache server to operate.
+Cyclowareness is one Next.js application with one PostgreSQL database. Pages are rendered on the server. Writes go through server actions that check the person's role and plan, and every query is limited to the person's organisation. Background work runs in the same process, or in an optional worker. There is no message queue or cache server to operate.
 
 ```mermaid
 flowchart TB
@@ -158,7 +159,7 @@ The full description, with the request lifecycle, data model, background jobs an
 | Application | Next.js 16 (App Router, React Server Components, Server Actions), React 19, TypeScript in strict mode |
 | Interface | Tailwind CSS 4, Lucide icons, a Canvas 2D mascot (the Rive runtime is kept as an alternative) |
 | Languages | next-intl with ten locales, right-to-left support for Arabic |
-| Data | PostgreSQL 14 or newer, Drizzle ORM, node-postgres; embedded PGlite for local development |
+| Data | PostgreSQL (the Docker stack ships version 16), Drizzle ORM, node-postgres; embedded PGlite for local development |
 | Validation | Zod |
 | Authentication | Own implementation: Argon2id passwords, database sessions, TOTP (Oslo), OpenID Connect with PKCE |
 | AI | Anthropic Claude through the official SDK; models are configuration settings |
@@ -266,7 +267,7 @@ cd portal && npx tsx scripts/check-lesson-locales.ts --coverage
 - live accounts with an email provider, an SMS gateway, the Anthropic API and an identity provider;
 - natural-voice narration, because no clips have been generated;
 - an image build on the release machine;
-- a native-speaker review of seven of the ten languages, and a legal review of the privacy policy and terms. These texts were translated and edited by AI agents.
+- a native-speaker review of seven of the ten languages, and a legal review of the privacy policy and terms. According to [docs/build/DECISIONS.md](docs/build/DECISIONS.md), these texts were translated and edited by AI agents.
 
 **Release history.** The product has not had its first release. The database schema is a single initial migration, regenerated until then.
 
