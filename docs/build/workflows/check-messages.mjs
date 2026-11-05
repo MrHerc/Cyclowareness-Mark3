@@ -5,7 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 
-const PORTAL = "C:/Users/Safar/Desktop/Cyclowareness- Vol2/portal";
+const PORTAL = "<repo>/portal";
 const require = createRequire(path.join(PORTAL, "package.json"));
 const { IntlMessageFormat } = require("intl-messageformat");
 const { parse } = require("@formatjs/icu-messageformat-parser");

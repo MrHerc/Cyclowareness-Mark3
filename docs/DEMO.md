@@ -14,7 +14,7 @@ Other products show a campaign report two weeks later. This shows the whole clos
 
 ## Run it
 
-You need Node.js 22 or newer and npm. Docker and PostgreSQL are not needed. From the repository root:
+You need Node.js 24 and npm. Docker and PostgreSQL are not needed. From the repository root:
 
 ```bash
 npm --prefix portal run demo

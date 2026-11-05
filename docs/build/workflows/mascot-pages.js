@@ -15,9 +15,9 @@ async function retrying(prompt, opts) {
   return null
 }
 
-const R = 'C:/Users/Safar/Desktop/Cyclowareness- Vol2'
+const R = '<repo>'
 const P = `${R}/portal`
-const SP = 'C:/Users/Safar/AppData/Local/Temp/claude/C--Users-Safar-Desktop-Cyclowareness--Vol2/66e61158-c161-4119-a251-69c6013bc3e9/scratchpad'
+const SP = '<scratchpad>'
 const SCHEMA = { type: 'object', properties: { summary: { type: 'string' }, files: { type: 'array', items: { type: 'string' } }, checks: { type: 'string' }, notes: { type: 'array', items: { type: 'string' } } }, required: ['summary', 'files', 'checks', 'notes'] }
 
 phase('Build')

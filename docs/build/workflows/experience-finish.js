@@ -23,9 +23,9 @@ async function retrying(prompt, opts) {
   return null
 }
 
-const R = 'C:/Users/Safar/Desktop/Cyclowareness- Vol2'
+const R = '<repo>'
 const P = `${R}/portal`
-const SP = 'C:/Users/Safar/AppData/Local/Temp/claude/C--Users-Safar-Desktop-Cyclowareness--Vol2/66e61158-c161-4119-a251-69c6013bc3e9/scratchpad'
+const SP = '<scratchpad>'
 const OUT = `${SP}/experience`
 
 const COMMON = `PROJECT: Cyclowareness (vendor Safarov Industries), a multi-tenant security-awareness LMS sold to banks and governments; it must look premium and be secure. App: ${P} (Next.js 16 App Router with webpack, React 19, TypeScript strict, Tailwind 4.3 CSS-first in src/app/globals.css, next-intl). Read ${R}/CLAUDE.md, ${P}/AGENTS.md (this Next.js differs from older versions) and the project skill ${R}/.claude/skills/cyclowareness-experience/SKILL.md plus the reference your task needs (animations.md for motion, lesson-engine.md for the player).
