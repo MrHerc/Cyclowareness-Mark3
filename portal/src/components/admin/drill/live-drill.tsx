@@ -70,7 +70,8 @@ export function LiveDrill({ initial, canLeadership }: { initial: DrillView; canL
     let timer: ReturnType<typeof setTimeout> | undefined;
     const poll = async () => {
       try {
-        const res = await fetch(`/api/admin/drill/${view.id}`, { cache: "no-store", headers: { accept: "application/json" } });
+        // POST: the poll applies the due events (the GET only reads).
+        const res = await fetch(`/api/admin/drill/${view.id}`, { method: "POST", cache: "no-store", headers: { accept: "application/json" } });
         // Signed out, no longer allowed, or the drill is gone: stop and let the page's own checks decide (sign-in, 404).
         if (res.status === 401 || res.status === 403 || res.status === 404) {
           if (!stopped) router.refresh();

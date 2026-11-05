@@ -1,12 +1,13 @@
 /**
  * Demo data: one organisation with a month of realistic history, produced through the same
  * services the app uses (XP, progress, attestations, certificates, risk). Safe to re-run: it
- * clears the database first. Never run against production.
+ * clears the database first (only a database holding nothing but the demo organisation, unless
+ * SEED_FORCE=1). Never runs with NODE_ENV=production.
  *
  *   npm run db:seed            (after npm run db:migrate)
  *
- * Demo sign-in: the role accounts in scripts/seed-data.ts with the password in SEED_PASSWORD
- * (see .env.example).
+ * Demo sign-in: the role accounts in scripts/seed-data.ts with SEED_PASSWORD (environment or
+ * .env.local); when it is empty, a random password is printed once at the end.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -28,21 +29,14 @@ import { DEFAULT_ATTESTATION, DEFAULT_TEMPLATES, defaultSettings } from "../src/
 import { departmentKey } from "../src/lib/departments";
 import { encodeRiskTitle, riskTitle } from "../src/lib/risk-title";
 import { REPORT_BONUS_XP, LAB_XP, dayKey } from "../src/lib/domain/gamification";
-import { DEMO_DOMAIN, DEPARTMENTS, PEOPLE, PUBLISHED_SEED_PASSWORD, emailFor, mulberry32, seedPasswordProblem, type DeptKey, type SeedPerson } from "./seed-data";
+import { DEMO_DOMAIN, DEPARTMENTS, PEOPLE, emailFor, foreignTenants, mulberry32, seedRefusal, type DeptKey, type SeedPerson } from "./seed-data";
 
-// The seed TRUNCATES EVERY TABLE. Only the local embedded database is seeded without asking: any
-// DATABASE_URL (a real PostgreSQL, wherever NODE_ENV points) needs an explicit ALLOW_SEED=1.
-if ((process.env.DATABASE_URL || process.env.NODE_ENV === "production") && process.env.ALLOW_SEED !== "1") {
-  console.error(
-    "Refusing to seed: it deletes every row of the target database and loads the demo organisation.\n" +
-      "DATABASE_URL (or NODE_ENV=production) is set. Set ALLOW_SEED=1 only for a fresh or throwaway database.",
-  );
-  process.exit(1);
-}
-// The published demo password would open every seeded account, the platform operator included.
-const passwordProblem = seedPasswordProblem(process.env);
-if (passwordProblem) {
-  console.error(`Refusing to seed: ${passwordProblem}`);
+// The seed reads .env.local like the app does (the shell environment wins), so a developer's own SEED_PASSWORD applies.
+if (fs.existsSync(path.join(process.cwd(), ".env.local"))) process.loadEnvFile(path.join(process.cwd(), ".env.local"));
+// The seed TRUNCATES EVERY TABLE and every seeded account (the platform operator included) shares one password.
+const refusal = seedRefusal(process.env);
+if (refusal) {
+  console.error(`Refusing to seed: ${refusal}`);
   process.exit(1);
 }
 
@@ -58,8 +52,9 @@ function seedTarget(): string {
   }
 }
 
-/** Demo password for every seeded account. Override with SEED_PASSWORD (required beyond the local embedded database). */
-const SEED_PASSWORD = process.env.SEED_PASSWORD ?? PUBLISHED_SEED_PASSWORD;
+/** Password of every seeded account: SEED_PASSWORD, or a random one printed once at the end (and nowhere else). */
+const SEED_PASSWORD = process.env.SEED_PASSWORD || randomToken(12);
+const generatedPassword = !process.env.SEED_PASSWORD;
 const rnd = mulberry32(20261018);
 const NOW = new Date();
 const DAY = 86_400_000;
@@ -81,6 +76,12 @@ type Mod = { id: string; slug: string; category: string; xp: number; lessons: Le
 
 async function main() {
   const { db, close, driver } = createDb();
+  const foreign = foreignTenants((await db.select({ slug: t.tenants.slug }).from(t.tenants)).map((r) => r.slug));
+  if (foreign.length && process.env.SEED_FORCE !== "1") {
+    console.error(`Refusing to seed: the database holds organisations other than the demo's (${foreign.join(", ")}). Set SEED_FORCE=1 to empty it anyway.`);
+    await close();
+    process.exit(1);
+  }
   console.log(`Seeding (${driver}) ${seedTarget()}: every table is emptied first…`);
   await truncateAll(db);
 
@@ -902,7 +903,9 @@ async function main() {
     });
   }
   console.log(`KPIs: risk ${k.avgRisk}, completion ${k.completion}%, report ${k.reportRate}%, click ${k.clickRate}%`);
-  console.log(`Done. Sign in with admin@${DEMO_DOMAIN} (and the other role accounts in scripts/seed-data.ts) using SEED_PASSWORD.`);
+  console.log(
+    `Done. Sign in with admin@${DEMO_DOMAIN} (and the other role accounts in scripts/seed-data.ts) ${generatedPassword ? `with the generated password (printed only here): ${SEED_PASSWORD}` : "with your SEED_PASSWORD."}`,
+  );
   await close();
 }
 

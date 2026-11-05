@@ -204,7 +204,7 @@ npm run setup
 npm run dev
 ```
 
-`npm run setup` applies the migration and loads a fictional demo organisation, Safarov Industries, with about 35 people and a month of activity history. Open http://localhost:3000 and sign in with one of these accounts. The password for all of them is the `SEED_PASSWORD` value in `portal/.env.example`.
+`npm run setup` applies the migration and loads a fictional demo organisation, Safarov Industries, with about 35 people and a month of activity history. Open http://localhost:3000 and sign in with one of these accounts. The password for all of them is printed once by `npm run setup` / `npm run demo` when the organisation is built, or it is your own `SEED_PASSWORD` in `portal/.env.local` (set it before seeding).
 
 | Email | Role |
 |---|---|

@@ -2,25 +2,26 @@
 
 export const DEMO_DOMAIN = "safarovindustries.com";
 
-/**
- * The demo password published in .env.example and this public repository. Anyone can read it, so it is
- * accepted only for the local embedded database (a developer's own machine).
- */
-export const PUBLISHED_SEED_PASSWORD = "Portal-Demo-2026!";
+/** The organisations the seed itself creates: any other one in the database is somebody's data. */
+export const SEED_TENANT_SLUGS: readonly string[] = ["platform", "safarov"];
 
 /**
- * Why the seed must not use `password` for this target, or null. Any DATABASE_URL or NODE_ENV=production
- * stack can be reachable by others, and every seeded account (the platform operator included) would open
- * with the published password: such stacks need their own SEED_PASSWORD of 12 or more characters.
+ * Why the seed must not run in this environment, or null. It empties every table and loads a fictional
+ * organisation, so production is never a target, a real PostgreSQL needs an explicit ALLOW_SEED=1, and a
+ * SEED_PASSWORD of your own must have 12+ characters (empty: the seed generates one and prints it once).
  */
-export function seedPasswordProblem(e: { DATABASE_URL?: string; NODE_ENV?: string; SEED_PASSWORD?: string }): string | null {
-  if (!e.DATABASE_URL && e.NODE_ENV !== "production") return null;
-  const password = e.SEED_PASSWORD ?? "";
-  if (!password || password === PUBLISHED_SEED_PASSWORD) {
-    return "SEED_PASSWORD is unset or is the demo password published in .env.example. This target is not the local embedded database, so set your own SEED_PASSWORD (12+ characters) before seeding.";
+export function seedRefusal(e: { DATABASE_URL?: string; NODE_ENV?: string; SEED_PASSWORD?: string; ALLOW_SEED?: string }): string | null {
+  if (e.NODE_ENV === "production") return "NODE_ENV=production. The seed empties every table and loads the demo organisation; it never runs on a production server.";
+  if (e.DATABASE_URL && e.ALLOW_SEED !== "1") {
+    return "it deletes every row of the target database and loads the demo organisation. DATABASE_URL is set: set ALLOW_SEED=1 only for a fresh or throwaway database.";
   }
-  if (password.length < 12) return "SEED_PASSWORD must have at least 12 characters for a target other than the local embedded database.";
+  if (e.SEED_PASSWORD && e.SEED_PASSWORD.length < 12) return "SEED_PASSWORD must have at least 12 characters. Leave it empty to get a random one, printed once at the end of the seed.";
   return null;
+}
+
+/** Tenants that are not the seed's own: a database holding any is not the demo, so the seed refuses to empty it. */
+export function foreignTenants(slugs: string[]): string[] {
+  return slugs.filter((s) => !SEED_TENANT_SLUGS.includes(s));
 }
 
 export type DeptKey = "exec" | "it" | "sec" | "fin" | "hr" | "legal" | "ops";

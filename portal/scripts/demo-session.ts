@@ -21,6 +21,8 @@ async function main() {
       .where(and(eq(t.users.email, `admin@${DEMO_DOMAIN}`), eq(t.users.status, "active")));
     if (!admin) throw new Error("The demo organisation is not seeded.");
     const token = randomToken(24);
+    // shortcut: the row lives 20 minutes and is purged by the maintenance job; the server owns the embedded database
+    // while it runs, so no second process can delete it. Upgrade to a sign-out request when an HTTP sign-out route exists.
     await db.insert(t.sessions).values({ id: sha256Hex(token), userId: admin.id, tenantId: admin.tenantId, expiresAt: new Date(Date.now() + 20 * 60_000), twoFactorVerified: true, userAgent: "demo warm-up" });
     process.stdout.write(token);
   } finally {

@@ -6,7 +6,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { DB } from "../src/server/db/client";
-import { defaultSettings } from "../src/lib/tenant-defaults";
+import { ALL_FEATURES, defaultSettings } from "../src/lib/tenant-defaults";
 import { advanceDrill, drillHistory, drillView, skipDrill, startDrill } from "../src/server/services/drill";
 import { sendQueuedSms } from "../src/server/services/campaigns";
 import { submitThreatReport } from "../src/server/services/threats";
@@ -45,8 +45,9 @@ beforeAll(async () => {
 }, 180_000);
 
 describe("live drill", () => {
-  it("is refused without the operator feature and for an unknown or voice template", async () => {
+  it("is refused without the seeded feature, which the operator console cannot switch on, and for an unknown or voice template", async () => {
     const base = { actorId: adminId, audience: "all" as const, departmentId: null, speed: "quick" as const, campaignName: "Drill" };
+    expect(ALL_FEATURES).not.toContain("live_drill");
     expect(await startDrill(db, { ...base, tenantId: plainTenantId, templateKey: "payslip" })).toEqual({ ok: false, reason: "feature" });
     expect(await startDrill(db, { ...base, tenantId, templateKey: "tech-support-call" })).toEqual({ ok: false, reason: "template" });
     expect(await startDrill(db, { ...base, tenantId, templateKey: "nope" })).toEqual({ ok: false, reason: "template" });
@@ -136,8 +137,10 @@ describe("live drill", () => {
     expect(reportAt).toBeGreaterThanOrEqual(0);
     const count = async () => (await db.select().from(t.threatReports).where(eq(t.threatReports.tenantId, tenantId))).length;
     const before = await count();
-    // As if the request had died after the report and before recording it: the steps from there run again.
+    // As if the request had died after the report and before recording it: the steps from there run again
+    // (the campaign is still running then; only finishDrill completes it).
     await db.update(t.drillRuns).set({ appliedUntil: reportAt, finishedAt: null, leaseUntil: null }).where(eq(t.drillRuns.id, done.id));
+    await db.update(t.campaigns).set({ status: "running", completedAt: null }).where(eq(t.campaigns.id, done.campaignId));
     const again = (await advanceDrill(db, tenantId, done.id))!;
     expect(again.appliedUntil).toBe(again.events.length);
     expect(await count()).toBe(before);
@@ -190,6 +193,24 @@ describe("live drill", () => {
     expect(view.cancelled).toBe(true);
     expect(view.status).toBe("finished");
     expect(view.simNow).toBeLessThan(view.simMinutes);
+  }, 120_000);
+
+  it("ends where it is when its campaign is completed, without a drill.finished entry", async () => {
+    const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "payslip", audience: "all", departmentId: null, speed: "quick", campaignName: "Completed" });
+    if (!started.ok) throw new Error(started.reason);
+    const [run0] = await db.select().from(t.drillRuns).where(eq(t.drillRuns.id, started.id));
+    const half = await advanceDrill(db, tenantId, started.id, new Date(run0.startedAt.getTime() + run0.durationMs / 3));
+    const finishedBefore = await db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenantId), eq(t.auditLog.action, "drill.finished")));
+    // Completed by hand on the campaign page, or by the 14-day campaign tick, while nobody polled the dashboard.
+    await db.update(t.campaigns).set({ status: "completed", completedAt: new Date() }).where(eq(t.campaigns.id, run0.campaignId));
+    const stopped = (await advanceDrill(db, tenantId, started.id, new Date(run0.startedAt.getTime() + run0.durationMs * 2)))!;
+    expect(stopped.finishedAt).not.toBeNull();
+    expect(stopped.appliedUntil).toBe(half!.appliedUntil);
+    const finishedAfter = await db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenantId), eq(t.auditLog.action, "drill.finished")));
+    expect(finishedAfter).toHaveLength(finishedBefore.length);
+    const view = (await drillView(db, stopped, "en"))!;
+    expect(view.status).toBe("finished");
+    expect(view.cancelled).toBe(false);
   }, 120_000);
 
   it("skips to the end on demand and ignores another organisation's drill id", async () => {

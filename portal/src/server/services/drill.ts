@@ -205,9 +205,9 @@ export function dueCount(events: DrillEvent[], elapsedMs: number): number {
 export async function advanceDrill(db: DB, tenantId: string, drillId: string, now = new Date()): Promise<Run | null> {
   const [run] = await db.select().from(t.drillRuns).where(and(eq(t.drillRuns.id, drillId), eq(t.drillRuns.tenantId, tenantId)));
   if (!run || run.finishedAt) return run ?? null;
-  // Cancelling the drill's campaign (campaign page) ends the drill where it is: no further step is played.
+  // A campaign no longer running (cancelled on its page, completed by hand or by the 14-day tick) ends the drill where it is: no further step is played.
   const [campaign] = await db.select({ status: t.campaigns.status }).from(t.campaigns).where(eq(t.campaigns.id, run.campaignId));
-  if (!campaign || campaign.status === "cancelled") {
+  if (!campaign || campaign.status !== "running") {
     await db.update(t.drillRuns).set({ finishedAt: now, leaseUntil: null }).where(and(eq(t.drillRuns.id, run.id), isNull(t.drillRuns.finishedAt)));
     const [stopped] = await db.select().from(t.drillRuns).where(eq(t.drillRuns.id, run.id));
     return stopped ?? null;

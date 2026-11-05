@@ -24,36 +24,46 @@ The command does the following, in about two minutes on a laptop:
 
 1. It installs the dependencies if `portal/node_modules` is missing.
 2. It creates `portal/.env.local` from `portal/.env.example` if the file does not exist.
-3. It rebuilds the demo organisation in the embedded database at `portal/.data/pg`, with 60 days of history.
+3. It builds the demo organisation in the embedded database at `portal/.data/pg`, with 60 days of history,
+   and prints the administrator's password once. On later runs it keeps that database and applies pending
+   migrations; `--reset` rebuilds it.
 4. It starts the portal on port 3000 and pre-compiles every page of the walkthrough.
 5. It prints the sign-in address.
+
+The warm-up in step 4 signs in as the demo administrator with a 20-minute session written straight into the
+database. It is not removed afterwards (the running server owns the embedded database); it expires on its own.
 
 Then:
 
 1. Open http://localhost:3000/sign-in?next=/admin/drill
-2. Sign in as `admin@safarovindustries.com`. The password is the `SEED_PASSWORD` value in `portal/.env.example`.
+2. Sign in as `admin@safarovindustries.com`. The password is printed once by `npm run setup` / `npm run demo`
+   when the organisation is built, or it is your own `SEED_PASSWORD` in `portal/.env.local`. Set the latter
+   before the first run if you want a password you know on every run.
 3. If the admin guide opens over the page, close it with Esc.
 
 | Option | Effect |
 |---|---|
 | `npm --prefix portal run demo -- --prod` | Production build, then the standalone server. Pages are fastest, but the build takes a few minutes. Use it for a recorded demo. |
 | `npm --prefix portal run demo -- --port 3005` | Another port. |
-| `npm --prefix portal run demo -- --keep-data` | Keep the current demo database, including earlier drills, instead of rebuilding it. |
+| `npm --prefix portal run demo -- --reset` | Rebuild the demo organisation (earlier drills are lost; the seed prints the new password). Without it the current database is kept. |
 
-Ctrl+C stops the server. Running the command again gives a fresh organisation. The demo answers on this
-computer only, because every demo account shares a published password. To show it on a big screen, mirror
-or share this screen.
+Ctrl+C stops the server. Running the command again keeps the organisation; add `--reset` for a fresh one.
+The demo answers on this computer only, because every demo account shares one password. To show it on a big
+screen, mirror or share this screen.
 
 ### With Docker instead
 
-This starts PostgreSQL 16, loads the demo organisation and serves the production image on port 3000:
+This starts PostgreSQL 16, loads the demo organisation and serves the production image on port 3000. The
+stack has no built-in secrets: copy `portal/.env.demo.example` to `portal/.env.demo` (gitignored), set
+`POSTGRES_PASSWORD`, `APP_SECRET` and `SEED_PASSWORD` (12+ characters, the password of every demo account),
+then:
 
 ```bash
-docker compose -f portal/docker-compose.demo.yml up --build
+docker compose --env-file portal/.env.demo -f portal/docker-compose.demo.yml up --build
 ```
 
-The stack uses fixed demo secrets and empties the database on every start, so it is for demos only.
-Remove it, including the database volume, with:
+The stack refuses to start while any of the three is missing, and it empties the database on every start,
+so it is for demos only. Remove it, including the database volume, with:
 
 ```bash
 docker compose -f portal/docker-compose.demo.yml down -v
@@ -67,7 +77,7 @@ docker compose -f portal/docker-compose.demo.yml down -v
 | 0:10 | Live dashboard, top | Point at the funnel and the tiles lighting up by department. | "Delivered, opened, clicked. That orange tile is someone who just clicked. Most clicks come within a minute of opening; the industry median is 21 seconds." |
 | 0:30 | Feed and AI Sel | Point at the feed. | "Here is what the platform did on its own. The moment someone clicks, they see what gave the email away, and the matching training is assigned with a due date. Nobody on the security team lifted a finger." |
 | 0:50 | Click-vs-report card | Point at first click and first report. | "This is the race that matters: how fast the first person reports it compared with the first click. Reports are matched to the simulation automatically and earn XP." |
-| 1:10 | Risk card | Point at the curve. | "Average risk jumps with every click, and more with every password typed into the fake page. Reports and finished trainings pull it back down. The click itself stays on the person's record for 90 days, which is the evidence an auditor asks for." |
+| 1:10 | Risk card | Point at the curve. | "Average risk jumps with every click, and more with every password typed into the fake page. Reports and finished trainings pull part of it back, but the click and the typed password stay on the record for 90 days, so the curve can end above where it started; the report shows before, peak and now. That record is the evidence an auditor asks for." |
 | 1:35 | Drill report | Wait for the report, or press **Skip to the end**. | "Their click rate against the untrained baseline of 33 percent. The resilience ratio: reports per click. How many trainings were assigned and finished, and where risk peaked." |
 | 2:15 | Campaign page | Press **Open the campaign**. | "None of that was a slideshow. This is the campaign record, with per-person timestamps for opened, clicked, entered a password and reported." |
 | 2:35 | Leadership panel | Press **Leadership panel** on the report. | "The board view already includes today's drill: risk trend, report rate, training completion, policy coverage." |
@@ -121,12 +131,16 @@ before, peak and now, and the report says which happened, instead of claiming a 
 
 ## Safety
 
-- The drill is the operator-only feature `live_drill`. No plan includes it. Only the demo seed switches it
-  on, for the fictional demo organisation. An operator can switch it for an organisation in `/super` →
-  Features. Never switch it on for real employees: their records would show clicks they never made.
+- The drill is the feature `live_drill`. No plan includes it and the operator console (`/super` → Features)
+  cannot switch it on: only the demo seed sets it, on the fictional demo organisation. It must never reach
+  real employees: their records would show clicks they never made.
 - The person who starts a drill is left out of its audience.
-- A drill never sends anything. Its recipients are kept out of the job that sends queued SMS simulations, and no email is queued.
-- Cancelling the drill's campaign on the campaign page ends the drill where it is.
+- A drill sends no lure (no email, no SMS): its recipients are kept out of the job that sends queued SMS
+  simulations, and no email is queued. Everything downstream is real: integration events (`phishing.clicked`,
+  `simulation.risky`, `simulation.reported`, `attestation.completed`) go to a configured webhook or syslog,
+  and the clicks' training risks get reminder emails if the organisation's SMTP is enabled, so keep Settings →
+  Integrations and Settings → Email off on the demo organisation.
+- Cancelling or completing the drill's campaign on the campaign page ends the drill where it is.
 - Only campaign managers and administrators can start one (`campaigns.write`), and at most 20 per
   organisation per hour.
 
@@ -135,6 +149,8 @@ before, peak and now, and the report says which happened, instead of claiming a 
 | Problem | Fix |
 |---|---|
 | `Port 3000 is in use` | If it is `npm run dev` or an earlier demo from this folder, stop it first: both use the embedded database in `portal/.data/pg`, which only one process may open. Use `--port 3005` only when an unrelated program holds port 3000. |
+| The organisation looks wrong or the seed fails | Do not run `npm run demo` while any server from this folder is up, on any port: they share the embedded database. Stop it, then run again (with `--reset` for a fresh organisation). |
+| The password is lost | Run again with `--reset`: the seed prints a new one. Or set `SEED_PASSWORD` in `portal/.env.local` first. |
 | The first page is slow | The development server compiles a page on first use. The script pre-compiles the walkthrough. For a recorded demo use `--prod`. |
 | The interface is in Azerbaijani | The demo administrator's language is az. Use the language picker at the top. All ten languages are complete. |
 | A drill shows very few clicks | That happens with "Easy to spot" lures, and it is realistic. For a livelier story pick a "Hard to spot" lure, such as "Changed bank details" or "Keynote invitation (executives)". |
@@ -148,7 +164,7 @@ before, peak and now, and the report says which happened, instead of claiming a 
 | `portal/src/lib/drill/plan.ts` | The behaviour planner, clock and progress (pure, tested) |
 | `portal/src/server/services/drill.ts` | Start, apply due events under a lease, finish, skip, dashboard view |
 | `portal/src/app/(admin)/admin/drill/` | Setup page, history and live page |
-| `portal/src/app/api/admin/drill/[id]/route.ts` | The endpoint the dashboard polls once a second |
+| `portal/src/app/api/admin/drill/[id]/route.ts` | The endpoint the dashboard polls once a second (POST applies the due events; GET only reads) |
 | `portal/src/components/admin/drill/` | Setup form and live dashboard |
 | `portal/drizzle/0001_live_drill.sql`, `0002_drill_risk_trail.sql` | The `drill_runs` table and its risk curve column |
 | `portal/tests/drill-plan.test.ts`, `portal/tests/drill-service.test.ts` | Planner unit tests, and an end-to-end test on an in-memory database |
