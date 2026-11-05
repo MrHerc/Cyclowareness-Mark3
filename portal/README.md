@@ -11,7 +11,7 @@ npm run setup                     # miqrasiyalar + demo məlumatlar (.data/pg, D
 npm run dev                       # http://localhost:3000
 ```
 
-Demo hesablar: `admin@safarovindustries.com` (tenant admin), `learner@safarovindustries.com` (işçi) və aşağıdakı cədvəldəki digər rollar. Parol: `.env.example` faylındakı `SEED_PASSWORD` dəyəri. Dev server işləyərkən `db:*` skriptlərini çalışdırmayın: lokal baza (PGlite) eyni anda yalnız bir prosesə açılır, əvvəlcə serveri dayandırın. Production üçün Docker bölməsinə baxın. Sənədin qalanı ingiliscədir.
+Demo hesablar: `admin@safarovindustries.com` (tenant admin), `learner@safarovindustries.com` (işçi) və aşağıdakı cədvəldəki digər rollar. Parol: `npm run setup` / `npm run demo` təşkilatı quranda bir dəfə çap edir, ya da `.env.local` faylında öz `SEED_PASSWORD` dəyəriniz. Dev server işləyərkən `db:*` skriptlərini çalışdırmayın: lokal baza (PGlite) eyni anda yalnız bir prosesə açılır, əvvəlcə serveri dayandırın. Production üçün Docker bölməsinə baxın. Sənədin qalanı ingiliscədir.
 
 **Three-minute demo:** `npm --prefix portal run demo` from the repository root, then follow [docs/DEMO.md](../docs/DEMO.md) (the Live drill: a phishing attack on the demo organisation, compressed into 90 seconds).
 
@@ -54,13 +54,13 @@ npm run setup                   # = npm run db:migrate && npm run db:seed
 npm run dev                     # http://localhost:3000
 ```
 
-`npm run db:migrate` applies the SQL in `drizzle/`; `npm run db:seed` loads the demo organisation "Safarov Industries" (fictional people and departments) with a month of history: progress, campaigns, incidents, sandbox verdicts, risk trend. The seed truncates every table first, so it can be re-run on the local embedded database; against a `DATABASE_URL` it refuses to run unless `ALLOW_SEED=1` is set. The demo data is for development and throwaway demos only, never for a customer installation (see [Production with Docker](#production-with-docker) for a real first start).
+`npm run db:migrate` applies the SQL in `drizzle/`; `npm run db:seed` loads the demo organisation "Safarov Industries" (fictional people and departments) with a month of history: progress, campaigns, incidents, sandbox verdicts, risk trend. The seed truncates every table first, so it can be re-run on the local embedded database; against a `DATABASE_URL` it refuses to run unless `ALLOW_SEED=1` is set, it never runs with `NODE_ENV=production`, and it refuses a database that holds organisations other than the demo's unless `SEED_FORCE=1`. The demo data is for development and throwaway demos only, never for a customer installation (see [Production with Docker](#production-with-docker) for a real first start).
 
 Open http://localhost:3000. Anonymous visitors get the public site in their language; sign in to reach the learner app or the admin console.
 
 ## Demo accounts
 
-All demo users belong to the demo organisation Safarov Industries (`safarovindustries.com`). The password for every account is the value of `SEED_PASSWORD` in `.env.example` (set your own `SEED_PASSWORD` before seeding to change it). That value is public, so the seed accepts it only for the local embedded database: against a `DATABASE_URL` or with `NODE_ENV=production` it refuses to run until `SEED_PASSWORD` is your own value of 12 or more characters. The accounts are defined in `scripts/seed-data.ts`; the operator account is created in `scripts/seed.ts`.
+All demo users belong to the demo organisation Safarov Industries (`safarovindustries.com`). The password for every account is printed once by `npm run setup` / `npm run demo` when the organisation is built (a random value; nothing in the repository holds it), or it is your own `SEED_PASSWORD` of 12 or more characters, set in the environment or in `.env.local` before seeding. The accounts are defined in `scripts/seed-data.ts`; the operator account is created in `scripts/seed.ts`.
 
 | Email | Role | Notes |
 |---|---|---|
@@ -87,10 +87,10 @@ The other ~30 seeded people have `firstname.lastname@safarovindustries.com` addr
 | `npm test` | Vitest, `tests/**/*.test.ts` |
 | `npm run db:generate` | `drizzle-kit generate`: writes a new SQL migration from `src/server/db/schema.ts` into `drizzle/` |
 | `npm run db:migrate` | Applies `drizzle/` to the database: PGlite locally, `DATABASE_URL` when set |
-| `npm run db:seed` | Loads the demo organisation (truncates all tables first; refuses with a `DATABASE_URL` or `NODE_ENV=production` unless `ALLOW_SEED=1`) |
+| `npm run db:seed` | Loads the demo organisation (truncates all tables first; needs `ALLOW_SEED=1` with a `DATABASE_URL`, never runs with `NODE_ENV=production`, refuses a non-demo database unless `SEED_FORCE=1`) |
 | `npm run db:reset` | Deletes `.data/pg`, then migrates and seeds |
 | `npm run setup` | `db:migrate` followed by `db:seed` |
-| `npm run demo` | One command to a ready-to-present demo: installs dependencies if missing, creates `.env.local`, rebuilds the demo organisation, starts the portal and pre-compiles the walkthrough's pages (`-- --prod` for a production build, `-- --port N`, `-- --keep-data`; it answers on this computer only). See `../docs/DEMO.md` |
+| `npm run demo` | One command to a ready-to-present demo: installs dependencies if missing, creates `.env.local`, builds the demo organisation (kept on later runs; `-- --reset` rebuilds it), starts the portal and pre-compiles the walkthrough's pages (`-- --prod` for a production build, `-- --port N`; it answers on this computer only). See `../docs/DEMO.md` |
 | `npm run content:sync` | Imports `content/library` (modules, lessons, learning paths) into the configured database. Idempotent: modules and lessons are matched by slug/key and updated in place, progress and assignments stay. The production server does the same on every start. Locally, stop `next dev` first (PGlite is single-process) |
 | `npm run jobs` | Background worker for servers running with `JOBS_ENABLED=0`: the same advisory-locked tick every minute; `npm run jobs -- --once` runs one tick (for cron). Needs `DATABASE_URL` (PostgreSQL) and exits otherwise: the embedded database is single-process, so locally keep `JOBS_ENABLED=1`. On SIGTERM it finishes the tick in progress before exiting |
 
@@ -120,7 +120,7 @@ Copy `.env.example` to `.env.local` (development) or provide the values to the c
 | `TRUST_PROXY` | `0` | Number of reverse proxies in front that append to `X-Forwarded-For` (`1` for one nginx/Caddy/Traefik). The client address is taken that many entries from the right, so a value sent by the client is never used. `0` ignores proxy headers. Used for the sign-in lockout, rate limits and audit IPs. **Required behind a proxy in production:** with `0` the per-address lockout and audit IPs are off, and the public demo form can only limit per email (beyond 100 anonymous requests an hour it still stores them but stops emailing `SALES_EMAIL`) |
 | `CLIENT_IP_HEADER` | `x-forwarded-for` | `x-real-ip` only when the proxy overwrites that header with the peer address |
 | `HSTS_INCLUDE_SUBDOMAINS`, `HSTS_PRELOAD` | `0` | Production sends `Strict-Transport-Security: max-age=63072000`. These add `includeSubDomains` and `preload` (preload needs both): only when every host of the domain is HTTPS for good |
-| `SEED_PASSWORD` | see `.env.example` | Password of every account created by `npm run db:seed`. The published default works only for the local embedded database; any other target needs your own value of 12+ characters |
+| `SEED_PASSWORD` | empty | Password of every account created by `npm run db:seed`. Empty: the seed generates a random one and prints it once at the end. Your own value needs 12+ characters; the seed also reads this one variable (and nothing else) from `.env.local` |
 | `ALLOW_SEED` | unset | Lets `db:seed` run against a `DATABASE_URL` or with `NODE_ENV=production`. The seed empties every table: only for fresh or throwaway databases |
 | `SALES_EMAIL` | empty | Demo requests from the public site are emailed here (they are always stored for the operator console). Needs the platform mail server below |
 | `PLATFORM_SMTP_HOST`, `PLATFORM_SMTP_PORT` (`587`), `PLATFORM_SMTP_SECURE` (`0`), `PLATFORM_SMTP_USER`, `PLATFORM_SMTP_PASSWORD`, `PLATFORM_MAIL_FROM` | empty | Mail server for platform mail that belongs to no organisation (demo requests). `SECURE=1` for implicit TLS (465), otherwise STARTTLS is required. `PLATFORM_MAIL_FROM` is required with a host. A start-up warning names `SALES_EMAIL` without a platform server |
@@ -198,7 +198,7 @@ docker compose logs app | grep bootstrap     # the operator's one-time invitatio
 
 Open the link, set the operator password, then create the customer organisations in the operator console (`/super`): each gets its first administrator with an invitation link. The `app` service reads `.env`, overrides `DATABASE_URL` so it points at the `db` service, and waits for PostgreSQL to be healthy. Data lives in the named volume `pgdata`. The app is published on `127.0.0.1:3000` only, for the TLS proxy on the same host (Docker-published ports bypass ufw/firewalld); change the mapping to `3000:3000` only if it must be reachable directly.
 
-Demo data is for development and throwaway demo stacks only: it **truncates every table** and loads the fictional "Safarov Industries" with ~37 accounts, the platform operator included, that all share one `SEED_PASSWORD`. Set your own value of 12 or more characters in `.env` first: the seed refuses the public one from `.env.example` on this stack. Never run it on a customer installation:
+Demo data is for development and throwaway demo stacks only: it **truncates every table** and loads the fictional "Safarov Industries" with ~37 accounts, the platform operator included, that all share one `SEED_PASSWORD`. Set `SEED_PASSWORD` (12 or more characters) in `.env` first, or leave it unset and the seed prints a random one once in this terminal. Never run it on a customer installation:
 
 ```bash
 docker compose --profile tools run --rm seed

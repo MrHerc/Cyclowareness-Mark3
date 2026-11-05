@@ -91,6 +91,8 @@ A malformed or `null` Origin is refused with `403`.
 | POST | `/api/admin/people/invite-links` | `people.write` | CSV of fresh invitation links |
 | GET | `/api/admin/policies/{id}/signoffs` | `policies.read` | CSV of policy sign-offs |
 | GET | `/api/admin/campaigns/{id}/usb-kit` | `campaigns.write` | CSV kit for a USB simulation |
+| GET | `/api/admin/drill/{id}` | `campaigns.write`, feature `live_drill` | JSON state of a live drill |
+| POST | `/api/admin/drill/{id}` | `campaigns.write`, feature `live_drill`, same origin | JSON state after applying the due drill events |
 | GET | `/api/super/demo-requests` | `platform.manage` | CSV of demo requests |
 
 ## 4. Endpoints
@@ -328,6 +330,12 @@ For a USB-drop campaign: one CSV row per drive. Requires `campaigns.write`.
 
 Each row holds the drive label, the person it is labelled for, the bait file name and the content of a small HTML beacon file. Opening the file leads to that person's tracking link. Other channels return `404`.
 
+### GET and POST /api/admin/drill/{id}
+
+The state of a live drill (docs/DEMO.md) for the dashboard: funnel, feed, risk curve and report. Requires `campaigns.write` and the feature `live_drill`, which only the demo seed sets; otherwise, or for an unknown id or another organisation's drill, `404`.
+
+The dashboard polls the `POST` once a second: it applies the drill events that are due (openings, clicks, reports, trainings, through the same services a real campaign uses) and answers with the state afterwards. It changes data, so it passes the same-origin check and answers `403` to a cross-site request. The `GET` returns the same state without applying anything. Both answer with `Cache-Control: no-store`.
+
 ### GET /api/super/demo-requests
 
 All demo requests from the public website as CSV, for platform operators with `platform.manage`. Each download writes an audit entry.
@@ -539,5 +547,6 @@ Limits are fixed windows counted in the database and shared by every server inst
 | People export and invitation links, combined | 20 per person per hour |
 | `GET /api/me/export` | 5 per person per hour |
 | `GET /api/sso/start`, `GET /api/sso/callback/{tenant}` | 60 per client address per minute and 600 per organisation per minute, each |
+| Start a drill (server action) | 20 drills per organisation per hour |
 
 Cached tutor answers and cached subtitles still count against the request limits. Client addresses are known only when `TRUST_PROXY` matches the number of reverse proxies in front of the server.

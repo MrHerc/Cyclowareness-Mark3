@@ -178,7 +178,7 @@ One command builds a fresh demo organisation in the embedded database and starts
 npm --prefix portal run demo
 ```
 
-Then open http://localhost:3000/sign-in?next=/admin/drill and follow [docs/DEMO.md](docs/DEMO.md), which has the talk track for the live drill. With Docker instead: `docker compose -f portal/docker-compose.demo.yml up --build`.
+Then open http://localhost:3000/sign-in?next=/admin/drill and follow [docs/DEMO.md](docs/DEMO.md), which has the talk track for the live drill. With Docker instead: `cp portal/.env.demo.example portal/.env.demo`, set its three values, then `docker compose --env-file portal/.env.demo -f portal/docker-compose.demo.yml up --build`.
 
 ### Local development
 
@@ -204,7 +204,7 @@ npm run setup
 npm run dev
 ```
 
-`npm run setup` applies the migration and loads a fictional demo organisation, Safarov Industries, with about 35 people and a month of activity history. Open http://localhost:3000 and sign in with one of these accounts. The password for all of them is the `SEED_PASSWORD` value in `portal/.env.example`.
+`npm run setup` applies the migration and loads a fictional demo organisation, Safarov Industries, with about 35 people and a month of activity history. Open http://localhost:3000 and sign in with one of these accounts. The password for all of them is printed once by `npm run setup` / `npm run demo` when the organisation is built, or it is your own `SEED_PASSWORD` in `portal/.env.local` (set it before seeding).
 
 | Email | Role |
 |---|---|

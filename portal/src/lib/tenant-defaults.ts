@@ -306,19 +306,19 @@ export const PLAN_FEATURES = {
   enterprise_hrm: ["closed_loops", "approvals", "threat_intel", "policy_intel", "leadership", "ops_center"],
 } as const;
 /**
- * Features no plan includes: the platform operator switches them on for one organisation (/super →
- * Features). `live_drill` plays a time-compressed phishing attack with synthetic responses from the
- * organisation's people, so it belongs on demo and sales organisations only, never on real employees.
+ * Features no plan includes and the operator console cannot switch on: only the demo seed sets them, on the
+ * fictional demo organisation. `live_drill` plays a time-compressed phishing attack with synthetic responses
+ * from the organisation's people, so it must never reach real employees.
  */
-export const OPERATOR_FEATURES = ["live_drill"] as const;
+export const SEED_ONLY_FEATURES = ["live_drill"] as const;
 export type Feature =
   | (typeof PLAN_FEATURES.essentials)[number]
   | (typeof PLAN_FEATURES.professional)[number]
   | (typeof PLAN_FEATURES.enterprise_hrm)[number]
-  | (typeof OPERATOR_FEATURES)[number];
+  | (typeof SEED_ONLY_FEATURES)[number];
 
-/** Every feature an operator can override: the plans' and the operator-only ones. */
-export const ALL_FEATURES: readonly Feature[] = [...PLAN_FEATURES.essentials, ...PLAN_FEATURES.professional, ...PLAN_FEATURES.enterprise_hrm, ...OPERATOR_FEATURES];
+/** Every feature an operator can override from /super: the plans' ones, never SEED_ONLY_FEATURES. */
+export const ALL_FEATURES: readonly Feature[] = [...PLAN_FEATURES.essentials, ...PLAN_FEATURES.professional, ...PLAN_FEATURES.enterprise_hrm];
 
 export function featuresFor(plan: "essentials" | "professional" | "enterprise_hrm", overrides: Record<string, boolean> = {}): Set<Feature> {
   const list: Feature[] = [...PLAN_FEATURES.essentials];

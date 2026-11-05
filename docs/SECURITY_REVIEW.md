@@ -65,7 +65,7 @@ Two published values still need action:
 **Impact.** Anyone who has read the repository can sign in to any seeded instance they can reach. The operator account has no second factor yet: the portal forces two-step setup after sign-in, so an attacker would simply enrol their own authenticator. From the operator console they control every tenant on that instance. The data is fictional, but a demo instance is often shown to prospects and may later receive real users or real SMTP credentials.
 
 **Remediation.**
-- Done: the seed now refuses to run against a `DATABASE_URL` or with `NODE_ENV=production` unless `SEED_PASSWORD` is set, differs from the published value and has 12 or more characters (`seedPasswordProblem` in `portal/scripts/seed-data.ts`, test `portal/tests/seed-guard.test.ts`). The local embedded database keeps the documented default so development is unchanged.
+- Done: the published password is gone from the repository. The seed uses `SEED_PASSWORD` (12 or more characters, environment or `.env.local`) or generates a random one and prints it once; it never runs with `NODE_ENV=production`, needs `ALLOW_SEED=1` for a `DATABASE_URL` and refuses a database holding organisations other than the demo's unless `SEED_FORCE=1` (`seedRefusal` and `foreignTenants` in `portal/scripts/seed-data.ts`, test `portal/tests/seed-guard.test.ts`).
 - To do: rotate passwords on reachable instances (see the rotation section). Never expose a seeded instance to the internet with the default password, including through a tunnel for a presentation.
 
 ### M-1 No automated dependency or secret scanning (Medium)

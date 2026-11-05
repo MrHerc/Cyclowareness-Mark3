@@ -7,13 +7,11 @@ title = "Cyclowareness"
 useDefault = true
 
 [[allowlists]]
-description = "Public placeholders: test-only and development-only APP_SECRET values, and the documented demo password"
+description = "Public placeholders: test-only and development-only APP_SECRET values"
 regexTarget = "secret"
 regexes = [
   # tests/*.test.ts stub APP_SECRET with these.
   '''test-only-app-secret''',
   # src/server/crypto.ts and src/server/env.ts use this outside production only; production refuses to start without APP_SECRET.
   '''^dev-only-secret-change-me''',
-  # SEED_PASSWORD in portal/.env.example: published on purpose, and scripts/seed.ts refuses it for any database but the local one.
-  '''^Portal-Demo-2026!?$''',
 ]
