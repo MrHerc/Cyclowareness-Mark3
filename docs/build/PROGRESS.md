@@ -45,6 +45,8 @@ Vəziyyət: 2026-10-19. Portal `portal/` qovluğundadır, lokalda tam işləyir 
 - **İşıq və hərəkət.** Tokenlər, `motion-ok`/`motion-full`, `useMotion`, `Burst`, `Spotlight`, Calm və Still qaydaları; learner, admin və landing səhifələri işıqlandırıldı (ADR-032). Tənqidçi 7,5/10 verdi, ardınca təkmilləşdirmə edildi. Üç müstəqil rəy 14 məsələ tapdı, 12-si düzəldildi, qalanları yekun dövrəyə (`finalize-portal.js`) verildi.
 - **Yoxlama.** `tsc` 0, `eslint --max-warnings=0` 0, vitest 81 fayl / 2621 test. Baza 10 × 106 dərslə yenidən seed olundu. Codex CLI bu kompüterdə çökdüyü üçün kod baxışlarını ECC və agent-skills rəyçiləri etdi (OPEN-QUESTIONS 24). Bu qeyd yazılanda 10 dildə uçdan-uca brauzer yoxlaması (`finalize-portal.js`) davam edirdi; commit və push hələ edilməyib.
 
+11. **Canlı məşq və bir əmrlə demo (2026-11-05).** Üç dəqiqəlik demonun mərkəzi: `/admin/drill`-də demo təşkilata qarşı sıxılmış vaxtda fişinq hücumu, real xidmətlərdən keçən planlaşdırılmış davranış, canlı panel (huni, şöbələr üzrə əməkdaş plitələri, AI Sel şərhi, platformanın etdikləri, klik və bildiriş yarışı, risk əyrisi, məşq hesabatı). `npm --prefix portal run demo` bir əmrlə təzə demo təşkilat qurur və səhifələri əvvəlcədən kompilyasiya edir; Docker yolu `portal/docker-compose.demo.yml`. Ssenari və mənbələr: `docs/DEMO.md` (ADR-034).
+
 ## Yoxlanılıb (brauzerdə, lokal)
 - Giriş, ev səhifəsi (content shield, su nişanı), onboarding turu (spotlight, klaviatura), dərs pleyeri (tutor, hotspot, simulyasiya, çoxcavablı sual, rəy vərəqi).
 - Admin icmalı, tənzimləmələr, əməliyyat mərkəzi, dövrələr, qəbul → dövrə + insident, təsdiq → təlim, studiya → qaralama → önizləmə, şəxs səhifəsi (QR, sparkline).

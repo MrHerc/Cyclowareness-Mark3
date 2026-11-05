@@ -170,6 +170,16 @@ The full description, with the request lifecycle, data model, background jobs an
 
 ## Quick start
 
+### Three-minute demo
+
+One command builds a fresh demo organisation in the embedded database and starts the portal:
+
+```bash
+npm --prefix portal run demo
+```
+
+Then open http://localhost:3000/sign-in?next=/admin/drill and follow [docs/DEMO.md](docs/DEMO.md), which has the talk track for the live drill. With Docker instead: `docker compose -f portal/docker-compose.demo.yml up --build`.
+
 ### Local development
 
 You need Node.js 22 or newer and npm. You do not need a database server: an embedded PostgreSQL stores data in `portal/.data/pg`.

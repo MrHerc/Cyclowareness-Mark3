@@ -7,7 +7,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { PageHeader, TabsNav } from "@/components/ui/layout";
 import { NewTenant, TenantControls } from "@/components/admin/platform-client";
-import { PLAN_FEATURES, featuresFor } from "@/lib/tenant-defaults";
+import { ALL_FEATURES, featuresFor } from "@/lib/tenant-defaults";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.platform");
@@ -27,7 +27,7 @@ export default async function OperatorTenantsPage() {
       .orderBy(asc(t.users.name)),
   ]);
   const countBy = new Map(counts.map((c) => [c.tenantId, Number(c.n)]));
-  const allFeatures = Object.values(PLAN_FEATURES).flat() as string[];
+  const allFeatures = [...ALL_FEATURES] as string[];
 
   return (
     <div className="grid gap-5">

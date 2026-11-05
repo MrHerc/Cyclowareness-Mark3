@@ -13,6 +13,8 @@ npm run dev                       # http://localhost:3000
 
 Demo hesablar: `admin@safarovindustries.com` (tenant admin), `learner@safarovindustries.com` (işçi) və aşağıdakı cədvəldəki digər rollar. Parol: `.env.example` faylındakı `SEED_PASSWORD` dəyəri. Dev server işləyərkən `db:*` skriptlərini çalışdırmayın: lokal baza (PGlite) eyni anda yalnız bir prosesə açılır, əvvəlcə serveri dayandırın. Production üçün Docker bölməsinə baxın. Sənədin qalanı ingiliscədir.
 
+**Three-minute demo:** `npm --prefix portal run demo` from the repository root, then follow [docs/DEMO.md](../docs/DEMO.md) (the Live drill: a phishing attack on the demo organisation, compressed into 90 seconds).
+
 ## Contents
 
 - [What is in the box](#what-is-in-the-box)
@@ -88,6 +90,7 @@ The other ~30 seeded people have `firstname.lastname@safarovindustries.com` addr
 | `npm run db:seed` | Loads the demo organisation (truncates all tables first; refuses with a `DATABASE_URL` or `NODE_ENV=production` unless `ALLOW_SEED=1`) |
 | `npm run db:reset` | Deletes `.data/pg`, then migrates and seeds |
 | `npm run setup` | `db:migrate` followed by `db:seed` |
+| `npm run demo` | One command to a ready-to-present demo: installs dependencies if missing, creates `.env.local`, rebuilds the demo organisation, starts the portal and pre-compiles the walkthrough's pages (`-- --prod` for a production build, `-- --port N`, `-- --keep-data`; it answers on this computer only). See `../docs/DEMO.md` |
 | `npm run content:sync` | Imports `content/library` (modules, lessons, learning paths) into the configured database. Idempotent: modules and lessons are matched by slug/key and updated in place, progress and assignments stay. The production server does the same on every start. Locally, stop `next dev` first (PGlite is single-process) |
 | `npm run jobs` | Background worker for servers running with `JOBS_ENABLED=0`: the same advisory-locked tick every minute; `npm run jobs -- --once` runs one tick (for cron). Needs `DATABASE_URL` (PostgreSQL) and exits otherwise: the embedded database is single-process, so locally keep `JOBS_ENABLED=1`. On SIGTERM it finishes the tick in progress before exiting |
 
@@ -329,6 +332,7 @@ npx tsx scripts/check-lesson-locales.ts --coverage   # every lesson translation:
 ## Documentation
 
 - `../docs/audit/` — the audit of the earlier portal that this rebuild follows: overview and routes, design tokens, learner app, admin panel, training catalogue (53 modules, 106 lessons), landing, lesson engine and mascot, screenshots, extracted content.
+- `../docs/DEMO.md` — the three-minute demo: how to run it, the talk track, what the Live drill simulates and what is real, the calibration sources.
 - `../docs/build/PLAN.md` — the build phases of the hybrid portal; `DECISIONS.md` (ADRs, including the ten languages, translation, narration, captions, player, mascot, light/motion and security hardening), `PROGRESS.md`, `OPEN-QUESTIONS.md` (what still needs the owner's decision or a key).
 - `../.claude/skills/cyclowareness-experience/` — the working reference for the mascot, motion, lessons, translations and the training pipeline, with the per-language glossaries.
 - Next.js itself: [documentation](https://nextjs.org/docs) and the version-specific guides shipped in `node_modules/next/dist/docs/` (this Next.js version has breaking changes compared with older tutorials; `AGENTS.md` says the same).
