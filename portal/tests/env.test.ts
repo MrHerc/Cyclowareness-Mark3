@@ -55,6 +55,17 @@ describe("production start-up", () => {
     await expect(load({ NODE_ENV: "production", APP_SECRET: SECRET, APP_URL: "http://localhost:3000", ALLOW_HTTP_APP_URL: "1", TRUST_PROXY: "1" })).resolves.toBeDefined();
   });
 
+  it("warns when the SMS gateway is plain http", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const base = { NODE_ENV: "production", APP_SECRET: SECRET, APP_URL: "https://portal.example.com", TRUST_PROXY: "1", SMS_PROVIDER: "webhook" };
+    await load({ ...base, SMS_WEBHOOK_URL: "http://sms.intranet.example/send" });
+    expect(warn.mock.calls.some(([m]) => String(m).includes("SMS_WEBHOOK_URL"))).toBe(true);
+    warn.mockClear();
+    await load({ ...base, SMS_WEBHOOK_URL: "https://sms.example.com/send" });
+    expect(warn.mock.calls.some(([m]) => String(m).includes("SMS_WEBHOOK_URL"))).toBe(false);
+    warn.mockRestore();
+  });
+
   it("does not need APP_URL during next build", async () => {
     await expect(load({ NODE_ENV: "production", NEXT_PHASE: "phase-production-build", APP_URL: "" })).resolves.toBeDefined();
   });

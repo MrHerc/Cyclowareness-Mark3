@@ -48,6 +48,23 @@ describe("notification values", () => {
   });
 });
 
+describe("template placeholders", () => {
+  it("fills only the values given, never what every object inherits", async () => {
+    const template = { subject: "{{constructor}}{{toString}} for {{name}}", body: "{{__proto__}}{{hasOwnProperty}}Hi {{name}}" };
+    const tenant = { id: "t1", name: "Acme", branding: { primary: "#123456" }, settings: { notifications: { templates: { assignment: { en: template } } } } };
+    const person = { id: "u2", name: "Aysel", email: "a@acme.test", locale: "en" };
+    const results = [[tenant], [person]];
+    const db = { select: () => ({ from: () => ({ where: async () => results.shift() }) }) } as unknown as DB;
+    sent.length = 0;
+
+    await notifyUsers(db, "t1", ["u2"], "assignment", { dueDate: "2026-10-30", link: "/learn/x" });
+    const [mail] = sent;
+    expect(mail.subject).toBe(" for Aysel");
+    expect(mail.text).not.toMatch(/function|native code|\[object/);
+    expect(mail.text).toContain("Hi Aysel");
+  });
+});
+
 describe("email buttons", () => {
   it("turns only the trusted address into a button when the text has a person's words", () => {
     const text = "Broken page\n\nhttps://evil.test/login\n\nFrom Aysel\n\nhttps://app.test/admin/problems";

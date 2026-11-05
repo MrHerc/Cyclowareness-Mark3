@@ -2,6 +2,27 @@
 
 export const DEMO_DOMAIN = "safarovindustries.com";
 
+/**
+ * The demo password published in .env.example and this public repository. Anyone can read it, so it is
+ * accepted only for the local embedded database (a developer's own machine).
+ */
+export const PUBLISHED_SEED_PASSWORD = "Portal-Demo-2026!";
+
+/**
+ * Why the seed must not use `password` for this target, or null. Any DATABASE_URL or NODE_ENV=production
+ * stack can be reachable by others, and every seeded account (the platform operator included) would open
+ * with the published password: such stacks need their own SEED_PASSWORD of 12 or more characters.
+ */
+export function seedPasswordProblem(e: { DATABASE_URL?: string; NODE_ENV?: string; SEED_PASSWORD?: string }): string | null {
+  if (!e.DATABASE_URL && e.NODE_ENV !== "production") return null;
+  const password = e.SEED_PASSWORD ?? "";
+  if (!password || password === PUBLISHED_SEED_PASSWORD) {
+    return "SEED_PASSWORD is unset or is the demo password published in .env.example. This target is not the local embedded database, so set your own SEED_PASSWORD (12+ characters) before seeding.";
+  }
+  if (password.length < 12) return "SEED_PASSWORD must have at least 12 characters for a target other than the local embedded database.";
+  return null;
+}
+
 export type DeptKey = "exec" | "it" | "sec" | "fin" | "hr" | "legal" | "ops";
 
 export const DEPARTMENTS: { key: DeptKey; name: string; parent?: DeptKey }[] = [

@@ -101,6 +101,11 @@ if (data.NODE_ENV === "production" && !building) {
       "[env] TRUST_PROXY=0: behind a reverse proxy client addresses are unknown, so the per-address sign-in lockout and audit IPs are off and the public demo form falls back to a per-email limit with a site-wide ceiling on the sales mail. Set TRUST_PROXY to the number of proxies in front.",
     );
   }
+  if (data.SMS_WEBHOOK_URL?.startsWith("http://")) {
+    console.warn(
+      "[env] SMS_WEBHOOK_URL uses plain http://: every sign-in code and SMS_WEBHOOK_TOKEN cross the network unencrypted. Use an https:// gateway address.",
+    );
+  }
   if (data.SALES_EMAIL && !data.PLATFORM_SMTP_HOST) {
     console.warn("[env] SALES_EMAIL is set but PLATFORM_SMTP_HOST is not: demo requests are stored for the operator console but not emailed.");
   }
