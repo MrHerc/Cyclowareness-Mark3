@@ -1,4 +1,4 @@
-<!-- version: 1; effective: 2026-10-04 -->
+<!-- version: 2; effective: 2026-11-05 -->
 # Nutzungsbedingungen
 
 Regeln für die Nutzung der Plattform: die Parteien, die Kontosicherheit, die zulässige Nutzung, simuliertes Phishing und QR-Code-Schulungen, die Pflichten der Organisation, geistiges Eigentum, die Grenzen von AI Sel, die Haftung, das anwendbare Recht und die Kontaktdaten. Ein unterzeichneter Kundenvertrag hat Vorrang vor diesen Nutzungsbedingungen.
@@ -90,9 +90,9 @@ Regeln für die Nutzung der Plattform: die Parteien, die Kontosicherheit, die zu
 
 ## 10. AI Sel (KI-Assistent)
 
-10.1. AI Sel beantwortet schriftliche oder gesprochene Fragen zur aktuellen Lektion. In der Cloud-Version werden die Antworten von Google-Gemini-Modellen über Google Cloud Vertex AI erzeugt.
+10.1. AI Sel beantwortet schriftliche oder gesprochene Fragen zur aktuellen Lektion. In der Cloud-Version werden die Antworten von Claude-Modellen über die Anthropic API (Anthropic PBC, USA) erzeugt. Eine gesprochene Frage wird vom Browser des Nutzers in Text umgewandelt; der Dienst erhält nur den Text. Die Vertonung der Lektionen wird vorab aus dem Text der Lektion von einem Text-to-Speech-Dienst erzeugt (derzeit ElevenLabs oder eine vom Anbieter betriebene Open-Source-Engine); dabei werden keine personenbezogenen Daten verarbeitet.
 10.2. Die Antworten von AI Sel können ungenau, unvollständig oder veraltet sein. Diese dienen ausschließlich Schulungszwecken und stellen keine rechtliche, technische oder sonstige fachliche Beratung dar. Befolgen Sie bei einem tatsächlichen Sicherheitsvorfall das Verfahren der Organisation zur Behandlung von Sicherheitsvorfällen und wenden Sie sich an deren für Informationssicherheit zuständige Mitarbeitende.
-10.3. Geben Sie in AI Sel keine personenbezogenen Daten, Passwörter oder vertraulichen Informationen ein. Vor dem Absenden einer Frage maskiert der Dienst E-Mail-Adressen, Telefonnummern sowie Karten- und Kontonummern; eine automatische Maskierung kann jedoch nicht alles erkennen.
+10.3. Geben Sie in AI Sel keine personenbezogenen Daten, Passwörter oder vertraulichen Informationen ein. Die Frage wird so an das Modell übermittelt, wie sie geschrieben wurde; der Dienst maskiert oder filtert sie nicht.
 10.4. AI Sel beantwortet keine Fragen außerhalb des Themas Cyberhygiene und unterliegt stündlichen Nutzungslimits; die Organisation kann AI Sel zusammen mit den gesprochenen Fragen deaktivieren.
 10.5. Fragen und Antworten werden gespeichert, damit dieselbe Frage erneut beantwortet werden kann, ohne dass eine neue Anfrage an das KI-Modell gesendet werden muss. Die Speicherung erfolgt ohne Verknüpfung mit dem Namen oder dem Konto der fragenden Person.
 
@@ -159,7 +159,7 @@ Regeln für die Nutzung der Plattform: die Parteien, die Kontosicherheit, die zu
 
 ## 19. Schlussbestimmungen
 
-19.1. Diese Nutzungsbedingungen werden in aserbaidschanischer, englischer und russischer Sprache veröffentlicht. Bei Abweichungen zwischen den Sprachfassungen ist der aserbaidschanische Text maßgeblich.
+19.1. Diese Nutzungsbedingungen werden in aserbaidschanischer, englischer, russischer, türkischer, rumänischer, georgischer, ukrainischer, deutscher, französischer und arabischer Sprache veröffentlicht. Bei Abweichungen zwischen den Sprachfassungen ist der aserbaidschanische Text maßgeblich.
 19.2. Sollte eine Bestimmung für unwirksam befunden werden, bleiben die übrigen Bestimmungen wirksam, und die unwirksame Bestimmung wird durch die wirksame Bestimmung ersetzt, die ihrem Zweck am nächsten kommt.
 19.3. Der Anbieter kann Subunternehmer einsetzen und bleibt für diese verantwortlich. Subunternehmer, die personenbezogene Daten verarbeiten, sind in der Datenschutzerklärung und im Datenverarbeitungsvertrag aufgeführt.
 19.4. Die Organisation darf ihre Rechte aus diesen Nutzungsbedingungen nicht ohne Zustimmung des Anbieters auf eine andere Person übertragen. Im Fall einer Umstrukturierung des Anbieters oder der Übertragung seines Geschäftsbetriebs auf eine andere Person kann der Anbieter seine Rechte aus diesen Nutzungsbedingungen durch Mitteilung an die Organisation übertragen.

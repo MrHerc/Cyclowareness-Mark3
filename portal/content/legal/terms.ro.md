@@ -1,4 +1,4 @@
-<!-- version: 1; effective: 2026-10-04 -->
+<!-- version: 2; effective: 2026-11-05 -->
 # Termeni de utilizare
 
 Regulile de utilizare a platformei: părțile, securitatea conturilor, utilizarea acceptabilă, simulările de phishing și instruirile cu coduri QR, obligațiile Organizației, proprietatea intelectuală, limitele asistentului AI Sel, răspunderea, legea aplicabilă și datele de contact. Un contract semnat cu clientul prevalează asupra prezenților Termeni.
@@ -90,9 +90,9 @@ Regulile de utilizare a platformei: părțile, securitatea conturilor, utilizare
 
 ## 10. AI Sel (asistent AI)
 
-10.1. AI Sel răspunde la întrebări scrise sau vocale referitoare la lecția curentă. În Versiunea cloud, răspunsurile sunt generate de modelele Google Gemini prin intermediul Google Cloud Vertex AI.
+10.1. AI Sel răspunde la întrebări scrise sau vocale referitoare la lecția curentă. În Versiunea cloud, răspunsurile sunt generate de modelele Claude prin intermediul Anthropic API (Anthropic PBC, Statele Unite ale Americii). O întrebare vocală este convertită în text de browserul Utilizatorului; Serviciul primește numai textul. Narațiunea lecțiilor este realizată în prealabil, pe baza textului lecției, de un serviciu de conversie a textului în vorbire (în prezent ElevenLabs sau un motor open-source operat de Furnizor) și nu implică date cu caracter personal.
 10.2. Răspunsurile oferite de AI Sel pot fi inexacte, incomplete sau depășite. Acestea sunt destinate exclusiv instruirii și nu constituie consultanță juridică, tehnică sau de altă natură profesională. În cazul unui incident real, urmați procedura Organizației de răspuns la incidente și contactați personalul acesteia responsabil de securitatea informației.
-10.3. Nu introduceți în AI Sel date cu caracter personal, parole sau informații confidențiale. Înainte de a trimite o întrebare, Serviciul maschează adresele de e-mail, numerele de telefon, precum și numerele de card și de cont, însă mascarea automată nu poate detecta totul.
+10.3. Nu introduceți în AI Sel date cu caracter personal, parole sau informații confidențiale. Întrebarea este transmisă modelului așa cum a fost scrisă; Serviciul nu o maschează și nu o filtrează.
 10.4. AI Sel nu răspunde la întrebări care nu țin de igiena cibernetică și este supus unor limite orare; Organizația îl poate dezactiva, împreună cu întrebările vocale.
 10.5. Întrebările și răspunsurile sunt stocate pentru ca aceeași întrebare să poată primi din nou răspuns fără trimiterea unei noi solicitări către modelul de inteligență artificială. Acestea sunt stocate fără a fi asociate cu numele sau cu contul persoanei care a adresat întrebarea.
 
@@ -159,7 +159,7 @@ Regulile de utilizare a platformei: părțile, securitatea conturilor, utilizare
 
 ## 19. Dispoziții finale
 
-19.1. Prezenții Termeni sunt publicați în limbile azeră, engleză și rusă. În cazul oricărei neconcordanțe între texte, prevalează textul în limba azeră.
+19.1. Prezenții Termeni sunt publicați în limbile azeră, engleză, rusă, turcă, română, georgiană, ucraineană, germană, franceză și arabă. În cazul oricărei neconcordanțe între texte, prevalează textul în limba azeră.
 19.2. Dacă o prevedere este declarată nevalidă, celelalte prevederi rămân în vigoare, iar prevederea nevalidă se înlocuiește cu prevederea validă care se apropie cel mai mult de scopul acesteia.
 19.3. Furnizorul poate recurge la subcontractanți și rămâne responsabil pentru aceștia. Subcontractanții care prelucrează date cu caracter personal sunt enumerați în Politica de confidențialitate și în Contractul privind datele.
 19.4. Organizația nu își poate transfera drepturile care decurg din prezenții Termeni unei alte persoane fără consimțământul Furnizorului. În cazul reorganizării Furnizorului sau al transferului activității sale către o altă persoană, Furnizorul își poate transfera drepturile care decurg din prezenții Termeni prin trimiterea unei notificări către Organizație.

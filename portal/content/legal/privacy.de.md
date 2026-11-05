@@ -1,4 +1,4 @@
-<!-- version: 2; effective: 2026-10-08 -->
+<!-- version: 3; effective: 2026-11-05 -->
 # Datenschutzerklärung
 
 Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welcher Rechtsgrundlage verarbeitet werden, wer dafür verantwortlich ist, was an AI Sel übermittelt wird, wo und wie lange Daten gespeichert werden, wie sie geschützt sind und wie Sie Ihre Rechte ausüben können.
@@ -28,14 +28,14 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 | Bestätigungen und Kenntnisnahme von Richtlinien | genauer Wortlaut des von Ihnen bestätigten Textes, Version der Richtlinie, Zeitpunkt, IP-Adresse | Sie und der Dienst |
 | Zertifikate | Modul, Ausstellungsdatum, Seriennummer, Link zur Überprüfung | der Dienst |
 | Ergebnisse von Schulungsangriffen | Scans von Schulungs-QR-Codes (Zeitpunkt, Gerätetyp, gekürzte IP-Adresse), Handlungen im simulierten Phishing, sofern aktiviert, Meldungen verdächtiger E-Mails | der Dienst |
-| AI Sel | die von Ihnen eingetippte Frage oder Ihre Sprachaufnahme, deren Text, die Antwort | Sie |
+| AI Sel | die von Ihnen eingetippte oder gesprochene Frage (der Dienst erhält sie als Text), die Antwort | Sie |
 | Sicherheits- und Gerätedaten | Audit-Protokoll der Anmeldungen und administrativen Handlungen, IP-Adresse, Browser- und Gerätetyp (User-Agent), aktive Sitzungen | der Dienst |
 | E-Mails | Einladungen, Passwort-Links, Erinnerungen, Berichte: Empfänger, Art, Zustellstatus | der Dienst |
 | Aufzeichnungen zur Ausübung von Rechten | Datendownloads, Löschanträge, Entscheidungen und Gründe | Sie, Ihre Organisation |
 
 3.1. Der Dienst benötigt keine besonderen Kategorien personenbezogener Daten (Daten über die rassische oder nationale Herkunft, das Familienleben, religiöse Überzeugungen, die Gesundheit oder strafrechtliche Verurteilungen) und verwendet Ihr Bild oder Ihre Stimme nicht, um Sie zu identifizieren.
 3.2. Ligatabellen vergleichen Abteilungen, nicht einzelne Personen, und zeigen keine Abteilungen mit weniger als drei aktiven Teilnehmenden an.
-3.3. Öffentliche Website. Wenn Sie die öffentliche Seite des Dienstes ohne Konto aufrufen, wird die dort getroffene Auswahl (Rolle, Organisationsgröße, stiller Modus, geschlossene Hinweise) ausschließlich in Ihrem eigenen Browser gespeichert (im lokalen Speicher und im Sitzungsspeicher) und nicht an den Anbieter übermittelt. Sie können sie über den Link „Meine Auswahl vergessen“ auf der Seite oder durch Löschen der Websitedaten in Ihrem Browser entfernen. Wenn Sie das Formular für eine Demo-Anfrage absenden, speichert der Anbieter die von Ihnen eingegebenen Daten (Name, dienstliche E-Mail-Adresse, Organisation, Größenklasse nach Zahl der Mitarbeitenden, Land, optionale Nachricht), die von Ihnen gewählte Rolle, den Anlass, der Sie zum Formular geführt hat, und die Stufe Ihres Testergebnisses. Diese Daten werden auf Grundlage der Einwilligung, die Sie durch Ankreuzen des Kontrollkästchens erteilen, zur Beantwortung Ihrer Anfrage verwendet; der Anbieter ist Eigentümer dieser Daten. Sofern in der Installation des Anbieters keine andere Frist festgelegt ist, werden die Daten nach 24 Monaten gelöscht, auf Ihren Antrag an die Adresse [wird nachgetragen] auch früher. Diese Daten werden niemals an AI Sel, an KI-Dienste oder an Analysedienste übermittelt.
+3.3. Öffentliche Website. Wenn Sie die öffentliche Seite des Dienstes ohne Konto aufrufen, wird die dort getroffene Auswahl (Rolle, Organisationsgröße, stiller Modus, geschlossene Hinweise) ausschließlich in Ihrem eigenen Browser gespeichert (im lokalen Speicher und im Sitzungsspeicher) und nicht an den Anbieter übermittelt. Sie können sie über den Link „Meine Auswahl vergessen“ auf der Seite oder durch Löschen der Websitedaten in Ihrem Browser entfernen. Wenn Sie das Formular für eine Demo-Anfrage absenden, speichert der Anbieter die von Ihnen eingegebenen Daten (Name, dienstliche E-Mail-Adresse, Organisation, Größenklasse nach Zahl der Mitarbeitenden, Land, optionale Nachricht) sowie die Sprache der Benutzeroberfläche, den Zeitpunkt der Anfrage und die Version dieser Datenschutzerklärung, in die Sie eingewilligt haben. Diese Daten werden auf Grundlage der Einwilligung, die Sie durch Ankreuzen des Kontrollkästchens erteilen, zur Beantwortung Ihrer Anfrage verwendet; der Anbieter ist Eigentümer dieser Daten. Sofern in der Installation des Anbieters keine andere Frist festgelegt ist, werden die Daten nach 24 Monaten gelöscht, auf Ihren Antrag an die Adresse [wird nachgetragen] auch früher. Diese Daten werden niemals an AI Sel, an KI-Dienste oder an Analysedienste übermittelt.
 
 ## 4. Zwecke und Rechtsgrundlagen
 
@@ -54,11 +54,11 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 
 ## 5. AI Sel (KI-Assistent)
 
-5.1. Wenn Sie AI Sel (dem KI-Assistenten) eine Frage stellen, übermittelt der Dienst ausschließlich die Frage, den Inhalt der aktuellen Lektion, die Sprache der Benutzeroberfläche und technische Kennungen an Google Cloud Vertex AI. Ihr Name, Ihre E-Mail-Adresse, Ihre Stellenbezeichnung und der Name Ihrer Organisation werden niemals übermittelt.
-5.2. Vor dem Senden maskiert der Dienst E-Mail-Adressen, Telefonnummern, Kartennummern, IBANs und lange Ziffernfolgen in der Frage. Eine automatische Maskierung kann nicht alles erkennen; nehmen Sie daher keine personenbezogenen Daten oder vertraulichen Informationen in Ihre Fragen auf.
-5.3. Eine gesprochene Frage wird als Sprachaufnahme an Google übermittelt, damit sie in Text umgewandelt werden kann; die Stimme selbst kann die Identifizierung der Person ermöglichen. Nach der Umwandlung in Text wird die Aufnahme im Dienst nicht gespeichert.
-5.4. Damit dieselbe Frage erneut beantwortet werden kann, ohne dass eine neue Anfrage gesendet werden muss, werden der maskierte Fragetext und die Antwort ohne jede Verknüpfung mit Ihrem Konto gespeichert. Die Audiodatei der Antwort wird einmal erzeugt und wiederverwendet.
-5.5. Nach seinen Bedingungen verwendet Google diese Daten nicht ohne Erlaubnis des Kunden zum Training von KI-Modellen. Google kann Anfragen, wie in seinen Bedingungen beschrieben, für einen begrenzten Zeitraum aufbewahren, um Missbrauch zu erkennen.
+5.1. Wenn Sie AI Sel (dem KI-Assistenten) eine Frage stellen, übermittelt der Dienst ausschließlich die Frage, den Text der aktuellen Lektion und die Sprache der Benutzeroberfläche an die Anthropic API (Anthropic PBC, USA), die die Antwort erzeugt. Ihr Name, Ihre E-Mail-Adresse, Ihre Stellenbezeichnung und der Name Ihrer Organisation werden niemals übermittelt. Von KI übersetzte Untertitel und Lektionsentwürfe im Schulungsstudio erstellt derselbe Dienst aus dem Text der Lektion und bei Entwürfen zusätzlich aus dem Thema, das die Autorin oder der Autor der Inhalte eingibt; sie enthalten keine Daten über Lernende.
+5.2. Der Dienst filtert die Frage nicht und maskiert nichts darin: Die Frage wird so übermittelt, wie Sie sie eingetippt haben oder wie Ihr Browser sie in Text umgewandelt hat. Nehmen Sie keine personenbezogenen Daten, Passwörter oder vertraulichen Informationen in Ihre Fragen auf. AI Sel ist angewiesen, niemals nach Passwörtern, Codes oder personenbezogenen Daten zu fragen oder diese zu wiederholen.
+5.3. Eine gesprochene Frage wird von der in Ihren Browser eingebauten Spracherkennung in Text umgewandelt. Welches Unternehmen diese Spracherkennung bereitstellt, hängt vom Browser ab; manche Browser senden die Aufnahme dafür nach den Bedingungen ihres Herstellers an dessen Server. Der Dienst erhält nur den erkannten Text, niemals die Aufnahme.
+5.4. Damit dieselbe Frage erneut beantwortet werden kann, ohne dass eine neue Anfrage gesendet werden muss, werden der Fragetext und die Antwort zusammen mit der Lektion und Ihrer Organisation, aber ohne jede Verknüpfung mit Ihrem Konto gespeichert. Die Antwort von AI Sel wird von der Sprachausgabe Ihres Browsers oder Geräts vorgelesen (manche Browser nutzen dafür einen Online-Sprachdienst). Die Vertonung der Lektionen wird vorab aus dem Text der Lektion von einem Text-to-Speech-Dienst erzeugt (derzeit ElevenLabs oder eine vom Anbieter betriebene Open-Source-Engine); dieser erhält keine personenbezogenen Daten, und während Sie lernen, wird ihm nichts übermittelt.
+5.5. Anthropic verarbeitet diese Anfragen nach seinen gewerblichen Bedingungen, nach denen Kundendaten nicht zum Training seiner Modelle verwendet werden. Anthropic kann Anfragen, wie in seinen Bedingungen beschrieben, für einen begrenzten Zeitraum aufbewahren, um Missbrauch zu erkennen.
 5.6. Ihre Organisation kann AI Sel oder gesprochene Fragen deaktivieren.
 
 ## 6. Wer Ihre Daten sehen kann
@@ -67,7 +67,9 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 6.2. Von Ihrer Organisation angebundene Systeme: ihr Mailserver (die E-Mails des Dienstes werden über den Mailserver der Organisation versendet), ihr Identitätsanbieter oder Verzeichnisdienst (für die Anmeldung und die Synchronisierung der Mitarbeitenden) sowie SIEM- oder ITSM-Systeme, die Sicherheitsereignisse einschließlich Ihrer Benutzerkennung, Ihrer E-Mail-Adresse und Ihrer Abteilung empfangen können.
 6.3. Unterauftragsverarbeiter des Anbieters (Cloud-Version):
 - UpCloud (UpCloud Ltd, Finnland, und ihre Tochtergesellschaften): Server, Dateispeicher und Backups in einem Rechenzentrum in London, Vereinigtes Königreich;
-- Google Cloud (Google LLC und ihre verbundenen Unternehmen): Vertex AI für die Antworten von AI Sel, die Umwandlung gesprochener Fragen in Text und die Sprachsynthese gemäß Abschnitt 5.
+- Anthropic (Anthropic PBC, USA): die Anthropic API für die Antworten von AI Sel, von KI übersetzte Untertitel und Lektionsentwürfe im Schulungsstudio gemäß Abschnitt 5;
+- ElevenLabs (USA): Sprachsynthese für die Vertonung der Lektionen ausschließlich aus dem Text der Lektionen gemäß Ziffer 5.4; ElevenLabs erhält keine personenbezogenen Daten;
+- wenn Ihre Organisation SMS nutzt (Einmalcodes für die Anmeldung oder SMS-Schulungsangriffe): der im Vertrag über die Verarbeitung personenbezogener Daten genannte SMS-Dienstleister, der die Telefonnummer und den Text der Nachricht erhält.
 6.4. Öffentliche Zertifikatsseite: Wenn Ihre Organisation die öffentliche Überprüfung aktiviert, sieht jede Person, die den Link zu Ihrem Zertifikat hat, Ihren Namen, das Modul, das Datum, die Organisation und die Seriennummer. Weitere Angaben zu Ihrer Person werden nicht angezeigt.
 6.5. Staatliche Stellen: nur soweit gesetzlich vorgeschrieben und in den gesetzlich festgelegten Grenzen.
 6.6. Die vom Anbieter verwendeten Benachrichtigungen der Serverüberwachung enthalten keine personenbezogenen Daten.
@@ -76,7 +78,7 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 ## 7. Speicherort der Daten und grenzüberschreitende Übermittlung
 
 7.1. In der Cloud-Version werden die Daten auf Servern in London, Vereinigtes Königreich, gespeichert. Für Organisationen in Aserbaidschan handelt es sich dabei um eine grenzüberschreitende Übermittlung im Sinne von Artikel 14 des Gesetzes „Über personenbezogene Daten“. Das Vereinigte Königreich ist wie Aserbaidschan Vertragspartei des Übereinkommens des Europarats zum Schutz des Menschen bei der automatischen Verarbeitung personenbezogener Daten (Konvention 108) und schützt personenbezogene Daten nach der UK GDPR. Die Europäische Kommission hat anerkannt, dass das Vereinigte Königreich ein angemessenes Schutzniveau gewährleistet; dieser Beschluss wurde im Dezember 2025 erneuert.
-7.2. An Google Vertex AI gesendete Anfragen können in Rechenzentren von Google in verschiedenen Ländern verarbeitet werden. Diese enthalten keine Namen, E-Mail-Adressen oder Stellenbezeichnungen (Abschnitt 5). Die Verarbeitung durch Google richtet sich nach dem Cloud Data Processing Addendum von Google; dieses Dokument enthält die Standardvertragsklauseln der Europäischen Kommission für Übermittlungen in Länder außerhalb der Europäischen Union.
+7.2. Anfragen an Anthropic werden in den USA verarbeitet. Diese enthalten keine Namen, E-Mail-Adressen oder Stellenbezeichnungen (Abschnitt 5). Die Verarbeitung durch Anthropic richtet sich nach dem Data Processing Addendum von Anthropic; dieses Dokument enthält die Standardvertragsklauseln der Europäischen Kommission für Übermittlungen in Länder außerhalb der Europäischen Union. ElevenLabs, ebenfalls in den USA, erhält nur den Text der Lektionen und keine personenbezogenen Daten.
 7.3. Ist Ihre Organisation verpflichtet, Daten in einem bestimmten Land zu speichern, kann sie die Lokale Version nutzen oder in ihrem Vertrag einen anderen Hosting-Standort vereinbaren.
 
 ## 8. Wie lange Daten gespeichert werden
@@ -85,6 +87,8 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 - Anmeldesitzung: endet nach 8 Stunden Inaktivität, sofern in der Installation der Organisation kein anderer Wert festgelegt ist.
 - Schritte der Zwei-Faktor-Authentisierung und des Single Sign-on: 10 Minuten. Download-Links: 5 Minuten.
 - Nutzungszähler von AI Sel: 24 Stunden.
+- Gespeicherte Fragen und Antworten von AI Sel (ohne Verknüpfung mit einem Konto): solange das Konto Ihrer Organisation im Dienst besteht.
+- Demo-Anfragen über die öffentliche Website: 24 Monate, sofern sie nicht früher gelöscht werden (Ziffer 3.3).
 - Zustellprotokolle für E-Mails: 90 Tage nach Abschluss der Zustellung.
 - Berichte zur Verzeichnissynchronisierung: 180 Tage.
 - Audit-Protokoll: kann über den Dienst weder geändert noch gelöscht werden; es wird für die Dauer des Vertrags der Organisation und danach für den im Vertrag festgelegten oder gesetzlich vorgeschriebenen Zeitraum aufbewahrt.
@@ -162,4 +166,4 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 
 16.1. [wird nachgetragen], Registernummer [wird nachgetragen], Anschrift [wird nachgetragen].
 16.2. Für Fragen und Anträge zum Datenschutz: [wird nachgetragen].
-16.3. Diese Datenschutzerklärung wird in aserbaidschanischer, englischer und russischer Sprache veröffentlicht. Bei Abweichungen zwischen den Sprachfassungen ist der aserbaidschanische Text maßgeblich.
+16.3. Diese Datenschutzerklärung wird in aserbaidschanischer, englischer, russischer, türkischer, rumänischer, georgischer, ukrainischer, deutscher, französischer und arabischer Sprache veröffentlicht. Bei Abweichungen zwischen den Sprachfassungen ist der aserbaidschanische Text maßgeblich.

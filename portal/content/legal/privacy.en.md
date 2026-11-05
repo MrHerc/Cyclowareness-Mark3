@@ -1,4 +1,4 @@
-<!-- version: 2; effective: 2026-10-08 -->
+<!-- version: 3; effective: 2026-11-05 -->
 # Privacy Policy
 
 What personal data is processed on the platform, for what purpose and on what legal basis, who is responsible, what is sent to AI Sel, where and for how long data is stored, how it is protected and how you can exercise your rights.
@@ -28,14 +28,14 @@ What personal data is processed on the platform, for what purpose and on what le
 | Attestations and familiarisation with policies | the exact content of the text you attested to, the policy version, the time, the IP address | you and the Service |
 | Certificates | module, date of issue, serial number, verification link | the Service |
 | Results of training attacks | scans of training QR codes (time, device type, truncated IP address), actions taken in simulated phishing where enabled, reports of suspicious emails | the Service |
-| AI Sel | the question you type or your voice recording, its text, the answer | you |
+| AI Sel | the question you type or speak (the Service receives it as text), the answer | you |
 | Security and device data | audit log of sign-ins and administrative actions, IP address, browser and device type (user agent), active sessions | the Service |
 | Emails | invitations, password links, reminders, reports: recipient, type, delivery status | the Service |
 | Records relating to the exercise of rights | data downloads, erasure requests, decisions and reasons | you, your Organisation |
 
 3.1. The Service does not require special categories of personal data (data about racial or national origin, family life, religious belief, health or criminal convictions) and does not use your picture or your voice to identify you.
 3.2. League tables compare departments, not individuals, and do not show departments with fewer than three active participants.
-3.3. Public website. If you view the Service's public page without an account, the choices you make there (role, organisation size, calm mode, dismissed hints) are stored only in your own browser (local storage and session storage) and are not sent to the Provider. You can clear them with the "Forget my choices" link on the page or by deleting the site data in your browser. If you submit the demo request form, the Provider stores the data you enter (name, work email, organisation, employee count range, country, optional message), the role you selected, what brought you to the form and the level of your test score. This data is used to respond to your request on the basis of the consent you give by ticking the checkbox, and the Provider is its owner. Unless a different period is set in the Provider's installation, the data is deleted after 24 months, or sooner upon your request to the address [to be provided]. It is never sent to AI Sel, to artificial intelligence services or to analytics.
+3.3. Public website. If you view the Service's public page without an account, the choices you make there (role, organisation size, calm mode, dismissed hints) are stored only in your own browser (local storage and session storage) and are not sent to the Provider. You can clear them with the "Forget my choices" link on the page or by deleting the site data in your browser. If you submit the demo request form, the Provider stores the data you enter (name, work email, organisation, employee count range, country, optional message), together with the interface language, the time of the request and the version of this Policy to which you consented. This data is used to respond to your request on the basis of the consent you give by ticking the checkbox, and the Provider is its owner. Unless a different period is set in the Provider's installation, the data is deleted after 24 months, or sooner upon your request to the address [to be provided]. It is never sent to AI Sel, to artificial intelligence services or to analytics.
 
 ## 4. Purposes and Legal Bases
 
@@ -54,11 +54,11 @@ What personal data is processed on the platform, for what purpose and on what le
 
 ## 5. AI Sel (AI Assistant)
 
-5.1. When you ask AI Sel (the AI assistant) a question, the Service sends only the question, the content of the current lesson, the interface language and technical identifiers to the Google Cloud Vertex AI service. Your name, email address, job title and the name of your Organisation are never sent.
-5.2. Before sending, the Service masks email addresses, telephone numbers, card numbers, IBANs and long sequences of digits in the question. Automatic masking cannot detect everything, so do not include personal data or confidential information in your questions.
-5.3. A spoken question is sent to Google as a voice recording so that it can be converted into text; the voice itself may make it possible to identify the person. After conversion into text, the recording is not stored in the Service.
-5.4. So that the same question can be answered again without sending a new request, the masked question text and the answer are stored without any link to your account. The audio file of the answer is generated once and reused.
-5.5. Under its terms, Google does not use this data to train artificial intelligence models without the customer's permission. Google may retain requests for a limited period to detect abuse, as described in its terms.
+5.1. When you ask AI Sel (the AI assistant) a question, the Service sends only the question, the text of the current lesson and the interface language to the Anthropic API (Anthropic PBC, United States), which generates the answer. Your name, email address, job title and the name of your Organisation are never sent. Subtitles translated by AI and lesson drafts in the training studio are produced by the same service from the lesson text and, for drafts, from the topic entered by the content author; they contain no data about learners.
+5.2. The Service does not filter or mask the question: it is sent as you typed it or as your browser converted it into text. Do not include personal data, passwords or confidential information in your questions. AI Sel is instructed never to ask for or repeat passwords, codes or personal data.
+5.3. A spoken question is converted into text by the speech recognition built into your browser. Which company provides that speech engine depends on the browser; some browsers send the recording to their maker's servers for this purpose, under that maker's terms. The Service receives only the resulting text, never the recording.
+5.4. So that the same question can be answered again without sending a new request, the question text and the answer are stored with the lesson and your Organisation, without any link to your account. AI Sel's answer is read aloud by the speech voice of your browser or device (some browsers use an online voice service for this). The narration of the lessons is produced in advance from the lesson text by a text-to-speech service (currently ElevenLabs, or an open-source engine operated by the Provider); it receives no personal data, and nothing is sent to it while you learn.
+5.5. Anthropic processes these requests under its commercial terms, under which it does not use customer data to train its models. Anthropic may retain requests for a limited period to detect abuse, as described in its terms.
 5.6. Your Organisation may disable AI Sel or spoken questions.
 
 ## 6. Who Can See Your Data
@@ -67,7 +67,9 @@ What personal data is processed on the platform, for what purpose and on what le
 6.2. Systems connected by your Organisation: its mail server (the Service's emails are sent through the Organisation's mail server), its identity provider or directory (for sign-in and employee synchronisation), and SIEM or ITSM systems that may receive security events, including your user identifier, email address and department.
 6.3. The Provider's sub-processors (Cloud Version):
 - UpCloud (UpCloud Ltd, Finland, and its subsidiaries): servers, file storage and backups in a data centre located in London, United Kingdom;
-- Google Cloud (Google LLC and its affiliates): Vertex AI for AI Sel's answers, the conversion of spoken questions into text and speech synthesis, in accordance with section 5.
+- Anthropic (Anthropic PBC, United States): the Anthropic API for AI Sel's answers, subtitles translated by AI and lesson drafts in the training studio, in accordance with section 5;
+- ElevenLabs (United States): speech synthesis of the lesson narration from the lesson text only, in accordance with clause 5.4; it receives no personal data;
+- where your Organisation uses text messages (one-time sign-in codes or simulated SMS attacks): the text-message operator named in the agreement on the processing of personal data, which receives the phone number and the text of the message.
 6.4. Public certificate page: where your Organisation enables public verification, anyone who has the link to your certificate sees your name, the module, the date, the Organisation and the serial number. Nothing else about you is shown.
 6.5. State bodies: only where required by legislation and within the limits it sets.
 6.6. The server monitoring notifications used by the Provider do not contain personal data.
@@ -76,7 +78,7 @@ What personal data is processed on the platform, for what purpose and on what le
 ## 7. Where Data Is Stored and Cross-Border Transfer
 
 7.1. In the Cloud Version, data is stored on servers located in London, United Kingdom. For Organisations in Azerbaijan, this is a cross-border transfer within the meaning of Article 14 of the Law "On Personal Data". The United Kingdom, like Azerbaijan, is a party to the Council of Europe Convention for the Protection of Individuals with regard to Automatic Processing of Personal Data (Convention 108) and protects personal data under the UK GDPR. The European Commission has recognised that the United Kingdom ensures an adequate level of protection; that decision was renewed in December 2025.
-7.2. Requests sent to Google Vertex AI may be processed in Google data centres in various countries. They do not contain names, email addresses or job titles (section 5). Processing by Google is governed by its Cloud Data Processing Addendum; that document includes the European Commission's standard contractual clauses for transfers outside the European Union.
+7.2. Requests to Anthropic are processed in the United States. They do not contain names, email addresses or job titles (section 5). Processing by Anthropic is governed by its Data Processing Addendum, which includes the European Commission's standard contractual clauses for transfers outside the European Union. ElevenLabs, also in the United States, receives only lesson text and no personal data.
 7.3. If your Organisation is required to store data in a particular country, it may use the Local Version or agree on a different hosting location in its agreement.
 
 ## 8. How Long Data Is Kept
@@ -85,6 +87,8 @@ What personal data is processed on the platform, for what purpose and on what le
 - Sign-in session: ends after 8 hours of inactivity, unless a different value is set in the Organisation's installation.
 - Two-step sign-in and single sign-on steps: 10 minutes. Download links: 5 minutes.
 - AI Sel usage counters: 24 hours.
+- AI Sel's stored questions and answers (without a link to any account): for as long as your Organisation's account in the Service exists.
+- Demo requests from the public website: 24 months, unless deleted sooner (clause 3.3).
 - Email delivery records: 90 days after delivery is completed.
 - Directory synchronisation reports: 180 days.
 - Audit log: cannot be changed or deleted through the Service; it is kept for as long as the Organisation's agreement is in force and, thereafter, for the period set out in the agreement or required by legislation.
@@ -162,4 +166,4 @@ What personal data is processed on the platform, for what purpose and on what le
 
 16.1. [to be provided], registration number [to be provided], address [to be provided].
 16.2. For questions and requests relating to privacy: [to be provided].
-16.3. This Policy is published in Azerbaijani, English and Russian. In the event of any discrepancy between the texts, the Azerbaijani text prevails.
+16.3. This Policy is published in Azerbaijani, English, Russian, Turkish, Romanian, Georgian, Ukrainian, German, French and Arabic. In the event of any discrepancy between the texts, the Azerbaijani text prevails.

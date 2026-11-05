@@ -1,4 +1,4 @@
-<!-- version: 1; effective: 2026-10-04 -->
+<!-- version: 2; effective: 2026-11-05 -->
 # Conditions d’utilisation
 
 Règles d’utilisation de la plateforme : les parties, la sécurité des comptes, l’utilisation acceptable, les simulations d’hameçonnage (phishing) et les formations aux QR codes, les obligations de l’Organisation, la propriété intellectuelle, les limites d’AI Sel, la responsabilité, le droit applicable et les coordonnées. Un contrat client signé prévaut sur les présentes Conditions.
@@ -90,9 +90,9 @@ Règles d’utilisation de la plateforme : les parties, la sécurité des compt
 
 ## 10. AI Sel (assistant IA)
 
-10.1. AI Sel répond aux questions écrites ou orales portant sur la leçon en cours. Dans la Version cloud, les réponses sont générées par les modèles Google Gemini via Google Cloud Vertex AI.
+10.1. AI Sel répond aux questions écrites ou orales portant sur la leçon en cours. Dans la Version cloud, les réponses sont générées par les modèles Claude via l’API d’Anthropic (Anthropic PBC, États-Unis). Une question orale est convertie en texte par le navigateur de l’Utilisateur ; le Service ne reçoit que le texte. La narration des leçons est produite à l’avance à partir du texte de la leçon par un service de synthèse vocale (actuellement ElevenLabs, ou un moteur open source exploité par le Prestataire), sans aucune donnée personnelle.
 10.2. Les réponses d’AI Sel peuvent être inexactes, incomplètes ou obsolètes. Elles sont fournies uniquement à des fins de formation et ne constituent ni un conseil juridique, ni un conseil technique, ni aucun autre conseil professionnel. En cas d’incident réel, suivez la procédure de réponse aux incidents de l’Organisation et contactez son personnel chargé de la sécurité de l’information.
-10.3. Ne saisissez pas de données personnelles, de mots de passe ni d’informations confidentielles dans AI Sel. Avant l’envoi d’une question, le Service masque les adresses e-mail, les numéros de téléphone ainsi que les numéros de carte et de compte, mais le masquage automatique ne peut pas tout détecter.
+10.3. Ne saisissez pas de données personnelles, de mots de passe ni d’informations confidentielles dans AI Sel. La question est transmise au modèle telle qu’elle a été rédigée ; le Service ne la masque pas et ne la filtre pas.
 10.4. AI Sel ne répond pas aux questions étrangères à l’hygiène informatique et est soumis à des limites d’utilisation par heure ; l’Organisation peut le désactiver, ainsi que les questions orales.
 10.5. Les questions et les réponses sont conservées afin qu’une même question puisse de nouveau recevoir une réponse sans qu’une nouvelle requête soit envoyée au modèle d’intelligence artificielle. Elles sont conservées sans être associées au nom ni au compte de la personne qui a posé la question.
 
@@ -159,7 +159,7 @@ Règles d’utilisation de la plateforme : les parties, la sécurité des compt
 
 ## 19. Dispositions finales
 
-19.1. Les présentes Conditions sont publiées en azerbaïdjanais, en anglais et en russe. En cas de divergence entre les textes, le texte azerbaïdjanais prévaut.
+19.1. Les présentes Conditions sont publiées en azerbaïdjanais, en anglais, en russe, en turc, en roumain, en géorgien, en ukrainien, en allemand, en français et en arabe. En cas de divergence entre les textes, le texte azerbaïdjanais prévaut.
 19.2. Si une disposition est déclarée invalide, les autres dispositions restent en vigueur, et la disposition invalide est remplacée par la disposition valide la plus proche de son objectif.
 19.3. Le Prestataire peut faire appel à des sous-traitants et en demeure responsable. Les sous-traitants qui traitent des données personnelles sont mentionnés dans la Politique de confidentialité et dans le Contrat de traitement des données.
 19.4. L’Organisation ne peut céder à un tiers les droits qu’elle tient des présentes Conditions sans le consentement du Prestataire. En cas de réorganisation du Prestataire ou de transfert de son activité à un tiers, le Prestataire peut céder les droits qu’il tient des présentes Conditions en adressant une notification à l’Organisation.

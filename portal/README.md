@@ -23,6 +23,7 @@ Demo hesablar: `admin@safarovindustries.com` (tenant admin), `learner@safarovind
 - [Project layout](#project-layout)
 - [Production with Docker](#production-with-docker)
 - [Languages](#languages)
+- [Legal texts](#legal-texts)
 - [Narration voice](#narration-voice)
 - [Operations notes](#operations-notes)
 - [Tests and checks](#tests-and-checks)
@@ -275,6 +276,13 @@ The whole portal (public site, learner app, admin console, emails, certificates,
 - **Lessons** are one file per language next to the English original: `content/library/lessons/{module}/{lesson}.{locale}.json`, with the translated catalogue titles in `content/library/i18n.{locale}.json`. A translation keeps every id, answer, address and link and changes only learner-facing text; check with `npx tsx scripts/check-lesson-locales.ts --coverage` (954 of 954 translations) and load them with `npm run content:sync`. The stories stay in the fictional Azerbaijani company world in every language. Glossaries and the translation recipe: `../.claude/skills/cyclowareness-experience/references/glossaries/` and `lesson-engine.md` recipe 6.3.
 - **Lesson captions in more languages.** In the lesson player, captions can show any of the ten languages from the stored translations, and, with the `ai_tutor` feature and `ANTHROPIC_API_KEY`, 65 further languages translated by AI (`POST /api/subtitles`, cached in the `ai_cache` table and shared by every learner; marked as machine translated).
 - **Not yet reviewed by people.** The translations were made and edited by AI agents; have a native speaker read each language, and a lawyer the legal texts, before a release in that market (`../docs/build/OPEN-QUESTIONS.md` 7, 8).
+
+## Legal texts
+
+The Privacy Policy and the Terms of Use are `content/legal/{privacy,terms}.{lang}.md` in all ten languages, served at `/legal/privacy` and `/legal/terms`; the Azerbaijani text is binding, and `tests/legal-content.test.ts` keeps every translation on the same edition and clause numbers. The header comment `<!-- version: N; effective: YYYY-MM-DD -->` is shown on the page; when the privacy edition changes, set the same date as `consentVersion` in `content/landing/{lang}.json`, so each demo request records the edition it consented to. The Provider's identity is still `[to be provided]`. For counsel and customers:
+
+- `../docs/legal/SUBPROCESSORS.md` — who processes what, for which purpose and where (Anthropic, ElevenLabs, hosting, mail, text messages), with the code that backs each line.
+- `../docs/legal/DPA-template.md` (English) and `../docs/legal/DPA-template.az.md` (Azerbaijani) — a controller–processor data processing agreement skeleton with annexes; a template for counsel, not a signed or reviewed text.
 
 ## Narration voice
 
