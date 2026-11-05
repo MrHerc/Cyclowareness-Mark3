@@ -63,6 +63,8 @@ describe("scoreLesson", () => {
     expect(wrong({ sceneId: "multi", picked: ["a"] })).toMatchObject({ correct: false });
     expect(wrong({ sceneId: "multi", picked: ["a", "b", "c"] })).toMatchObject({ correct: false });
     expect(wrong({ sceneId: "spots", picked: ["s1", MISS, "s2"] })).toMatchObject({ correct: false });
+    // The player records one miss however many clicks missed; any number is scored the same way.
+    expect(wrong({ sceneId: "spots", picked: ["s1", ...Array.from({ length: 50 }, () => MISS), "s2"] })).toMatchObject({ correct: false });
     expect(wrong({ sceneId: "cards", itemId: "c1", picked: ["safe"] })).toMatchObject({ correct: false });
     expect(wrong({ sceneId: "pairs", picked: ["p1>p2", "p1>p1", "p2>p2"] })).toMatchObject({ correct: false });
     expect(wrong({ sceneId: "steps", picked: ["i2", "i1", "i3"] })).toMatchObject({ correct: false });

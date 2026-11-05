@@ -154,13 +154,21 @@ export async function completeLesson(
   return { xpAwarded: xp, firstTime, moduleStatus: status, percent };
 }
 
-/** Opens an attempt at a lesson: its start is recorded once, until a completion uses it up. */
+/**
+ * Opens an attempt at a lesson: its start is recorded once, until a completion uses it up. A start
+ * older than four hours is a sitting that ended: the clock restarts, so a lesson opened days ahead
+ * neither satisfies the dwell nor counts as time trained.
+ */
 export async function startLesson(db: DB, p: { userId: string; lessonId: string; at?: Date }) {
   const at = p.at ?? new Date();
+  const now = sql`${at.toISOString()}::timestamptz`;
   await db
     .insert(t.lessonProgress)
     .values({ userId: p.userId, lessonId: p.lessonId, startedAt: at })
-    .onConflictDoUpdate({ target: [t.lessonProgress.userId, t.lessonProgress.lessonId], set: { startedAt: sql`coalesce(${t.lessonProgress.startedAt}, ${at.toISOString()}::timestamptz)` } });
+    .onConflictDoUpdate({
+      target: [t.lessonProgress.userId, t.lessonProgress.lessonId],
+      set: { startedAt: sql`case when ${t.lessonProgress.startedAt} > ${now} - interval '4 hours' then ${t.lessonProgress.startedAt} else ${now} end` },
+    });
 }
 
 /** The furthest scene the player showed in the current attempt; it only moves forward. */

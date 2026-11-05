@@ -121,22 +121,33 @@ describe("completing lessons", () => {
     expect(answers.map((a) => [a.sceneId, a.correct, a.firstTry, a.outcome])).toEqual(expect.arrayContaining([["q1", false, false, null], ["sim", false, false, "risky"]]));
   });
 
-  it("awards the XP once when the same completion arrives twice at the same time", async () => {
+  it("uses the attempt up once when the same completion arrives twice at the same time: one XP event, one set of answers", async () => {
     const { user } = await setup();
     const mod = await addModule(db);
     await learning.startLessonAction(mod.slug, "lesson-1");
     await db.update(t.lessonProgress).set({ startedAt: new Date(Date.now() - 60_000) }).where(eq(t.lessonProgress.userId, user.id));
     await learning.reachSceneAction(mod.slug, "lesson-1", LAST_SCENE);
     const results = await Promise.all([finish(mod.slug, "lesson-1", RIGHT), finish(mod.slug, "lesson-1", RIGHT)]);
-    expect(results.map((r) => r.ok)).toEqual([true, true]);
-    expect(results.map((r) => r.xp).sort()).toEqual([0, 33]);
+    expect(results.filter((r) => r.ok)).toMatchObject([{ xp: 33 }]);
+    expect(results.filter((r) => !r.ok)).toEqual([{ ok: false, xp: 0, error: "unverified" }]);
     expect(await db.select().from(t.xpEvents).where(eq(t.xpEvents.userId, user.id))).toHaveLength(1);
+    expect(await db.select().from(t.answers).where(eq(t.answers.userId, user.id))).toHaveLength(RIGHT.length);
+  });
+
+  it("caps the time trained at three times the lesson's nominal length", async () => {
+    const { user } = await setup();
+    const mod = await addModule(db);
+    await play(mod.slug, "lesson-1", RIGHT, { startedAgoMs: 3 * 3600_000 });
+    const [progress] = await db.select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, user.id));
+    expect(progress.secondsSpent).toBe(mod.lessons[0].minutes * 180);
   });
 
   it("refuses malformed input, unknown modules and lessons without writing anything", async () => {
     const { user } = await setup();
     const mod = await addModule(db);
     expect(await learning.completeLessonAction({ slug: mod.slug, lessonKey: "lesson-1", answers: Array.from({ length: 401 }, () => ({ sceneId: "q1", picked: ["a"] })) })).toEqual({ ok: false, xp: 0 });
+    // The player never sends more than one miss per hotspot scene or one wrong pairing per match scene, so 40 picks are enough.
+    expect(await learning.completeLessonAction({ slug: mod.slug, lessonKey: "lesson-1", answers: [{ sceneId: "q1", picked: Array.from({ length: 41 }, () => "*") }] })).toEqual({ ok: false, xp: 0 });
     expect(await finish("no-such-module", "lesson-1")).toEqual({ ok: false, xp: 0 });
     expect(await finish(mod.slug, "no-such-lesson")).toEqual({ ok: false, xp: 0 });
     expect(await db.select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, user.id))).toEqual([]);

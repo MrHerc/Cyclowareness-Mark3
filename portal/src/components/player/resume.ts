@@ -16,7 +16,8 @@ export type SavedLesson =
   | { kind: "playing"; index: number; maxIndex: number; inner: number; answers: PlayerAnswer[]; elapsedMs: number }
   | { kind: "done"; result: LessonResult; token: string | null };
 
-const VERSION = 1;
+// 2: answers hold what was picked (v1 held the browser's own verdict), so an older state starts the lesson over.
+const VERSION = 2;
 const MAX_ANSWERS = 400;
 const MAX_ELAPSED_MS = 4 * 3600_000;
 const MAX_PICKED = 40;

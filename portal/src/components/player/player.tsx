@@ -258,6 +258,9 @@ export function LessonPlayer(p: PlayerProps) {
       await reachSceneAction(p.slug, p.lesson.key, index);
       const res = await completeLessonAction({ slug: p.slug, lessonKey: p.lesson.key, answers: answers.current.slice(0, 400) });
       if (!res.ok) {
+        // A refused attempt may have no start any more (used up by another tab, or opened before the
+        // server kept starts): open one again, so that pressing Finish later can succeed. A valid start is kept.
+        if (res.error) void startLessonAction(p.slug, p.lesson.key);
         toast(t(res.error ? "recap.unverified" : "recap.saveError"), "error");
         return;
       }

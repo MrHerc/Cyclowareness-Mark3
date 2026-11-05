@@ -131,7 +131,7 @@ export type LessonResult = {
   xp: number;
   moduleStatus?: "in_progress" | "awaiting_attestation" | "completed";
   nextKey?: string | null;
-  /** The attempt could not be verified (not started here, too fast, scenes skipped, answers missing). */
+  /** The attempt could not be verified (not started here or already used up, too fast, scenes skipped, answers missing). */
   error?: "unverified";
 };
 
@@ -176,6 +176,14 @@ export async function completeLessonAction(input: z.infer<typeof completeSchema>
     await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "learning.completion_refused", targetType: "lesson", targetId: lesson.id, meta: { module: mod.slug, lesson: lesson.key, reason } });
     return { ok: false, xp: 0, error: "unverified" };
   }
+  // The attempt is used up by one statement before anything is written: the same completion sent
+  // twice at once would otherwise store its answer rows twice (they feed the risk score).
+  const consumed = await db()
+    .update(t.lessonProgress)
+    .set({ startedAt: null, reached: 0 })
+    .where(and(eq(t.lessonProgress.userId, v.user.id), eq(t.lessonProgress.lessonId, lesson.id), eq(t.lessonProgress.startedAt, attempt!.startedAt!)))
+    .returning({ userId: t.lessonProgress.userId });
+  if (!consumed.length) return { ok: false, xp: 0, error: "unverified" };
 
   if (scored.answers.length) {
     await db()
@@ -184,7 +192,8 @@ export async function completeLessonAction(input: z.infer<typeof completeSchema>
     const risky = scored.answers.filter((a) => a.outcome && a.outcome !== "safe").length;
     if (risky) await emitEvent(db(), v.tenant.id, "simulation.risky", { module: mod.slug, lesson: lesson.key, choices: risky });
   }
-  const secondsSpent = Math.min(4 * 3600, Math.round((now - started) / 1000));
+  // Time trained: at most three times the lesson's nominal length, so a lesson left open adds no more.
+  const secondsSpent = Math.min(lesson.minutes * 180, Math.round((now - started) / 1000));
   const res = await completeLesson(db(), { tenantId: v.tenant.id, userId: v.user.id, lessonId: lesson.id, secondsSpent });
   await recomputeRisk(db(), v.tenant.id, [v.user.id]);
   const sorted = lessons.sort((a, b) => a.position - b.position);

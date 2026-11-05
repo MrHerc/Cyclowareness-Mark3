@@ -1076,7 +1076,8 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
   const t = useTranslations("player");
   const contentLang = useContentLang();
   const [found, setFound] = useState<Set<string>>(new Set());
-  // Every click, a miss included: the server scores the scene from this list.
+  // Each spot found, plus one MISS when any click hit nothing: the server scores the scene from this
+  // list, and it only needs to know whether a miss happened (the list is capped at 40 entries).
   const clicks = useRef<string[]>([]);
   const [lastSpot, setLastSpot] = useState<string | null>(null);
   const [finished, setFinished] = useState(false);
@@ -1089,7 +1090,7 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
   }, []);
 
   const missed = () => {
-    if (!finished) clicks.current.push(MISS);
+    if (!finished && !clicks.current.includes(MISS)) clicks.current.push(MISS);
   };
   const onSpot = (id: string) => {
     if (finished) return;
@@ -1279,6 +1280,8 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
   const [matched, setMatched] = useState<Set<string>>(new Set());
   const [wrong, setWrong] = useState<string | null>(null);
   const [mistakes, setMistakes] = useState(0);
+  // The right pairings plus the first wrong one: the server only needs to know whether any pairing went
+  // wrong, and the list is capped at 40 entries.
   const attempts = useRef<string[]>([]);
   const complete = matched.size === scene.pairs.length;
 
@@ -1295,7 +1298,7 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
 
   const pickRight = (id: string) => {
     if (!left || matched.has(id)) return;
-    attempts.current.push(`${left}>${id}`);
+    if (left === id || !attempts.current.some((a) => a.split(">")[0] !== a.split(">")[1])) attempts.current.push(`${left}>${id}`);
     if (left === id) {
       setMatched(new Set(matched).add(id));
       setLeft(null);

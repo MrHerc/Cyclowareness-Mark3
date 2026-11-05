@@ -125,14 +125,20 @@ describe("completeLesson", () => {
 });
 
 describe("startLesson and reachScene", () => {
-  it("records when an attempt began, once, and the furthest scene shown; a completion clears both", async () => {
+  it("records when an attempt began, once per sitting, and the furthest scene shown; a completion clears both", async () => {
     const { tenant, person, mod } = await setup();
     const lesson = mod.lessons[0];
+    const hour = 3600_000;
     await startLesson(db, { userId: person.id, lessonId: lesson.id, at: day(1) });
-    await startLesson(db, { userId: person.id, lessonId: lesson.id, at: day(2) });
+    await startLesson(db, { userId: person.id, lessonId: lesson.id, at: new Date(day(1).getTime() + hour) });
+    expect(await lessonRow(person.id, lesson.id)).toMatchObject({ startedAt: day(1) });
+    // Reopened more than four hours later: a new sitting, so the clock restarts.
+    await startLesson(db, { userId: person.id, lessonId: lesson.id, at: new Date(day(1).getTime() + 5 * hour) });
+    expect(await lessonRow(person.id, lesson.id)).toMatchObject({ startedAt: new Date(day(1).getTime() + 5 * hour) });
+    await startLesson(db, { userId: person.id, lessonId: lesson.id, at: new Date(day(1).getTime() + 6 * hour) });
     await reachScene(db, { userId: person.id, lessonId: lesson.id, index: 3 });
     await reachScene(db, { userId: person.id, lessonId: lesson.id, index: 1 });
-    expect(await lessonRow(person.id, lesson.id)).toMatchObject({ startedAt: day(1), reached: 3, completedAt: null, attempts: 0 });
+    expect(await lessonRow(person.id, lesson.id)).toMatchObject({ startedAt: new Date(day(1).getTime() + 5 * hour), reached: 3, completedAt: null, attempts: 0 });
     await completeLesson(db, { tenantId: tenant.id, userId: person.id, lessonId: lesson.id, at: day(2) });
     expect(await lessonRow(person.id, lesson.id)).toMatchObject({ startedAt: null, reached: 0, completedAt: day(2), attempts: 1 });
     await startLesson(db, { userId: person.id, lessonId: lesson.id, at: day(3) });

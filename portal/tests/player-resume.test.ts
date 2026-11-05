@@ -21,17 +21,17 @@ describe("lesson resume state", () => {
     const raw = serializeLesson({ kind: "playing", index: 1, maxIndex: 1, inner: 0, answers: [], elapsedMs: 0 }, scenes);
     expect(parseLesson(raw, ["intro", "mail", "recap"], ids)).toBeNull();
     expect(parseLesson(raw, ["intro", "quiz", "mail", "recap"], ids)).toBeNull();
-    expect(parseLesson(raw.replace('"v":1', '"v":0'), scenes, ids)).toBeNull();
+    expect(parseLesson(raw.replace('"v":2', '"v":1'), scenes, ids)).toBeNull();
     expect(parseLesson("{not json", scenes, ids)).toBeNull();
     expect(parseLesson(null, scenes, ids)).toBeNull();
-    expect(parseLesson(JSON.stringify({ v: 1, scenes, kind: "playing", index: 4, inner: 0, answers: [], elapsedMs: 0 }), scenes, ids)).toBeNull();
-    expect(parseLesson(JSON.stringify({ v: 1, scenes, kind: "playing", index: 1, inner: 1.5, answers: [], elapsedMs: 0 }), scenes, ids)).toBeNull();
-    expect(parseLesson(JSON.stringify({ v: 1, scenes, kind: "done", result: { ok: false, xp: 0 }, token: null }), scenes, ids)).toBeNull();
+    expect(parseLesson(JSON.stringify({ v: 2, scenes, kind: "playing", index: 4, inner: 0, answers: [], elapsedMs: 0 }), scenes, ids)).toBeNull();
+    expect(parseLesson(JSON.stringify({ v: 2, scenes, kind: "playing", index: 1, inner: 1.5, answers: [], elapsedMs: 0 }), scenes, ids)).toBeNull();
+    expect(parseLesson(JSON.stringify({ v: 2, scenes, kind: "done", result: { ok: false, xp: 0 }, token: null }), scenes, ids)).toBeNull();
   });
 
   it("drops malformed or unknown answers and caps the elapsed time", () => {
     const raw = JSON.stringify({
-      v: 1,
+      v: 2,
       scenes,
       kind: "playing",
       index: 1,
@@ -55,7 +55,7 @@ describe("lesson resume state", () => {
   });
 
   it("keeps the furthest scene reached, never before the current one or past the last", () => {
-    const at = (fields: Record<string, unknown>) => parseLesson(JSON.stringify({ v: 1, scenes, kind: "playing", index: 1, inner: 0, answers: [], elapsedMs: 0, ...fields }), scenes, ids);
+    const at = (fields: Record<string, unknown>) => parseLesson(JSON.stringify({ v: 2, scenes, kind: "playing", index: 1, inner: 0, answers: [], elapsedMs: 0, ...fields }), scenes, ids);
     expect(at({ maxIndex: 3 })).toMatchObject({ index: 1, maxIndex: 3 });
     // A state saved before maxIndex existed: the scene it shows was the furthest one.
     expect(at({})).toMatchObject({ index: 1, maxIndex: 1 });
