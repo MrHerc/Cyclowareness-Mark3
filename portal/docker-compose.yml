@@ -99,7 +99,8 @@ services:
       APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (32+ random characters)}
       # The seed refuses to touch a DATABASE_URL without it.
       ALLOW_SEED: "1"
-      SEED_PASSWORD: ${SEED_PASSWORD:?set SEED_PASSWORD in .env (12+ characters)}
+      # SEED_PASSWORD comes from .env when set there; empty, the seed prints a random one once in this terminal.
+      # Not required here: this file is interpolated whole, profile or not, and `docker compose up` must not need it.
     user: node
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]

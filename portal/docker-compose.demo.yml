@@ -7,8 +7,8 @@
 # Then follow docs/DEMO.md. THROWAWAY ONLY: the seed empties every table each time the stack starts. No
 # secret lives in this file: APP_SECRET, POSTGRES_PASSWORD and SEED_PASSWORD come from .env.demo (gitignored)
 # and the stack refuses to start without them. For a real installation use docker-compose.yml (README,
-# "Production with Docker"). `docker compose -f portal/docker-compose.demo.yml down -v` removes it all,
-# the database volume included.
+# "Production with Docker"). `docker compose --env-file portal/.env.demo -f portal/docker-compose.demo.yml down -v`
+# removes it all, the database volume included (down interpolates the file too, so it needs the env file).
 name: cyclowareness-demo
 
 x-demo-env: &demo-env

@@ -66,7 +66,7 @@ The stack refuses to start while any of the three is missing, and it empties the
 so it is for demos only. Remove it, including the database volume, with:
 
 ```bash
-docker compose -f portal/docker-compose.demo.yml down -v
+docker compose --env-file portal/.env.demo -f portal/docker-compose.demo.yml down -v
 ```
 
 ## The talk track (3 minutes)

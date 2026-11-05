@@ -178,7 +178,7 @@ One command builds a fresh demo organisation in the embedded database and starts
 npm --prefix portal run demo
 ```
 
-Then open http://localhost:3000/sign-in?next=/admin/drill and follow [docs/DEMO.md](docs/DEMO.md), which has the talk track for the live drill. With Docker instead: `docker compose -f portal/docker-compose.demo.yml up --build`.
+Then open http://localhost:3000/sign-in?next=/admin/drill and follow [docs/DEMO.md](docs/DEMO.md), which has the talk track for the live drill. With Docker instead: `cp portal/.env.demo.example portal/.env.demo`, set its three values, then `docker compose --env-file portal/.env.demo -f portal/docker-compose.demo.yml up --build`.
 
 ### Local development
 

@@ -6,11 +6,12 @@
  *
  *   npm run db:seed            (after npm run db:migrate)
  *
- * Demo sign-in: the role accounts in scripts/seed-data.ts with SEED_PASSWORD (environment or
- * .env.local); when it is empty, a random password is printed once at the end.
+ * Demo sign-in: the role accounts in scripts/seed-data.ts with SEED_PASSWORD (environment, or that
+ * one variable from .env.local); when it is empty, a random password is printed once at the end.
  */
 import fs from "node:fs";
 import path from "node:path";
+import { parseEnv } from "node:util";
 import { getTableName, is, sql } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import { PgTable } from "drizzle-orm/pg-core";
@@ -31,8 +32,9 @@ import { encodeRiskTitle, riskTitle } from "../src/lib/risk-title";
 import { REPORT_BONUS_XP, LAB_XP, dayKey } from "../src/lib/domain/gamification";
 import { DEMO_DOMAIN, DEPARTMENTS, PEOPLE, emailFor, foreignTenants, mulberry32, seedRefusal, type DeptKey, type SeedPerson } from "./seed-data";
 
-// The seed reads .env.local like the app does (the shell environment wins), so a developer's own SEED_PASSWORD applies.
-if (fs.existsSync(path.join(process.cwd(), ".env.local"))) process.loadEnvFile(path.join(process.cwd(), ".env.local"));
+// Only SEED_PASSWORD is taken from .env.local (the shell environment wins): the database target stays the shell's, as in migrate.ts.
+const envLocal = path.join(process.cwd(), ".env.local");
+if (fs.existsSync(envLocal)) process.env.SEED_PASSWORD ||= parseEnv(fs.readFileSync(envLocal, "utf8")).SEED_PASSWORD ?? "";
 // The seed TRUNCATES EVERY TABLE and every seeded account (the platform operator included) shares one password.
 const refusal = seedRefusal(process.env);
 if (refusal) {
