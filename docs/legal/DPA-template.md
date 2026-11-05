@@ -30,11 +30,11 @@ The Controller has a legal basis for the processing and informs data subjects (T
 
 ## 5. Confidentiality
 
-Persons authorised by the Processor to process personal data are bound by confidentiality, including after their engagement ends (Article 5.5 of the Law "On Personal Data").
+Persons authorised by the Processor to process personal data are bound by confidentiality, including after their engagement ends (`[Article 5.5 — counsel to verify]` of the Law "On Personal Data").
 
 ## 6. Security
 
-The Processor implements the technical and organisational measures in Annex II and keeps them appropriate to the risk (Article 32 GDPR; Articles 5.8 and 9.12 of the Law "On Personal Data"). The Processor may update them if the level of protection does not decrease.
+The Processor implements the technical and organisational measures in Annex II and keeps them appropriate to the risk (Article 32 GDPR; `[Articles 5.8 and 9.12 — counsel to verify]` of the Law "On Personal Data"). The Processor may update them if the level of protection does not decrease.
 
 ## 7. Sub-processors
 
@@ -92,7 +92,7 @@ Liability follows the Customer Agreement `[counsel: check whether the cap applie
 From Privacy Policy §9 and the code; counsel and the Processor's security lead to confirm before signature.
 
 - Encryption in transit (HTTPS/TLS); passwords stored only as one-way hashes; integration secrets (mail server passwords, single sign-on and integration keys) encrypted at rest.
-- Separation of each Organisation's data by row-level security in the database.
+- Every query of the application is limited to the Organisation's own data (tenant filter); database row-level security is not yet in place `[counsel: see S-03]`.
 - Two-step sign-in (can be made mandatory for administrators), sign-in attempt limits, device limits, sessions ending after inactivity.
 - Role-based access with scopes; an append-only audit log of sign-ins and administrative actions.
 - AI Sel: no name, email, job title or organisation name is sent to the AI provider; questions are stored without a link to the account; hourly limits.

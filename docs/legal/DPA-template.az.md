@@ -30,11 +30,11 @@ Sahib işlənilmə üçün hüquqi əsasa malikdir və subyektləri məlumatland
 
 ## 5. Məxfilik
 
-Operatorun fərdi məlumatları işləməyə səlahiyyət verdiyi şəxslər, o cümlədən fəaliyyətləri başa çatdıqdan sonra, məxfilik öhdəliyi daşıyırlar ("Fərdi məlumatlar haqqında" Qanunun 5.5-ci maddəsi).
+Operatorun fərdi məlumatları işləməyə səlahiyyət verdiyi şəxslər, o cümlədən fəaliyyətləri başa çatdıqdan sonra, məxfilik öhdəliyi daşıyırlar ("Fərdi məlumatlar haqqında" Qanunun `[5.5-ci maddəsi — hüquqşünas yoxlamalıdır]`).
 
 ## 6. Təhlükəsizlik
 
-Operator II Əlavədəki texniki və təşkilati tədbirləri həyata keçirir və onları riskə uyğun saxlayır (GDPR-in 32-ci maddəsi; "Fərdi məlumatlar haqqında" Qanunun 5.8 və 9.12-ci maddələri). Qorunma səviyyəsi aşağı düşməmək şərtilə Operator tədbirləri yeniləyə bilər.
+Operator II Əlavədəki texniki və təşkilati tədbirləri həyata keçirir və onları riskə uyğun saxlayır (GDPR-in 32-ci maddəsi; "Fərdi məlumatlar haqqında" Qanunun `[5.8 və 9.12-ci maddələri — hüquqşünas yoxlamalıdır]`). Qorunma səviyyəsi aşağı düşməmək şərtilə Operator tədbirləri yeniləyə bilər.
 
 ## 7. Subprosessorlar
 
@@ -92,7 +92,7 @@ Məsuliyyət Müştəri Müqaviləsinə uyğundur `[hüquqşünas: məhdudiyyət
 Məxfilik Siyasətinin 9-cu bölməsindən və koddan götürülüb; imzadan əvvəl hüquqşünas və Operatorun təhlükəsizlik üzrə məsul şəxsi təsdiq etməlidir.
 
 - Ötürmə zamanı şifrələmə (HTTPS/TLS); parollar yalnız birtərəfli heş kimi saxlanılır; inteqrasiya sirləri (poçt serveri parolları, vahid giriş və inteqrasiya açarları) şifrələnmiş halda saxlanılır.
-- Hər Təşkilatın məlumatlarının verilənlər bazasında sətir səviyyəsində təhlükəsizliklə ayrılması.
+- Tətbiqin hər sorğusu yalnız Təşkilatın öz məlumatları ilə məhdudlaşdırılır (təşkilat filtri); verilənlər bazasında sətir səviyyəsində təhlükəsizlik hələ tətbiq edilməyib `[hüquqşünas üçün: S-03-ə baxın]`.
 - İki addımlı giriş (administratorlar üçün məcburi edilə bilər), giriş cəhdlərinin limitləri, cihaz limitləri, fəaliyyətsizlikdən sonra bitən sessiyalar.
 - Səlahiyyət sahələri ilə rola əsaslanan giriş; girişlərin və inzibati hərəkətlərin yalnız əlavə edilə bilən audit jurnalı.
 - AI Sel: Sİ təminatçısına ad, e-poçt, vəzifə və ya təşkilat adı göndərilmir; suallar hesabla əlaqə olmadan saxlanılır; saatlıq limitlər.
