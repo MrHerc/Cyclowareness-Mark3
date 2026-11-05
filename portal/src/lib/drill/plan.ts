@@ -93,7 +93,9 @@ export function simToMs(sim: number, durationMs: number, simMinutes = DRILL_SIM_
 export function msToSim(elapsedMs: number, durationMs: number, simMinutes = DRILL_SIM_MINUTES): number {
   const span = Math.max(1, durationMs - DRILL_LEAD_MS - DRILL_TAIL_MS);
   const frac = clamp01((elapsedMs - DRILL_LEAD_MS) / span);
-  return Math.min(simMinutes, -DRILL_WARP_TAU * Math.log(1 - frac * (1 - Math.exp(-simMinutes / DRILL_WARP_TAU))));
+  // Exact at the end: floating point would otherwise read 239.999… and the clock would show 3 h 59 min.
+  if (frac >= 1) return simMinutes;
+  return Math.max(0, Math.min(simMinutes, -DRILL_WARP_TAU * Math.log(1 - frac * (1 - Math.exp(-simMinutes / DRILL_WARP_TAU)))));
 }
 
 type Plan = { deliver: number; open?: number; click?: number; submit?: number; report?: number; train?: number };
@@ -140,8 +142,11 @@ export function planDrill(
     plans[i].report = undefined;
   }
   if (openers.length > 1 && !plans.some((p) => p.report !== undefined)) {
-    const careful = [...openers].sort((a, b) => a.risk - b.risk).find(({ i }) => plans[i].click === undefined);
+    const byCare = [...openers].sort((a, b) => a.risk - b.risk);
+    const careful = byCare.find(({ i }) => plans[i].click === undefined);
     if (careful) plans[careful.i].report = plans[careful.i].open! + 1.5;
+    // Everyone who opened it clicked: the most careful of them reports it afterwards.
+    else plans[byCare[0].i].report = Math.min(last, (plans[byCare[0].i].submit ?? plans[byCare[0].i].click!) + 3);
   }
   if (!plans.some((p) => p.train !== undefined && p.train <= last)) {
     const clicker = order.filter(({ i }) => plans[i].click !== undefined).sort((a, b) => plans[a.i].click! - plans[b.i].click!)[0];

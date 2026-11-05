@@ -892,6 +892,8 @@ export const drillRuns = pgTable(
     leaseUntil: ts("lease_until"),
     /** Average risk score of the audience, and each person's score, before the drill. */
     baseline: jsonb("baseline").$type<{ avgRisk: number; scores: Record<string, number> }>().notNull(),
+    /** The audience's average risk score after each applied batch (simulated minute, score), from the baseline on. */
+    riskTrail: jsonb("risk_trail").$type<{ sim: number; risk: number }[]>().notNull().default([]),
     startedAt: ts("started_at").notNull(),
     finishedAt: ts("finished_at"),
     createdBy: uuid("created_by"),

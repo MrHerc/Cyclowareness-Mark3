@@ -42,7 +42,13 @@ const GROUPS: { key: string; heading?: boolean; items: ItemDef[] }[] = [
       { key: "problems", href: "/admin/problems", perm: "problems.manage" },
     ],
   },
-  { key: "phishing", items: [{ key: "campaigns", href: "/admin/campaigns", perm: "campaigns.read" }] },
+  {
+    key: "phishing",
+    items: [
+      { key: "campaigns", href: "/admin/campaigns", perm: "campaigns.read" },
+      { key: "drill", href: "/admin/drill", perm: "campaigns.write", feature: "live_drill" },
+    ],
+  },
   {
     key: "secops",
     items: [

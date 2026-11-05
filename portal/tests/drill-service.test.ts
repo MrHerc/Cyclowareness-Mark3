@@ -2,12 +2,14 @@ import path from "node:path";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { DB } from "../src/server/db/client";
 import { defaultSettings } from "../src/lib/tenant-defaults";
 import { advanceDrill, drillHistory, drillView, skipDrill, startDrill } from "../src/server/services/drill";
+import { sendQueuedSms } from "../src/server/services/campaigns";
+import { submitThreatReport } from "../src/server/services/threats";
 import { drillProgress } from "../src/lib/drill/plan";
 
 const pglite = new PGlite();
@@ -109,9 +111,78 @@ describe("live drill", () => {
     expect(view.feed.length).toBeGreaterThan(0);
     expect(view.template.moduleTitle).toBe("Phishing email");
     expect(view.risk.before).toBe(run0.baseline.avgRisk);
+    // The risk curve starts at the baseline and has a point per applied batch; the peak is its highest point.
+    expect(run.riskTrail[0]).toEqual({ sim: 0, risk: run0.baseline.avgRisk });
+    expect(run.riskTrail.length).toBeGreaterThanOrEqual(3);
+    expect(view.risk.peak).toBe(Math.max(...run.riskTrail.map((p) => p.risk), view.risk.now));
+    expect(view.risk.peak).toBeGreaterThanOrEqual(view.risk.before);
 
     const history = await drillHistory(db, tenantId, "en");
     expect(history[0]).toMatchObject({ id: run.id, finished: true, audience: RISKS.length, totals: expected });
+  }, 120_000);
+
+  it("does not report twice when a step is replayed after a crash", async () => {
+    const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "keynote", audience: "all", departmentId: null, speed: "quick", campaignName: "Replay" });
+    if (!started.ok) throw new Error(started.reason);
+    const done = (await skipDrill(db, tenantId, started.id))!;
+    const reportAt = done.events.findIndex((e) => e.kind === "report");
+    expect(reportAt).toBeGreaterThanOrEqual(0);
+    const count = async () => (await db.select().from(t.threatReports).where(eq(t.threatReports.tenantId, tenantId))).length;
+    const before = await count();
+    // As if the request had died after the report and before recording it: the steps from there run again.
+    await db.update(t.drillRuns).set({ appliedUntil: reportAt, finishedAt: null, leaseUntil: null }).where(eq(t.drillRuns.id, done.id));
+    const again = (await advanceDrill(db, tenantId, done.id))!;
+    expect(again.appliedUntil).toBe(again.events.length);
+    expect(await count()).toBe(before);
+  }, 120_000);
+
+  it("matches a report to the exact tracking link when two drills use the same lure", async () => {
+    const a = await startDrill(db, { tenantId, actorId: adminId, templateKey: "fine", audience: "all", departmentId: null, speed: "quick", campaignName: "A" });
+    const b = await startDrill(db, { tenantId, actorId: adminId, templateKey: "fine", audience: "all", departmentId: null, speed: "quick", campaignName: "B" });
+    if (!a.ok || !b.ok) throw new Error("not started");
+    // Both delivered: B's recipients carry the newer delivery time.
+    const runA = (await skipDrill(db, tenantId, a.id))!;
+    const runB = (await skipDrill(db, tenantId, b.id))!;
+    const recA = await db.select().from(t.campaignRecipients).where(eq(t.campaignRecipients.campaignId, runA.campaignId));
+    const recB = await db.select().from(t.campaignRecipients).where(eq(t.campaignRecipients.campaignId, runB.campaignId));
+    const person = recA.find((r) => !r.reportedAt && recB.some((x) => x.userId === r.userId && !x.reportedAt));
+    // With 12 people and about a third reporting in each drill, someone reported in neither.
+    if (!person) throw new Error("no person left who reported in neither drill");
+    await submitThreatReport(db, { tenantId, userId: person.userId, channel: "email", subject: "Unpaid fine", url: `http://localhost:3000/t/${person.token}` });
+    const [afterA] = await db.select().from(t.campaignRecipients).where(eq(t.campaignRecipients.id, person.id));
+    const [afterB] = await db.select().from(t.campaignRecipients).where(and(eq(t.campaignRecipients.campaignId, runB.campaignId), eq(t.campaignRecipients.userId, person.userId)));
+    expect(afterA.reportedAt).not.toBeNull();
+    expect(afterB.reportedAt).toBeNull();
+  }, 120_000);
+
+  it("never sends a real text message for an SMS drill", async () => {
+    // People with phones, so the SMS lure has an audience and the queued-SMS job would otherwise pick them up.
+    const people = await db.select({ id: t.users.id }).from(t.users).where(and(eq(t.users.tenantId, tenantId), eq(t.users.role, "learner")));
+    for (const [i, p] of people.slice(0, 4).entries()) await db.update(t.users).set({ phone: `+99450000020${i}` }).where(eq(t.users.id, p.id));
+    const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "bank-sms", audience: "all", departmentId: null, speed: "quick", campaignName: "SMS drill" });
+    if (!started.ok) throw new Error(started.reason);
+    expect(started.recipients).toBe(4);
+    expect(await sendQueuedSms(db, { budgetMs: 5_000 })).toBe(0);
+    const [run] = await db.select().from(t.drillRuns).where(eq(t.drillRuns.id, started.id));
+    const unsent = await db.select().from(t.campaignRecipients).where(and(eq(t.campaignRecipients.campaignId, run.campaignId), isNull(t.campaignRecipients.sentAt)));
+    expect(unsent).toHaveLength(4);
+    await skipDrill(db, tenantId, started.id);
+  }, 120_000);
+
+  it("ends where it is when its campaign is cancelled", async () => {
+    const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "payslip", audience: "all", departmentId: null, speed: "quick", campaignName: "Cancelled" });
+    if (!started.ok) throw new Error(started.reason);
+    const [run0] = await db.select().from(t.drillRuns).where(eq(t.drillRuns.id, started.id));
+    const half = await advanceDrill(db, tenantId, started.id, new Date(run0.startedAt.getTime() + run0.durationMs / 3));
+    await db.update(t.campaigns).set({ status: "cancelled" }).where(eq(t.campaigns.id, run0.campaignId));
+    // The next poll, still mid-drill, finds the campaign cancelled.
+    const stopped = (await advanceDrill(db, tenantId, started.id, new Date(run0.startedAt.getTime() + run0.durationMs / 2)))!;
+    expect(stopped.finishedAt).not.toBeNull();
+    expect(stopped.appliedUntil).toBe(half!.appliedUntil);
+    const view = (await drillView(db, stopped, "en"))!;
+    expect(view.cancelled).toBe(true);
+    expect(view.status).toBe("finished");
+    expect(view.simNow).toBeLessThan(view.simMinutes);
   }, 120_000);
 
   it("skips to the end on demand and ignores another organisation's drill id", async () => {

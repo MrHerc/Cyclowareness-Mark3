@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray, isNotNull, isNull, lte, ne, or, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNotNull, isNull, lte, ne, notExists, or, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { departmentClosure } from "./assignments";
@@ -269,6 +269,8 @@ export async function sendQueuedSms(db: DB, opts: { limit?: number; budgetMs?: n
           gte(t.campaigns.launchedAt, new Date(now.getTime() - SMS_SEND_WINDOW_MS)),
           eq(t.users.status, "active"),
           isNotNull(t.users.phone),
+          // A live drill's recipients are delivered by its playback (services/drill.ts); nothing is ever sent for them.
+          notExists(db.select({ id: t.drillRuns.id }).from(t.drillRuns).where(eq(t.drillRuns.campaignId, t.campaigns.id))),
         ),
       )
       .orderBy(asc(t.campaigns.launchedAt), asc(t.campaignRecipients.id))

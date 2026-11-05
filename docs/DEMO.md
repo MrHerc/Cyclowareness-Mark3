@@ -39,6 +39,7 @@ Then:
 | `npm --prefix portal run demo -- --prod` | Production build, then the standalone server. Pages are fastest, but the build takes a few minutes. Use it for a recorded demo. |
 | `npm --prefix portal run demo -- --port 3005` | Another port. |
 | `npm --prefix portal run demo -- --keep-data` | Keep the current demo database, including earlier drills, instead of rebuilding it. |
+| `npm --prefix portal run demo -- --host 0.0.0.0` | Let other devices on the network open the demo, for example a tablet. By default only this computer can, because the demo password is public. |
 
 Ctrl+C stops the server. Running the command again gives a fresh organisation.
 
@@ -119,6 +120,8 @@ started" and "Live drill finished") stay in the database like any campaign's.
   on, for the fictional demo organisation. An operator can switch it for an organisation in `/super` →
   Features. Never switch it on for real employees: their records would show clicks they never made.
 - The person who starts a drill is left out of its audience.
+- A drill never sends anything. Its recipients are kept out of the job that sends queued SMS simulations, and no email is queued.
+- Cancelling the drill's campaign on the campaign page ends the drill where it is.
 - Only campaign managers and administrators can start one (`campaigns.write`), and at most 20 per
   organisation per hour.
 
@@ -143,5 +146,5 @@ started" and "Live drill finished") stay in the database like any campaign's.
 | `portal/src/app/(admin)/admin/drill/` | Setup page, history and live page |
 | `portal/src/app/api/admin/drill/[id]/route.ts` | The endpoint the dashboard polls once a second |
 | `portal/src/components/admin/drill/` | Setup form and live dashboard |
-| `portal/drizzle/0001_live_drill.sql` | The `drill_runs` table |
+| `portal/drizzle/0001_live_drill.sql`, `0002_drill_risk_trail.sql` | The `drill_runs` table and its risk curve column |
 | `portal/tests/drill-plan.test.ts`, `portal/tests/drill-service.test.ts` | Planner unit tests, and an end-to-end test on an in-memory database |

@@ -25,8 +25,11 @@ import { DEFAULT_ATTESTATION, featuresFor, withDefaults } from "../../lib/tenant
 import { pick } from "../../i18n/config";
 import { DRILL_SIM_MINUTES, DRILL_SPEEDS, INDUSTRY_BASELINE_CLICK, drillProgress, msToSim, planDrill, seedFrom, type DrillEvent, type DrillKind, type DrillOutcome, type DrillSpeed, type DrillTotals } from "../../lib/drill/plan";
 
-/** Templates a drill can play: the ones whose recipients open, click and report (email and SMS). */
-export const DRILL_TEMPLATE_KEYS = ["payslip", "invoice", "mfa-qr", "bank-details", "fine", "keynote", "bank-sms", "parcel-sms"] as const;
+/**
+ * Templates a drill can play: the ones whose recipients open, click and report (email and SMS). The first is
+ * the default: a medium lure with a fake sign-in page shows every step of the funnel in a demo.
+ */
+export const DRILL_TEMPLATE_KEYS = ["mfa-qr", "payslip", "invoice", "bank-details", "keynote", "fine", "bank-sms", "parcel-sms"] as const;
 
 export function drillTemplates(features: ReadonlySet<string>): CampaignTemplate[] {
   return DRILL_TEMPLATE_KEYS.map((k) => TEMPLATE_BY_KEY.get(k)).filter((x): x is CampaignTemplate => !!x && (x.channel === "email" || x.channel === "sms") && templateOnPlan(x, features));
@@ -98,6 +101,7 @@ export async function startDrill(db: DB, p: StartDrillInput): Promise<StartDrill
       simMinutes: DRILL_SIM_MINUTES,
       events,
       baseline: { avgRisk, scores: Object.fromEntries(people.map((x) => [x.userId, x.risk])) },
+      riskTrail: [{ sim: 0, risk: avgRisk }],
       startedAt: now,
       createdBy: p.actorId,
     })
@@ -155,7 +159,10 @@ async function applyEvent(db: DB, ctx: ApplyContext, e: DrillEvent) {
     case "submit":
       await recordSubmit(db, r.token);
       return;
-    case "report":
+    case "report": {
+      // Applied at most once per person, also when a request died after the report and before its bookkeeping.
+      const [already] = await db.select({ at: t.campaignRecipients.reportedAt }).from(t.campaignRecipients).where(eq(t.campaignRecipients.id, e.recipientId));
+      if (already?.at) return;
       // The Report button: matched to this simulation by its tracking link, triaged without an analyst.
       await submitThreatReport(db, {
         tenantId,
@@ -166,6 +173,7 @@ async function applyEvent(db: DB, ctx: ApplyContext, e: DrillEvent) {
       });
       await recomputeRisk(db, tenantId, [r.userId]);
       return;
+    }
     case "train": {
       if (!ctx.module) return;
       for (const lessonId of ctx.module.lessonIds) await completeLesson(db, { tenantId, userId: r.userId, lessonId, secondsSpent: 150 });
@@ -197,6 +205,13 @@ export function dueCount(events: DrillEvent[], elapsedMs: number): number {
 export async function advanceDrill(db: DB, tenantId: string, drillId: string, now = new Date()): Promise<Run | null> {
   const [run] = await db.select().from(t.drillRuns).where(and(eq(t.drillRuns.id, drillId), eq(t.drillRuns.tenantId, tenantId)));
   if (!run || run.finishedAt) return run ?? null;
+  // Cancelling the drill's campaign (campaign page) ends the drill where it is: no further step is played.
+  const [campaign] = await db.select({ status: t.campaigns.status }).from(t.campaigns).where(eq(t.campaigns.id, run.campaignId));
+  if (!campaign || campaign.status === "cancelled") {
+    await db.update(t.drillRuns).set({ finishedAt: now, leaseUntil: null }).where(and(eq(t.drillRuns.id, run.id), isNull(t.drillRuns.finishedAt)));
+    const [stopped] = await db.select().from(t.drillRuns).where(eq(t.drillRuns.id, run.id));
+    return stopped ?? null;
+  }
   const elapsed = now.getTime() - run.startedAt.getTime();
   const due = dueCount(run.events, elapsed);
   let applied = run.appliedUntil;
@@ -208,8 +223,11 @@ export async function advanceDrill(db: DB, tenantId: string, drillId: string, no
       .returning({ id: t.drillRuns.id });
     if (claimed) {
       const ctx = await applyContext(db, run);
+      // Whether this request still holds the drill: each step is recorded with a compare-and-set, and a request
+      // that stalled past its lease (another one took over) stops instead of applying the same steps again.
+      let held = true;
       try {
-        for (; applied < due; applied++) {
+        while (applied < due) {
           const e = run.events[applied];
           try {
             if (ctx) await applyEvent(db, ctx, e);
@@ -217,13 +235,29 @@ export async function advanceDrill(db: DB, tenantId: string, drillId: string, no
             // One failed step (a deleted person, a removed module) must not stop the rest of the drill.
             console.error(`[drill] ${run.id}: ${e.kind} for ${e.recipientId} failed`, error);
           }
-          await db
+          const [kept] = await db
             .update(t.drillRuns)
             .set({ appliedUntil: applied + 1, leaseUntil: new Date(Date.now() + LEASE_MS) })
+            .where(and(eq(t.drillRuns.id, run.id), eq(t.drillRuns.appliedUntil, applied)))
+            .returning({ id: t.drillRuns.id });
+          if (!kept) {
+            held = false;
+            break;
+          }
+          applied++;
+        }
+        // One point on the risk curve per batch: clicks push it up, reports and finished trainings pull it down.
+        const last = held ? run.events[applied - 1] : undefined;
+        if (last) {
+          const point = { sim: last.sim, risk: await audienceRisk(db, run) };
+          await db
+            .update(t.drillRuns)
+            .set({ riskTrail: sql`${t.drillRuns.riskTrail} || ${JSON.stringify([point])}::jsonb` })
             .where(eq(t.drillRuns.id, run.id));
         }
       } finally {
-        await db.update(t.drillRuns).set({ leaseUntil: null }).where(eq(t.drillRuns.id, run.id));
+        // Released only by its holder: the row still shows this request's last step.
+        if (held) await db.update(t.drillRuns).set({ leaseUntil: null }).where(and(eq(t.drillRuns.id, run.id), eq(t.drillRuns.appliedUntil, applied)));
       }
     }
   }
@@ -244,13 +278,16 @@ async function finishDrill(db: DB, run: Run) {
   await snapshotTenant(db, run.tenantId);
   const progress = drillProgress(run.events, run.events.length, [...new Set(run.events.map((e) => e.recipientId))]);
   const now = await audienceRisk(db, run);
+  // The trail grew during this request; the row read at its start does not have the last points.
+  const [fresh] = await db.select({ trail: t.drillRuns.riskTrail }).from(t.drillRuns).where(eq(t.drillRuns.id, run.id));
+  const trail = fresh?.trail ?? run.riskTrail;
   await audit(db, {
     tenantId: run.tenantId,
     actorId: run.createdBy,
     action: "drill.finished",
     targetType: "campaign",
     targetId: run.campaignId,
-    meta: { clicked: progress.totals.clicked, reported: progress.totals.reported, trained: progress.totals.trained, riskBefore: run.baseline.avgRisk, riskAfter: now },
+    meta: { clicked: progress.totals.clicked, reported: progress.totals.reported, trained: progress.totals.trained, riskBefore: run.baseline.avgRisk, riskPeak: Math.max(run.baseline.avgRisk, now, ...trail.map((p) => p.risk)), riskAfter: now },
   });
 }
 
@@ -278,6 +315,8 @@ export type DrillView = {
   id: string;
   campaignId: string;
   status: "running" | "finished";
+  /** The campaign was cancelled during the drill, which ended it early. */
+  cancelled: boolean;
   /** Milliseconds since the start, measured on the server (the client keeps counting from it). */
   elapsedMs: number;
   durationMs: number;
@@ -287,15 +326,17 @@ export type DrillView = {
   totals: DrillTotals;
   firstClick: number | null;
   firstReport: number | null;
-  risk: { before: number; now: number };
+  /** Average risk of the audience: before, highest so far, now, and the curve (simulated minute, score). */
+  risk: { before: number; peak: number; now: number; trail: { sim: number; risk: number }[] };
   benchmark: number;
-  people: { id: string; name: string; initials: string; department: string | null; outcome: DrillOutcome; reported: boolean; trained: boolean; risk: number; riskBefore: number }[];
+  /** No per-person risk score here: a campaign manager may start drills without being allowed to read people's scores. */
+  people: { id: string; name: string; initials: string; department: string | null; outcome: DrillOutcome; reported: boolean; trained: boolean }[];
   feed: DrillFeedItem[];
 };
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
-  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? (parts.at(-1)?.[0] ?? "") : "")).toLocaleUpperCase();
+  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? (parts.at(-1)?.[0] ?? "") : "")).toUpperCase();
 }
 
 export async function drillView(db: DB, run: Run, locale: string, now = new Date()): Promise<DrillView | null> {
@@ -309,11 +350,13 @@ export async function drillView(db: DB, run: Run, locale: string, now = new Date
     .where(eq(t.campaignRecipients.campaignId, run.campaignId))
     .orderBy(asc(t.departments.name), asc(t.users.name));
   const [mod] = await db.select({ title: t.modules.title }).from(t.modules).where(and(eq(t.modules.slug, tpl.moduleSlug), isNull(t.modules.tenantId)));
+  const [campaign] = await db.select({ status: t.campaigns.status }).from(t.campaigns).where(eq(t.campaigns.id, run.campaignId));
   const progress = drillProgress(run.events, run.appliedUntil, rows.map((r) => r.id));
   const byRecipient = new Map(rows.map((r) => [r.id, r]));
-  const elapsedMs = run.finishedAt ? run.durationMs : Math.max(0, Math.min(run.durationMs, now.getTime() - run.startedAt.getTime()));
+  const until = run.finishedAt ?? now;
+  const elapsedMs = Math.max(0, Math.min(run.durationMs, until.getTime() - run.startedAt.getTime()));
   const feed: DrillFeedItem[] = [];
-  for (let i = run.appliedUntil - 1; i >= 0 && feed.length < 14; i--) {
+  for (let i = run.appliedUntil - 1; i >= 0 && feed.length < 9; i--) {
     const e = run.events[i];
     if (e.kind === "deliver" || e.kind === "open") continue;
     const who = byRecipient.get(e.recipientId);
@@ -324,10 +367,11 @@ export async function drillView(db: DB, run: Run, locale: string, now = new Date
     id: run.id,
     campaignId: run.campaignId,
     status: run.finishedAt ? "finished" : "running",
+    cancelled: campaign?.status === "cancelled",
     elapsedMs,
     durationMs: run.durationMs,
     simMinutes: run.simMinutes,
-    simNow: run.finishedAt ? run.simMinutes : msToSim(elapsedMs, run.durationMs, run.simMinutes),
+    simNow: msToSim(elapsedMs, run.durationMs, run.simMinutes),
     template: {
       key: tpl.key,
       name: templateText(tpl.name, locale),
@@ -343,11 +387,11 @@ export async function drillView(db: DB, run: Run, locale: string, now = new Date
     totals: progress.totals,
     firstClick: progress.firstClick,
     firstReport: progress.firstReport,
-    risk: { before: run.baseline.avgRisk, now: avgNow },
+    risk: { before: run.baseline.avgRisk, peak: Math.max(run.baseline.avgRisk, avgNow, ...run.riskTrail.map((p) => p.risk)), now: avgNow, trail: run.riskTrail },
     benchmark: INDUSTRY_BASELINE_CLICK,
     people: rows.map((r) => {
       const s = progress.people.get(r.id) ?? { outcome: "pending" as const, reported: false, trained: false };
-      return { id: r.id, name: r.name, initials: initials(r.name), department: r.department, ...s, risk: r.risk, riskBefore: run.baseline.scores[r.userId] ?? r.risk };
+      return { id: r.id, name: r.name, initials: initials(r.name), department: r.department, ...s };
     }),
     feed,
   };
@@ -366,6 +410,7 @@ export async function drillHistory(db: DB, tenantId: string, locale: string, lim
     const ids = [...new Set(run.events.map((e) => e.recipientId))];
     const audience = Object.keys(run.baseline.scores).length;
     const { totals } = drillProgress(run.events, run.appliedUntil, ids);
-    return { id: run.id, campaignId: run.campaignId, name: tpl ? templateText(tpl.name, locale) : run.templateKey, startedAt: run.startedAt, finished: !!run.finishedAt, audience, totals };
+    // createdAt, not startedAt: "Skip to the end" moves startedAt back so every step falls due.
+    return { id: run.id, campaignId: run.campaignId, name: tpl ? templateText(tpl.name, locale) : run.templateKey, startedAt: run.createdAt, finished: !!run.finishedAt, audience, totals };
   });
 }

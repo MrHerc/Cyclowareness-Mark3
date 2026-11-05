@@ -62,7 +62,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
   if (!allowed(v, "overview.read")) redirect(allowed(v, "leadership.read") ? "/admin/leadership" : "/admin/reports");
   const sp = await searchParams;
   const locale = await getLocale();
-  const [tr, tc, format] = await Promise.all([getTranslations("admin.overview"), getTranslations("common"), getAppFormatter()]);
+  const [tr, tc, tn, format] = await Promise.all([getTranslations("admin.overview"), getTranslations("common"), getTranslations("admin.nav"), getAppFormatter()]);
   const d = await overviewData(v, locale, typeof sp.d === "string" ? sp.d : null);
   const setup = await setupState(v);
   const k = d.kpis;
@@ -113,11 +113,12 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
             ["assign", allowed(v, "assignments.write")],
             ["aiTraining", allowed(v, "studio.write")],
             ["campaign", allowed(v, "campaigns.write")],
+            ["drill", allowed(v, "campaigns.write") && v.tenant.features.has("live_drill")],
             ["reports", allowed(v, "reports.read") && v.tenant.features.has("reports")],
           ] as [QuickActionKey, boolean][]
         )
           .filter(([, ok]) => ok)
-          .map(([key]) => ({ key, label: tr(`quick.${key}`) }))}
+          .map(([key]) => ({ key, label: key === "drill" ? tn("drill") : tr(`quick.${key}`) }))}
       />
 
       {!v.tenant.settings.setupHidden && allowed(v, "settings.write") ? (

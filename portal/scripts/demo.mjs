@@ -9,6 +9,7 @@
  *   npm run demo -- --prod            production build, then the standalone server (fastest pages; the build takes minutes)
  *   npm run demo -- --port 3005       another port
  *   npm run demo -- --keep-data       keep the current demo database (drills already run stay)
+ *   npm run demo -- --host 0.0.0.0    reachable from other devices (default: this computer only; the demo password is public)
  *
  * Only Node.js built-ins are used here, so it runs before `npm ci`.
  */
@@ -29,6 +30,8 @@ const option = (name, fallback) => {
 const prod = flag("prod");
 const keepData = flag("keep-data");
 const port = Number(option("port", process.env.PORT ?? "3000"));
+// Loopback by default: the demo accounts share a published password. --host 0.0.0.0 shows it to another device on purpose.
+const host = option("host", "127.0.0.1");
 const npm = process.platform === "win32" ? "npm.cmd" : "npm";
 const npx = process.platform === "win32" ? "npx.cmd" : "npx";
 
@@ -99,6 +102,8 @@ if (!warmToken) say("Could not create the warm-up session; pages behind sign-in 
 
 /* 5. Start the portal */
 const appUrl = `http://localhost:${port}`;
+// The warm-up calls the address the server binds to ("localhost" may resolve to ::1 first).
+const warmBase = `http://${host === "0.0.0.0" || host === "::" ? "127.0.0.1" : host}:${port}`;
 let child;
 if (prod) {
   say("Production build (takes a few minutes)…");
@@ -111,7 +116,7 @@ if (prod) {
     ...process.env,
     NODE_ENV: "production",
     PORT: String(port),
-    HOSTNAME: "0.0.0.0",
+    HOSTNAME: host,
     APP_URL: appUrl,
     ALLOW_HTTP_APP_URL: "1",
     ALLOW_EMBEDDED_DB: "1",
@@ -122,7 +127,7 @@ if (prod) {
   child = spawn(process.execPath, ["scripts/start-standalone.mjs"], { cwd: root, env, stdio: "inherit" });
 } else {
   say(`Starting the development server on ${appUrl}…`);
-  child = spawn(npx, ["next", "dev", "--webpack", "-p", String(port)], { cwd: root, env: { ...process.env, PORT: String(port) }, stdio: "inherit", shell: process.platform === "win32" });
+  child = spawn(npx, ["next", "dev", "--webpack", "-H", host, "-p", String(port)], { cwd: root, env: { ...process.env, PORT: String(port) }, stdio: "inherit", shell: process.platform === "win32" });
 }
 const stop = () => child.kill("SIGTERM");
 process.on("SIGINT", stop);
@@ -130,12 +135,12 @@ process.on("SIGTERM", stop);
 child.on("exit", (code) => process.exit(code ?? 0));
 
 /* 6. Warm up the walkthrough's pages (each compiles on its first request in development) */
-if (!(await waitFor(`${appUrl}/sign-in`, 300_000))) fail("The server did not answer within 5 minutes.");
+if (!(await waitFor(`${warmBase}/sign-in`, 300_000))) fail("The server did not answer within 5 minutes.");
 say("Warming up the demo pages…");
 const cookie = warmToken ? `${prod ? "__Host-cy_session" : "cy_session"}=${warmToken}` : "";
 const zero = "00000000-0000-4000-8000-000000000000";
 for (const route of ["/sign-in", "/admin/drill", `/admin/drill/${zero}`, `/api/admin/drill/${zero}`, "/admin", "/admin/campaigns", `/admin/campaigns/${zero}`, "/admin/threats", "/admin/leadership"]) {
-  await waitFor(`${appUrl}${route}`, 300_000, cookie);
+  await waitFor(`${warmBase}${route}`, 300_000, cookie);
 }
 
 const email = "admin@safarovindustries.com";
