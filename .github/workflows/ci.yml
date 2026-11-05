@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# A newer push to the same branch cancels the run still going for the older one.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: portal
+
+env:
+  # The checks need no secrets: src/server/env.ts falls back to development defaults, and the
+  # tests run against an in-memory PGlite database.
+  CI: "true"
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  checks:
+    name: Lint, types, translations, tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint
+        run: npx eslint src tests scripts --max-warnings=0
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lesson translations
+        run: npx tsx scripts/check-lesson-locales.ts --coverage
+
+      - name: Tests
+        run: npx vitest run --reporter=default
+        env:
+          VITE_CONFIG_NATIVE_IGNORE_WARNING: "true"
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        # `postbuild` (scripts/check-build.mjs) fails the build when prerendered output embeds the
+        # build-time fallback address.
+        run: npm run build
