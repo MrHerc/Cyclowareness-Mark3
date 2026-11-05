@@ -1,0 +1,57 @@
+# One-command demo stack: PostgreSQL 16, the demo organisation "Safarov Industries" and the portal on
+# http://localhost:3000. From the repository root:
+#
+#   docker compose -f portal/docker-compose.demo.yml up --build
+#
+# Then follow docs/DEMO.md. THROWAWAY ONLY: the secrets below are public demo values and the seed empties
+# every table each time the stack starts. For a real installation use docker-compose.yml (README,
+# "Production with Docker"). `docker compose -f portal/docker-compose.demo.yml down -v` removes it all,
+# the database volume included.
+name: cyclowareness-demo
+
+x-demo-env: &demo-env
+  DATABASE_URL: postgres://portal:demo-only-not-secret@db:5432/portal
+  APP_URL: http://localhost:3000
+  # Plain HTTP on loopback is fine for a laptop demo; a real installation needs https://.
+  ALLOW_HTTP_APP_URL: "1"
+  APP_SECRET: demo-only-not-secret-0123456789abcdef0123456789
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: portal
+      POSTGRES_PASSWORD: demo-only-not-secret
+      POSTGRES_DB: portal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portal -d portal"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  # Applies the migrations, then loads the demo organisation (fictional people, 60 days of history, the
+  # live_drill feature switched on). Runs once per `up`; the portal waits for it.
+  seed:
+    build:
+      context: .
+      target: builder
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *demo-env
+      ALLOW_SEED: "1"
+    user: node
+    command: ["sh", "-c", "npx tsx scripts/migrate.ts && npx tsx scripts/seed.ts"]
+
+  app:
+    build: .
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    environment:
+      <<: *demo-env
+      JOBS_ENABLED: "1"
+      TRUST_PROXY: "0"
+    ports:
+      - "127.0.0.1:3000:3000"

@@ -136,6 +136,8 @@ async function main() {
       settings,
       domain: DEMO_DOMAIN,
       domainVerifiedAt: daysAgo(4),
+      // The fictional demo organisation only: live drills play synthetic responses (operator feature, docs/DEMO.md).
+      features: { live_drill: true },
       createdAt: daysAgo(60),
     })
     .returning();

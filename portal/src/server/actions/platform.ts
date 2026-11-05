@@ -10,7 +10,7 @@ import { domainProofFound, domainProofRecord, normaliseHost } from "../auth/doma
 import { audit } from "../services/audit";
 import { env } from "../env";
 import { TENANT_SLUG_RE, createTenantWithAdmin } from "../services/tenants";
-import { PLAN_FEATURES, withDefaults, type Feature } from "../../lib/tenant-defaults";
+import { ALL_FEATURES, withDefaults, type Feature } from "../../lib/tenant-defaults";
 import { LOCALES } from "../../i18n/config";
 
 /**
@@ -20,7 +20,6 @@ import { LOCALES } from "../../i18n/config";
 
 type Result = { ok: boolean; error?: string };
 const uuid = z.string().uuid();
-const ALL_FEATURES = Object.values(PLAN_FEATURES).flat() as Feature[];
 
 const tenantSchema = z.object({
   name: z.string().trim().min(2).max(120),

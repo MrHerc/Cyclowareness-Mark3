@@ -1,0 +1,1 @@
+ALTER TABLE "drill_runs" ADD COLUMN "risk_trail" jsonb DEFAULT '[]'::jsonb NOT NULL;

@@ -857,6 +857,51 @@ export const campaignRecipients = pgTable(
   (t) => [index("recipients_campaign_idx").on(t.campaignId), index("recipients_user_idx").on(t.userId)],
 );
 
+/** One planned step of a live drill (src/lib/drill/plan.ts): what one recipient does, and when. */
+export type DrillEventRow = {
+  /** Milliseconds after the start, in real time. */
+  at: number;
+  /** Simulated minutes after delivery (what the dashboard's clock shows). */
+  sim: number;
+  kind: "deliver" | "open" | "click" | "submit" | "report" | "train";
+  recipientId: string;
+  userId: string;
+};
+
+/**
+ * Live drill (operator feature `live_drill`, demo organisations only): a phishing campaign whose
+ * recipients' behaviour is planned up front and played back in compressed time through the real
+ * services (tracking, risk, threat intake, training). The dashboard's polls apply the due events;
+ * `appliedUntil` counts the events already applied and `leaseUntil` lets one request at a time apply.
+ */
+export const drillRuns = pgTable(
+  "drill_runs",
+  {
+    id: id(),
+    tenantId: tenantRef(),
+    campaignId: uuid("campaign_id")
+      .notNull()
+      .references(() => campaigns.id, { onDelete: "cascade" }),
+    templateKey: text("template_key").notNull(),
+    /** Real length of the playback in milliseconds. */
+    durationMs: integer("duration_ms").notNull(),
+    /** Simulated minutes the playback covers. */
+    simMinutes: integer("sim_minutes").notNull(),
+    events: jsonb("events").$type<DrillEventRow[]>().notNull(),
+    appliedUntil: integer("applied_until").notNull().default(0),
+    leaseUntil: ts("lease_until"),
+    /** Average risk score of the audience, and each person's score, before the drill. */
+    baseline: jsonb("baseline").$type<{ avgRisk: number; scores: Record<string, number> }>().notNull(),
+    /** The audience's average risk score after each applied batch (simulated minute, score), from the baseline on. */
+    riskTrail: jsonb("risk_trail").$type<{ sim: number; risk: number }[]>().notNull().default([]),
+    startedAt: ts("started_at").notNull(),
+    finishedAt: ts("finished_at"),
+    createdBy: uuid("created_by"),
+    createdAt: createdAt(),
+  },
+  (t) => [index("drill_runs_tenant_idx").on(t.tenantId, t.createdAt)],
+);
+
 /* ───────────────────────── Support & feedback ───────────────────────── */
 
 export const problemReports = pgTable(

@@ -62,8 +62,9 @@ export async function submitThreatReport(
     .where(and(eq(t.campaignRecipients.userId, p.userId), gte(t.campaignRecipients.sentAt, since), inArray(t.campaigns.status, ["running", "completed"])))
     .orderBy(desc(t.campaignRecipients.sentAt));
   const subject = normalise(p.subject);
-  const match = candidates.find((c) => {
-    if (p.url && p.url.includes(`/t/${c.token}`)) return true;
+  // The tracking link names the exact recipient; only without one does the subject decide (the newest match wins).
+  const byLink = p.url ? candidates.find((c) => p.url!.includes(`/t/${c.token}`)) : undefined;
+  const match = byLink ?? candidates.find((c) => {
     const tpl = TEMPLATE_BY_KEY.get(c.templateKey);
     if (!tpl) return false;
     return Object.values(tpl.subject).some((s) => {

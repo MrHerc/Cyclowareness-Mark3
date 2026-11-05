@@ -288,10 +288,20 @@ export const PLAN_FEATURES = {
   professional: ["ai_tutor", "tutor_voice", "sms_voice", "qr_trap", "sandbox", "threat_intake", "incidents", "risk_profiles", "sso", "ldap", "integrations", "compliance_pack", "studio"],
   enterprise_hrm: ["closed_loops", "approvals", "threat_intel", "policy_intel", "leadership", "ops_center"],
 } as const;
+/**
+ * Features no plan includes: the platform operator switches them on for one organisation (/super →
+ * Features). `live_drill` plays a time-compressed phishing attack with synthetic responses from the
+ * organisation's people, so it belongs on demo and sales organisations only, never on real employees.
+ */
+export const OPERATOR_FEATURES = ["live_drill"] as const;
 export type Feature =
   | (typeof PLAN_FEATURES.essentials)[number]
   | (typeof PLAN_FEATURES.professional)[number]
-  | (typeof PLAN_FEATURES.enterprise_hrm)[number];
+  | (typeof PLAN_FEATURES.enterprise_hrm)[number]
+  | (typeof OPERATOR_FEATURES)[number];
+
+/** Every feature an operator can override: the plans' and the operator-only ones. */
+export const ALL_FEATURES: readonly Feature[] = [...PLAN_FEATURES.essentials, ...PLAN_FEATURES.professional, ...PLAN_FEATURES.enterprise_hrm, ...OPERATOR_FEATURES];
 
 export function featuresFor(plan: "essentials" | "professional" | "enterprise_hrm", overrides: Record<string, boolean> = {}): Set<Feature> {
   const list: Feature[] = [...PLAN_FEATURES.essentials];
