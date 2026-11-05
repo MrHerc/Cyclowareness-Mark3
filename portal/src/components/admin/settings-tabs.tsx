@@ -445,7 +445,8 @@ export function IdentityTab({
     maxDevices: identity.maxDevices,
     ssoEnabled: identity.ssoEnabled,
     sso: {
-      protocol: identity.sso?.protocol ?? "oidc",
+      // Only OpenID Connect is connected: a stored "saml" moves to it on the next save.
+      protocol: "oidc" as "oidc" | "saml",
       issuer: identity.sso?.issuer ?? "",
       clientId: identity.sso?.clientId ?? "",
       clientSecret: "",
@@ -503,17 +504,8 @@ export function IdentityTab({
       <Card>
         <CardHeader title={<Step n={1}>{t("step1Title")}</Step>} description={t("step1Body")} />
         <CardBody className="grid gap-2">
-          <Segmented
-            name="protocol"
-            ariaLabel={t("protocol")}
-            className="w-fit"
-            value={sso.protocol}
-            onChange={(v) => setSso({ protocol: v as "oidc" | "saml" })}
-            options={[
-              { value: "oidc", label: "OpenID Connect" },
-            ]}
-          />
-          {sso.protocol === "oidc" ? <p className="text-caption text-ink-muted">{t("oidcHint")}</p> : null}
+          <p className="text-caption text-ink-muted">{t("oidcHint")}</p>
+          {identity.sso?.protocol === "saml" ? <Notice tone="warn">{t("samlNotConnected")}</Notice> : null}
         </CardBody>
       </Card>
       <Card>
@@ -559,18 +551,12 @@ export function IdentityTab({
             <Button variant="secondary" onClick={checkSettings}>
               {t("checkSettings")}
             </Button>
-            {sso.protocol === "oidc" ? (
-              <ButtonAnchor href={`${signInLink}&test=1`} variant="secondary" aria-describedby="i-test-hint">
-                {t("openTest")}
-              </ButtonAnchor>
-            ) : (
-              <Button variant="secondary" disabled aria-describedby="i-test-hint">
-                {t("openTest")}
-              </Button>
-            )}
+            <ButtonAnchor href={`${signInLink}&test=1`} variant="secondary" aria-describedby="i-test-hint">
+              {t("openTest")}
+            </ButtonAnchor>
           </div>
           <p id="i-test-hint" className="text-caption text-ink-subtle">
-            {sso.protocol === "oidc" ? t("testSignInHint") : t("samlNotConnected")}
+            {t("testSignInHint")}
           </p>
           <div role="status" className="grid gap-2">
             {checked !== null ? <Notice tone={checked ? "safe" : "risk"}>{checked ? t("checkOk") : t("checkFailed")}</Notice> : null}

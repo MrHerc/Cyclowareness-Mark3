@@ -974,8 +974,8 @@ language's voice (section 3.4).
   text has arrived (Offline fallback below). Env (`src/server/env.ts`): `ANTHROPIC_API_KEY` (optional) and
   `ANTHROPIC_TUTOR_MODEL` (default `claude-haiku-5-5`; tutor only). `ANTHROPIC_MODEL` (default
   `claude-opus-5-5`) is the Studio drafting model in `src/server/ai.ts`; it rejects disabled thinking, so
-  pointing the tutor at it makes every answer fall back to the lesson text. No TTS variables exist;
-  `VOICE_PROVIDER` is for voice-call campaigns, not narration. ADR-008: only lesson context and the
+  pointing the tutor at it makes every answer fall back to the lesson text. No TTS variables exist
+  (voice-call campaigns are not built and are refused at launch). ADR-008: only lesson context and the
   question go to the model, never learner data.
 - **Context** `lessonContext(moduleTitle, lessonTitle, scenes)`, called with the module and
   lesson titles in the scenes' language (`pick(mod.title, row.locale)`, `pick(row.title, row.locale)`):

@@ -569,20 +569,20 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
 /* ───────── automatic refresher ───────── */
 
 const REFRESHER_TITLE: Record<string, string> = {
-  az: "Qısa təkrar dərs",
-  en: "Short refresher",
-  ru: "Короткое повторение",
-  tr: "Kısa tekrar dersi",
-  ro: "Recapitulare scurtă",
-  ka: "მოკლე გამეორება",
-  uk: "Коротке повторення",
-  de: "Kurze Auffrischung",
-  fr: "Petite remise à niveau",
-  ar: "مراجعة قصيرة",
+  az: "Aylıq təkrar təlim",
+  en: "Monthly follow-up training",
+  ru: "Ежемесячное повторное обучение",
+  tr: "Aylık tekrar eğitimi",
+  ro: "Instruire lunară de reîmprospătare",
+  ka: "ყოველთვიური განმეორებითი ტრენინგი",
+  uk: "Щомісячне повторне навчання",
+  de: "Monatliche Auffrischungsschulung",
+  fr: "Remise à niveau mensuelle",
+  ar: "تدريب تنشيطي شهري",
 } satisfies Record<Locale, string>;
 
 /**
- * People at or above the risk threshold get one short refresher a month (no penalty, no XP loss):
+ * People at or above the risk threshold get one follow-up training task a month (no penalty, no XP loss):
  * their next open assigned module, else the phishing module, never one they already completed.
  * Whoever already got this month's refresher (open or finished) is left alone until next month.
  */
