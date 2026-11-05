@@ -1,6 +1,9 @@
 import type { Scene } from "@/lib/content/types";
+import { tutorAnswerId } from "@/lib/content/scoring";
 import type { LessonResult } from "@/server/actions/learning";
 import type { PlayerAnswer } from "./scenes";
+
+export { tutorAnswerId };
 
 /**
  * Where a learner is in a lesson, kept in the tab's sessionStorage so that a reload, a discarded
@@ -16,7 +19,7 @@ export type SavedLesson =
 const VERSION = 1;
 const MAX_ANSWERS = 400;
 const MAX_ELAPSED_MS = 4 * 3600_000;
-const OUTCOMES = new Set(["safe", "risky", "compromised"]);
+const MAX_PICKED = 40;
 const MODULE_STATUSES = new Set(["in_progress", "awaiting_attestation", "completed"]);
 
 export function lessonStateKey(userId: string, slug: string, lessonKey: string): string {
@@ -25,11 +28,6 @@ export function lessonStateKey(userId: string, slug: string, lessonKey: string):
 
 export function serializeLesson(state: SavedLesson, sceneIds: string[]): string {
   return JSON.stringify({ v: VERSION, scenes: sceneIds, ...state });
-}
-
-/** The answer id a tutor checkpoint records: the beat belongs to its scene but is scored on its own. */
-export function tutorAnswerId(sceneId: string, beatId: string): string {
-  return `${sceneId}:${beatId}`;
 }
 
 /** Every answer id the lesson's scenes can record, so a restored answer is kept only if the lesson still has it. */
@@ -42,16 +40,9 @@ const shortString = (v: unknown): v is string => typeof v === "string" && v.leng
 function answerOf(v: unknown): PlayerAnswer | null {
   if (!v || typeof v !== "object") return null;
   const a = v as Record<string, unknown>;
-  if (!shortString(a.sceneId) || typeof a.correct !== "boolean" || typeof a.firstTry !== "boolean") return null;
+  if (!shortString(a.sceneId) || !Array.isArray(a.picked) || a.picked.length > MAX_PICKED || !a.picked.every(shortString)) return null;
   if (a.itemId !== undefined && !shortString(a.itemId)) return null;
-  if (a.outcome !== undefined && !(typeof a.outcome === "string" && OUTCOMES.has(a.outcome))) return null;
-  return {
-    sceneId: a.sceneId,
-    ...(a.itemId !== undefined ? { itemId: a.itemId as string } : {}),
-    correct: a.correct,
-    firstTry: a.firstTry,
-    ...(a.outcome !== undefined ? { outcome: a.outcome as PlayerAnswer["outcome"] } : {}),
-  };
+  return { sceneId: a.sceneId, ...(a.itemId !== undefined ? { itemId: a.itemId as string } : {}), picked: a.picked };
 }
 
 function resultOf(v: unknown): LessonResult | null {

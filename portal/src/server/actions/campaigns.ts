@@ -7,7 +7,7 @@ import { db, t } from "../db";
 import { actionViewer } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
 import { audit } from "../services/audit";
-import { launchCampaign, recordSubmit, type LaunchBlock } from "../services/campaigns";
+import { launchCampaign, recordSubmit, setCampaignStatus, type LaunchBlock } from "../services/campaigns";
 import { TEMPLATE_BY_KEY, templateOnPlan } from "../../lib/campaigns/templates";
 
 const draftSchema = z.object({
@@ -84,13 +84,8 @@ export async function setCampaignStatusAction(id: string, status: "cancelled" | 
   const v = await actionViewer("campaigns.write");
   // Only these two end states can be set by hand; anything else would let a running campaign be relaunched.
   if (!isUuid(id) || (status !== "cancelled" && status !== "completed")) return { ok: false };
-  const [c] = await db().select().from(t.campaigns).where(and(eq(t.campaigns.id, id), eq(t.campaigns.tenantId, v.tenant.id)));
-  if (!c || c.status === "completed" || c.status === "cancelled") return { ok: false };
-  await db()
-    .update(t.campaigns)
-    .set({ status, ...(status === "completed" ? { completedAt: new Date() } : {}) })
-    .where(eq(t.campaigns.id, c.id));
-  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: status === "cancelled" ? "campaign.cancelled" : "campaign.changed", targetType: "campaign", targetId: c.id, meta: { status } });
+  if (!(await setCampaignStatus(db(), v.tenant.id, id, status))) return { ok: false };
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: status === "cancelled" ? "campaign.cancelled" : "campaign.changed", targetType: "campaign", targetId: id, meta: { status } });
   refresh();
   return { ok: true };
 }

@@ -10,6 +10,7 @@ import { migrate } from "drizzle-orm/pglite/migrator";
 import * as t from "../../src/server/db/schema";
 import type { DB } from "../../src/server/db/client";
 import type { Role } from "../../src/server/db/schema";
+import type { Scene } from "../../src/lib/content/types";
 import { defaultSettings } from "../../src/lib/tenant-defaults";
 
 /** Starting the embedded database and applying the migrations takes a few seconds (longer on Windows). */
@@ -48,7 +49,22 @@ export async function addUser(db: DB, tenantId: string, o: Partial<typeof t.user
   return row;
 }
 
-/** A module with `lessons` lessons at positions `firstPosition`, `firstPosition + 1`, … */
+/** The English text of every test lesson: a question "q1" (option "a" is right) and a one-step simulation "sim" ("report" is safe). */
+export const TEST_SCENES: Scene[] = [
+  { type: "intro", id: "start", title: "Start", body: "Welcome." },
+  { type: "choice", id: "q1", question: { prompt: "Which one?", options: [{ id: "a", label: "A", correct: true, feedback: "Yes." }, { id: "b", label: "B", correct: false, feedback: "No." }] } },
+  {
+    type: "simulation",
+    id: "sim",
+    environment: "inbox",
+    title: "Inbox",
+    intro: "Handle the email.",
+    steps: [{ id: "link", artifact: { kind: "email" }, actions: [{ id: "open", label: "Open", kind: "click-link", outcome: "risky", feedback: "Risky." }, { id: "report", label: "Report", kind: "report", outcome: "safe", feedback: "Safe." }] }],
+  },
+  { type: "recap", id: "recap", points: ["Done."] },
+];
+
+/** A module with `lessons` lessons at positions `firstPosition`, `firstPosition + 1`, …, each with TEST_SCENES as its English text. */
 export async function addModule(db: DB, o: Partial<typeof t.modules.$inferInsert> & { lessons?: number; firstPosition?: number } = {}) {
   const { lessons = 3, firstPosition = 0, ...values } = o;
   const n = next();
@@ -62,6 +78,7 @@ export async function addModule(db: DB, o: Partial<typeof t.modules.$inferInsert
         .values(Array.from({ length: lessons }, (_, i) => ({ moduleId: mod.id, key: `lesson-${i + 1}`, title: { en: `Lesson ${i + 1}` }, minutes: 3, position: firstPosition + i })))
         .returning()
     : [];
+  if (rows.length) await db.insert(t.lessonContents).values(rows.map((l) => ({ lessonId: l.id, locale: "en", scenes: TEST_SCENES })));
   return { ...mod, lessons: rows.sort((a, b) => a.position - b.position) };
 }
 

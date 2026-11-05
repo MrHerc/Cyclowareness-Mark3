@@ -91,16 +91,20 @@ export async function submitThreatReport(
   if (match && !match.reportedAt) {
     await db.update(t.campaignRecipients).set({ reportedAt: new Date() }).where(and(eq(t.campaignRecipients.id, match.id), isNull(t.campaignRecipients.reportedAt)));
   }
-  // Report bonus, capped per day so it can't be farmed.
+  // Report bonus, capped per day so it can't be farmed: the person's row is locked before the count,
+  // so reports sent at the same moment are counted one after another (as recordLabAttempt does).
   const today = dayKey(new Date());
-  const [{ n }] = await db
-    .select({ n: count() })
-    .from(t.xpEvents)
-    .where(and(eq(t.xpEvents.userId, p.userId), eq(t.xpEvents.reason, "report"), sql`to_char(${t.xpEvents.at} at time zone 'Asia/Baku', 'YYYY-MM-DD') = ${today}`));
-  if (Number(n) < REPORT_BONUS_DAILY_CAP) {
-    await awardXp(db, { tenantId: p.tenantId, userId: p.userId, amount: REPORT_BONUS_XP, reason: "report", ref: `TR-${number}` });
-    xp = REPORT_BONUS_XP;
-  }
+  await db.transaction(async (tx) => {
+    await tx.select({ id: t.users.id }).from(t.users).where(eq(t.users.id, p.userId)).for("update");
+    const [{ n }] = await tx
+      .select({ n: count() })
+      .from(t.xpEvents)
+      .where(and(eq(t.xpEvents.userId, p.userId), eq(t.xpEvents.reason, "report"), sql`to_char(${t.xpEvents.at} at time zone 'Asia/Baku', 'YYYY-MM-DD') = ${today}`));
+    if (Number(n) < REPORT_BONUS_DAILY_CAP) {
+      await awardXp(tx, { tenantId: p.tenantId, userId: p.userId, amount: REPORT_BONUS_XP, reason: "report", ref: `TR-${number}` });
+      xp = REPORT_BONUS_XP;
+    }
+  });
   await audit(db, { tenantId: p.tenantId, actorId: p.userId, action: "threat.reported", targetType: "threat_report", targetId: String(number), ip: p.ip ?? null, meta: { channel: p.channel, simulation: !!match } });
   await emitEvent(db, p.tenantId, match ? "simulation.reported" : "threat.reported", { number, channel: p.channel, simulation: !!match });
   if (!match) {

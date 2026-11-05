@@ -112,6 +112,14 @@ describe("submitThreatReport", () => {
     expect(xp).toEqual([5, 5, 5, 5, 5, 0, 0]);
   });
 
+  it("keeps the daily bonus cap when reports arrive at the same time", async () => {
+    const tenant = await addTenant(db);
+    const reporter = await addUser(db, tenant.id);
+    const results = await Promise.all(Array.from({ length: 8 }, (_, i) => submitThreatReport(db, { tenantId: tenant.id, userId: reporter.id, channel: "other", subject: `Report ${i}` })));
+    expect(results.filter((r) => r.xp > 0)).toHaveLength(5);
+    expect(await db.select().from(t.xpEvents).where(and(eq(t.xpEvents.userId, reporter.id), eq(t.xpEvents.reason, "report")))).toHaveLength(5);
+  });
+
   it("gives simultaneous reports distinct numbers", async () => {
     const tenant = await addTenant(db);
     const reporter = await addUser(db, tenant.id);

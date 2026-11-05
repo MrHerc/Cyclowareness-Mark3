@@ -43,14 +43,15 @@ import { BrandAvatar } from "./brand-avatar";
 import { ArtifactModeProvider, hasLink, lensTargets, cleanSpeech, langProps, useContentLang } from "./rich";
 import { Illustration, Stat } from "./illustrations";
 import { wordsOf, type Voice } from "./narrator";
-import { tutorAnswerId } from "./resume";
+import { MISS, tutorAnswerId, type Submission } from "@/lib/content/scoring";
 import { CaptionBar } from "./captions";
 import { checkPassword } from "@/lib/password-strength";
 import { vibrate } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
-export type PlayerAnswer = { sceneId: string; itemId?: string; correct: boolean; firstTry: boolean; outcome?: Outcome };
+/** What the learner picked in a scored scene; the server scores it (src/lib/content/scoring.ts). */
+export type PlayerAnswer = Submission;
 
 type Narrator = {
   /** `lang`: read the text with that language's voice instead of the lesson's (interface strings). */
@@ -444,7 +445,7 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
     if (!pickedOpt || checked) return;
     setChecked(true);
     if (!pickedOpt.correct) vibrate();
-    env.onAnswer({ sceneId: tutorAnswerId(scene.id, beat.id), correct: pickedOpt.correct, firstTry: true });
+    env.onAnswer({ sceneId: tutorAnswerId(scene.id, beat.id), picked: [pickedOpt.id] });
   };
 
   // After the narration the beat moves on by itself: to its question, or to the next beat.
@@ -667,7 +668,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
     if (!step) return;
     env.narrator.stop();
     if (a.outcome !== "safe") vibrate();
-    env.onAnswer({ sceneId: scene.id, itemId: step.id, correct: a.outcome === "safe", firstTry: true, outcome: a.outcome });
+    env.onAnswer({ sceneId: scene.id, itemId: step.id, picked: [a.id] });
     setDone((d) => new Set(d).add(step.id));
     setResult({ outcome: a.outcome, feedback: a.feedback, next: a.next });
   };
@@ -998,7 +999,7 @@ export function ChoiceScene({ scene, env }: { scene: Extract<Scene, { type: "cho
     setChecked(true);
     setTimedOut(expired);
     if (!ok) vibrate();
-    env.onAnswer({ sceneId: scene.id, correct: ok, firstTry: true });
+    env.onAnswer({ sceneId: scene.id, picked: expired ? [] : [...picked] });
   };
   const left = useCountdown(env.timer, !checked, () => check(true));
   const ok = checked && !timedOut && isRight(picked);
@@ -1075,7 +1076,8 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
   const t = useTranslations("player");
   const contentLang = useContentLang();
   const [found, setFound] = useState<Set<string>>(new Set());
-  const [miss, setMiss] = useState(0);
+  // Every click, a miss included: the server scores the scene from this list.
+  const clicks = useRef<string[]>([]);
   const [lastSpot, setLastSpot] = useState<string | null>(null);
   const [finished, setFinished] = useState(false);
   const valid = useMemo(() => new Set(scene.spots.map((s) => s.id)), [scene]);
@@ -1086,13 +1088,17 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const missed = () => {
+    if (!finished) clicks.current.push(MISS);
+  };
   const onSpot = (id: string) => {
     if (finished) return;
     if (!valid.has(id)) {
-      setMiss((m) => m + 1);
+      missed();
       return;
     }
     if (found.has(id)) return;
+    clicks.current.push(id);
     const next = new Set(found).add(id);
     setFound(next);
     setLastSpot(id);
@@ -1101,14 +1107,14 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
     if (next.size < need) env.narrator.speak(spot.explain);
     if (next.size >= need) {
       setFinished(true);
-      env.onAnswer({ sceneId: scene.id, correct: miss === 0, firstTry: true });
+      env.onAnswer({ sceneId: scene.id, picked: clicks.current });
     }
   };
   const last = scene.spots.find((s) => s.id === lastSpot);
 
   return (
     <div className="mx-auto grid w-full max-w-5xl gap-6 py-2 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-      <div onClick={() => !finished && setMiss((m) => m + 1)}>
+      <div onClick={missed}>
         <ArtifactModeProvider value={{ hotspot: { found, onSpot, validSpots: valid } }}>
           <ArtifactView artifact={scene.artifact} />
         </ArtifactModeProvider>
@@ -1182,7 +1188,7 @@ export function SwipeScene({ scene, env }: { scene: Extract<Scene, { type: "swip
     setAnswer(v);
     setDrag(0);
     if (v !== card.verdict) vibrate();
-    env.onAnswer({ sceneId: scene.id, itemId: card.id, correct: v === card.verdict, firstTry: true });
+    env.onAnswer({ sceneId: scene.id, itemId: card.id, picked: [v] });
   };
   const next = () => {
     env.narrator.stop();
@@ -1273,6 +1279,7 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
   const [matched, setMatched] = useState<Set<string>>(new Set());
   const [wrong, setWrong] = useState<string | null>(null);
   const [mistakes, setMistakes] = useState(0);
+  const attempts = useRef<string[]>([]);
   const complete = matched.size === scene.pairs.length;
 
   useEffect(() => {
@@ -1281,13 +1288,14 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
   }, []);
   useEffect(() => {
     if (complete) {
-      env.onAnswer({ sceneId: scene.id, correct: mistakes === 0, firstTry: true });
+      env.onAnswer({ sceneId: scene.id, picked: attempts.current });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [complete]);
 
   const pickRight = (id: string) => {
     if (!left || matched.has(id)) return;
+    attempts.current.push(`${left}>${id}`);
     if (left === id) {
       setMatched(new Set(matched).add(id));
       setLeft(null);
@@ -1380,7 +1388,7 @@ export function OrderScene({ scene, env }: { scene: Extract<Scene, { type: "orde
   const check = () => {
     const ok = items.every((x, i) => x.id === scene.items[i].id);
     if (!ok) vibrate();
-    if (!checkedOnce) env.onAnswer({ sceneId: scene.id, correct: ok, firstTry: true });
+    if (!checkedOnce) env.onAnswer({ sceneId: scene.id, picked: items.map((x) => x.id) });
     setCheckedOnce(true);
     setAttempts((a) => a + 1);
     setResult(ok ? "ok" : "wrong");
@@ -1445,11 +1453,11 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current]);
 
-  const choose = (c: NonNullable<ScenarioNode["choices"]>[number]) => {
+  const choose = (c: NonNullable<ScenarioNode["choices"]>[number], k: number) => {
     env.narrator.stop();
     const outcome: Outcome = c.outcome ?? "safe";
     if (outcome !== "safe") vibrate();
-    env.onAnswer({ sceneId: scene.id, itemId: current.id, correct: outcome === "safe", firstTry: true, outcome: c.outcome ?? undefined });
+    env.onAnswer({ sceneId: scene.id, itemId: current.id, picked: [String(k)] });
     setHistory((h) => [...h.slice(0, -1), { node: current, choice: c.label }]);
     setPending({ feedback: c.feedback, next: c.next, outcome: c.outcome });
   };
@@ -1527,7 +1535,7 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
         {!pending && !ending && current.choices?.length ? (
           <div {...langProps(contentLang)} className="grid gap-2">
             {current.choices.map((c, k) => (
-              <button key={k} type="button" onClick={() => choose(c)} className="rounded-xl border-2 border-line bg-surface px-4 py-3 text-start text-body-sm font-semibold transition-colors hover:border-brand-400">
+              <button key={k} type="button" onClick={() => choose(c, k)} className="rounded-xl border-2 border-line bg-surface px-4 py-3 text-start text-body-sm font-semibold transition-colors hover:border-brand-400">
                 {c.label}
               </button>
             ))}
@@ -1602,7 +1610,7 @@ export function PasswordScene({ scene, env }: { scene: Extract<Scene, { type: "p
     setScore(s);
     if (!reached && v && s >= scene.targetScore) {
       setReached(true);
-      env.onAnswer({ sceneId: scene.id, correct: true, firstTry: true });
+      env.onAnswer({ sceneId: scene.id, picked: [] });
     }
   };
 

@@ -433,6 +433,9 @@ export const lessonProgress = pgTable(
     xpAwarded: integer("xp_awarded").notNull().default(0),
     attempts: integer("attempts").notNull().default(0),
     secondsSpent: integer("seconds_spent").notNull().default(0),
+    /** The current attempt, as the server saw it: when it began and the furthest scene reached. Cleared by each completion. */
+    startedAt: ts("started_at"),
+    reached: integer("reached").notNull().default(0),
   },
   (t) => [primaryKey({ columns: [t.userId, t.lessonId] })],
 );
@@ -473,6 +476,10 @@ export const xpEvents = pgTable(
   (t) => [index("xp_user_at_idx").on(t.userId, t.at), index("xp_tenant_at_idx").on(t.tenantId, t.at)],
 );
 
+/** How a completion was established: rows from before the server-side check stay self-reported. */
+export const EVIDENCE = ["self_reported", "server_verified"] as const;
+export type Evidence = (typeof EVIDENCE)[number];
+
 export const attestations = pgTable("attestations", {
   id: id(),
   tenantId: tenantRef(),
@@ -485,8 +492,9 @@ export const attestations = pgTable("attestations", {
     .references(() => modules.id, { onDelete: "no action" }),
   text: text("text").notNull(),
   locale: text("locale").notNull(),
+  evidence: text("evidence", { enum: EVIDENCE }).notNull().default("self_reported"),
   at: ts("at").notNull().defaultNow(),
-}, (t) => [index("attestations_user_idx").on(t.userId)]);
+}, (t) => [index("attestations_user_idx").on(t.userId), uniqueIndex("attestations_user_module_idx").on(t.userId, t.moduleId)]);
 
 export const certificates = pgTable("certificates", {
   id: id(),
@@ -499,8 +507,15 @@ export const certificates = pgTable("certificates", {
   pathId: uuid("path_id").references(() => learningPaths.id, { onDelete: "no action" }),
   serial: text("serial").notNull().unique(),
   publicToken: text("public_token").notNull().unique(),
+  evidence: text("evidence", { enum: EVIDENCE }).notNull().default("self_reported"),
   issuedAt: ts("issued_at").notNull().defaultNow(),
-}, (t) => [index("certificates_user_idx").on(t.userId), index("certificates_tenant_idx").on(t.tenantId)]);
+}, (t) => [
+  index("certificates_user_idx").on(t.userId),
+  index("certificates_tenant_idx").on(t.tenantId),
+  // One certificate per module or path and person: the database backs the claims in progress.ts and learning.ts.
+  uniqueIndex("certificates_user_module_idx").on(t.userId, t.moduleId).where(sql`module_id is not null`),
+  uniqueIndex("certificates_user_path_idx").on(t.userId, t.pathId).where(sql`path_id is not null`),
+]);
 
 export const policies = pgTable("policies", {
   id: id(),

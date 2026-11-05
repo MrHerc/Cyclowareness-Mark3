@@ -47,11 +47,17 @@ export async function toggleSessionAction(sessionId: string, register: boolean):
   const [s] = await db().select().from(t.liveSessions).where(and(eq(t.liveSessions.id, sessionId), eq(t.liveSessions.tenantId, v.tenant.id)));
   if (!s || s.startsAt < new Date()) return { ok: false };
   if (register) {
-    if (s.capacity) {
-      const [{ n }] = await db().select({ n: count() }).from(t.sessionRegistrations).where(eq(t.sessionRegistrations.sessionId, s.id));
-      if (Number(n) >= s.capacity) return { ok: false, error: "full" };
-    }
-    await db().insert(t.sessionRegistrations).values({ sessionId: s.id, userId: v.user.id }).onConflictDoNothing();
+    // The session row is locked before the count, so two people taking the last seat at the same moment are counted one after another.
+    const full = await db().transaction(async (tx) => {
+      await tx.select({ id: t.liveSessions.id }).from(t.liveSessions).where(eq(t.liveSessions.id, s.id)).for("update");
+      if (s.capacity) {
+        const [{ n }] = await tx.select({ n: count() }).from(t.sessionRegistrations).where(eq(t.sessionRegistrations.sessionId, s.id));
+        if (Number(n) >= s.capacity) return true;
+      }
+      await tx.insert(t.sessionRegistrations).values({ sessionId: s.id, userId: v.user.id }).onConflictDoNothing();
+      return false;
+    });
+    if (full) return { ok: false, error: "full" };
   } else {
     await db().delete(t.sessionRegistrations).where(and(eq(t.sessionRegistrations.sessionId, s.id), eq(t.sessionRegistrations.userId, v.user.id)));
   }

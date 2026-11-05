@@ -266,8 +266,9 @@ flowchart LR
 
 **Completion.**
 
+- A lesson attempt is the server's: `startLessonAction` records when it began, the player reports each scene it shows (`reachSceneAction`, furthest scene only) and sends what the learner picked in every scored scene. `completeLessonAction` scores those picks from the stored lesson content (`src/lib/content/scoring.ts`), computes correctness, first-try and outcome itself, and refuses an attempt that was not started here, took less than max(20 s, 25 % of the lesson's minutes), skipped a scene or left a scored scene unanswered (audit `learning.completion_refused`, one typed error the player shows). Time trained is the server's clock.
 - A lesson awards its share of the module's XP the first time. Repeating it awards nothing but records the new completion time.
-- When every lesson is done, the module waits for the learner's attestation. The attestation issues a certificate with a serial number and a public verification page, `/c/{token}`.
+- When every lesson is done, the module waits for the learner's attestation. The attestation, the module's completion and its certificate (serial number, public verification page `/c/{token}`) are written in one transaction, backed by unique keys per person and module or path. Attestations and certificates carry `evidence`: `server_verified` for rows written since the check, `self_reported` for older rows; the certificate page, the compliance pack and the personal data export show it.
 - Completing every module of a path issues a path certificate.
 
 **Gamification** (`src/lib/domain/gamification.ts`).
@@ -490,7 +491,7 @@ These are open in the code at this commit. Most are also tracked in [`docs/build
 - **SAML and LDAP.** Settings are stored, but there is no SAML exchange and no directory synchronisation.
 - **SSO account matching.** SSO accounts are matched by email only. The provider's `sub` is not bound to the account.
 - **SSO domain proof.** The SSO callback creates new learners for the saved domain without re-checking that the domain proof is still valid.
-- **Lesson completion.** The server does not verify that a learner passed through every scene before marking a lesson complete.
+- **Lesson completion.** The server verifies the attempt's start, dwell, scenes reached and scored answers, but the scene reports and picks still come from the learner's browser: a learner who scripts the three actions in order, waits the dwell and sends right answers is not distinguishable from one who read the lesson. The password scene's strength is checked in the browser only (the typed text never leaves it). Rows from before the check stay `self_reported`.
 - **Threat intelligence.** There is no feed ingestion; items are created by the seed.
 - **PDF reports.** PDFs come from the browser's print dialog; there is no server-side PDF. Scheduled report emails carry a sign-in link to the CSV or XLSX download, not an attachment.
 - **Time zone.** Every organisation runs on Baku time; there is no per-tenant time zone.

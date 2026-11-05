@@ -45,7 +45,7 @@ import {
   type PlayerAnswer,
   type SceneEnv,
 } from "./scenes";
-import { attestModuleAction, completeLessonAction, startLessonAction, type LessonResult } from "@/server/actions/learning";
+import { attestModuleAction, completeLessonAction, reachSceneAction, startLessonAction, type LessonResult } from "@/server/actions/learning";
 import { setPreferencesAction } from "@/server/actions/preferences";
 
 export type PlayerProps = {
@@ -229,7 +229,8 @@ export function LessonPlayer(p: PlayerProps) {
     setPhase("playing");
     savePosition(at, from?.inner ?? 0, reach);
     if (doneParam) setDoneParam(false);
-    void startLessonAction(p.slug, p.lesson.key);
+    // The attempt's start, then its furthest scene, are the server's: a resumed one tells it where it already was.
+    void startLessonAction(p.slug, p.lesson.key).then(() => (reach > 0 ? reachSceneAction(p.slug, p.lesson.key, reach) : undefined));
   };
 
   /** Opens a scene: any one up to `reach`, the furthest reached (the next one only through the current scene's own end). */
@@ -241,6 +242,7 @@ export function LessonPlayer(p: PlayerProps) {
     setIndex(at);
     setMaxIndex(reach);
     savePosition(at, 0, reach);
+    if (reach > maxIndex) void reachSceneAction(p.slug, p.lesson.key, reach);
   };
   const nextScene = () => {
     if (index + 1 < scenes.length) goTo(index + 1, Math.max(maxIndex, index + 1));
@@ -252,14 +254,11 @@ export function LessonPlayer(p: PlayerProps) {
     setSaving(true);
     stop();
     try {
-      const res = await completeLessonAction({
-        slug: p.slug,
-        lessonKey: p.lesson.key,
-        seconds: Math.min(4 * 3600, Math.round((Date.now() - started.current) / 1000)),
-        answers: answers.current.slice(0, 400),
-      });
+      // The last scene is reported again first: a report lost on the way must not refuse an honest attempt.
+      await reachSceneAction(p.slug, p.lesson.key, index);
+      const res = await completeLessonAction({ slug: p.slug, lessonKey: p.lesson.key, answers: answers.current.slice(0, 400) });
       if (!res.ok) {
-        toast(t("recap.saveError"), "error");
+        toast(t(res.error ? "recap.unverified" : "recap.saveError"), "error");
         return;
       }
       // No router.refresh() here: every link on the done screen leads to a freshly rendered page,

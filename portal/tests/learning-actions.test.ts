@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
@@ -42,28 +42,52 @@ async function setup(o: { plan?: t.Plan; role?: t.Role; settings?: (s: t.TenantS
   return { tenant, user };
 }
 
-const finish = (slug: string, lessonKey: string, answers: Parameters<typeof learning.completeLessonAction>[0]["answers"] = []) =>
-  learning.completeLessonAction({ slug, lessonKey, seconds: 120, answers });
+type Answers = Parameters<typeof learning.completeLessonAction>[0]["answers"];
+/** Every scored scene of a test lesson answered right (see TEST_SCENES). */
+const RIGHT: Answers = [
+  { sceneId: "q1", picked: ["a"] },
+  { sceneId: "sim", itemId: "link", picked: ["report"] },
+];
+const LAST_SCENE = 3;
+const refusals = () => db.select().from(t.auditLog).where(and(eq(t.auditLog.actorId, viewer.user.id), eq(t.auditLog.action, "learning.completion_refused")));
+
+/** Plays the lesson as the real player does: starts it, reaches every scene, finishes with the answers; the start is backdated past the dwell. */
+async function play(slug: string, lessonKey: string, answers: Answers = RIGHT, o: { startedAgoMs?: number; reach?: number } = {}) {
+  await learning.startLessonAction(slug, lessonKey);
+  await db
+    .update(t.lessonProgress)
+    .set({ startedAt: new Date(Date.now() - (o.startedAgoMs ?? 60_000)) })
+    .where(and(eq(t.lessonProgress.userId, viewer.user.id), isNotNull(t.lessonProgress.startedAt)));
+  await learning.reachSceneAction(slug, lessonKey, o.reach ?? LAST_SCENE);
+  return learning.completeLessonAction({ slug, lessonKey, answers });
+}
+const finish = (slug: string, lessonKey: string, answers: Answers = []) => learning.completeLessonAction({ slug, lessonKey, answers });
 
 describe("completing lessons", () => {
-  it("walks a module lesson by lesson to the attestation, storing answers and the new risk score", async () => {
+  it("walks a module lesson by lesson to the attestation, scoring the answers itself and storing the new risk score", async () => {
     const { tenant, user } = await setup();
     const mod = await addModule(db, { xp: 90, category: "accounts" });
-    const first = await finish(mod.slug, "lesson-1", [
-      { sceneId: "q1", correct: true, firstTry: true },
-      { sceneId: "sim", itemId: "link", correct: false, firstTry: true, outcome: "risky" },
+    const first = await play(mod.slug, "lesson-1", [
+      { sceneId: "q1", picked: ["a"] },
+      { sceneId: "sim", itemId: "link", picked: ["open"] },
     ]);
     expect(first).toEqual({ ok: true, xp: 30, moduleStatus: "in_progress", nextKey: "lesson-2" });
     const answers = await db.select().from(t.answers).where(eq(t.answers.userId, user.id));
     expect(answers).toHaveLength(2);
-    expect(answers.find((a) => a.sceneId === "sim")).toMatchObject({ tenantId: tenant.id, itemId: "link", outcome: "risky", category: "accounts", correct: false });
-    await finish(mod.slug, "lesson-2");
-    const last = await finish(mod.slug, "lesson-3");
+    expect(answers.find((a) => a.sceneId === "q1")).toMatchObject({ correct: true, firstTry: true, outcome: null });
+    expect(answers.find((a) => a.sceneId === "sim")).toMatchObject({ tenantId: tenant.id, itemId: "link", outcome: "risky", category: "accounts", correct: false, firstTry: false });
+    // The time trained is the server's own clock, not a number from the browser.
+    const [progress] = await db.select().from(t.lessonProgress).where(and(eq(t.lessonProgress.userId, user.id), eq(t.lessonProgress.lessonId, mod.lessons[0].id)));
+    expect(progress.secondsSpent).toBeGreaterThanOrEqual(60);
+    expect(progress).toMatchObject({ startedAt: null, reached: 0 });
+    await play(mod.slug, "lesson-2");
+    const last = await play(mod.slug, "lesson-3");
     expect(last).toEqual({ ok: true, xp: 30, moduleStatus: "awaiting_attestation", nextKey: null });
     const [row] = await db.select().from(t.users).where(eq(t.users.id, user.id));
     expect(row.xp).toBe(90);
     // Recomputed from evidence instead of the default 50 for a new account.
     expect(row.riskScore).not.toBe(50);
+    expect(await refusals()).toEqual([]);
   });
 
   it("queues the 'simulation.risky' event for an organisation that subscribed to it", async () => {
@@ -71,46 +95,83 @@ describe("completing lessons", () => {
       settings: (s) => ({ ...s, integrations: { ...s.integrations, webhookEnabled: true, webhookUrl: "https://siem.example/hook", webhookEvents: ["simulation.risky"] } }),
     });
     const mod = await addModule(db);
-    await finish(mod.slug, "lesson-1", [{ sceneId: "sim", correct: false, firstTry: true, outcome: "compromised" }]);
+    await play(mod.slug, "lesson-1", [{ sceneId: "q1", picked: ["b"] }, { sceneId: "sim", itemId: "link", picked: ["open"] }]);
     const [delivery] = await db.select().from(t.webhookDeliveries).where(eq(t.webhookDeliveries.tenantId, tenant.id));
     expect(delivery.payload).toMatchObject({ event: "simulation.risky", data: { module: mod.slug, lesson: "lesson-1", choices: 1 } });
+  });
+
+  it("refuses an attempt that was not started here, one that was too quick, one that skipped scenes and one with answers missing or forged", async () => {
+    const { user } = await setup();
+    const mod = await addModule(db);
+    const xpEvents = () => db.select().from(t.xpEvents).where(eq(t.xpEvents.userId, user.id));
+    const refused = { ok: false, xp: 0, error: "unverified" };
+    expect(await finish(mod.slug, "lesson-1", RIGHT)).toEqual(refused);
+    expect(await play(mod.slug, "lesson-1", RIGHT, { startedAgoMs: 10_000 })).toEqual(refused);
+    // A fresh lesson: the furthest scene only moves forward, so lesson-1 already stands at the end.
+    expect(await play(mod.slug, "lesson-2", RIGHT, { reach: LAST_SCENE - 1 })).toEqual(refused);
+    expect(await play(mod.slug, "lesson-1", [{ sceneId: "q1", picked: ["a"] }])).toEqual(refused);
+    expect(await play(mod.slug, "lesson-1", [...RIGHT, { sceneId: "q1", picked: ["zzz"] }])).toEqual(refused);
+    expect((await refusals()).map((r) => (r.meta as { reason: string }).reason).sort()).toEqual(["invalid", "not_started", "too_fast", "unanswered", "unreached"]);
+    expect(await xpEvents()).toEqual([]);
+    expect(await db.select().from(t.answers).where(eq(t.answers.userId, user.id))).toEqual([]);
+    // The browser's own verdict is ignored: a wrong pick claimed right is stored wrong.
+    const forged = [{ sceneId: "q1", picked: ["b"], correct: true, firstTry: true }, { sceneId: "sim", itemId: "link", picked: ["open"], correct: true, firstTry: true, outcome: "safe" }] as unknown as Answers;
+    expect((await play(mod.slug, "lesson-1", forged)).ok).toBe(true);
+    const answers = await db.select().from(t.answers).where(eq(t.answers.userId, user.id));
+    expect(answers.map((a) => [a.sceneId, a.correct, a.firstTry, a.outcome])).toEqual(expect.arrayContaining([["q1", false, false, null], ["sim", false, false, "risky"]]));
+  });
+
+  it("awards the XP once when the same completion arrives twice at the same time", async () => {
+    const { user } = await setup();
+    const mod = await addModule(db);
+    await learning.startLessonAction(mod.slug, "lesson-1");
+    await db.update(t.lessonProgress).set({ startedAt: new Date(Date.now() - 60_000) }).where(eq(t.lessonProgress.userId, user.id));
+    await learning.reachSceneAction(mod.slug, "lesson-1", LAST_SCENE);
+    const results = await Promise.all([finish(mod.slug, "lesson-1", RIGHT), finish(mod.slug, "lesson-1", RIGHT)]);
+    expect(results.map((r) => r.ok)).toEqual([true, true]);
+    expect(results.map((r) => r.xp).sort()).toEqual([0, 33]);
+    expect(await db.select().from(t.xpEvents).where(eq(t.xpEvents.userId, user.id))).toHaveLength(1);
   });
 
   it("refuses malformed input, unknown modules and lessons without writing anything", async () => {
     const { user } = await setup();
     const mod = await addModule(db);
-    expect(await learning.completeLessonAction({ slug: mod.slug, lessonKey: "lesson-1", seconds: 5 * 3600, answers: [] })).toEqual({ ok: false, xp: 0 });
-    expect(await learning.completeLessonAction({ slug: mod.slug, lessonKey: "lesson-1", seconds: 10, answers: Array.from({ length: 401 }, () => ({ sceneId: "q", correct: true, firstTry: true })) })).toEqual({ ok: false, xp: 0 });
+    expect(await learning.completeLessonAction({ slug: mod.slug, lessonKey: "lesson-1", answers: Array.from({ length: 401 }, () => ({ sceneId: "q1", picked: ["a"] })) })).toEqual({ ok: false, xp: 0 });
     expect(await finish("no-such-module", "lesson-1")).toEqual({ ok: false, xp: 0 });
     expect(await finish(mod.slug, "no-such-lesson")).toEqual({ ok: false, xp: 0 });
     expect(await db.select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, user.id))).toEqual([]);
   });
 
-  it("keeps draft modules from learners but lets Studio authors preview them", async () => {
+  it("keeps draft modules from learners but lets Studio authors preview them, earning nothing", async () => {
     await setup();
     const draft = await addModule(db, { status: "draft", tenantId: viewer.tenant.id, origin: "ai", firstPosition: 1 });
-    expect(await finish(draft.slug, "lesson-1")).toEqual({ ok: false, xp: 0 });
-    await setup({ role: "content_creator" });
+    expect(await play(draft.slug, "lesson-1")).toEqual({ ok: false, xp: 0 });
+    const { user } = await setup({ role: "content_creator" });
     const own = await addModule(db, { status: "draft", tenantId: viewer.tenant.id, origin: "ai", firstPosition: 1 });
-    expect((await finish(own.slug, "lesson-1")).ok).toBe(true);
+    expect(await play(own.slug, "lesson-1")).toEqual({ ok: true, xp: 0 });
+    expect(await db.select().from(t.answers).where(eq(t.answers.userId, user.id))).toEqual([]);
+    expect((await db.select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, user.id))).map((p) => p.completedAt)).toEqual([null]);
   });
 
   it("uses the organisation's own module where it shares a slug with the library", async () => {
     const { user } = await setup();
     const library = await addModule(db, { slug: "shared-slug-a" });
     const own = await addModule(db, { slug: "shared-slug-a", tenantId: viewer.tenant.id, origin: "custom" });
-    await finish("shared-slug-a", "lesson-1");
+    await play("shared-slug-a", "lesson-1");
     const [progress] = await db.select().from(t.moduleProgress).where(eq(t.moduleProgress.userId, user.id));
     expect(progress.moduleId).toBe(own.id);
     expect(progress.moduleId).not.toBe(library.id);
   });
 
-  it("bookmarks an opened lesson for the Home 'Continue' card", async () => {
+  it("bookmarks an opened lesson for the Home 'Continue' card and records when the attempt began", async () => {
     const { user } = await setup();
     const mod = await addModule(db);
     await learning.startLessonAction(mod.slug, "lesson-2");
     const [progress] = await db.select().from(t.moduleProgress).where(eq(t.moduleProgress.userId, user.id));
     expect(progress).toMatchObject({ moduleId: mod.id, status: "in_progress", lastLessonKey: "lesson-2" });
+    const [attempt] = await db.select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, user.id));
+    expect(attempt).toMatchObject({ lessonId: mod.lessons[1].id, completedAt: null, reached: 0 });
+    expect(attempt.startedAt).toBeInstanceOf(Date);
   });
 });
 
@@ -120,13 +181,24 @@ describe("attesting a module", () => {
     locale = "ru";
     const mod = await addModule(db, { lessons: 2 });
     expect(await learning.attestModuleAction(mod.slug)).toEqual({ ok: false });
-    await finish(mod.slug, "lesson-1");
-    await finish(mod.slug, "lesson-2");
+    await play(mod.slug, "lesson-1");
+    await play(mod.slug, "lesson-2");
     const res = await learning.attestModuleAction(mod.slug);
     expect(res).toEqual({ ok: true, token: expect.stringMatching(/^[a-z2-7]+$/) });
     const [attestation] = await db.select().from(t.attestations).where(eq(t.attestations.userId, user.id));
-    expect(attestation).toMatchObject({ text: "Я подтверждаю.", locale: "ru", moduleId: mod.id });
+    expect(attestation).toMatchObject({ text: "Я подтверждаю.", locale: "ru", moduleId: mod.id, evidence: "server_verified" });
+    expect(await db.select().from(t.certificates).where(eq(t.certificates.userId, user.id))).toMatchObject([{ moduleId: mod.id, evidence: "server_verified" }]);
     expect(await learning.attestModuleAction(mod.slug)).toEqual({ ok: false });
+  });
+
+  it("stores one attestation and one certificate when the confirmation is sent twice at the same time", async () => {
+    const { user } = await setup();
+    const mod = await addModule(db, { lessons: 1 });
+    await play(mod.slug, "lesson-1");
+    const results = await Promise.all([learning.attestModuleAction(mod.slug), learning.attestModuleAction(mod.slug)]);
+    expect(results.filter((r) => r.ok)).toHaveLength(1);
+    expect(await db.select().from(t.attestations).where(eq(t.attestations.userId, user.id))).toHaveLength(1);
+    expect(await db.select().from(t.certificates).where(eq(t.certificates.userId, user.id))).toHaveLength(1);
   });
 
   it("issues the learning path certificate once, when the path's last module is attested", async () => {
@@ -138,15 +210,31 @@ describe("attesting a module", () => {
       .values({ tenantId: viewer.tenant.id, key: `path-${a.slug}`, title: { en: "Path" }, description: { en: "" }, audience: { en: "" }, recurrence: { en: "" }, standards: [], moduleSlugs: [a.slug, b.slug] })
       .returning();
     const pathCerts = () => db.select().from(t.certificates).where(and(eq(t.certificates.userId, user.id), eq(t.certificates.pathId, path.id)));
-    await finish(a.slug, "lesson-1");
+    await play(a.slug, "lesson-1");
     await learning.attestModuleAction(a.slug);
     expect(await pathCerts()).toHaveLength(0);
-    await finish(b.slug, "lesson-1");
+    await play(b.slug, "lesson-1");
     await learning.attestModuleAction(b.slug);
-    expect(await pathCerts()).toHaveLength(1);
+    expect(await pathCerts()).toMatchObject([{ evidence: "server_verified" }]);
     // Replaying a module of a finished path does not issue another one.
-    await finish(a.slug, "lesson-1");
+    await play(a.slug, "lesson-1");
     expect(await pathCerts()).toHaveLength(1);
+  });
+
+  it("issues one learning path certificate when the path's last two modules are attested at the same time", async () => {
+    const { user } = await setup();
+    const a = await addModule(db, { lessons: 1 });
+    const b = await addModule(db, { lessons: 1 });
+    const [path] = await db
+      .insert(t.learningPaths)
+      .values({ tenantId: viewer.tenant.id, key: `path-${a.slug}`, title: { en: "Path" }, description: { en: "" }, audience: { en: "" }, recurrence: { en: "" }, standards: [], moduleSlugs: [a.slug, b.slug] })
+      .returning();
+    await play(a.slug, "lesson-1");
+    await play(b.slug, "lesson-1");
+    const results = await Promise.all([learning.attestModuleAction(a.slug), learning.attestModuleAction(b.slug)]);
+    expect(results.map((r) => r.ok)).toEqual([true, true]);
+    expect(await db.select().from(t.certificates).where(and(eq(t.certificates.userId, user.id), eq(t.certificates.pathId, path.id)))).toHaveLength(1);
+    expect(await db.select().from(t.certificates).where(eq(t.certificates.userId, user.id))).toHaveLength(3);
   });
 });
 
