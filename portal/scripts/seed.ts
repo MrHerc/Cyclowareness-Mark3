@@ -28,7 +28,7 @@ import { DEFAULT_ATTESTATION, DEFAULT_TEMPLATES, defaultSettings } from "../src/
 import { departmentKey } from "../src/lib/departments";
 import { encodeRiskTitle, riskTitle } from "../src/lib/risk-title";
 import { REPORT_BONUS_XP, LAB_XP, dayKey } from "../src/lib/domain/gamification";
-import { DEMO_DOMAIN, DEPARTMENTS, PEOPLE, emailFor, mulberry32, type DeptKey, type SeedPerson } from "./seed-data";
+import { DEMO_DOMAIN, DEPARTMENTS, PEOPLE, PUBLISHED_SEED_PASSWORD, emailFor, mulberry32, seedPasswordProblem, type DeptKey, type SeedPerson } from "./seed-data";
 
 // The seed TRUNCATES EVERY TABLE. Only the local embedded database is seeded without asking: any
 // DATABASE_URL (a real PostgreSQL, wherever NODE_ENV points) needs an explicit ALLOW_SEED=1.
@@ -37,6 +37,12 @@ if ((process.env.DATABASE_URL || process.env.NODE_ENV === "production") && proce
     "Refusing to seed: it deletes every row of the target database and loads the demo organisation.\n" +
       "DATABASE_URL (or NODE_ENV=production) is set. Set ALLOW_SEED=1 only for a fresh or throwaway database.",
   );
+  process.exit(1);
+}
+// The published demo password would open every seeded account, the platform operator included.
+const passwordProblem = seedPasswordProblem(process.env);
+if (passwordProblem) {
+  console.error(`Refusing to seed: ${passwordProblem}`);
   process.exit(1);
 }
 
@@ -52,8 +58,8 @@ function seedTarget(): string {
   }
 }
 
-/** Demo password for every seeded account. Override with SEED_PASSWORD. */
-const SEED_PASSWORD = process.env.SEED_PASSWORD ?? "Portal-Demo-2026!";
+/** Demo password for every seeded account. Override with SEED_PASSWORD (required beyond the local embedded database). */
+const SEED_PASSWORD = process.env.SEED_PASSWORD ?? PUBLISHED_SEED_PASSWORD;
 const rnd = mulberry32(20261018);
 const NOW = new Date();
 const DAY = 86_400_000;
