@@ -8,3 +8,9 @@ export function parseDay(value: unknown): string | null {
   const date = new Date(Date.UTC(y, m - 1, d));
   return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d ? value : null;
 }
+
+/**
+ * The time zone of an organisation that has not chosen one (TenantSettings.timeZone): Baku, where
+ * every organisation ran before the setting existed, so their days and deadlines stay where they were.
+ */
+export const DEFAULT_TIME_ZONE = "Asia/Baku";

@@ -8,6 +8,8 @@ import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { dayKey, lessonXp, nextStreak } from "../../lib/domain/gamification";
 import { isUniqueViolation } from "../db/errors";
+import { withDefaults } from "../../lib/tenant-defaults";
+import { tenantTimeZone } from "./tenants";
 
 export function randomToken(bytes = 20): string {
   const buf = new Uint8Array(bytes);
@@ -26,7 +28,8 @@ export async function awardXp(
     .from(t.users)
     .where(eq(t.users.id, p.userId));
   if (!u) return;
-  const day = dayKey(at);
+  // The streak day turns over at the organisation's midnight.
+  const day = dayKey(at, await tenantTimeZone(db, p.tenantId));
   // Replayed history (seed) can arrive out of order; never move the streak backwards.
   const streak =
     u.last && u.last > day ? { current: u.cur, longest: u.longest, lastDay: u.last, freezes: u.freezes } : nextStreak({ current: u.cur, longest: u.longest, lastDay: u.last }, day, u.freezes);
@@ -193,9 +196,9 @@ export async function touchModule(db: DB, p: { userId: string; moduleId: string;
  * out an existing serial again).
  */
 async function nextSerial(db: DB, tenantId: string, at: Date): Promise<string> {
-  const [tenant] = await db.select({ slug: t.tenants.slug }).from(t.tenants).where(eq(t.tenants.id, tenantId));
-  // The year of the Baku day (as the certificate shows it), not of the server's own time zone.
-  const prefix = `${tenant.slug.toUpperCase()}-${dayKey(at).slice(0, 4)}-`;
+  const [tenant] = await db.select({ slug: t.tenants.slug, settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId));
+  // The year of the organisation's day (as the certificate shows it), not of the server's own time zone.
+  const prefix = `${tenant.slug.toUpperCase()}-${dayKey(at, withDefaults(tenant.settings).timeZone).slice(0, 4)}-`;
   // The cast matters: with a text parameter, `substring(... from ...)` is the regular-expression form.
   const rest = sql`substring(${t.certificates.serial} from ${prefix.length + 1}::int)`;
   const [row] = await db

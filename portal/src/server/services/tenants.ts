@@ -1,6 +1,13 @@
+import { eq } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
-import { DEFAULT_BRANDING, defaultSettings } from "../../lib/tenant-defaults";
+import { DEFAULT_BRANDING, defaultSettings, withDefaults } from "../../lib/tenant-defaults";
+
+/** The organisation's time zone (Settings → Languages), for services that only get its id. */
+export async function tenantTimeZone(db: DB, tenantId: string): Promise<string> {
+  const [row] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId));
+  return withDefaults(row?.settings).timeZone;
+}
 
 /** Organisation slugs: lowercase letters, digits and inner hyphens, 3–40 characters. */
 export const TENANT_SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/;

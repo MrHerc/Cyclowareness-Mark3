@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { dayAt } from "@/lib/time";
 import { ArrowLeft, ArrowRight, Globe, Lock, Plus, RotateCw, ScanSearch, ShieldAlert, X, FileBadge2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { dirOf } from "@/i18n/config";
-import { useClientFormat } from "@/lib/client-format";
+import { useClientFormat, useOrgTimeZone } from "@/lib/client-format";
 
 export type Cert = { subject: string; org: string | null; altNames: string[]; issuer: string; from: string; to: string; fingerprint: string };
 export type BrowserTab = {
@@ -53,8 +54,9 @@ export function BrowserApp({
   const t = useTranslations("learner.lab.vm.browser");
   const locale = useLocale();
   const format = useClientFormat();
-  // Certificate validity is a Baku day (YYYY-MM-DD), shown in the UI language.
-  const day = (d: string) => format.dateTime(new Date(`${d}T12:00:00+04:00`), { dateStyle: "medium" });
+  // Certificate validity is a day (YYYY-MM-DD) of the organisation's zone, shown in the UI language.
+  const timeZone = useOrgTimeZone();
+  const day = (d: string) => format.dateTime(dayAt(d, timeZone), { dateStyle: "medium" });
   const tab = tabs.find((x) => x.id === active) ?? tabs[0];
   const [pop, setPop] = useState<"info" | "inspect" | "cert" | null>(null);
   const certClose = useRef<HTMLButtonElement>(null);

@@ -1,21 +1,22 @@
 import { describe, expect, it, vi } from "vitest";
 
 const cookie = { value: "az" as string | undefined };
-const header = { accept: null as string | null, country: null as string | null };
+const header = { accept: null as string | null, country: null as string | null, site: null as string | null };
 vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => (cookie.value ? { value: cookie.value } : undefined) }),
   headers: async () => {
     const h = new Headers();
     if (header.accept) h.set("accept-language", header.accept);
     if (header.country) h.set("cf-ipcountry", header.country);
+    if (header.site) h.set("x-site-locale", header.site);
     return h;
   },
 }));
 vi.mock("next-intl/server", () => ({ getRequestConfig: (fn: unknown) => fn }));
-const session = { value: null as null | { user: { locale: string }; tenant: { settings: { locales: string[]; defaultLocale: string } } } };
+const session = { value: null as null | { user: { locale: string }; tenant: { settings: { locales: string[]; defaultLocale: string; timeZone?: string } } } };
 vi.mock("../src/server/auth/viewer", () => ({ getSession: async () => session.value }));
 
-type Config = (params: { locale?: string }) => Promise<{ locale: string; messages: { common: { cancel: string } } }>;
+type Config = (params: { locale?: string }) => Promise<{ locale: string; timeZone: string; messages: { common: { cancel: string } } }>;
 const config = async () => (await import("../src/i18n/request")).default as unknown as Config;
 
 describe("request config", () => {
@@ -42,6 +43,19 @@ describe("request config", () => {
     cookie.value = undefined;
     expect((await (await config())({})).locale).toBe("en");
     session.value = null;
+  });
+
+  it("shows times in the signed-in organisation's zone, the default zone elsewhere", async () => {
+    cookie.value = "az";
+    session.value = { user: { locale: "ru" }, tenant: { settings: { locales: [], defaultLocale: "az", timeZone: "Europe/Berlin" } } };
+    expect((await (await config())({})).timeZone).toBe("Europe/Berlin");
+    expect((await (await config())({ locale: "ru" })).timeZone).toBe("Europe/Berlin");
+    header.site = "en";
+    expect((await (await config())({})).timeZone).toBe("Asia/Baku");
+    header.site = null;
+    session.value = null;
+    expect((await (await config())({})).timeZone).toBe("Asia/Baku");
+    expect((await (await config())({ locale: "ru" })).timeZone).toBe("Asia/Baku");
   });
 
   it("gives a signed-out visitor the browser's language, and outside Azerbaijan English for one the app does not have", async () => {

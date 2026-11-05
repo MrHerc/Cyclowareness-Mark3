@@ -8,6 +8,7 @@ import { DOMAIN_PROOF_GRACE_DAYS } from "@/server/auth/domain-proof";
 import { CAMPAIGN_CANCELLED_ERROR, resendableMail } from "@/server/mail";
 import type { TenantSettings } from "@/server/db/schema";
 import { requestNow } from "@/lib/time";
+import { TIME_ZONES } from "@/lib/tenant-defaults";
 import { PageHeader, TabsNav } from "@/components/ui/layout";
 import {
   AttestationTab,
@@ -92,7 +93,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
       break;
     }
     case "languages":
-      body = <LanguagesTab defaultLocale={s.defaultLocale} locales={s.locales} />;
+      body = <LanguagesTab defaultLocale={s.defaultLocale} locales={s.locales} timeZone={s.timeZone} timeZones={TIME_ZONES} />;
       break;
     case "identity":
       body = (

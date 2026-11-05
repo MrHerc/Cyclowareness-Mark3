@@ -27,7 +27,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
   const str = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : "");
   const action = (AUDIT_ACTIONS as readonly string[]).includes(str("action")) ? str("action") : "";
   // Impossible days (2026-13-01) and a range that ends before it starts are ignored, not sent to the database.
-  const range = dayRange(str("from"), str("to"));
+  const range = dayRange(str("from"), str("to"), v.tenant.settings.timeZone);
   const from = range.fromDay;
   const to = range.toDay;
   const page = pageParam(str("page"));

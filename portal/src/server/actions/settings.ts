@@ -17,7 +17,7 @@ import { clientIp } from "../request";
 import { rateLimit } from "../rate-limit";
 import { LOCALES, isLocale } from "../../i18n/config";
 import { isHexColor } from "../../lib/color";
-import { WEBHOOK_EVENTS, withDefaults } from "../../lib/tenant-defaults";
+import { WEBHOOK_EVENTS, isTimeZone, withDefaults } from "../../lib/tenant-defaults";
 import { svgLogoProblem } from "../svg-safety";
 import { isUuid } from "../../lib/ids";
 import { endpointKey, storedSecretOutcome } from "../../lib/stored-secret";
@@ -166,6 +166,17 @@ export async function saveLanguagesAction(defaultLocale: string, locales: string
   const valid = [...new Set(locales)].filter((l) => (LOCALES as readonly string[]).includes(l));
   if (!(LOCALES as readonly string[]).includes(defaultLocale) || !valid.includes(defaultLocale)) return { ok: false, field: "defaultLocale" };
   await saveSettings(v, (s) => ({ ...s, defaultLocale, locales: valid }), "settings.languages");
+  return { ok: true };
+}
+
+/** The organisation's IANA time zone: its days, due dates, reminders, scheduled reports and the times every page shows. */
+export async function saveTimeZoneAction(timeZone: string): Promise<SaveResult> {
+  const v = await actionViewer("settings.write");
+  if (!isTimeZone(timeZone)) return { ok: false, field: "timeZone" };
+  const from = v.tenant.settings.timeZone;
+  // The Languages tab saves both together: an unchanged zone writes no "Time zone changed" audit entry.
+  if (timeZone === from) return { ok: true };
+  await saveSettings(v, (s) => ({ ...s, timeZone }), "settings.timezone", { from, to: timeZone });
   return { ok: true };
 }
 

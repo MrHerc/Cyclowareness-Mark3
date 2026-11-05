@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useClientFormat } from "@/lib/client-format";
+import { useClientFormat, useOrgTimeZone } from "@/lib/client-format";
 import { parseDay } from "@/lib/day";
 import { CalendarClock, FileDown, Plus, Trash2 } from "lucide-react";
 import { removeScheduleAction, saveScheduleAction } from "@/server/actions/reports";
@@ -133,6 +133,7 @@ export function Schedules({
   const t = useTranslations("admin.reports");
   const tc = useTranslations("common");
   const format = useClientFormat();
+  const timeZone = useOrgTimeZone();
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState(kinds[0]?.key ?? "completion");
   const [fmt, setFmt] = useState("xlsx");
@@ -239,7 +240,7 @@ export function Schedules({
           <Field label={t("recipients")} htmlFor="s-to" hint={t("recipientsHint")}>
             <Input id="s-to" dir="ltr" value={recipients} onChange={(e) => setRecipients(e.target.value)} placeholder="ciso@example.az, hr@example.az" />
           </Field>
-          <p className="text-caption text-ink-muted">{t("scheduleHint")}</p>
+          <p className="text-caption text-ink-muted">{t("scheduleHint", { zone: timeZone })}</p>
           <Button
             disabled={!recipients.trim() || pending}
             onClick={() =>

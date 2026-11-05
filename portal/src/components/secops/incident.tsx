@@ -30,7 +30,7 @@ export function NewIncident({
   modules: Option[];
   departments: Option[];
   people: PersonOption[];
-  /** The prefilled training due date (YYYY-MM-DD), computed on the server so it is the Baku day and matches between render and hydration. */
+  /** The prefilled training due date (YYYY-MM-DD), computed on the server so it is the organisation's day and matches between render and hydration. */
   defaultDue: string;
   prefill?: { title?: string; severity?: (typeof SEVERITIES)[number]; source?: (typeof SOURCES)[number]; iocs?: string; mitre?: string; sandboxId?: string; description?: string };
   label?: string;
@@ -268,7 +268,7 @@ export function IncidentTrainingEditor({
   modules: Option[];
   departments: Option[];
   people: PersonOption[];
-  /** The due date offered when the incident has none yet (YYYY-MM-DD, the Baku day, computed on the server). */
+  /** The due date offered when the incident has none yet (YYYY-MM-DD, the organisation's day, computed on the server). */
   defaultDue: string;
 }) {
   const t = useTranslations("secops.incidents");

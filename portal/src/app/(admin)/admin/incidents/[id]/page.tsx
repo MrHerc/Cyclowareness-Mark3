@@ -15,7 +15,7 @@ import { CopyText, IncidentControls, IncidentTrainingEditor } from "@/components
 import { formOptions } from "@/server/queries/secops-options";
 import { defang } from "@/lib/defang";
 import { pick } from "@/i18n/config";
-import { bakuDayPlus } from "@/lib/time";
+import { dayAt, dayPlus } from "@/lib/time";
 import { incidentForPage } from "./incident";
 
 const SEV_TONE = { low: "neutral", medium: "warn", high: "risk", critical: "risk" } as const;
@@ -100,7 +100,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                   ? [
                       pick(mod[0].title, locale),
                       inc.minScore ? tr("minScoreValue", { score: inc.minScore }) : null,
-                      inc.dueDate ? tr("dueValue", { date: format.dateTime(new Date(`${inc.dueDate}T12:00:00`), { dateStyle: "medium" }) }) : null,
+                      inc.dueDate ? tr("dueValue", { date: format.dateTime(dayAt(inc.dueDate, v.tenant.settings.timeZone), { dateStyle: "medium" }) }) : null,
                     ]
                       .filter(Boolean)
                       .join(" · ")
@@ -116,7 +116,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                       modules={options.modules}
                       departments={options.departments}
                       people={options.people}
-                      defaultDue={bakuDayPlus(7)}
+                      defaultDue={dayPlus(7, v.tenant.settings.timeZone)}
                     />
                   ) : null}
                 </span>

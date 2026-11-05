@@ -3,7 +3,7 @@ import { apiViewer } from "@/server/auth/api";
 import { db, t } from "@/server/db";
 import { audit } from "@/server/services/audit";
 import { toCsv } from "@/lib/csv";
-import { todayInBaku } from "@/lib/time";
+import { todayIn } from "@/lib/time";
 
 /** Demo requests from the public site, as CSV (platform operators only). */
 export async function GET(request: Request) {
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   return new Response(csv, {
     headers: {
       "content-type": "text/csv; charset=utf-8",
-      "content-disposition": `attachment; filename="demo-requests-${todayInBaku()}.csv"`,
+      "content-disposition": `attachment; filename="demo-requests-${todayIn(v.tenant.settings.timeZone)}.csv"`,
       "cache-control": "no-store",
     },
   });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { bakuParts } from "@/lib/baku-clock";
+import { zonedParts } from "@/lib/baku-clock";
 import { useMotion } from "@/lib/motion";
 
 /** A media query as a value; false on the server, where the lab shows its boot screen anyway. */
@@ -32,9 +32,9 @@ export function useSeconds(): number {
   return useSyncExternalStore(subscribeTick, () => Math.floor(Date.now() / 1000), () => 0);
 }
 
-/** Baku wall-clock time for the taskbar, by fixed-offset arithmetic (no Intl on the client). */
-export function bakuClock(seconds: number): { time: string } {
-  return { time: bakuParts(seconds * 1000).time };
+/** Wall-clock time for the taskbar in the organisation's time zone (useTimeZone()). */
+export function zonedClock(seconds: number, timeZone: string): { time: string } {
+  return { time: zonedParts(seconds * 1000, timeZone).time };
 }
 
 export function formatElapsed(totalSeconds: number): string {

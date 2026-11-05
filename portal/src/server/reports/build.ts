@@ -9,7 +9,7 @@ import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { riskBand } from "../../lib/domain/risk";
 import { levelFor } from "../../lib/domain/gamification";
 import { LOCALE_NAMES, pick, type Locale } from "../../i18n/config";
-import { dayRange, todayInBaku } from "../../lib/time";
+import { dayRange, todayIn } from "../../lib/time";
 import { isUuid } from "../../lib/ids";
 import type { ReportKind } from "../db/schema";
 
@@ -18,8 +18,8 @@ export type ReportTable = { title: string; headers: string[]; rows: Cell[][] };
 export type ReportFilters = { from?: string; to?: string; departmentId?: string };
 
 /** Impossible days and a reversed range are ignored (no date filter) rather than compared as Invalid Date, which drops every row. */
-function range(f: ReportFilters) {
-  const r = dayRange(f.from, f.to);
+function range(f: ReportFilters, timeZone: string) {
+  const r = dayRange(f.from, f.to, timeZone);
   return { from: r.from, to: r.to };
 }
 const within = (d: Date | null, r: { from: Date | null; to: Date | null }) => !d || ((!r.from || d >= r.from) && (!r.to || d <= r.to));
@@ -63,7 +63,7 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
   const [tr, tc] = await Promise.all([getTranslations({ locale, namespace: "admin.reports" }), getTranslations({ locale, namespace: "common" })]);
   const c = (k: string) => tr(`cols.${k}` as "cols.person");
   const title = tr(`kinds.${kind}.title`);
-  const r = range(f);
+  const r = range(f, v.tenant.settings.timeZone);
   const { users, deptName } = await scopedPeople(v, f);
   const ids = users.map((u) => u.id);
   const dept = (u: { departmentId: string | null }) => (u.departmentId ? (deptName.get(u.departmentId) ?? "") : "");
@@ -82,7 +82,7 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
       const assigned = await resolveAssignments(db(), v.tenant.id, ids);
       const progress = ids.length ? await db().select().from(t.moduleProgress).where(inArray(t.moduleProgress.userId, ids)) : [];
       const pm = new Map(progress.map((p) => [`${p.userId}:${p.moduleId}`, p]));
-      const today = todayInBaku();
+      const today = todayIn(v.tenant.settings.timeZone);
       const rows: Cell[][] = [];
       for (const u of users) {
         for (const a of (assigned.get(u.id) ?? new Map()).values()) {

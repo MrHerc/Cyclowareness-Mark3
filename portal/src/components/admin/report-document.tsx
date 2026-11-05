@@ -2,17 +2,17 @@ import type { ReactNode } from "react";
 
 type Cell = string | number | Date | null;
 
-function show(v: Cell, fmt: (d: Date) => string, num: (n: number) => string, day?: (d: Date) => string): string {
+function show(v: Cell, fmt: (d: Date) => string, num: (n: number) => string, day?: (day: string) => string): string {
   if (v === null || v === undefined || v === "") return "—";
   if (v instanceof Date) return fmt(v);
-  // A calendar day (a due date) without a time of day: noon in Baku keeps it on the same day everywhere.
-  if (day && typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) return day(new Date(`${v}T12:00:00+04:00`));
+  // A calendar day (a due date) without a time of day: the caller writes it in its language and the organisation's zone.
+  if (day && typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) return day(v);
   if (typeof v === "number") return num(v);
   return String(v);
 }
 
 /** One printable report section: heading, optional note and a compact table. Dates, days and numbers use the document's language. */
-export function ReportSection({ title, note, headers, rows, formatDate, formatDay, formatNumber, empty }: { title: string; note?: ReactNode; headers: string[]; rows: Cell[][]; formatDate: (d: Date) => string; formatDay?: (d: Date) => string; formatNumber: (n: number) => string; empty: string }) {
+export function ReportSection({ title, note, headers, rows, formatDate, formatDay, formatNumber, empty }: { title: string; note?: ReactNode; headers: string[]; rows: Cell[][]; formatDate: (d: Date) => string; formatDay?: (day: string) => string; formatNumber: (n: number) => string; empty: string }) {
   return (
     <section className="break-inside-avoid-page">
       <h2 className="mt-8 mb-2 text-title-sm font-bold">{title}</h2>

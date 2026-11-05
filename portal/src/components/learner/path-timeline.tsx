@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useClientFormat } from "@/lib/client-format";
+import { useClientFormat, useOrgTimeZone } from "@/lib/client-format";
+import { dayAt } from "@/lib/time";
 import { Check, ChevronDown, ChevronRight, Clock, Compass, Layers, Zap } from "lucide-react";
 import { Pill } from "@/components/ui/pill";
 import { moduleIcon } from "@/components/learner/module-icon";
@@ -28,13 +29,14 @@ export type PathItem = {
 const VISIBLE = 4;
 
 /**
- * Vertical "Your path" timeline from the original Home page. `today` is the Baku day (YYYY-MM-DD) the
- * server rendered on: due dates end at midnight Baku, and a client component keeps the clock out of render.
+ * Vertical "Your path" timeline from the original Home page. `today` is the organisation's day (YYYY-MM-DD)
+ * the server rendered on: due dates end at its midnight, and a client component keeps the clock out of render.
  */
 export function PathTimeline({ items, today }: { items: PathItem[]; today: string }) {
   const t = useTranslations("learner.home");
   const tc = useTranslations("common");
   const format = useClientFormat();
+  const timeZone = useOrgTimeZone();
   const [all, setAll] = useState(false);
   const shown = all ? items : items.slice(0, VISIBLE);
   return (
@@ -99,7 +101,7 @@ export function PathTimeline({ items, today }: { items: PathItem[]; today: strin
                     </span>
                     {m.due && !done ? (
                       <span className={cn("font-semibold", m.due < today ? "text-risk-600" : "text-ink-muted")}>
-                        {tc("time.due", { date: format.dateTime(new Date(`${m.due}T12:00:00+04:00`), { day: "numeric", month: "short" }) })}
+                        {tc("time.due", { date: format.dateTime(dayAt(m.due, timeZone), { day: "numeric", month: "short" }) })}
                       </span>
                     ) : null}
                   </div>

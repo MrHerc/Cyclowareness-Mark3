@@ -9,6 +9,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState, PageHeader, TabsNav } from "@/components/ui/layout";
 import { IntelActions } from "@/components/secops/intake";
+import { dayAt } from "@/lib/time";
 import { intelForPage } from "./intel";
 
 const STATUSES = ["all", "new", "reviewed", "converted", "dismissed"] as const;
@@ -54,7 +55,7 @@ export default async function IntelPage({ params, searchParams }: PageProps<"/ad
                   </div>
                   <h2 className="text-title-sm font-semibold">{i.title}</h2>
                   <p className="text-body-sm text-ink-muted">{i.summary}</p>
-                  {i.effectiveDate ? <p className="text-caption font-semibold text-ink">{tr("effective", { date: format.dateTime(new Date(`${i.effectiveDate}T12:00:00`), { dateStyle: "long" }) })}</p> : null}
+                  {i.effectiveDate ? <p className="text-caption font-semibold text-ink">{tr("effective", { date: format.dateTime(dayAt(i.effectiveDate, v.tenant.settings.timeZone), { dateStyle: "long" }) })}</p> : null}
                   <div className="flex flex-wrap items-center gap-1.5 text-tab">
                     {i.tags.map((tag) => (
                       <span key={tag} className="rounded-xs bg-sunken px-2 py-0.5 font-mono text-ink-muted">

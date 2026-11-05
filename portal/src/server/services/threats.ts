@@ -9,6 +9,7 @@ import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { REPORT_BONUS_DAILY_CAP, REPORT_BONUS_XP, dayKey } from "../../lib/domain/gamification";
 import { isUniqueViolation } from "../db/errors";
 import { messagesFor } from "../../i18n/translator";
+import { tenantTimeZone } from "./tenants";
 
 export type ThreatChannel = (typeof t.threatReports.$inferInsert)["channel"];
 
@@ -93,13 +94,14 @@ export async function submitThreatReport(
   }
   // Report bonus, capped per day so it can't be farmed: the person's row is locked before the count,
   // so reports sent at the same moment are counted one after another (as recordLabAttempt does).
-  const today = dayKey(new Date());
+  const tz = await tenantTimeZone(db, p.tenantId);
+  const today = dayKey(new Date(), tz);
   await db.transaction(async (tx) => {
     await tx.select({ id: t.users.id }).from(t.users).where(eq(t.users.id, p.userId)).for("update");
     const [{ n }] = await tx
       .select({ n: count() })
       .from(t.xpEvents)
-      .where(and(eq(t.xpEvents.userId, p.userId), eq(t.xpEvents.reason, "report"), sql`to_char(${t.xpEvents.at} at time zone 'Asia/Baku', 'YYYY-MM-DD') = ${today}`));
+      .where(and(eq(t.xpEvents.userId, p.userId), eq(t.xpEvents.reason, "report"), sql`to_char(${t.xpEvents.at} at time zone ${tz}, 'YYYY-MM-DD') = ${today}`));
     if (Number(n) < REPORT_BONUS_DAILY_CAP) {
       await awardXp(tx, { tenantId: p.tenantId, userId: p.userId, amount: REPORT_BONUS_XP, reason: "report", ref: `TR-${number}` });
       xp = REPORT_BONUS_XP;
@@ -116,7 +118,7 @@ export async function submitThreatReport(
       // "New threat report TR-1042" in each analyst's language; the reported subject is the body.
       const titles = new Map<string, string>();
       for (const locale of new Set(analysts.map((a) => a.locale))) {
-        titles.set(locale, createTranslator({ ...(await messagesFor(locale)), namespace: "secops.threats" })("notifyTitle", { number }));
+        titles.set(locale, createTranslator({ ...(await messagesFor(locale, tz)), namespace: "secops.threats" })("notifyTitle", { number }));
       }
       await db.insert(t.notifications).values(
         analysts.map((a) => ({ tenantId: p.tenantId, userId: a.id, kind: "threat", title: titles.get(a.locale) ?? `TR-${number}`, body: p.subject.slice(0, 140), href: "/admin/threats" })),

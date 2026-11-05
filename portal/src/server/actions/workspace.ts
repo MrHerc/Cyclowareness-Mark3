@@ -245,7 +245,7 @@ export async function createAssignmentAction(input: z.infer<typeof assignSchema>
         .from(t.users)
         .where(eq(t.users.tenantId, v.tenant.id));
       for (const u of people.filter((p) => wanted.has(p.id))) {
-        const due = dueFor({ dueKind: a.dueKind, dueDate: null, dueDays: a.dueDays }, u) ?? "";
+        const due = dueFor({ dueKind: a.dueKind, dueDate: null, dueDays: a.dueDays }, u, v.tenant.settings.timeZone) ?? "";
         byDue.set(due, [...(byDue.get(due) ?? []), u.id]);
       }
     } else byDue.set(a.dueKind === "fixed" ? (a.dueDate ?? "") : "", targets);

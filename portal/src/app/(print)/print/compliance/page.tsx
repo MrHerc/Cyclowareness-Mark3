@@ -10,6 +10,7 @@ import { DocHeader, ReportSection } from "@/components/admin/report-document";
 import { PrintToolbar } from "@/components/admin/print-toolbar";
 import { Notice } from "@/components/ui/layout";
 import { pick } from "@/i18n/config";
+import { dayAt } from "@/lib/time";
 
 /** The title is what the browser's "Save as PDF" suggests as the file name. */
 export async function generateMetadata() {
@@ -69,9 +70,9 @@ export default async function CompliancePack({ searchParams }: PageProps<"/print
   const gaps = completed.filter((c) => !attested.has(`${c.userId}:${c.moduleId}`)).map((c) => [names.get(c.userId) ?? "", pick(c.title, locale)]);
   if (allowed(v, "reports.read")) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "report.compliance_pack", meta: filters });
   const fd = (d: Date) => format.dateTime(d, { dateStyle: "short", timeStyle: "short" });
-  const fdy = (d: Date) => format.dateTime(d, { dateStyle: "short" });
+  const fdy = (day: string) => format.dateTime(dayAt(day, v.tenant.settings.timeZone), { dateStyle: "short" });
   const fn = (n: number) => format.number(n);
-  const day = (s?: string) => (s ? format.dateTime(new Date(`${s}T12:00:00+04:00`), { dateStyle: "long" }) : "…");
+  const day = (s?: string) => (s ? format.dateTime(dayAt(s, v.tenant.settings.timeZone), { dateStyle: "long" }) : "…");
   const period = filters.from || filters.to ? tr("period", { from: day(filters.from), to: day(filters.to) }) : tr("allTime");
   return (
     <>

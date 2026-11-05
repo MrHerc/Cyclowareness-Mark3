@@ -16,7 +16,7 @@ import { HomeMascot } from "@/components/learner/home-mascot";
 import { PathTimeline } from "@/components/learner/path-timeline";
 import { levelFor, dayKey, liveStreak } from "@/lib/domain/gamification";
 import { riskBand } from "@/lib/domain/risk";
-import { todayInBaku } from "@/lib/time";
+import { todayIn } from "@/lib/time";
 import { cn } from "@/lib/cn";
 import { TrendMark } from "../league/trend";
 
@@ -43,7 +43,7 @@ export default async function HomePage() {
   const awaiting = catalog.find((m) => m.status === "awaiting_attestation");
   const goal = v.tenant.settings.learning.dailyGoalXp;
   const lvl = levelFor(v.user.xp);
-  const streak = liveStreak(v.user.streakCurrent, v.user.streakLastDay, dayKey(new Date()), v.user.streakFreezes);
+  const streak = liveStreak(v.user.streakCurrent, v.user.streakLastDay, dayKey(new Date(), v.tenant.settings.timeZone), v.user.streakFreezes);
   const band = riskBand(v.user.riskScore);
   const firstName = v.user.name.split(" ")[0];
   // The lesson the home tutor answers about, with the language of the text the learner would get (studio lessons may exist in one language only).
@@ -204,7 +204,7 @@ export default async function HomePage() {
             </p>
           </div>
           <PathTimeline
-            today={todayInBaku()}
+            today={todayIn(v.tenant.settings.timeZone)}
             items={path.map((m) => ({
               slug: m.slug,
               category: m.category,

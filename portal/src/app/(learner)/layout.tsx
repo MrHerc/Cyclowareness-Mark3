@@ -23,7 +23,7 @@ export default async function LearnerLayout({ children }: { children: React.Reac
       ? db().select({ code: t.watermarkCodes.code }).from(t.watermarkCodes).where(and(eq(t.watermarkCodes.userId, v.user.id), eq(t.watermarkCodes.sessionId, v.sessionId))).limit(1)
       : Promise.resolve([] as { code: string }[]),
   ]);
-  const streak = liveStreak(v.user.streakCurrent, v.user.streakLastDay, dayKey(new Date()), v.user.streakFreezes);
+  const streak = liveStreak(v.user.streakCurrent, v.user.streakLastDay, dayKey(new Date(), v.tenant.settings.timeZone), v.user.streakFreezes);
   const freezes = v.user.streakFreezes;
   const hidden = [
     ...(!v.tenant.features.has("lab") ? ["lab"] : []),

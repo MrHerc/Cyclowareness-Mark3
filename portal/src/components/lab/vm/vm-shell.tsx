@@ -5,10 +5,10 @@ import { useLocale, useTranslations } from "next-intl";
 import { dirOf } from "@/i18n/config";
 import { ChevronLeft, ListChecks, Maximize2, Minimize2, Minus, MonitorSmartphone, SignalHigh, Volume2, Wifi, X, BatteryFull, LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { useClientFormat } from "@/lib/client-format";
+import { useClientFormat, useOrgTimeZone } from "@/lib/client-format";
 import type { AppId } from "../model/labs";
 import { APP_ORDER, APP_SIZE, clampWindow, fitWindow, type WmAction, type WmState } from "../model/wm";
-import { bakuClock, useSeconds } from "./hooks";
+import { useSeconds, zonedClock } from "./hooks";
 
 export type VmApp = { id: AppId; label: string; icon: ReactNode; tile: string; content: ReactNode; badge?: number };
 
@@ -19,9 +19,10 @@ function Clock({ stacked }: { stacked?: boolean }) {
   const t = useTranslations("learner.lab.vm");
   const format = useClientFormat();
   const secs = useSeconds();
+  const timeZone = useOrgTimeZone();
   if (!secs) return null;
-  const { time } = bakuClock(secs);
-  // Baku day in the UI language's numeric order (az/ru 25.10.2026, en 10/25/2026).
+  const { time } = zonedClock(secs, timeZone);
+  // The organisation's day in the UI language's numeric order (az/ru 25.10.2026, en 10/25/2026).
   const date = format.dateTime(secs * 1000, { day: "numeric", month: "numeric", year: "numeric" });
   return (
     <span className={cn("text-right leading-tight tabular-nums", stacked ? "grid" : "")}>

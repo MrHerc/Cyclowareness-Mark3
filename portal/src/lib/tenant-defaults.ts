@@ -1,4 +1,5 @@
 import { LOCALES, type Locale } from "../i18n/config";
+import { DEFAULT_TIME_ZONE } from "./day";
 import type { TemplateKind, TenantBranding, TenantSettings } from "../server/db/schema";
 
 export const DEFAULT_BRANDING: TenantBranding = { primary: "#4f46e5", accent: "#ff7a1a" };
@@ -222,6 +223,7 @@ export function defaultSettings(locale = "az"): TenantSettings {
   return {
     defaultLocale: locale,
     locales: [...LOCALES],
+    timeZone: DEFAULT_TIME_ZONE,
     protection: { contentProtection: true, watermark: true },
     learning: { timeLimits: true, refresher: true, riskThreshold: 67, dailyGoalXp: 50 },
     attestationText: { ...DEFAULT_ATTESTATION },
@@ -234,8 +236,22 @@ export function defaultSettings(locale = "az"): TenantSettings {
   };
 }
 
+/** The IANA time zones Settings → Languages offers; ICU lists Kyiv by its old name and leaves out UTC. */
+export const TIME_ZONES: readonly string[] = ["UTC", ...Intl.supportedValuesOf("timeZone").map((z) => (z === "Europe/Kiev" ? "Europe/Kyiv" : z))];
+
+/** Any named zone the runtime can format, so a saved alias never falls back to Baku when ICU renames it. Offsets such as "+03:00" are refused: Postgres reads them with the opposite sign. */
+export function isTimeZone(v: unknown): v is string {
+  if (typeof v !== "string" || !/^[A-Za-z]/.test(v)) return false;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: v });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 type Group = Record<string, unknown>;
-const group = (v: unknown): Group => (v && typeof v === "object" && !Array.isArray(v) ? (v as Group) : {});
+const group =(v: unknown): Group => (v && typeof v === "object" && !Array.isArray(v) ? (v as Group) : {});
 
 /** Texts per language; a single string saved by an older release belongs to the organisation's default language. */
 function perLocale(v: unknown, defaultLocale: string): Record<string, string> | undefined {
@@ -267,6 +283,7 @@ export function withDefaults(raw: unknown): TenantSettings {
     ...r,
     defaultLocale: d.defaultLocale,
     locales: Array.isArray(r.locales) && r.locales.length ? r.locales.filter((l): l is string => typeof l === "string") : d.locales,
+    timeZone: isTimeZone(r.timeZone) ? r.timeZone : d.timeZone,
     protection: { ...d.protection, ...group(r.protection) },
     learning: { ...d.learning, ...group(r.learning) },
     attestationText: { ...d.attestationText, ...group(r.attestationText) } as Record<string, string>,

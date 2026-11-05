@@ -15,7 +15,7 @@ const pglite = new PGlite();
 const db = drizzle(pglite, { schema: t }) as unknown as DB;
 vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src/server/db/schema") }));
 
-let viewer: { user: { id: string }; tenant: { id: string; name: string } } | null = null;
+let viewer: { user: { id: string }; tenant: { id: string; name: string; settings: { timeZone: string } } } | null = null;
 vi.mock("../src/server/auth/viewer", () => ({ getViewer: async () => viewer }));
 
 const { GET } = await import("../src/app/api/me/export/route");
@@ -60,7 +60,7 @@ beforeAll(async () => {
   await db.insert(t.threatReports).values({ tenantId: tenant.id, number: 1, reporterId: me, channel: "email", subject: "Odd mail", details: "Asked for my password", url: "https://evil.test" });
   await db.insert(t.sandboxAnalyses).values({ tenantId: tenant.id, number: 1, kind: "url", objectName: "https://evil.test", verdict: "malicious", score: 90, findings: [], iocs: [], mitre: [], submittedBy: me });
   await db.insert(t.sessions).values({ id: "session-hash", userId: me, tenantId: tenant.id, expiresAt: new Date(Date.now() + 86_400_000), ip: "198.51.100.7", userAgent: "Firefox" });
-  viewer = { user: { id: me }, tenant: { id: tenant.id, name: tenant.name } };
+  viewer = { user: { id: me }, tenant: { id: tenant.id, name: tenant.name, settings: { timeZone: "Europe/Berlin" } } };
   // Starting the embedded database and applying the migrations takes a while.
 }, 180_000);
 

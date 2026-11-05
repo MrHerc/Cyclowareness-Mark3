@@ -74,6 +74,7 @@ export const AUDIT_ACTIONS = [
   "domain.at_risk",
   "domain.removed",
   "settings.languages",
+  "settings.timezone",
   "settings.identity",
   "settings.email",
   "settings.email_tested",

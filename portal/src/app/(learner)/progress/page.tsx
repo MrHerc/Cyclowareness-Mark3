@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/ui/layout";
 import { ModuleIcon } from "@/components/learner/module-icon";
 import { BADGES, dayKey, levelFor, liveStreak } from "@/lib/domain/gamification";
 import { riskBand } from "@/lib/domain/risk";
+import { dayAt } from "@/lib/time";
 import { cn } from "@/lib/cn";
 
 const BADGE_ICON = { first_step: Footprints, module_master: BookCheck, sharp_eye: Eye, streak_7: Flame, policy_keeper: Signature, lab_explorer: FlaskConical, certified_5: Award, path_finisher: Route } as const;
@@ -25,10 +26,10 @@ export default async function ProgressPage() {
   const v = await requireViewer();
   const locale = await getLocale();
   const [t, tc, format, catalog, days, badges] = await Promise.all([getTranslations("learner.progress"), getTranslations("common"), getFormatter(), getCatalog(v, locale), xpByDay(v), badgesFor(v.user.id, v.tenant.id)]);
-  // Chart labels in the UI language (the screen-reader tables and the heatmap tooltips); the day is a Baku day.
-  const points = days.map((d) => ({ value: d.value, label: format.dateTime(new Date(`${d.label}T12:00:00+04:00`), { day: "numeric", month: "short" }) }));
+  // Chart labels in the UI language (the screen-reader tables and the heatmap tooltips); the day is the organisation's.
+  const points = days.map((d) => ({ value: d.value, label: format.dateTime(dayAt(d.label, v.tenant.settings.timeZone), { day: "numeric", month: "short" }) }));
   const lvl = levelFor(v.user.xp);
-  const streak = liveStreak(v.user.streakCurrent, v.user.streakLastDay, dayKey(new Date()), v.user.streakFreezes);
+  const streak = liveStreak(v.user.streakCurrent, v.user.streakLastDay, dayKey(new Date(), v.tenant.settings.timeZone), v.user.streakFreezes);
   const band = riskBand(v.user.riskScore);
   const started = catalog.filter((m) => m.status !== "not_started").sort((a, b) => b.percent - a.percent);
   const completed = catalog.filter((m) => m.status === "completed").length;

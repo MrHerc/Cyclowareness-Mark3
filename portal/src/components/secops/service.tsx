@@ -2,13 +2,14 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { useOrgTimeZone } from "@/lib/client-format";
 import { Check, Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteSessionAction, reviewFeedbackAction, saveSessionAction, setAttendanceAction, setTicketStatusAction } from "@/server/actions/secops";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
-import { bakuParts, fromBakuLocalInput, fromBakuParts, toBakuLocalInput } from "@/lib/baku-clock";
+import { fromZonedLocalInput, fromZonedParts, toZonedLocalInput, zonedParts } from "@/lib/baku-clock";
 
 /* ───────── live sessions ───────── */
 
@@ -19,15 +20,16 @@ export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
-  // The start is entered in Baku time, the zone sessions are listed in, not the browser's: a new one
-  // defaults to 11:00 Baku a week from now.
+  // The start is entered in the organisation's time zone, the one sessions are listed in, not the
+  // browser's: a new one defaults to 11:00 there a week from now.
+  const timeZone = useOrgTimeZone();
   const fresh = (): SessionDraft => {
-    const startsAt = fromBakuParts(bakuParts(Date.now() + 7 * 86_400_000).date, "11:00")!;
+    const startsAt = fromZonedParts(zonedParts(Date.now() + 7 * 86_400_000, timeZone).date, "11:00", timeZone)!;
     return { id: null, title: "", description: "", startsAt: startsAt.toISOString(), durationMin: 45, location: "", host: "", capacity: null };
   };
   const [f, setF] = useState<SessionDraft>(() => initial ?? fresh());
-  const [local, setLocal] = useState(() => toBakuLocalInput(f.startsAt));
-  const startsAt = fromBakuLocalInput(local);
+  const [local, setLocal] = useState(() => toZonedLocalInput(f.startsAt, timeZone));
+  const startsAt = fromZonedLocalInput(local, timeZone);
   // Number inputs are kept as typed, so an out-of-range value is shown and explained instead of silently replaced.
   const [dur, setDur] = useState(String(f.durationMin));
   const [cap, setCap] = useState(f.capacity === null ? "" : String(f.capacity));
@@ -79,7 +81,7 @@ export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
                   if (!initial) {
                     const next = fresh();
                     setF(next);
-                    setLocal(toBakuLocalInput(next.startsAt));
+                    setLocal(toZonedLocalInput(next.startsAt, timeZone));
                     setDur(String(next.durationMin));
                     setCap("");
                   }
@@ -99,7 +101,7 @@ export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
             <Textarea id="s-desc" value={f.description} onChange={(e) => { edit("description"); setF({ ...f, description: e.target.value }); }} maxLength={2000} {...invalid(fieldError("description"), "s-desc")} />
           </Field>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Field label={t("form.startsAt")} htmlFor="s-start" hint={tc("time.bakuZone")} error={fieldError("startsAt")}>
+            <Field label={t("form.startsAt")} htmlFor="s-start" hint={tc("time.zone", { zone: timeZone })} error={fieldError("startsAt")}>
               <Input id="s-start" type="datetime-local" value={local} onChange={(e) => { edit("startsAt"); setLocal(e.target.value); }} aria-describedby="s-start-hint" {...invalid(fieldError("startsAt"), "s-start")} />
             </Field>
             <Field label={t("form.duration")} htmlFor="s-dur" error={durationError}>

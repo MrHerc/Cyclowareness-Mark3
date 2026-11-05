@@ -39,7 +39,8 @@ export default async function CertificatePage({ params }: PageProps<"/c/[token]"
   // The organisation's own wording in the page's language, else the default one of that language.
   const title = c.title?.[locale]?.trim() || tr("title");
   const subject = pick(row.moduleTitle ?? row.pathTitle, locale);
-  const date = format.dateTime(row.cert.issuedAt, { dateStyle: "long" });
+  // The issuing organisation's day, also for a visitor who is not signed in (the request's zone is then the default).
+  const date = format.dateTime(row.cert.issuedAt, { dateStyle: "long", timeZone: settings.timeZone });
   const template = c.text?.[locale]?.trim() || pick(row.moduleTitle ? DEFAULT_CERTIFICATE_TEXT : DEFAULT_PATH_CERTIFICATE_TEXT, locale);
   const text = template.replaceAll("{name}", row.user.name).replaceAll("{module}", subject).replaceAll("{date}", date);
   const verifyUrl = `${appUrl()}/c/${token}`;

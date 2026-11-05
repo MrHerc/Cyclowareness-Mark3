@@ -9,7 +9,7 @@ import { audit } from "@/server/services/audit";
 import { rateLimit } from "@/server/rate-limit";
 import { sameOrigin } from "@/server/request";
 import { toCsv } from "@/lib/csv";
-import { todayInBaku } from "@/lib/time";
+import { todayIn } from "@/lib/time";
 import { isLocale, type Locale } from "@/i18n/config";
 
 const TEMPLATE_SAMPLE: Record<Locale, string[]> = {
@@ -33,7 +33,8 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
   const v = await getViewer();
   if (!v) return deniedResponse(request, 401);
   if (twoFactorGap(v)) return deniedResponse(request, 403, "/profile?section=security&required=1");
-  const date = todayInBaku();
+  const tz = v.tenant.settings.timeZone;
+  const date = todayIn(tz);
 
   if (kind === "export") {
     if (!allowed(v, "people.read")) return deniedResponse(request, 403);
@@ -43,6 +44,7 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
     const csv = toCsv(
       ["name", "email", "department", "job_title", "role", "status", "risk_score", "xp", "last_active", "joined"],
       people.map((p) => [p.name, p.email, p.departmentName ?? "", p.jobTitle ?? "", tc(`roles.${p.role}`), tc(`userStatus.${p.status}`), p.riskScore, p.xp, p.lastActiveAt ?? null, p.createdAt]),
+      tz,
     );
     await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "people.exported", meta: { count: people.length } });
     return new Response(csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="people-${date}.csv"`, "cache-control": "no-store" } });
@@ -77,7 +79,7 @@ export async function POST(request: Request, { params }: RouteContext<"/api/admi
   const rows: string[][] = [];
   for (const u of invited) rows.push([u.name, u.email, await issueAccountLink(u.id, "invite")]);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.invite_links_bulk", meta: { count: rows.length } });
-  const date = todayInBaku();
+  const date = todayIn(v.tenant.settings.timeZone);
   return new Response(toCsv(["name", "email", "invite_link"], rows), {
     headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="invite-links-${date}.csv"`, "cache-control": "no-store" },
   });

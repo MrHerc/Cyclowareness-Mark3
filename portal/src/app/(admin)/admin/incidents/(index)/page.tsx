@@ -10,7 +10,7 @@ import { formOptions } from "@/server/queries/secops-options";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState, PageHeader, TabsNav } from "@/components/ui/layout";
 import { NewIncident } from "@/components/secops/incident";
-import { bakuDayPlus } from "@/lib/time";
+import { dayPlus } from "@/lib/time";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -41,7 +41,7 @@ export default async function IncidentsPage({ searchParams }: PageProps<"/admin/
         title={tn("incidents")}
         subtitle={tr("subtitle")}
         icon={<Siren />}
-        actions={options ? <NewIncident modules={options.modules} departments={options.departments} people={options.people} prefill={prefill} defaultOpen={!!prefill} defaultDue={bakuDayPlus(7)} key={prefill?.sandboxId ?? "new"} /> : null}
+        actions={options ? <NewIncident modules={options.modules} departments={options.departments} people={options.people} prefill={prefill} defaultOpen={!!prefill} defaultDue={dayPlus(7, v.tenant.settings.timeZone)} key={prefill?.sandboxId ?? "new"} /> : null}
       />
       <TabsNav items={STATUSES.map((s) => ({ href: `?status=${s}`, label: tr(`statuses.${s}`), active: status === s, count: s === "all" ? all.length : all.filter((i) => i.status === s).length }))} />
       {list.length ? (

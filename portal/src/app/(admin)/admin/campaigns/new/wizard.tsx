@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useClientFormat } from "@/lib/client-format";
+import { useClientFormat, useOrgTimeZone } from "@/lib/client-format";
 import { Building2, Calendar, Check, Clock, Globe, Mail, MessageSquare, Phone, Usb } from "lucide-react";
 import { saveCampaignAction } from "@/server/actions/campaigns";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { toast } from "@/components/ui/toast";
 import { TemplatePreview } from "@/components/admin/template-preview";
 import { TEMPLATES, templateText, type Channel } from "@/lib/campaigns/templates";
 import { cn } from "@/lib/cn";
-import { bakuParts, fromBakuParts } from "@/lib/baku-clock";
+import { fromZonedParts, zonedParts } from "@/lib/baku-clock";
 
 const CHANNELS: { key: Channel; icon: typeof Mail }[] = [
   { key: "email", icon: Mail },
@@ -39,9 +39,10 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
   const [audience, setAudience] = useState<"all" | "department" | null>(initial?.audience ?? null);
   const [departmentId, setDepartmentId] = useState(initial?.departmentId ?? "");
   const [when, setWhen] = useState<"later" | "date" | null>(initial ? (initial.scheduledAt ? "date" : "later") : null);
-  // The send time is entered in Baku time, the zone it is listed in everywhere, not the browser's.
-  const [date, setDate] = useState(() => (initial?.scheduledAt ? bakuParts(initial.scheduledAt).date : ""));
-  const [time, setTime] = useState(() => (initial?.scheduledAt ? bakuParts(initial.scheduledAt).time : "10:00"));
+  // The send time is entered in the organisation's time zone, the one it is listed in everywhere, not the browser's.
+  const timeZone = useOrgTimeZone();
+  const [date, setDate] = useState(() => (initial?.scheduledAt ? zonedParts(initial.scheduledAt, timeZone).date : ""));
+  const [time, setTime] = useState(() => (initial?.scheduledAt ? zonedParts(initial.scheduledAt, timeZone).time : "10:00"));
   // Render must stay pure, so the clock is sampled when the schedule inputs change.
   const [now, setNow] = useState(0);
   const [name, setName] = useState(initial?.name ?? "");
@@ -51,7 +52,7 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
   const templates = useMemo(() => offered.filter((x) => x.channel === channel), [offered, channel]);
   const tpl = TEMPLATES.find((x) => x.key === templateKey) ?? null;
   const dept = departments.find((d) => d.id === departmentId);
-  const scheduledAt = when === "date" && date ? fromBakuParts(date, time || "10:00") : null;
+  const scheduledAt = when === "date" && date ? fromZonedParts(date, time || "10:00", timeZone) : null;
 
   const canNext = (s: number) =>
     s === 1 ? !!channel : s === 2 ? !!templateKey : s === 3 ? audience === "all" || (audience === "department" && !!departmentId) : s === 4 ? when === "later" || (when === "date" && !!date && !!scheduledAt && scheduledAt.getTime() > now) : true;
@@ -176,7 +177,7 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
               <Field label={tw("date")} htmlFor="w-date">
                 <Input id="w-date" type="date" value={date} onChange={(e) => (setDate(e.target.value), setNow(Date.now()))} className="w-48" />
               </Field>
-              <Field label={tw("time")} htmlFor="w-time" hint={tc("time.bakuZone")}>
+              <Field label={tw("time")} htmlFor="w-time" hint={tc("time.zone", { zone: timeZone })}>
                 <Input id="w-time" type="time" value={time} onChange={(e) => (setTime(e.target.value), setNow(Date.now()))} className="w-36" aria-describedby="w-time-hint" />
               </Field>
             </div>

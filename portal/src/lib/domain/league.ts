@@ -1,6 +1,7 @@
 /** Department league: score = 60 % assigned completion + 40 % simulation reporting. */
 
-import { todayInBaku } from "@/lib/time";
+import { DEFAULT_TIME_ZONE } from "@/lib/day";
+import { todayIn } from "@/lib/time";
 
 export type DepartmentStats = {
   id: string;
@@ -30,11 +31,11 @@ export function rankLeague(rows: DepartmentStats[], locale?: string): LeagueRow[
 }
 
 /**
- * Days left in the month, counting today. The month and today are Baku's (like every day in the UI),
- * not the server's local ones, so from 00:00 to 04:00 Baku on the 1st it already counts the new month.
+ * Days left in the month, counting today. The month and today are the organisation's (like every day
+ * in the UI), not the server's local ones, so after midnight there on the 1st it already counts the new month.
  */
-export function daysLeftInMonth(now: Date): number {
-  const [year, month, day] = todayInBaku(now).split("-").map(Number);
+export function daysLeftInMonth(now: Date, timeZone = DEFAULT_TIME_ZONE): number {
+  const [year, month, day] = todayIn(timeZone, now).split("-").map(Number);
   const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
   return lastDay - day + 1;
 }
