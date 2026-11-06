@@ -121,6 +121,10 @@ export type TenantSettings = {
     syslogFormat?: "cef" | "json";
     syslogEnabled: boolean;
   };
+  security: {
+    /** Until when (ISO) the platform operator may issue a sign-in link for an administrator; null or past: refused. */
+    supportAccessUntil: string | null;
+  };
   setupHidden?: boolean;
   setupSkipped?: string[];
 };

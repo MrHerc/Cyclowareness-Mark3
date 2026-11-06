@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useClientFormat } from "@/lib/client-format";
 import { Copy, Globe2, KeyRound, Pencil, Plus, SlidersHorizontal, Trash2 } from "lucide-react";
 import { adminLinkAction, createTenantAction, deleteDemoAction, renameTenantAction, setDemoStatusAction, setTenantFeatureAction, setTenantPlanAction, verifyTenantDomainAction } from "@/server/actions/platform";
+import { ConfirmPasswordField, useStepUpError } from "@/components/admin/person-actions";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Checkbox, Field, Input, Select } from "@/components/ui/field";
@@ -170,6 +171,9 @@ export function TenantControls({
   const [mode, setMode] = useState<"features" | "link" | "rename" | "domain" | null>(null);
   const [adminId, setAdminId] = useState(admins[0]?.id ?? "");
   const [link, setLink] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [pwError, setPwError] = useState<string | null>(null);
+  const stepUpError = useStepUpError();
   const [newName, setNewName] = useState(name);
   const [host, setHost] = useState(domain ?? "");
   const [force, setForce] = useState(false);
@@ -290,21 +294,14 @@ export function TenantControls({
         onClose={() => {
           setMode(null);
           setLink(null);
+          setPassword("");
+          setPwError(null);
         }}
         title={t("adminLink")}
         description={t("adminLinkBody")}
         footer={
           !link && admins.length ? (
-            <Button
-              disabled={pending || !adminId}
-              onClick={() =>
-                start(async () => {
-                  const res = await adminLinkAction(tenantId, adminId);
-                  if (!res.ok) return toast(tc("errors.generic"), "error");
-                  setLink(res.link ?? null);
-                })
-              }
-            >
+            <Button type="submit" form={`link-${tenantId}`} disabled={pending || !adminId || !password}>
               {t("makeLink")}
             </Button>
           ) : null
@@ -318,15 +315,31 @@ export function TenantControls({
             <CopyLink link={link} />
           </div>
         ) : (
-          <Field label={t("pickAdmin")} htmlFor={`adm-${tenantId}`}>
-            <Select id={`adm-${tenantId}`} value={adminId} onChange={(e) => setAdminId(e.target.value)}>
-              {admins.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name} · {a.email}
-                </option>
-              ))}
-            </Select>
-          </Field>
+          <form
+            id={`link-${tenantId}`}
+            className="grid gap-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              start(async () => {
+                const res = await adminLinkAction(tenantId, adminId, password);
+                if (res.ok) return setLink(res.link ?? null);
+                const refused = stepUpError(res.error);
+                if (refused) setPwError(refused);
+                else toast(res.error === "supportAccess" ? t("supportAccessMissing") : tc("errors.generic"), "error");
+              });
+            }}
+          >
+            <Field label={t("pickAdmin")} htmlFor={`adm-${tenantId}`}>
+              <Select id={`adm-${tenantId}`} value={adminId} onChange={(e) => setAdminId(e.target.value)}>
+                {admins.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name} · {a.email}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <ConfirmPasswordField id={`link-pw-${tenantId}`} value={password} onChange={setPassword} error={pwError} />
+          </form>
         )}
       </Dialog>
     </div>

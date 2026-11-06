@@ -1,4 +1,6 @@
 import { hash, verify } from "@node-rs/argon2";
+import { eq } from "drizzle-orm";
+import { db, t } from "../db";
 import { checkPassword } from "../../lib/password-strength";
 
 /** Argon2id with the OWASP-recommended baseline (19 MiB, 2 iterations, 1 lane). */
@@ -15,6 +17,12 @@ export async function verifyPassword(stored: string | null, password: string): P
   } catch {
     return false;
   }
+}
+
+/** A signed-in person's own password against the stored hash (confirming a sensitive action). An account without a password never matches. */
+export async function verifyUserPassword(userId: string, password: string): Promise<boolean> {
+  const [u] = await db().select({ hash: t.users.passwordHash }).from(t.users).where(eq(t.users.id, userId));
+  return verifyPassword(u?.hash ?? null, password);
 }
 
 export const PASSWORD_MIN_LENGTH = 10;

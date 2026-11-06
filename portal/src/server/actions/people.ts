@@ -3,7 +3,6 @@
 import { and, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
-import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
 import { isUniqueViolation, logFailure } from "../db/errors";
@@ -13,8 +12,9 @@ import { ASSIGNABLE_ROLES } from "../auth/permissions";
 import { emailDomain } from "../auth/sso-routing";
 import { issueAccountLink } from "../auth/links";
 import { invalidateUserSessions } from "../auth/session";
+import { stepUp, type StepUpError } from "../auth/step-up";
 import { audit } from "../services/audit";
-import { notifyUsers } from "../services/notify";
+import { notifyTakeover, notifyUsers } from "../services/notify";
 import { coveringAssignments, departmentClosure, gainsCoverage, resolveAssignments } from "../services/assignments";
 import { recomputeRisk } from "../services/risk";
 import { scopeDepartmentIds } from "../queries/admin";
@@ -192,13 +192,17 @@ export async function emailInvitesAction(userIds: string[]): Promise<{ ok: boole
   return { ok: true, count };
 }
 
-export async function createLinkAction(userId: string, kind: "invite" | "reset"): Promise<{ ok: boolean; url?: string }> {
+export async function createLinkAction(userId: string, kind: "invite" | "reset", password?: string): Promise<{ ok: boolean; url?: string; error?: StepUpError }> {
   const v = await actionViewer("people.write");
   if (kind !== "invite" && kind !== "reset") return { ok: false };
+  // A reset link takes over a live account; an invite only activates one nobody has used yet.
+  const refused = kind === "reset" ? await stepUp(v, password, "person.reset_link") : null;
+  if (refused) return { ok: false, error: refused };
   const u = await target(v, userId);
   if (!u) return { ok: false };
   const url = await issueAccountLink(u.id, kind);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: kind === "invite" ? "person.invite_link" : "person.reset_link", targetType: "user", targetId: u.id, ip: await clientIp() });
+  if (kind === "reset") await notifyTakeover(db(), v.tenant.id, v.user, u, "resetLinkIssued");
   return { ok: true, url };
 }
 
@@ -237,29 +241,35 @@ export async function updatePersonAction(userId: string, input: z.input<typeof u
   return { ok: true };
 }
 
-export async function changeRoleAction(userId: string, role: Role): Promise<{ ok: boolean }> {
+export async function changeRoleAction(userId: string, role: Role, password?: string): Promise<{ ok: boolean; error?: StepUpError }> {
   const v = await actionViewer("people.write");
   const u = await target(v, userId);
   if (!u || u.id === v.user.id || !ASSIGNABLE_ROLES.includes(role)) return { ok: false };
   if ((role === "tenant_admin" || u.role === "tenant_admin") && v.user.role !== "tenant_admin" && v.user.role !== "super_admin") return { ok: false };
+  if (u.role === role) return { ok: true };
+  const refused = await stepUp(v, password, "person.role_changed");
+  if (refused) return { ok: false, error: refused };
   await db().update(t.users).set({ role }).where(eq(t.users.id, u.id));
   // Privilege changes take effect on the next sign-in.
   await invalidateUserSessions(u.id);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.role_changed", targetType: "user", targetId: u.id, meta: { from: u.role, to: role } });
+  // Peers hear of it when an administrator is made or unmade.
+  await notifyTakeover(db(), v.tenant.id, v.user, { ...u, role: role === "tenant_admin" ? role : u.role }, "roleChanged", (locale) => ROLE_NAMES[locale as Locale]?.[role] ?? role);
   refresh();
   return { ok: true };
 }
 
 /** Clears the authenticator and backup codes and signs the person out everywhere; they set it up again from their profile. */
-export async function resetTwoFactorAction(userId: string): Promise<{ ok: boolean }> {
+export async function resetTwoFactorAction(userId: string, password?: string): Promise<{ ok: boolean; error?: StepUpError }> {
   const v = await actionViewer("people.write");
+  const refused = await stepUp(v, password, "auth.2fa_reset");
+  if (refused) return { ok: false, error: refused };
   const u = await target(v, userId);
   if (!u || u.id === v.user.id) return { ok: false };
   await db().update(t.users).set({ totpSecret: null, totpEnabled: false, totpRecovery: null }).where(eq(t.users.id, u.id));
   await invalidateUserSessions(u.id);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.2fa_reset", targetType: "user", targetId: u.id, ip: await clientIp() });
-  const tr = await getTranslations({ locale: u.locale, namespace: "admin.person" });
-  await db().insert(t.notifications).values({ tenantId: v.tenant.id, userId: u.id, kind: "security", title: tr("twoFactorResetTitle"), body: tr("twoFactorResetBody"), href: "/profile" });
+  await notifyTakeover(db(), v.tenant.id, v.user, u, "twoFactorReset");
   refresh();
   return { ok: true };
 }

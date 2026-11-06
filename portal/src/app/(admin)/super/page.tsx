@@ -7,7 +7,8 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { PageHeader, TabsNav } from "@/components/ui/layout";
 import { NewTenant, TenantControls } from "@/components/admin/platform-client";
-import { ALL_FEATURES, featuresFor } from "@/lib/tenant-defaults";
+import { ALL_FEATURES, featuresFor, withDefaults } from "@/lib/tenant-defaults";
+import { requestNow } from "@/lib/time";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.platform");
@@ -28,6 +29,7 @@ export default async function OperatorTenantsPage() {
   ]);
   const countBy = new Map(counts.map((c) => [c.tenantId, Number(c.n)]));
   const allFeatures = [...ALL_FEATURES] as string[];
+  const now = requestNow().getTime();
 
   return (
     <div className="grid gap-5">
@@ -42,6 +44,9 @@ export default async function OperatorTenantsPage() {
         {tenants.map((x) => {
           const overrides = x.features ?? {};
           const effective = featuresFor(x.plan, overrides);
+          // The organisation's consent for a support sign-in link (Settings → Security), 72 hours at a time.
+          const until = withDefaults(x.settings).security.supportAccessUntil;
+          const supportUntil = until && Date.parse(until) > now ? new Date(until) : null;
           return (
             <li key={x.id}>
               <Card>
@@ -58,6 +63,7 @@ export default async function OperatorTenantsPage() {
                     </div>
                     <Pill tone="brand">{tr(`plans.${x.plan}`)}</Pill>
                     {Object.keys(overrides).length ? <Pill tone="warn">{tr("overridesCount", { count: Object.keys(overrides).length })}</Pill> : null}
+                    <Pill tone={supportUntil ? "safe" : "neutral"}>{supportUntil ? tr("supportAccessUntil", { date: format.dateTime(supportUntil, { dateStyle: "medium", timeStyle: "short" }) }) : tr("noSupportAccess")}</Pill>
                   </div>
                   <p className="text-tab text-ink-subtle">
                     {tr("features")}: {effective.size} / {allFeatures.length}

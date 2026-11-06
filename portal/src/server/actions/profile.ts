@@ -6,7 +6,7 @@ import { refresh } from "next/cache";
 import QRCode from "qrcode";
 import { db, t } from "../db";
 import { actionViewer, getSession } from "../auth/viewer";
-import { hashPassword, passwordProblem, verifyPassword } from "../auth/password";
+import { hashPassword, passwordProblem, verifyUserPassword } from "../auth/password";
 import { newBackupCodes, newTotpKey, totpUri, verifyTotpOnce } from "../auth/totp";
 import { invalidateUserSessions } from "../auth/session";
 import { twoFactorRequired } from "../auth/permissions";
@@ -16,8 +16,7 @@ import { rateLimit } from "../rate-limit";
 
 async function checkPassword(userId: string, password: string): Promise<boolean> {
   if (!(await rateLimit(`pw-confirm:${userId}`, 10, 15 * 60_000)).ok) return false;
-  const [u] = await db().select({ hash: t.users.passwordHash }).from(t.users).where(eq(t.users.id, userId));
-  return verifyPassword(u?.hash ?? null, password);
+  return verifyUserPassword(userId, password);
 }
 
 /** Step 1 of 2FA setup: confirm the password, create a key and show it as a QR code. */

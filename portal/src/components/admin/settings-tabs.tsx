@@ -16,6 +16,7 @@ import {
   ImageUp,
   Italic,
   KeyRound,
+  LifeBuoy,
   Link as LinkIcon,
   Mail,
   PenLine,
@@ -32,7 +33,9 @@ import {
 } from "lucide-react";
 import {
   domainProofRecordAction,
+  grantSupportAccessAction,
   lookupWatermarkAction,
+  revokeSupportAccessAction,
   rotateWebhookSecretAction,
   saveAttestationAction,
   saveBrandingAction,
@@ -1447,6 +1450,30 @@ export function ProtectionTab({ protection }: { protection: TenantSettings["prot
         </CardBody>
       </Card>
     </div>
+  );
+}
+
+/* ───────── security ───────── */
+
+/** `allowedUntil`: the live grant's end, formatted on the server (null when there is none or it has passed). */
+export function SecurityTab({ allowedUntil }: { allowedUntil: string | null }) {
+  const t = useTranslations("settings.security");
+  const [pending, start] = useTransition();
+  const run = (fn: () => Promise<{ ok: boolean }>, message: string) => start(async () => void ((await fn()).ok && toast(message, "success")));
+  return (
+    <Card>
+      <CardHeader title={t("title")} description={t("body")} icon={<LifeBuoy />} action={<Pill tone={allowedUntil ? "safe" : "neutral"}>{allowedUntil ? t("activeUntil", { date: allowedUntil }) : t("inactive")}</Pill>} />
+      <CardBody className="flex flex-wrap gap-2">
+        <Button disabled={pending} onClick={() => run(grantSupportAccessAction, t("granted"))}>
+          {t("grant")}
+        </Button>
+        {allowedUntil ? (
+          <Button variant="secondary" disabled={pending} onClick={() => run(revokeSupportAccessAction, t("revoked"))}>
+            {t("revoke")}
+          </Button>
+        ) : null}
+      </CardBody>
+    </Card>
   );
 }
 

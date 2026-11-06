@@ -11,7 +11,7 @@ import type { Role } from "../src/server/db/schema";
 vi.mock("next/cache", () => ({ refresh: vi.fn() }));
 vi.mock("next-intl/server", () => ({ getTranslations: async () => (key: string) => key }));
 vi.mock("../src/server/services/audit", () => ({ audit: vi.fn() }));
-vi.mock("../src/server/services/notify", () => ({ notifyUsers: vi.fn() }));
+vi.mock("../src/server/services/notify", () => ({ notifyUsers: vi.fn(), notifyTakeover: vi.fn() }));
 vi.mock("../src/server/services/risk", () => ({ recomputeRisk: vi.fn() }));
 vi.mock("../src/server/queries/admin", () => ({}));
 const issueAccountLink = vi.fn(async (userId: string, kind: string) => `http://localhost/account/${kind}/token-for-${userId}`);
@@ -30,9 +30,12 @@ vi.mock("../src/server/auth/viewer", () => ({
 }));
 
 const people = await import("../src/server/actions/people");
+const { hashPassword } = await import("../src/server/auth/password");
 
 const ids = { operator: "", second: "", admin: "", learner: "" };
 let departmentId = "";
+// Takeover actions (reset link, 2FA reset, role change) take the actor's own password.
+const PW = "Correct-Horse-Battery-9";
 
 beforeAll(async () => {
   await migrate(drizzle(pglite), { migrationsFolder: path.join(__dirname, "..", "drizzle") });
@@ -40,8 +43,9 @@ beforeAll(async () => {
   tenantId = tenant.id;
   const [dept] = await db.insert(t.departments).values({ tenantId, name: "Ops", nameKey: "ops" }).returning();
   departmentId = dept.id;
+  const passwordHash = await hashPassword(PW);
   const add = async (email: string, role: Role) =>
-    (await db.insert(t.users).values({ tenantId, email, name: email.split("@")[0], role, totpEnabled: true, totpSecret: "secret", deletionRequestedAt: new Date() }).returning())[0].id;
+    (await db.insert(t.users).values({ tenantId, email, name: email.split("@")[0], role, passwordHash, totpEnabled: true, totpSecret: "secret", deletionRequestedAt: new Date() }).returning())[0].id;
   ids.operator = await add("operator@platform.test", "super_admin");
   ids.second = await add("second@platform.test", "super_admin");
   ids.admin = await add("admin@platform.test", "tenant_admin");
@@ -55,10 +59,10 @@ describe("a tenant admin and the platform operator", () => {
   it("cannot reach a super_admin through any people action", async () => {
     actor = { id: ids.admin, role: "tenant_admin" };
     const before = await row(ids.operator);
-    expect(await people.createLinkAction(ids.operator, "reset")).toEqual({ ok: false });
+    expect(await people.createLinkAction(ids.operator, "reset", PW)).toEqual({ ok: false });
     expect(await people.createLinkAction(ids.operator, "invite")).toEqual({ ok: false });
-    expect(await people.resetTwoFactorAction(ids.operator)).toEqual({ ok: false });
-    expect(await people.changeRoleAction(ids.operator, "learner")).toEqual({ ok: false });
+    expect(await people.resetTwoFactorAction(ids.operator, PW)).toEqual({ ok: false });
+    expect(await people.changeRoleAction(ids.operator, "learner", PW)).toEqual({ ok: false });
     expect(await people.updatePersonAction(ids.operator, { name: "Taken over", locale: "en", phone: "" })).toMatchObject({ ok: false });
     expect(await people.setStatusAction([ids.operator], "suspended")).toEqual({ ok: false });
     expect(await people.moveDepartmentAction([ids.operator], departmentId)).toEqual({ ok: false });
@@ -81,9 +85,9 @@ describe("a tenant admin and the platform operator", () => {
 
   it("leaves a super_admin to another super_admin", async () => {
     actor = { id: ids.operator, role: "super_admin" };
-    expect(await people.resetTwoFactorAction(ids.second)).toEqual({ ok: true });
+    expect(await people.resetTwoFactorAction(ids.second, PW)).toEqual({ ok: true });
     expect((await row(ids.second)).totpEnabled).toBe(false);
-    expect(await people.createLinkAction(ids.second, "reset")).toMatchObject({ ok: true });
+    expect(await people.createLinkAction(ids.second, "reset", PW)).toMatchObject({ ok: true });
   });
 });
 

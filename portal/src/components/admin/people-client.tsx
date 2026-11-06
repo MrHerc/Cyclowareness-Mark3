@@ -8,6 +8,7 @@ import { RelativeTime } from "@/components/relative-time";
 import { Bell, Building2, FileUp, KeyRound, Link2, Mail, Plus, Search, UserX } from "lucide-react";
 import { addPersonAction, createLinkAction, emailInvitesAction, importPeopleAction, moveDepartmentAction, remindPeopleAction, setStatusAction, type ImportPreview, type PersonState } from "@/server/actions/people";
 import { remindAwaitingAction } from "@/server/actions/admin-overview";
+import { ConfirmPasswordField, useStepUpError } from "@/components/admin/person-actions";
 import { Avatar } from "@/components/ui/avatar";
 import { Button, TextButton } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -139,18 +140,30 @@ export function PeopleTable({
   const toggle = (id: string) => setSelected((s) => (s.has(id) ? new Set([...s].filter((x) => x !== id)) : new Set(s).add(id)));
   const ids = useMemo(() => [...selected], [selected]);
   const invitedSelected = rows.some((r) => selected.has(r.id) && r.status === "invited");
+  // A reset link takes over a live account: the administrator confirms it with their own password.
+  const tp = useTranslations("admin.person");
+  const [resetFor, setResetFor] = useState<PeopleRow | null>(null);
+  const [password, setPassword] = useState("");
+  const [pwError, setPwError] = useState<string | null>(null);
+  const stepUpError = useStepUpError();
+  const closeReset = () => {
+    setResetFor(null);
+    setPassword("");
+    setPwError(null);
+  };
 
   const copyLink = (id: string, kind: "invite" | "reset") =>
     start(async () => {
-      const res = await createLinkAction(id, kind);
+      const res = await createLinkAction(id, kind, password);
       if (res.ok && res.url) {
+        closeReset();
         try {
           await navigator.clipboard.writeText(res.url);
           toast(t("linkCopied"));
         } catch {
           window.prompt(t("linkCreated"), res.url);
         }
-      }
+      } else setPwError(stepUpError(res.error));
     });
 
   return (
@@ -274,7 +287,7 @@ export function PeopleTable({
                           {t("inviteLink")}
                         </TextButton>
                       ) : r.status === "active" ? (
-                        <TextButton tone="muted" disabled={pending} onClick={() => copyLink(r.id, "reset")}>
+                        <TextButton tone="muted" disabled={pending} onClick={() => setResetFor(r)}>
                           <KeyRound className="size-3.5" />
                           {t("resetLink")}
                         </TextButton>
@@ -287,6 +300,21 @@ export function PeopleTable({
           </tbody>
         </table>
       </ScrollRegion>
+      <Dialog open={!!resetFor} onClose={closeReset} title={tp("resetLinkTitle", { name: resetFor?.name ?? "" })} size="sm">
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (resetFor) copyLink(resetFor.id, "reset");
+          }}
+        >
+          <p className="text-body-sm text-ink-muted">{tp("resetLinkBody", { name: resetFor?.name ?? "" })}</p>
+          <ConfirmPasswordField id="list-reset-pw" value={password} onChange={setPassword} error={pwError} />
+          <Button type="submit" disabled={pending || !password}>
+            {t("resetLink")}
+          </Button>
+        </form>
+      </Dialog>
     </div>
   );
 }
