@@ -50,8 +50,9 @@ sends something nobody meant to send (a simulation to the wrong people, a wrong 
      can act, the operator issues a one-time password link for one of them from `/super` (support
      access, audited as `platform.admin_link`). There is no organisation-wide suspend switch yet.
    - An integration secret leaked (SMTP, SSO, webhook signing secret): replace it in that organisation's
-     Settings. Do **not** rotate `APP_SECRET` as a containment step: every stored secret and
-     authenticator key is encrypted with it and would have to be re-entered.
+     Settings. A leaked `APP_SECRET` is rotated with the four steps under "Rotating APP_SECRET"
+     below, never by replacing the value alone: every stored secret and authenticator key is
+     encrypted with it.
    - A plan feature misbehaves for one organisation: switch it off in `/super` (feature override).
    - A wrong campaign is running: cancel it on its campaign page; queued mail of a cancelled campaign
      is never sent.
@@ -108,6 +109,43 @@ sends something nobody meant to send (a simulation to the wrong people, a wrong 
   `POSTGRES_PASSWORD`), sign in, open one organisation's dashboard, and note the time it took.
 - **Objectives.** RPO 24 hours (nightly dumps). RTO: the restore time measured in the first drill,
   `<to be measured>`, plus the time to start a new host.
+
+## Rotating APP_SECRET
+
+`APP_SECRET` seals every stored secret (SMTP, SSO and LDAP passwords, webhook signing secrets,
+authenticator keys) and keys the hashes of TOTP backup codes. Each ciphertext carries the id of the
+key that sealed it, and `APP_SECRET_PREVIOUS` keeps the old key readable while the stored values are
+re-encrypted, so nothing has to be re-entered. Every instance (`app`, `worker`) gets the same values.
+
+1. **Generate** the new secret: `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`.
+   Put it in the escrow next to the old one (Backups above): a dump made before step 3 still needs
+   the old key. If `APP_DOMAIN_PROOF_SECRET` is not set yet, set it now to the *current* `APP_SECRET`
+   (see below) and keep it for good.
+2. **Deploy both keys.** `APP_SECRET=<new>` and `APP_SECRET_PREVIOUS=<old>` on every instance, then
+   restart them. New secrets are sealed with the new key, old ones still open, backup codes still
+   verify and domain proofs still resolve.
+3. **Re-encrypt.** From the `portal` folder, with the server's environment (`DATABASE_URL` and both
+   keys): `npx tsx scripts/rotate-secret.ts`. It prints how many organisations' settings and how many
+   authenticator keys it re-encrypted, nothing else, and is safe to run again (the second run reports
+   zero). A value that opens with neither key is left as it is and counted; that organisation then
+   re-enters the secret in Settings.
+4. **Remove the old key.** Take `APP_SECRET_PREVIOUS` out of the environment and restart. Write the
+   rotation down in the timeline of the incident that caused it.
+
+What a rotation does not carry over:
+
+- **Signed values are not re-signed.** The signed state of a single sign-on that is in progress
+  across the restart of step 2 is refused once; the person starts the sign-in again.
+- **Backup codes made before the rotation** are hashed with the old key. They verify while
+  `APP_SECRET_PREVIOUS` is set and stop working at step 4; authenticator (TOTP) codes are unaffected.
+  Tell administrators to have people with backup codes generate new ones (Security) before step 4,
+  or leave step 4 until they have.
+- **Domain proofs.** Without `APP_DOMAIN_PROOF_SECRET`, the TXT value every organisation published is
+  derived from `APP_SECRET`: it is still accepted while the old key is set, and after step 4 every
+  organisation would have to publish a new record within the 7-day grace period. Setting
+  `APP_DOMAIN_PROOF_SECRET` to the `APP_SECRET` in use when the records were published (step 1), and
+  never changing it, keeps every record valid: the value proves nothing to someone who does not
+  control the domain's DNS, so it need not rotate with `APP_SECRET`.
 
 ## Checking TRUST_PROXY
 

@@ -14,6 +14,7 @@ vi.mock("../src/server/auth/viewer", () => ({
 vi.mock("../src/server/auth/domain-proof", () => ({
   normaliseHost: (d: string) => d.trim().toLowerCase(),
   domainProofRecord: () => "record",
+  domainProofRecords: () => ["record"],
   domainProofFound: async () => {
     throw new Error("dns reached");
   },

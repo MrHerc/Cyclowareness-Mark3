@@ -2,8 +2,8 @@ import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, 
 
 /**
  * Encryption for secrets stored in the database (SMTP and SSO passwords, TOTP keys, webhook
- * secrets): AES-256-GCM with a key derived from APP_SECRET. Rotating APP_SECRET makes stored
- * secrets unreadable, so admins re-enter them.
+ * secrets): AES-256-GCM with a key derived from APP_SECRET. During a rotation APP_SECRET_PREVIOUS
+ * still opens what the old key sealed; scripts/rotate-secret.ts re-encrypts it all (docs/OPERATIONS.md).
  */
 function secret(): string {
   const value = process.env.APP_SECRET;
@@ -12,28 +12,57 @@ function secret(): string {
   return "dev-only-secret-change-me-dev-only-secret-change-me";
 }
 
-function key(purpose: string): Buffer {
-  return createHash("sha256").update(`${purpose}:${secret()}`).digest();
+/** The current secret first, then the previous one while a rotation is under way. */
+function secrets(): string[] {
+  const previous = process.env.APP_SECRET_PREVIOUS;
+  return previous && previous.length >= 32 ? [secret(), previous] : [secret()];
+}
+
+function key(purpose: string, value = secret()): Buffer {
+  return createHash("sha256").update(`${purpose}:${value}`).digest();
+}
+
+/** Key id written into v2 ciphertexts, so decryption knows which secret sealed them. */
+function kid(value: string): string {
+  return createHash("sha256").update(value).digest("hex").slice(0, 8);
 }
 
 export function encryptSecret(plain: string): string {
   const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", key("enc"), iv);
+  const current = secret();
+  const cipher = createCipheriv("aes-256-gcm", key("enc", current), iv);
   const data = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
-  return ["v1", iv.toString("base64url"), cipher.getAuthTag().toString("base64url"), data.toString("base64url")].join(":");
+  return ["v2", kid(current), iv.toString("base64url"), cipher.getAuthTag().toString("base64url"), data.toString("base64url")].join(":");
 }
 
+/** True when the ciphertext was sealed with the current APP_SECRET (what scripts/rotate-secret.ts leaves alone). */
+export function sealedWithCurrentKey(value: string): boolean {
+  return value.startsWith(`v2:${kid(secret())}:`);
+}
+
+/**
+ * Opens a v2 ciphertext with the key its id names and a v1 one (no key id) with every key; a v2
+ * whose id matches no key is tried with every key too, GCM's tag rejects the wrong ones.
+ */
 export function decryptSecret(value: string | null | undefined): string | null {
   if (!value) return null;
-  const [version, iv, tag, data] = value.split(":");
-  if (version !== "v1" || !iv || !tag || data === undefined) return null;
-  try {
-    const decipher = createDecipheriv("aes-256-gcm", key("enc"), Buffer.from(iv, "base64url"));
-    decipher.setAuthTag(Buffer.from(tag, "base64url"));
-    return Buffer.concat([decipher.update(Buffer.from(data, "base64url")), decipher.final()]).toString("utf8");
-  } catch {
-    return null;
+  const [version, ...rest] = value.split(":");
+  if (version !== "v1" && version !== "v2") return null;
+  const id = version === "v2" ? rest.shift() : undefined;
+  const [iv, tag, data] = rest;
+  if (!iv || !tag || data === undefined) return null;
+  const all = secrets();
+  const candidates = id ? [...all.filter((s) => kid(s) === id), ...all.filter((s) => kid(s) !== id)] : all;
+  for (const s of candidates) {
+    try {
+      const decipher = createDecipheriv("aes-256-gcm", key("enc", s), Buffer.from(iv, "base64url"));
+      decipher.setAuthTag(Buffer.from(tag, "base64url"));
+      return Buffer.concat([decipher.update(Buffer.from(data, "base64url")), decipher.final()]).toString("utf8");
+    } catch {
+      // Not this key.
+    }
   }
+  return null;
 }
 
 /** HMAC-SHA256 hex signature (webhooks, signed one-off values). */

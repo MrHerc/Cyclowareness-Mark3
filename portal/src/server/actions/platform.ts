@@ -6,9 +6,9 @@ import { z } from "zod";
 import { db, t } from "../db";
 import { actionViewer } from "../auth/viewer";
 import { issueAccountLink } from "../auth/links";
-import { domainProofFound, domainProofRecord, normaliseHost } from "../auth/domain-proof";
+import { domainProofFound, domainProofRecords, normaliseHost } from "../auth/domain-proof";
 import { audit } from "../services/audit";
-import { env } from "../env";
+import { isUniqueViolation } from "../db/errors";
 import { TENANT_SLUG_RE, createTenantWithAdmin } from "../services/tenants";
 import { ALL_FEATURES, withDefaults, type Feature } from "../../lib/tenant-defaults";
 import { LOCALES } from "../../i18n/config";
@@ -98,7 +98,7 @@ export async function verifyTenantDomainAction(tenantId: string, domain: string,
   if (!uuid.safeParse(tenantId).success || !host) return { ok: false, error: "invalid" };
   const [tenant] = await db().select({ id: t.tenants.id }).from(t.tenants).where(eq(t.tenants.id, tenantId));
   if (!tenant) return { ok: false };
-  const found = await domainProofFound(host, domainProofRecord(tenantId, env.secret));
+  const found = await domainProofFound(host, domainProofRecords(tenantId));
   const verified = found || force;
   const now = new Date();
   // The DNS lookup is done; the row is read and written under a lock so a settings save made by the
@@ -117,7 +117,12 @@ export async function verifyTenantDomainAction(tenantId: string, domain: string,
       .set({ domain: host, domainVerifiedAt: verified ? now : null, settings })
       .where(eq(t.tenants.id, tenantId));
     return true;
+  }).catch((error: unknown) => {
+    // Another organisation holds the proof for this domain (tenants_domain_verified_idx).
+    if (isUniqueViolation(error, "tenants_domain_verified_idx")) return "taken" as const;
+    throw error;
   });
+  if (saved === "taken") return { ok: false, error: "domainTaken", found };
   if (!saved) return { ok: false };
   await audit(db(), {
     tenantId,

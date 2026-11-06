@@ -15,7 +15,7 @@ import type { Role } from "../db/schema";
 import { hashPassword, passwordProblem, verifyPassword } from "../auth/password";
 import { clearSessionCookie, createSession, invalidateSession, invalidateUserSessions, readSessionToken, sessionIdFromToken, setSessionCookie } from "../auth/session";
 import { getSession } from "../auth/viewer";
-import { hashBackupCode, legacyBackupHash, verifyTotpOnce } from "../auth/totp";
+import { backupCodeHashes, verifyTotpOnce } from "../auth/totp";
 import { isConsoleRole } from "../auth/permissions";
 import { decideSignInStep, emailDomain, type SignInStep } from "../auth/sso-routing";
 import { featuresFor, withDefaults } from "../../lib/tenant-defaults";
@@ -294,7 +294,7 @@ export async function verifySecondFactorAction(prev: AuthState, form: FormData):
 
 /** Spends a backup code in one conditional update, so a code works once even when sent twice in parallel. */
 async function spendBackupCode(userId: string, code: string): Promise<boolean> {
-  for (const h of [hashBackupCode(code), legacyBackupHash(code)]) {
+  for (const h of backupCodeHashes(code)) {
     const spent = await db()
       .update(t.users)
       .set({ totpRecovery: sql`${t.users.totpRecovery} - ${h}::text` })

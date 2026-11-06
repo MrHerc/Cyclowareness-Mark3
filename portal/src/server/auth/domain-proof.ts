@@ -2,6 +2,7 @@ import "server-only";
 import { Resolver } from "node:dns/promises";
 import { domainToASCII } from "node:url";
 import { hmac } from "../crypto";
+import { env } from "../env";
 
 /**
  * Domain proof (Settings → Branding): the organisation publishes a TXT record with a value only
@@ -33,13 +34,24 @@ export function domainProofRecord(tenantId: string, secret: string): string {
   return `${DOMAIN_PROOF_PREFIX}${hmac(tenantId, secret).slice(0, 24)}`;
 }
 
-/** Looks for the record on the domain itself and on _cyclowareness.<domain>. Errors and timeouts count as missing. */
-export async function domainProofFound(host: string, expected: string): Promise<boolean> {
+/**
+ * The record this organisation publishes (from the domain-proof secret, which never rotates) and,
+ * while APP_SECRET is being rotated without a separate domain-proof secret, the one it published before.
+ */
+export function domainProofRecords(tenantId: string): string[] {
+  const records = [domainProofRecord(tenantId, env.domainProofSecret)];
+  if (env.previousSecret) records.push(domainProofRecord(tenantId, env.previousSecret));
+  return records;
+}
+
+/** Looks for one of the records on the domain itself and on _cyclowareness.<domain>. Errors and timeouts count as missing. */
+export async function domainProofFound(host: string, expected: string | readonly string[]): Promise<boolean> {
+  const accepted = new Set(typeof expected === "string" ? [expected] : expected);
   const resolver = new Resolver({ timeout: 5_000, tries: 1 });
   const has = async (name: string): Promise<boolean> => {
     try {
       const records = await resolver.resolveTxt(name);
-      return records.some((chunks) => chunks.join("").trim() === expected);
+      return records.some((chunks) => accepted.has(chunks.join("").trim()));
     } catch {
       return false;
     }
