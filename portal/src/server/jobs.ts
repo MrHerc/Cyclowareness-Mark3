@@ -404,10 +404,23 @@ async function cleanup(db: DB, now: Date): Promise<number> {
   for (const org of await db.select({ id: t.tenants.id, settings: t.tenants.settings }).from(t.tenants)) {
     if (Date.now() > deadline) break;
     const { auditMonths, learningMonths } = withDefaults(org.settings).retention;
-    if (auditMonths > 0) total += await deleteInBatches(db, t.auditLog, t.auditLog.id, and(eq(t.auditLog.tenantId, org.id), lt(t.auditLog.at, monthsAgo(auditMonths))), deadline);
+    const purged = { auditEntries: 0, answers: 0, risks: 0 };
+    if (auditMonths > 0) purged.auditEntries = await deleteInBatches(db, t.auditLog, t.auditLog.id, and(eq(t.auditLog.tenantId, org.id), lt(t.auditLog.at, monthsAgo(auditMonths))), deadline);
     if (learningMonths > 0) {
-      total += await deleteInBatches(db, t.answers, t.answers.id, and(eq(t.answers.tenantId, org.id), lt(t.answers.at, monthsAgo(learningMonths))), deadline);
-      total += await deleteInBatches(db, t.behaviorRisks, t.behaviorRisks.id, and(eq(t.behaviorRisks.tenantId, org.id), lt(t.behaviorRisks.closedAt, monthsAgo(learningMonths))), deadline);
+      purged.answers = await deleteInBatches(db, t.answers, t.answers.id, and(eq(t.answers.tenantId, org.id), lt(t.answers.at, monthsAgo(learningMonths))), deadline);
+      purged.risks = await deleteInBatches(db, t.behaviorRisks, t.behaviorRisks.id, and(eq(t.behaviorRisks.tenantId, org.id), lt(t.behaviorRisks.closedAt, monthsAgo(learningMonths))), deadline);
+    }
+    const count = purged.auditEntries + purged.answers + purged.risks;
+    total += count;
+    // A purge leaves its own entry, so a gap in the organisation's history is explained rather than suspect.
+    if (count > 0) {
+      await audit(db, {
+        tenantId: org.id,
+        actorId: null,
+        action: "retention.purged",
+        at: now,
+        meta: { ...purged, ...(auditMonths > 0 ? { auditBefore: monthsAgo(auditMonths).toISOString() } : {}), ...(learningMonths > 0 ? { learningBefore: monthsAgo(learningMonths).toISOString() } : {}) },
+      });
     }
   }
   // Done for today only when everything fit in the time budget; otherwise the next tick continues.

@@ -465,7 +465,7 @@ export const answers = pgTable(
     outcome: text("outcome"), // simulations: safe | risky | compromised
     at: ts("at").notNull().defaultNow(),
   },
-  (t) => [index("answers_user_idx").on(t.userId)],
+  (t) => [index("answers_user_idx").on(t.userId), index("answers_tenant_at_idx").on(t.tenantId, t.at)],
 );
 
 export const xpEvents = pgTable(

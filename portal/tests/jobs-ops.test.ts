@@ -81,5 +81,13 @@ describe("job runner tick", () => {
     expect(await auditOnly()).toEqual({ ...everything, audit: ["recent"] });
     expect(await learningOnly()).toEqual({ ...everything, answers: ["recent"], risks: ["closed lately", "still open"] });
     expect(await keeps()).toEqual(everything);
+    const purges = await db.select({ tenantId: t.auditLog.tenantId, meta: t.auditLog.meta }).from(t.auditLog).where(eq(t.auditLog.action, "retention.purged"));
+    expect(purges).toHaveLength(2);
+    expect(purges.map((p) => p.meta)).toEqual(
+      expect.arrayContaining([
+        { auditEntries: 1, answers: 0, risks: 0, auditBefore: "2026-10-07T10:00:00.000Z" },
+        { auditEntries: 0, answers: 1, risks: 1, learningBefore: "2025-11-07T10:00:00.000Z" },
+      ]),
+    );
   }, 60_000);
 });

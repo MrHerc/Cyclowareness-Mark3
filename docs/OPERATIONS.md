@@ -123,8 +123,11 @@ per run; whatever is left is picked up by the next tick).
   (0 to 120, 0 = keep forever, the default). *Audit log* deletes that organisation's audit entries
   older than the value. *Answers and closed risks* deletes its lesson answers and the behaviour risks
   closed longer ago than the value; open risks stay. Every change is in the audit log as
-  `settings.retention`. Deleting answers lowers the figures of the module-quality report and the
-  inputs of the next risk recomputation for that period.
+  `settings.retention`. Deleting answers lowers the figures of the module-quality report for that
+  period. The risk score reads risky answers of the last 90 days and first-try accuracy of the last
+  180 days, so a value under 6 months shortens those windows and changes that organisation's risk
+  scores. Each run that deletes something writes one `retention.purged` entry to that organisation's
+  audit log with the counts and cutoff dates, so the gap in its history is explained.
 - **Never deleted by the job.** Lesson progress, XP events, attestations and certificates: they are
   the organisation's compliance evidence and feed XP and league totals.
 - **Backups.** Deleted rows stay in the nightly dumps until those age out (`BACKUP_KEEP_DAYS`, 14,
