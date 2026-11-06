@@ -300,3 +300,18 @@ describe("problem reports", () => {
     expect(queueEmail).not.toHaveBeenCalled();
   });
 });
+
+describe("startLessonAction", () => {
+  it("records only a lesson that belongs to the module, and never an oversized key", async () => {
+    const { user } = await setup();
+    const mod = await addModule(db, { lessons: 1 });
+    const progress = () => db.select().from(t.moduleProgress).where(eq(t.moduleProgress.userId, user.id));
+    await learning.startLessonAction(mod.slug, "lesson-2");
+    await learning.startLessonAction(mod.slug, "x".repeat(101));
+    await learning.startLessonAction("x".repeat(101), "lesson-1");
+    expect(await progress()).toEqual([]);
+    expect(await db.select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, user.id))).toEqual([]);
+    await learning.startLessonAction(mod.slug, "lesson-1");
+    expect(await progress()).toMatchObject([{ moduleId: mod.id, lastLessonKey: "lesson-1" }]);
+  });
+});

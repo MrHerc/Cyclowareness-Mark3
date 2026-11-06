@@ -3,11 +3,15 @@ import { and, desc, eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { db, t } from "@/server/db";
 import { apiViewer } from "@/server/auth/api";
+import { can } from "@/server/auth/permissions";
 import { audit } from "@/server/services/audit";
 import { toCsv } from "@/lib/csv";
 import { todayIn } from "@/lib/time";
 
-/** Sign-off list of the current policy version, for auditors, with columns and values in the admin's language. */
+/**
+ * Sign-off list of the current policy version, for auditors, with columns and values in the admin's language.
+ * The address each person signed from is personal data: only roles that read the audit log get that column.
+ */
 export async function GET(request: Request, { params }: RouteContext<"/api/admin/policies/[id]/signoffs">) {
   const { id } = await params;
   const v = await apiViewer("policies.read", request);
@@ -25,11 +29,12 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
   const by = new Map(signoffs.map((s) => [s.userId, s]));
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "policy.signoffs_downloaded", targetType: "policy", targetId: id, meta: { version: version?.version ?? null, people: people.length } });
   const tr = await getTranslations("admin.reports.cols");
+  const showIp = can(v.user.role, "audit.read");
   const csv = toCsv(
-    [tr("person"), tr("email"), tr("department"), tr("policy"), tr("version"), tr("signed"), tr("signedAt"), "IP"],
+    [tr("person"), tr("email"), tr("department"), tr("policy"), tr("version"), tr("signed"), tr("signedAt"), ...(showIp ? ["IP"] : [])],
     people.map((p) => {
       const s = by.get(p.id);
-      return [p.name, p.email, p.department ?? "", policy.title, version?.version ?? "", s ? tr("yes") : tr("no"), s?.signedAt ?? null, s?.ip ?? ""];
+      return [p.name, p.email, p.department ?? "", policy.title, version?.version ?? "", s ? tr("yes") : tr("no"), s?.signedAt ?? null, ...(showIp ? [s?.ip ?? ""] : [])];
     }),
     v.tenant.settings.timeZone,
   );

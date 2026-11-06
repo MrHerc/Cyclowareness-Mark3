@@ -15,7 +15,7 @@ let client: Anthropic | null = null;
 
 /**
  * AI tutor. Streams plain text. Only lesson context and the question are sent to the model;
- * nothing that identifies the learner. Answers are cached per lesson, scene and question.
+ * nothing that identifies the learner. Answers are cached per organisation, lesson, scene and question.
  */
 export async function POST(request: Request) {
   // Same-origin only; a malformed or "null" Origin header is refused rather than thrown on.
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   if (!row) return new Response("Not found", { status: 404 });
   const scenes = row.scenes as Scene[];
 
-  const cacheId = tutorCacheId(locale, row.id, sceneId, question, row.locale, row.scenes);
+  const cacheId = tutorCacheId(v.tenant.id, locale, row.id, sceneId, question, row.locale, row.scenes);
   const [cached] = await db().select().from(t.tutorCache).where(eq(t.tutorCache.id, cacheId));
   const headers = { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" };
   if (cached) return new Response(cached.answer, { headers: { ...headers, "x-tutor-mode": "cache" } });
