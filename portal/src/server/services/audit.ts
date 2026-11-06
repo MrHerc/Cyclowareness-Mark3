@@ -125,6 +125,7 @@ export const AUDIT_ACTIONS = [
   "demo.status",
   "demo.deleted",
   "demo.exported",
+  "seats.exported",
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
