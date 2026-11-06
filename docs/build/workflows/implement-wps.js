@@ -49,7 +49,8 @@ const REVIEW_SCHEMA = { type: 'object', properties: { verdict: { type: 'string',
 
 const FIX_SCHEMA = { type: 'object', properties: { fixed: { type: 'array', items: { type: 'string' } }, rejected: { type: 'array', items: { type: 'string' }, description: 'findings you did not apply, each with the reason' }, commits: { type: 'array', items: { type: 'string' } }, checks: { type: 'object', properties: { typecheck: { type: 'boolean' }, lint: { type: 'boolean' }, vitest: { type: 'boolean' } }, required: ['typecheck', 'lint', 'vitest'] } }, required: ['fixed', 'rejected', 'commits', 'checks'] }
 
-const LENSES = (wp) => wp.security
+// A package may name its own reviewers ({ key, model: 'mythos'|'opus', prompt }); otherwise the two default lenses apply.
+const LENSES = (wp) => Array.isArray(wp.lenses) && wp.lenses.length ? wp.lenses : wp.security
   ? [
     { key: 'security', model: 'mythos', prompt: 'Lens: attacker. Try to break what was built: bypass the check, forge the evidence, reach another tenant, replay, race two requests, exceed a limit, inject through every input, abuse the migration or the default. Every finding must have file:line and a concrete attack.' },
     { key: 'correctness', model: 'opus', prompt: 'Lens: correctness and completeness against the brief. Does every acceptance item hold? Edge cases, error paths, transactions, i18n (all ten locales, key parity, ICU), RTL, hydration, tests that actually assert the behaviour.' },
