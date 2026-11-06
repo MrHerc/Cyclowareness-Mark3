@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { and, asc, desc, eq, inArray, ne } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { Wand2 } from "lucide-react";
 import { hasFeature, requirePermission } from "@/server/auth/viewer";
@@ -12,9 +12,10 @@ import { Pill } from "@/components/ui/pill";
 import { EmptyState, PageHeader, TabsNav } from "@/components/ui/layout";
 import { MaterialForm, ModuleRowActions, StudioLessonForm } from "@/components/secops/studio";
 import { AiTrainer } from "@/components/admin/ai-trainer/ai-trainer";
+import { ScormExport } from "@/components/admin/scorm-export";
 import { TRAINING_LOCALES } from "@/server/ai-verify";
 import { CATEGORIES } from "@/lib/domain/catalog";
-import { pick } from "@/i18n/config";
+import { isLocale, pick } from "@/i18n/config";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -30,7 +31,7 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
   const tab = TABS.includes(sp.tab as "lessons") ? (sp.tab as (typeof TABS)[number]) : "lessons";
   const locale = await getLocale();
   const [tr, ta, tn, tc, format] = await Promise.all([getTranslations("secops.studio"), getTranslations("secops.approvals"), getTranslations("admin.nav"), getTranslations("common"), getFormatter()]);
-  const [own, materials, options] = await Promise.all([
+  const [own, materials, options, exportable] = await Promise.all([
     db()
       .select()
       .from(t.modules)
@@ -38,6 +39,12 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
       .orderBy(desc(t.modules.createdAt)),
     db().select().from(t.materials).where(eq(t.materials.tenantId, v.tenant.id)).orderBy(desc(t.materials.createdAt)).limit(100),
     formOptions(v.tenant.id, locale),
+    // The library's modules and the organisation's own: what a SCORM export may package.
+    db()
+      .select({ id: t.modules.id, title: t.modules.title })
+      .from(t.modules)
+      .where(or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)))
+      .orderBy(asc(t.modules.sortOrder)),
   ]);
   const lessons = own.length
     ? await db().select({ moduleId: t.lessons.moduleId, key: t.lessons.key }).from(t.lessons).where(inArray(t.lessons.moduleId, own.map((m) => m.id))).orderBy(asc(t.lessons.position))
@@ -65,6 +72,7 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
         defaultLocale={locale}
         categories={categories}
       />
+      <ScormExport modules={exportable.map((m) => ({ id: m.id, title: pick(m.title, locale) }))} defaultLocale={isLocale(locale) ? locale : "en"} />
       <TabsNav items={TABS.map((k) => ({ href: `?tab=${k}`, label: tr(`tabs.${k}`), active: tab === k, count: k === "lessons" ? own.length : materials.length }))} />
       {tab === "lessons" ? (
         own.length ? (

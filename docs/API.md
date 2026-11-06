@@ -91,6 +91,7 @@ A malformed or `null` Origin is refused with `403`.
 | POST | `/api/admin/people/invite-links` | `people.write` | CSV of fresh invitation links |
 | GET | `/api/admin/policies/{id}/signoffs` | `policies.read` | CSV of policy sign-offs |
 | GET | `/api/admin/campaigns/{id}/usb-kit` | `campaigns.write` | CSV kit for a USB simulation |
+| GET | `/api/admin/modules/{id}/scorm` | `studio.write`, feature `studio` | SCORM 1.2 zip of a module |
 | GET | `/api/admin/drill/{id}` | `campaigns.write`, feature `live_drill` | JSON state of a live drill |
 | POST | `/api/admin/drill/{id}` | `campaigns.write`, feature `live_drill`, same origin | JSON state after applying the due drill events |
 | GET | `/api/super/demo-requests` | `platform.manage` | CSV of demo requests |
@@ -330,6 +331,20 @@ For a USB-drop campaign: one CSV row per drive. Requires `campaigns.write`.
 
 Each row holds the drive label, the person it is labelled for, the bait file name and the content of a small HTML beacon file. Opening the file leads to that person's tracking link. Other channels return `404`.
 
+### GET /api/admin/modules/{id}/scorm
+
+A module as a SCORM 1.2 package for a customer's LMS, from Studio → "Export for an LMS". Requires `studio.write` and the feature `studio`. The query parameter `locale` is one of the ten interface languages (`az en ru tr ro ka uk de fr ar`); anything else answers `400`. The module must be a library module or one of the organisation's own; another organisation's module, an unknown id or a module without lessons answers `404`. Each download writes the audit entry `module.exported` (meta: `format`, `locale`) and answers with `Content-Disposition: attachment; filename="<module>-scorm12-<locale>.zip"` and `Cache-Control: no-store`.
+
+The zip holds:
+
+- `imsmanifest.xml`: one organization with one SCO item for the module (`adlcp:scormtype="sco"`, launched by `launcher.html`), `adlcp:masteryscore` 80 when the module has scored scenes, and the resource's file list;
+- `launcher.html`, `player.css`, `player.js`: the app's own lesson player built for offline use (`scripts/build-scorm-player.ts`, `src/scorm/`); relative paths only, so it also opens from `file://`;
+- `lessons.js`: every lesson of the module in the chosen language (English where a lesson has no text in it), the fictional brands they use and the player's interface strings. It is a script rather than JSON because browsers refuse fetches from `file://` pages.
+
+The package finds the LMS's `API` object by the standard walk (this window and up to seven parents, then the opener). It sets `cmi.core.lesson_status` to `incomplete` on the first launch, keeps the finished lessons in `cmi.suspend_data` (with `cmi.core.exit` `suspend` while some remain), and when every lesson is done sets `cmi.core.score.raw` (min 0, max 100: the share of first-try correct answers, scored in the browser by `src/lib/content/scoring.ts`) and `passed` or `failed` against the mastery score, or `completed` for a module without scored scenes. Each finish and the page's close set `cmi.core.session_time` and call `LMSCommit`; the close calls `LMSFinish`. Narration uses the browser's voices only, AI Sel's tutor and problem reports are off, and nothing is reported back to the portal: completions stay in the LMS.
+
+The player files are built on first use into `.data/scorm/` (development; delete the folder after changing the player) or in the Docker image's builder stage.
+
 ### GET and POST /api/admin/drill/{id}
 
 The state of a live drill (docs/DEMO.md) for the dashboard: funnel, feed, risk curve and report. Requires `campaigns.write` and the feature `live_drill`, which only the demo seed sets; otherwise, or for an unknown id or another organisation's drill, `404`.
@@ -545,6 +560,7 @@ Limits are fixed windows counted in the database and shared by every server inst
 | `POST /api/subtitles`, model calls | 6 per person per 10 minutes, 30 per person per day, 300 per organisation per day |
 | `GET /api/admin/reports/{kind}` | 60 per person per hour |
 | People export and invitation links, combined | 20 per person per hour |
+| `GET /api/admin/modules/{id}/scorm` | 30 per person per hour |
 | `GET /api/me/export` | 5 per person per hour |
 | `GET /api/sso/start`, `GET /api/sso/callback/{tenant}` | 60 per client address per minute and 600 per organisation per minute, each |
 | Start a drill (server action) | 20 drills per organisation per hour |
