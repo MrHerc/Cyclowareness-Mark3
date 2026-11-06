@@ -9,7 +9,7 @@ export const metadata: Metadata = { robots: { index: false, follow: false }, ref
 /** QR trap landing (training QR codes in simulations). */
 export default async function TrackedQr({ params }: PageProps<"/q/[token]">) {
   const { token } = await params;
-  const view = await trackingView(token, "qr");
+  const view = await trackingView(token);
   if (!view) {
     const t = await getTranslations("site.teach");
     return <p className="grid min-h-dvh place-items-center text-body text-ink-muted">{t("expired")}</p>;

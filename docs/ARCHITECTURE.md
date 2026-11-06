@@ -312,7 +312,7 @@ The sum is capped between 0 and 100. Bands are low (0 to 33), medium (34 to 66) 
    - the plan does not include the template.
 3. Every recipient gets a random tracking token.
 4. Delivery depends on the channel:
-   - **Email** goes through the outbox and is sent by the job runner, with the template's display name and the organisation's own address.
+   - **Email** goes through the outbox and is sent by the job runner, with the template's display name and, when Settings → Email has a simulation sender address on a proven look-alike domain, that address; otherwise the organisation's own address (`docs/SIMULATION-DELIVERY.md`).
    - **SMS** is sent by the job runner.
    - **USB** produces a CSV kit with one beacon file per drive.
    - **Voice** never gets this far: the launch is refused.
@@ -320,8 +320,8 @@ The sum is capped between 0 and 100. Bands are low (0 to 33), medium (34 to 66) 
 **Tracking.**
 
 - **Opens.** `/api/t/{token}/open` is a one-pixel image that records the first open.
-- **Clicks.** `/t/{token}` and `/q/{token}` record the first click or QR scan. Each click opens a behaviour risk tied to the template's training module, recomputes the person's risk and emits an integration event.
-- **Mail scanners.** Requests whose user agent or prefetch headers look like a mail security gateway are not counted (`src/server/tracking.ts`). Safe Links and sandbox detonations therefore do not create false clicks.
+- **Clicks.** `/t/{token}` and `/q/{token}` render without recording anything; the page sends a beacon (`simulationClickAction`) once it runs in a browser, and the first beacon records the click or QR scan. Each click opens a behaviour risk tied to the template's training module, recomputes the person's risk and emits an integration event.
+- **Mail scanners.** A gateway that only fetches the page never counts; a beacon from a known scanner user agent or a browser prefetch is refused (`src/server/tracking.ts`). A sandbox that detonates the link in a scriptable browser with an ordinary user agent still counts, so simulations must be allow-listed at the mail gateway (`docs/SIMULATION-DELIVERY.md`).
 - **Teachable moment.** After a click the person sees the red flags in their own language, and a link to the lesson.
 - **Fake sign-in.** The form's inputs have no names, so nothing typed leaves the browser. Only the fact of submission is stored.
 - **Cancelled campaigns** record nothing more.

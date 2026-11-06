@@ -2,12 +2,12 @@ import "server-only";
 import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
 import { db, t } from "./db";
-import { recordClick } from "./services/campaigns";
 import { templateText } from "../lib/campaigns/templates";
 
 /**
  * Mail security gateways open links before people do (Safe Links, sandboxes, previews).
- * Those requests must not count as clicks, or innocent people would get a "you clicked" risk.
+ * Rendering the page therefore never counts as a click: the click is recorded by a JavaScript
+ * beacon from the page (simulationClickAction), which this check still refuses for known scanners.
  */
 const SCANNERS = /(bot|crawler|spider|preview|scanner|safelinks|microsoft office|msoffice|outlook|proofpoint|mimecast|barracuda|fortinet|symantec|trend ?micro|sophos|zscaler|curl|wget|python-requests|go-http-client|java\/|okhttp|headless)/i;
 
@@ -17,10 +17,10 @@ export async function isLikelyScanner(): Promise<boolean> {
   return !ua || SCANNERS.test(ua) || h.get("purpose") === "prefetch" || h.get("sec-purpose")?.includes("prefetch") === true;
 }
 
-export async function trackingView(token: string, via: "link" | "qr") {
+/** What the landing page shows; it records nothing (see above). */
+export async function trackingView(token: string) {
   if (!/^[a-z2-7]{10,40}$/.test(token)) return null;
-  const scanner = await isLikelyScanner();
-  const data = scanner ? await peek(token) : await recordClick(db(), token, via);
+  const data = await peek(token);
   if (!data) return null;
   const [tenant] = await db().select({ name: t.tenants.name }).from(t.tenants).where(eq(t.tenants.id, data.tenantId));
   return {
@@ -28,7 +28,7 @@ export async function trackingView(token: string, via: "link" | "qr") {
     flags: data.template.redFlags.map((f) => templateText(f, data.locale)),
     moduleSlug: data.template.moduleSlug,
     // A cancelled campaign records nothing, so it goes straight to the teachable moment.
-    harvest: data.template.harvest && !scanner && !data.cancelled,
+    harvest: data.template.harvest && !data.cancelled,
     submitted: data.submitted,
     brandName: templateText(data.template.sender.name, data.locale),
     // The recipient's profile language (that of the flags and sender above): /t and /q show the teachable moment in it.

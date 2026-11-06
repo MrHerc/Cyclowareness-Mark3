@@ -287,6 +287,34 @@ export async function saveIdentityAction(input: z.infer<typeof identitySchema>):
   return { ok: true };
 }
 
+/** Domain of an address, in the ASCII form the proof is stored in. */
+const addressDomain = (address: string) => normaliseHost(address.slice(address.lastIndexOf("@") + 1));
+
+/**
+ * Proves the look-alike domain of the simulation sender address: the organisation publishes the same
+ * TXT record as for its own domain (domainProofRecordAction) on that domain. Only a proven domain can
+ * be saved as the simulation sender (saveEmailAction). A new proof drops an address on the previous domain.
+ */
+export async function verifySimulationDomainAction(address: string): Promise<{ ok: boolean; found: boolean; domain?: string; error?: "rateLimited" }> {
+  const v = await actionViewer("settings.write");
+  const host = z.email().safeParse(address).success ? addressDomain(address) : null;
+  if (!host) return { ok: false, found: false };
+  // Shares the organisation's domain-check budget: two DNS lookups per check.
+  if (!(await rateLimit(`domain-check:${v.tenant.id}`, 20, 60 * 60_000)).ok) return { ok: false, found: false, error: "rateLimited" };
+  const found = await domainProofFound(host, domainProofRecord(v.tenant.id, env.secret));
+  if (found) {
+    await saveSettings(
+      v,
+      (s) => ({ ...s, email: { ...s.email, simulationDomain: host, simulationFromAddress: s.email.simulationFromAddress && addressDomain(s.email.simulationFromAddress) === host ? s.email.simulationFromAddress : undefined } }),
+      "domain.verified",
+      { domain: host, found, simulation: true },
+    );
+  } else {
+    await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "domain.rechecked", ip: await clientIp(), meta: { domain: host, found, simulation: true } });
+  }
+  return { ok: true, found, domain: host };
+}
+
 const emailSchema = z.object({
   host: z.string().trim().max(253).optional(),
   port: z.number().int().min(1).max(65535).optional(),
@@ -297,6 +325,7 @@ const emailSchema = z.object({
   fromAddress: z.email().max(254).or(z.literal("")).optional(),
   replyTo: z.email().max(254).or(z.literal("")).optional(),
   helpdesk: z.email().max(254).or(z.literal("")).optional(),
+  simulationFromAddress: z.email().max(254).or(z.literal("")).optional(),
   enabled: z.boolean(),
 });
 
@@ -313,7 +342,10 @@ export async function saveEmailAction(input: z.infer<typeof emailSchema>): Promi
   // The stored password is only kept for the same host and port (lib/stored-secret.ts); 587 is the transport's default port.
   const smtpSecret = (s: TenantSettings) =>
     storedSecretOutcome({ stored: !!s.email.passwordEnc && !d.password, before: endpointKey(s.email.host, s.email.port ?? 587), after: endpointKey(d.host, d.port ?? 587), needed: !!d.host && !!d.user });
-  if (smtpSecret(await currentSettings(v)) === "required") return { ok: false, field: "password", error: "secretRequired" };
+  const current = await currentSettings(v);
+  if (smtpSecret(current) === "required") return { ok: false, field: "password", error: "secretRequired" };
+  // A simulation may only be sent from a look-alike domain this organisation has proven (verifySimulationDomainAction).
+  if (d.simulationFromAddress && addressDomain(d.simulationFromAddress) !== current.email.simulationDomain) return { ok: false, field: "simulationFromAddress" };
   await saveSettings(
     v,
     (s) => {
@@ -330,6 +362,8 @@ export async function saveEmailAction(input: z.infer<typeof emailSchema>): Promi
           fromAddress: d.fromAddress || undefined,
           replyTo: d.replyTo || undefined,
           helpdesk: d.helpdesk || undefined,
+          simulationFromAddress: d.simulationFromAddress || undefined,
+          simulationDomain: s.email.simulationDomain,
           // Sending stays off after server changes until a new test succeeds.
           testedAt: changedServer ? undefined : s.email.testedAt,
           enabled: d.enabled && !changedServer && !!s.email.testedAt,

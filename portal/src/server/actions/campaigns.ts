@@ -7,7 +7,8 @@ import { db, t } from "../db";
 import { actionViewer } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
 import { audit } from "../services/audit";
-import { launchCampaign, recordSubmit, setCampaignStatus, type LaunchBlock } from "../services/campaigns";
+import { launchCampaign, recordClick, recordSubmit, setCampaignStatus, type LaunchBlock } from "../services/campaigns";
+import { isLikelyScanner } from "../tracking";
 import { TEMPLATE_BY_KEY, templateOnPlan } from "../../lib/campaigns/templates";
 
 const draftSchema = z.object({
@@ -88,6 +89,15 @@ export async function setCampaignStatusAction(id: string, status: "cancelled" | 
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: status === "cancelled" ? "campaign.cancelled" : "campaign.changed", targetType: "campaign", targetId: id, meta: { status } });
   refresh();
   return { ok: true };
+}
+
+/**
+ * The click beacon of the simulation page (/t and /q), sent once the page runs in a browser: a
+ * mail scanner that merely fetches the page records nothing. Recorded once per recipient.
+ */
+export async function simulationClickAction(token: string, via: "link" | "qr"): Promise<void> {
+  if (!/^[a-z2-7]{10,40}$/.test(token) || (via !== "link" && via !== "qr") || (await isLikelyScanner())) return;
+  await recordClick(db(), token, via);
 }
 
 /** Fake sign-in on the simulation page: only the fact is recorded, never what was typed. */

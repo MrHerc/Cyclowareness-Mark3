@@ -175,7 +175,7 @@ Fonts come from `next/font/google` (Geologica, Noto Sans Georgian and Noto Sans 
 
 ## Production with Docker
 
-The image is a multi-stage build (`deps` -> `builder` -> `runner`) on `node:24-trixie-slim` (build with `--pull` so the base image brings the latest Node security release). The runner contains the Next.js standalone server, `.next/static`, `public/`, `drizzle/`, `content/` and the migration script, runs as the non-root `node` user, listens on `0.0.0.0:3000` and has a `HEALTHCHECK` against `/api/health` (200 only when the database answers a query, 503 otherwise; usable by load balancers too). The builder stage runs `scripts/check-lesson-locales.ts --coverage` before `next build`, so a broken lesson file or translation fails the image build, not a deployment. On every start:
+The image is a multi-stage build (`deps` -> `builder` -> `runner`) on `node:24-trixie-slim`, pinned by its multi-arch index digest so builds are reproducible (Dependabot proposes the digest bump weekly; merge it to pick up Node security releases; `postgres:16-alpine` in the compose files is pinned the same way). The runner contains the Next.js standalone server, `.next/static`, `public/`, `drizzle/`, `content/` and the migration script, runs as the non-root `node` user, listens on `0.0.0.0:3000` and has a `HEALTHCHECK` against `/api/health` (200 only when the database answers a query, 503 otherwise; usable by load balancers too). The builder stage runs `scripts/check-lesson-locales.ts --coverage` before `next build`, so a broken lesson file or translation fails the image build, not a deployment. On every start:
 
 1. the entrypoint checks `DATABASE_URL` and `APP_SECRET` (32+ characters) and applies pending migrations (`scripts/migrate.mjs`, node-postgres); a failure stops the container;
 2. the server (`src/server/bootstrap.ts`, before it takes requests) imports the lesson library and learning paths from `content/` — idempotent, matched by slug/key, progress and assignments are never touched, so a new image brings its content changes with it; several replicas take turns on an advisory lock;
@@ -211,7 +211,7 @@ To run background jobs outside the web containers, set `JOBS_ENABLED=0` for `app
 ### Image only
 
 ```bash
-docker build --pull -t portal .
+docker build -t portal .
 docker run --rm -p 127.0.0.1:3000:3000 \
   -e DATABASE_URL='postgres://user:pass@db.example.internal:5432/portal?sslmode=verify-full' \
   -e APP_SECRET=... -e APP_URL=https://your.host -e TRUST_PROXY=1 \
@@ -349,6 +349,7 @@ CI=1 npm run e2e                           # the same against the production bui
 
 - `../docs/audit/` — the audit of the earlier portal that this rebuild follows: overview and routes, design tokens, learner app, admin panel, training catalogue (53 modules, 106 lessons), landing, lesson engine and mascot, screenshots, extracted content.
 - `../docs/OPERATIONS.md` — incident response, post-mortem template, on-call, quarterly access review, backups, checking `TRUST_PROXY`.
+- `../docs/SIMULATION-DELIVERY.md` — getting phishing simulations into the inbox: the look-alike sending domain and its proof, SPF/DKIM/DMARC, allow-listing in Microsoft 365 (Defender advanced delivery) and Google Workspace, and how clicks are counted so mail scanners do not create false ones.
 - `../docs/DEMO.md` — the three-minute demo: how to run it, the talk track, what the Live drill simulates and what is real, the calibration sources.
 - `../docs/build/PLAN.md` — the build phases of the hybrid portal; `DECISIONS.md` (ADRs, including the ten languages, translation, narration, captions, player, mascot, light/motion and security hardening), `PROGRESS.md`, `OPEN-QUESTIONS.md` (what still needs the owner's decision or a key).
 - `../.claude/skills/cyclowareness-experience/` — the working reference for the mascot, motion, lessons, translations and the training pipeline, with the per-language glossaries.
