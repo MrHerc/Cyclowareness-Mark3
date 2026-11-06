@@ -5,6 +5,7 @@ import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { departmentClosure, resolveAssignments } from "../services/assignments";
 import { scopeDepartmentIds } from "../queries/admin";
+import { riskStory, storySentences } from "../queries/risk-story";
 import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { riskBand } from "../../lib/domain/risk";
 import { levelFor } from "../../lib/domain/gamification";
@@ -57,6 +58,13 @@ export async function scopedPeople(v: Viewer, f: ReportFilters) {
     .orderBy(asc(t.users.name));
   const deptName = new Map(departments.map((d) => [d.id, d.name]));
   return { users: users.filter((u) => !dept || (u.departmentId && dept.has(u.departmentId))), deptName };
+}
+
+/** The leadership risk story as a one-column section of the compliance pack, for the people the pack covers. */
+export async function buildRiskStory(v: Viewer, f: ReportFilters, locale: string): Promise<ReportTable> {
+  const tr = await getTranslations({ locale, namespace: "admin.riskStory" });
+  const sentences = await storySentences(await riskStory(v, locale, f.departmentId), locale);
+  return { title: tr("title"), headers: [tr("finding")], rows: sentences.map((s) => [s]) };
 }
 
 export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters, locale: string): Promise<ReportTable> {

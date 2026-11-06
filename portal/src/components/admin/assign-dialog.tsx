@@ -25,7 +25,7 @@ export function AssignDialog({
   paths: Option[];
   departments: { id: string; name: string }[];
   people: { id: string; name: string }[];
-  preset?: { target: "module" | "path"; targetId: string; userIds?: string[] };
+  preset?: { target: "module" | "path"; targetId: string; userIds?: string[]; departmentId?: string };
   label?: string;
 }) {
   const t = useTranslations("admin.assignments");
@@ -34,8 +34,8 @@ export function AssignDialog({
   const [target, setTarget] = useState<"module" | "path">(preset?.target ?? "module");
   const [targetId, setTargetId] = useState(preset?.targetId ?? "");
   const [q, setQ] = useState("");
-  const [scope, setScope] = useState<"everyone" | "department" | "user">(preset?.userIds?.length ? "user" : "everyone");
-  const [departmentId, setDepartmentId] = useState("");
+  const [scope, setScope] = useState<"everyone" | "department" | "user">(preset?.userIds?.length ? "user" : preset?.departmentId ? "department" : "everyone");
+  const [departmentId, setDepartmentId] = useState(preset?.departmentId ?? "");
   const [userId, setUserId] = useState(preset?.userIds?.[0] ?? "");
   const [dueKind, setDueKind] = useState<"none" | "fixed" | "after_joining">("none");
   const [dueDate, setDueDate] = useState("");
