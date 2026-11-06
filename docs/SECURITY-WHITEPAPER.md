@@ -2,7 +2,7 @@
 
 For the security, risk and procurement teams of organisations evaluating Cyclowareness, the security-awareness platform by Safarov Industries.
 
-This paper describes the controls that exist in the platform's code today. It is drawn from the engineering documentation ([ARCHITECTURE.md](ARCHITECTURE.md)) and the internal security review of 2026-11-05 ([SECURITY_REVIEW.md](SECURITY_REVIEW.md)), and every statement was checked against the source. It is not a certification and not a contract: where a commitment is needed (hosting region, service levels, data processing terms), it belongs in the agreement with your organisation. The [last section](#what-the-platform-does-not-provide-yet) lists what is not in place yet.
+This paper describes the controls that exist in the platform's code today. It is drawn from the engineering documentation and the internal security review of 2026-11-05, and every statement was checked against the source. It is not a certification and not a contract: where a commitment is needed (hosting region, service levels, data processing terms), it belongs in the agreement with your organisation. The [last section](#what-the-platform-does-not-provide-yet) lists what is not in place yet.
 
 ## Contents
 
@@ -46,7 +46,7 @@ This paper describes the controls that exist in the platform's code today. It is
 | Passwords | Argon2id (19 MiB memory, 2 iterations), at least 10 characters and a zxcvbn strength score of 3, checked against the person's name and email. Signed-in people can change their password; other devices are then signed out. |
 | Brute-force protection | Failed attempts are counted per account and client address within 15 minutes; codes sent by SMS and password-reset mails are limited per recipient. Sign-in, phone sign-in, SSO domain lookup and password reset answer the same way whether or not an account exists. |
 | Two-step verification | TOTP authenticator apps with single-use backup codes (stored as keyed hashes). A code that was accepted cannot be used again. Mandatory for the platform operator; mandatory for every console role while the organisation's rule is on, which is the default for new organisations. |
-| Privileged roles | Organisation administrators, security analysts, campaign managers and the platform operator always sign in with a password and their second step, never with single sign-on or a text-message code. No console role can sign in with a text-message code. |
+| Privileged roles | Organisation administrators, security analysts, campaign managers and the platform operator always sign in with their own password, never with single sign-on or a text-message code. Once they have set up two-step verification it is asked at every sign-in, and while the organisation's rule is on (the default) they must set it up before they can use the console. |
 | Single sign-on | OpenID Connect authorization code flow with PKCE, state and nonce, over HTTPS. The ID token's signature, issuer, audience, expiry and nonce are checked, and the email claim counts only when the provider marks it verified. SSO works only for a domain the organisation has proven with a DNS TXT record (re-checked daily). On first sign-in the account is bound to the provider's issuer and subject identifier, and a different subject is refused later. |
 | Sessions | A random 192-bit token in a `__Host-` cookie (HttpOnly, Secure, SameSite=Lax). The database stores only its SHA-256 hash. The session slides to 30 days on use and ends at most 90 days after sign-in. An organisation can limit the number of devices signed in at once; people can sign out their other devices. |
 | Account links | Invitation and password-reset tokens are stored as hashes, work once, and invitations expire after 14 days. |
@@ -98,7 +98,7 @@ Certificates and the compliance pack are used as evidence for regulators and aud
 
 - Sign-ins, refused actions, exports and downloads, role and two-step changes and every administrative change are written to the organisation's audit log with the actor and client address, and shown in the admin console.
 - Events can be forwarded to your SIEM by signed webhook or syslog.
-- The server writes structured JSON log lines; error records carry the error's name, code and stack but never its message or request parameters.
+- The server writes structured JSON log lines; failed database queries are logged with the error's name, code and stack, never the query parameters.
 - `/api/health` reports the database state, whether the background job runner is current, and the delivery backlog.
 
 ## Deployment and operations
