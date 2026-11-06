@@ -769,7 +769,7 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
   days throw at the `date` column, `tests/due-date-actions.test.ts`). The end of a due day is
   `T23:59:59+04:00` (Baku) in jobs; `after_joining` adds days (UTC) to the person's start:
   `users.created_at`, or `activated_at` when that is later.
-- **Time zone:** every "day" (`dayKey`, XP by day, snapshots, due) is `Asia/Baku`.
+- **Time zone:** every "day" (`dayKey`, XP by day, snapshots, due, 08:00 report mails) is computed in the organisation's time zone (`settings.timeZone`, IANA, default `Asia/Baku`; Settings → Languages; `tenantTimeZone(db, tenantId)` in `src/server/services/tenants.ts`; ADR-039). The Baku names in this reference are the defaults, not fixed zones.
 - **i18n:** `messages/{locale}/{learner,admin,secops,settings,common}.json` for the ten UI languages; keys without dots,
   ICU braces escaped with quotes, `tests/i18n.test.ts` checks parity and placeholders. Edit the
   JSON with the Edit tool (never regenerate whole files); add every key to all ten locales, using the

@@ -159,6 +159,7 @@ describe("live drill", () => {
     });
     const before = await counts();
     await db.update(t.drillRuns).set({ appliedUntil: trainAt, finishedAt: null, leaseUntil: null }).where(eq(t.drillRuns.id, done.id));
+    await db.update(t.campaigns).set({ status: "running", completedAt: null }).where(eq(t.campaigns.id, done.campaignId));
     const again = (await advanceDrill(db, tenantId, done.id))!;
     expect(again.appliedUntil).toBe(again.events.length);
     expect(await counts()).toEqual(before);

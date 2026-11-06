@@ -95,7 +95,7 @@ export async function launchCampaign(db: DB, campaignId: string, actorId: string
     .set({ status: "running", launchedAt: now })
     .where(and(eq(t.campaigns.id, c.id), inArray(t.campaigns.status, ["draft", "scheduled"])))
     .returning({ id: t.campaigns.id });
-  if (!claimed) return { ok: false, reason: "empty" };
+  if (!claimed) return { ok: false, reason: "launched" };
   let count = 0;
   for (const u of audience) {
     const token = randomToken(16);

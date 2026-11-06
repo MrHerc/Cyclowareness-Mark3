@@ -77,9 +77,8 @@ describe("launchBlocker", () => {
     expect(await c.launchBlocker(db, tenant.id, "email", 3)).toBeNull();
     env.isProd = true;
     expect(await c.launchBlocker(db, tenant.id, "email", 3)).toBe("mail");
+    // No telephony adapter exists: voice is refused in every environment.
     expect(await c.launchBlocker(db, tenant.id, "voice", 3)).toBe("voice");
-    env.VOICE_PROVIDER = "twilio";
-    expect(await c.launchBlocker(db, tenant.id, "voice", 3)).toBeNull();
     const mailing = await addTenant(db, { settings: settings({ email: { enabled: true, host: "smtp.example" } }) });
     expect(await c.launchBlocker(db, mailing.id, "email", 3)).toBeNull();
     smsOn = false;
@@ -126,7 +125,7 @@ describe("launchCampaign", () => {
     const { tenant } = await org({ people: 1 });
     for (const status of ["running", "completed", "cancelled"] as const) {
       const campaign = await draft(tenant.id, { status });
-      expect(await c.launchCampaign(db, campaign.id, null)).toEqual({ ok: false, reason: "empty" });
+      expect(await c.launchCampaign(db, campaign.id, null)).toEqual({ ok: false, reason: "launched" });
       expect(await recipients(campaign.id)).toEqual([]);
     }
   });

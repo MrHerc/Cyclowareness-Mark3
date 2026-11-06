@@ -80,7 +80,7 @@ risk score) needs both references.
   (`src/i18n/az-numbers.ts`; the chunk `src/i18n/az-numbers-polyfill.ts` replaces `Intl.NumberFormat`
   for every language and loads the data of all ten; `tests/az-numbers.test.ts`). Format on the server when you can, with
   `getFormatter`, or `getAppFormatter()` (`src/i18n/server-format.ts`) for a relative time so az reads
-  «… əvvəl» / «… sonra» as on the client. ADR-017, ADR-024. Every "day" in the pipeline is `Asia/Baku`.
+  «… əvvəl» / «… sonra» as on the client. ADR-017, ADR-024. Every "day" in the pipeline is the organisation's time zone (`settings.timeZone`, IANA, default `Asia/Baku`, ADR-039): pass it from `tenantTimeZone()` to the `dayKey`/due helpers in `src/lib/time.ts`.
 - Respect the learner's motion preference (`users.motion` = `full | calm | still`, exposed as
   `<html data-motion>`) and `prefers-reduced-motion` in every animation, including the mascot. CSS
   animations are covered globally; JS timers, rAF and the mascot must check it themselves, with

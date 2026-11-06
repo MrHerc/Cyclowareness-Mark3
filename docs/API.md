@@ -445,10 +445,10 @@ These are the events the code emits (`src/server/services`, `src/server/actions`
 | `incident.created` | An incident is opened | `number` (`IR-…`), `title`, `severity`, `source`, `iocs`, `mitre`; a confidential incident sends only `number`, `severity` and `confidential: true` |
 | `sandbox.malicious` | A sandbox analysis returns a malicious verdict | `number` (`SB-…`), `kind`, `iocs`; plus `sha256` when the object was submitted on the sandbox page rather than checked from a threat report |
 | `admin.audit` | Only the test event from Settings | `test`, `by` |
+| `risk.threshold_crossed` | A person's risk score rises from below the organisation's learning risk threshold (Settings → Learning, default 67) to at or above it; sent once per crossing, never on the way down | `userId`, `score`, `threshold` |__ROW__
 
 `userId` is the person's UUID in Cyclowareness, not their email.
 
-The Settings page also offers `risk.threshold_crossed`, but no code emits it yet.
 
 ## 7. Syslog and SIEM
 

@@ -4,6 +4,7 @@ import { createTranslator } from "next-intl";
 import * as t from "../src/server/db/schema";
 import type { Viewer } from "../src/server/auth/viewer";
 import { messagesFor } from "../src/i18n/translator";
+import { withDefaults } from "../src/lib/tenant-defaults";
 import { DB_SETUP_TIMEOUT, addDepartment, addModule, addTenant, addUser, assignEveryone, testDb } from "./helpers/db";
 
 const { db, ready } = testDb();
@@ -16,7 +17,7 @@ const { buildReport, parseReportFilters, scopedPeople } = await import("../src/s
 
 beforeAll(ready, DB_SETUP_TIMEOUT);
 
-const as = (tenantId: string, user: { id: string; role: t.Role; departmentId?: string | null }) => ({ user: { departmentId: null, ...user }, tenant: { id: tenantId } }) as unknown as Viewer;
+const as = (tenantId: string, user: { id: string; role: t.Role; departmentId?: string | null }) => ({ user: { departmentId: null, ...user }, tenant: { id: tenantId, settings: withDefaults({}) } }) as unknown as Viewer;
 
 describe("parseReportFilters", () => {
   it("applies valid days and a department id", () => {
