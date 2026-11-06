@@ -5,11 +5,11 @@
  *   npx tsx scripts/rotate-secret.ts
  */
 import { createDb } from "../src/server/db/client";
-import { rotateStoredSecrets } from "../src/server/services/secret-rotation";
+import { rotateStoredSecrets, rotationRefusal } from "../src/server/services/secret-rotation";
 
 async function main() {
-  const secret = process.env.APP_SECRET ?? "";
-  if (process.env.NODE_ENV === "production" && secret.length < 32) throw new Error("APP_SECRET (32+ characters) must be set: a rotation cannot seal production secrets with the development key.");
+  const refusal = rotationRefusal(process.env);
+  if (refusal) throw new Error(`Refusing to rotate: ${refusal}`);
   const handle = createDb();
   try {
     const counts = await rotateStoredSecrets(handle.db);

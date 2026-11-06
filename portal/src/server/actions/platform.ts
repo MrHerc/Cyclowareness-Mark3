@@ -122,7 +122,10 @@ export async function verifyTenantDomainAction(tenantId: string, domain: string,
     if (isUniqueViolation(error, "tenants_domain_verified_idx")) return "taken" as const;
     throw error;
   });
-  if (saved === "taken") return { ok: false, error: "domainTaken", found };
+  if (saved === "taken") {
+    await audit(db(), { tenantId, actorId: v.user.id, action: "domain.rechecked", targetType: "tenant", targetId: tenantId, meta: { domain: host, found, byOperator: true, forced: !found && force, taken: true, by: v.user.email } });
+    return { ok: false, error: "domainTaken", found };
+  }
   if (!saved) return { ok: false };
   await audit(db(), {
     tenantId,

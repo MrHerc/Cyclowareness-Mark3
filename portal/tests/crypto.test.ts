@@ -51,7 +51,7 @@ vi.mock("node:dns/promises", () => ({
 const { decryptSecret, encryptSecret, sealedWithCurrentKey } = await import("../src/server/crypto");
 const { backupCodeHashes, hashBackupCode, legacyBackupHash } = await import("../src/server/auth/totp");
 const { domainProofFound, domainProofRecord, domainProofRecords } = await import("../src/server/auth/domain-proof");
-const { rotateStoredSecrets } = await import("../src/server/services/secret-rotation");
+const { rotateStoredSecrets, rotationRefusal } = await import("../src/server/services/secret-rotation");
 const { verifyDomainAction } = await import("../src/server/actions/settings");
 const { verifyTenantDomainAction } = await import("../src/server/actions/platform");
 
@@ -129,11 +129,14 @@ describe("rotate-secret", () => {
     settings.integrations = { ...settings.integrations, webhookSecretEnc: sealedWith(CURRENT, "already-current") };
     const tenant = await addTenant(db, { settings });
     const untouched = await addTenant(db);
+    // A row saved before some settings group existed must not stop the run.
+    const partial = await addTenant(db, { settings: { email: { enabled: true, passwordEnc: sealedWith(PREVIOUS, "partial-password") } } as never });
     const user = await addUser(db, tenant.id, { totpSecret: sealedWith(PREVIOUS, "JBSWY3DPEHPK3PXP") });
     const current = await addUser(db, tenant.id, { totpSecret: sealedWith(CURRENT, "CURRENTKEY") });
     const unreadable = await addUser(db, tenant.id, { totpSecret: sealedWith("some-other-secret-nobody-has-any-more-0123456789", "LOST") });
 
-    expect(await rotateStoredSecrets(db)).toEqual({ tenants: 1, users: 1, unreadable: 1 });
+    expect(await rotateStoredSecrets(db)).toEqual({ tenants: 2, users: 1, unreadable: 1 });
+    expect(decryptSecret((await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, partial.id)))[0].settings.email.passwordEnc)).toBe("partial-password");
     const [row] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenant.id));
     const resealed = [row.settings.identity.sso?.clientSecretEnc, row.settings.identity.ldap?.passwordEnc, row.settings.email.passwordEnc, row.settings.integrations.webhookSecretEnc] as string[];
     for (const value of resealed) expect(sealedWithCurrentKey(value)).toBe(true);
@@ -148,6 +151,18 @@ describe("rotate-secret", () => {
     rotation(false);
     expect(resealed.map(decryptSecret)).toEqual(["sso-secret", "ldap-password", V1_PLAIN, "already-current"]);
     expect(decryptSecret(await totp(user.id))).toBe("JBSWY3DPEHPK3PXP");
+  });
+});
+
+describe("rotate-secret refusal", () => {
+  it("refuses to seal with the development key wherever a database is named, and a previous key too short to count", () => {
+    const weak = "short";
+    expect(rotationRefusal({ DATABASE_URL: "postgres://db/portal", APP_SECRET: weak })).toMatch(/APP_SECRET \(32\+/);
+    expect(rotationRefusal({ NODE_ENV: "production", APP_SECRET: "" })).toMatch(/APP_SECRET \(32\+/);
+    expect(rotationRefusal({ APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: weak })).toMatch(/APP_SECRET_PREVIOUS/);
+    expect(rotationRefusal({ DATABASE_URL: "postgres://db/portal", APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: PREVIOUS })).toBeNull();
+    // The embedded development database is the only place the fallback key may be used.
+    expect(rotationRefusal({ APP_SECRET: "" })).toBeNull();
   });
 });
 
@@ -192,7 +207,7 @@ describe("one verified domain per organisation", () => {
     h.viewer.tenant = { id: second.id, name: second.name, settings: second.settings };
     h.txt.set("shared.gov.az", [[domainProofRecord(second.id, CURRENT)]]);
     expect(await verifyDomainAction("shared.gov.az")).toEqual({ ok: false, verified: false, found: true, kept: false, error: "domainTaken" });
-    expect(h.audits.map((a) => a.meta?.taken)).toEqual([true]);
+    expect(h.audits.map((a) => [a.action, a.meta?.taken, a.meta?.byOperator])).toEqual([["domain.rechecked", true, true], ["domain.rechecked", true, undefined]]);
     const [row] = await db.select({ domain: t.tenants.domain, verifiedAt: t.tenants.domainVerifiedAt }).from(t.tenants).where(eq(t.tenants.id, second.id));
     expect(row).toEqual({ domain: null, verifiedAt: null });
     // The same domain unverified is no conflict (the index is partial), nor is the first organisation's own re-check.
