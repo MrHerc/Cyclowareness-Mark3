@@ -1,5 +1,5 @@
 import "server-only";
-import { asc, eq, gte, or, sql } from "drizzle-orm";
+import { asc, eq, gte, ne, or, sql } from "drizzle-orm";
 import { db, t } from "../db";
 import { campaignStats } from "../services/campaigns";
 
@@ -19,6 +19,8 @@ export async function peopleCounts(now = new Date()) {
       monthly: sql<number>`count(*) filter (where ${t.users.status} = 'active' and ${t.users.lastActiveAt} >= ${month})`,
     })
     .from(t.users)
+    // Platform operators are vendor staff, not billable seats of the organisation they sit in.
+    .where(ne(t.users.role, "super_admin"))
     .groupBy(t.users.tenantId);
   return new Map(rows.map((r) => [r.tenantId, { active: Number(r.active), invited: Number(r.invited), weekly: Number(r.weekly), monthly: Number(r.monthly) }]));
 }

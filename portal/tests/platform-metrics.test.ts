@@ -72,7 +72,8 @@ describe("platformMetrics", () => {
     expect(byId.get(alpha)).toMatchObject({
       slug: "alpha",
       plan: "professional",
-      active: 3,
+      // The operator account in Alpha is not a seat.
+      active: 2,
       invited: 1,
       weekly: 1,
       monthly: 2,
@@ -106,7 +107,7 @@ describe("GET /api/super/seats", () => {
     expect(res.headers.get("content-type")).toContain("text/csv");
     const month = todayIn("Asia/Baku").slice(0, 7);
     const lines = (await res.text()).replace(/^﻿/, "").trim().split("\r\n");
-    expect(lines).toEqual(["organisation,plan,active_people,invited_people,month", `alpha,professional,3,1,${month}`, `beta,essentials,1,0,${month}`]);
+    expect(lines).toEqual(["organisation,plan,active_people,invited_people,month", `alpha,professional,2,1,${month}`, `beta,essentials,1,0,${month}`]);
     expect(audit).toHaveBeenCalledWith(db, expect.objectContaining({ action: "seats.exported", actorId: operator }));
   });
 });
