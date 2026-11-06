@@ -57,6 +57,8 @@ export type TenantSettings = {
   timeZone: string;
   protection: { contentProtection: boolean; watermark: boolean; androidScreenBlock?: boolean };
   learning: { timeLimits: boolean; refresher: boolean; riskThreshold: number; dailyGoalXp: number };
+  /** Months the daily clean-up keeps audit entries, and answers and closed risks; 0 keeps them forever. */
+  retention: { auditMonths: number; learningMonths: number };
   attestationText: Record<string, string>;
   /** `title` and `text`: the organisation's own wording per language ({ az, en, ru }); a language without one gets the default. */
   certificate: { title?: Record<string, string>; text?: Record<string, string>; signerName?: string; signerTitle?: string; publicLink: boolean };

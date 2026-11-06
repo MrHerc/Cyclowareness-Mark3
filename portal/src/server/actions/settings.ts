@@ -430,6 +430,17 @@ export async function saveLearningAction(input: z.infer<typeof learningSchema>):
   return { ok: true };
 }
 
+const months = z.number().int().min(0).max(120);
+const retentionSchema = z.object({ auditMonths: months, learningMonths: months });
+
+export async function saveRetentionAction(input: z.infer<typeof retentionSchema>): Promise<SaveResult> {
+  const v = await actionViewer("settings.write");
+  const p = retentionSchema.safeParse(input);
+  if (!p.success) return invalid(p);
+  await saveSettings(v, (s) => ({ ...s, retention: p.data }), "settings.retention", p.data);
+  return { ok: true };
+}
+
 const protectionSchema = z.tuple([z.boolean(), z.boolean(), z.boolean().default(false)]);
 
 export async function saveProtectionAction(contentProtection: boolean, watermark: boolean, androidScreenBlock = false): Promise<{ ok: boolean }> {

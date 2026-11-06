@@ -83,6 +83,7 @@ export const AUDIT_ACTIONS = [
   "settings.certificate",
   "settings.learning",
   "settings.protection",
+  "settings.retention",
   "settings.integrations",
   "settings.webhook_secret",
   "settings.integration_test",

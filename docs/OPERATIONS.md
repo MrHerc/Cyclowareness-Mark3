@@ -109,6 +109,31 @@ sends something nobody meant to send (a simulation to the wrong people, a wrong 
 - **Objectives.** RPO 24 hours (nightly dumps). RTO: the restore time measured in the first drill,
   `<to be measured>`, plus the time to start a new host.
 
+## Data retention and residency
+
+The job worker runs a clean-up once a day (`cleanup()` in `portal/src/server/jobs.ts`, at most 30 s
+per run; whatever is left is picked up by the next tick).
+
+- **Fixed platform retention.** Sign-in attempts after 2 days; rate-limit windows once they end;
+  sessions once they expire; sign-in links one day after they expire; watermark codes of ended
+  sessions after 90 days; sent, logged or failed mail and delivered or failed integration deliveries
+  after 90 days; read notifications after 400 days; cached AI Sel answers after 12 months; demo
+  requests from the public site after 24 months.
+- **Per-organisation retention.** Settings → Protection → Data retention, two values in months
+  (0 to 120, 0 = keep forever, the default). *Audit log* deletes that organisation's audit entries
+  older than the value. *Answers and closed risks* deletes its lesson answers and the behaviour risks
+  closed longer ago than the value; open risks stay. Every change is in the audit log as
+  `settings.retention`. Deleting answers lowers the figures of the module-quality report and the
+  inputs of the next risk recomputation for that period.
+- **Never deleted by the job.** Lesson progress, XP events, attestations and certificates: they are
+  the organisation's compliance evidence and feed XP and league totals.
+- **Backups.** Deleted rows stay in the nightly dumps until those age out (`BACKUP_KEEP_DAYS`, 14,
+  plus the off-host copy's own retention). Say so when a customer asks how long deleted data lasts.
+- **Residency.** Where the data lives is a hosting decision, not a setting: the hosted portal keeps
+  every organisation in one database in the region the platform is hosted in
+  (`<hosting region, open question for the owner>`); a customer that needs its data in its own
+  country or data centre runs the same compose stack (`portal/docker-compose.yml`) on its own server.
+
 ## Checking TRUST_PROXY
 
 The sign-in lockout, the rate limits and the audit log use the client address. Behind reverse proxies

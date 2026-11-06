@@ -132,7 +132,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
       body = <LearningTab learning={s.learning} />;
       break;
     case "protection":
-      body = <ProtectionTab protection={s.protection} />;
+      body = <ProtectionTab protection={s.protection} retention={s.retention} />;
       break;
     case "integrations": {
       const rows = await db()
