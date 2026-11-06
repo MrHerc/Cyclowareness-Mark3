@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { departmentClosure } from "../services/assignments";
-import { getDepartments, listPeople, scopeDepartmentIds } from "./admin";
+import { getDepartments, listPeople, narrowToDepartment, scopeDepartmentIds } from "./admin";
 import { pick } from "../../i18n/config";
 import { dayPlus, requestNow, todayIn, zonedTime } from "../../lib/time";
 
@@ -42,8 +42,7 @@ export async function riskStory(v: Viewer, locale: string, departmentId?: string
   const now = requestNow();
   let dept = await scopeDepartmentIds(v);
   if (departmentId) {
-    const closure = departmentClosure(await getDepartments(tid));
-    dept = closure.has(departmentId) && (!dept || dept.has(departmentId)) ? closure.get(departmentId)! : new Set<string>();
+    dept = narrowToDepartment(dept, departmentClosure(await getDepartments(tid)), departmentId);
   }
   const people = (await listPeople(v, { departmentIds: dept })).filter((p) => p.status === "active");
   const ids = people.map((p) => p.id);

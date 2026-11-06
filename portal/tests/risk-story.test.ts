@@ -117,6 +117,12 @@ describe("riskStory", () => {
     // The compliance pack carries the same sentences as its own section.
     const section = await buildRiskStory(as(o.tenant.id, o.admin), {}, "en");
     expect(section).toEqual({ title: "Risk story", headers: ["Finding"], rows: sentences.map((x) => [x]) });
+
+    // A filter outside the viewer's scope, or another organisation's department, matches nobody.
+    const head = await addUser(db, o.tenant.id, { departmentId: o.it_.id, role: "department_head", riskScore: 0 });
+    expect(await riskStory(as(o.tenant.id, head), "en", o.finance.id)).toEqual({ empty: true, days: 0 });
+    const foreign = await addDepartment(db, (await addTenant(db)).id, "Elsewhere");
+    expect(await riskStory(as(o.tenant.id, o.admin), "en", foreign.id)).toEqual({ empty: true, days: 0 });
   });
 });
 

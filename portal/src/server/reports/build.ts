@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { departmentClosure, resolveAssignments } from "../services/assignments";
-import { scopeDepartmentIds } from "../queries/admin";
+import { narrowToDepartment, scopeDepartmentIds } from "../queries/admin";
 import { riskStory, storySentences } from "../queries/risk-story";
 import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { riskBand } from "../../lib/domain/risk";
@@ -45,12 +45,7 @@ export async function scopedPeople(v: Viewer, f: ReportFilters) {
   const scope = await scopeDepartmentIds(v);
   const departments = await db().select().from(t.departments).where(eq(t.departments.tenantId, v.tenant.id));
   const closure = departmentClosure(departments);
-  let dept: Set<string> | null = scope;
-  if (f.departmentId) {
-    // A department filter that no longer exists (deleted or merged) or lies outside the viewer's scope
-    // matches nobody; it must never widen the report to the whole organisation.
-    dept = closure.has(f.departmentId) && (!scope || scope.has(f.departmentId)) ? closure.get(f.departmentId)! : new Set<string>();
-  }
+  const dept = f.departmentId ? narrowToDepartment(scope, closure, f.departmentId) : scope;
   const users = await db()
     .select()
     .from(t.users)

@@ -109,7 +109,7 @@ export default async function LeadershipPage() {
             <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {storyTiles.map((x) => (
                 <div key={x.label} className="grid content-start gap-1 rounded-lg bg-sunken p-3">
-                  <dt className="text-tab text-ink-muted">{x.label}</dt>
+                  <dt className="text-tab text-ink-muted break-words hyphens-auto">{x.label}</dt>
                   <dd className="text-title-sm font-bold tabular-nums">
                     <bdi>{x.value}</bdi>
                   </dd>

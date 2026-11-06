@@ -30,6 +30,14 @@ export async function scopeDepartmentIds(v: Viewer): Promise<Set<string> | null>
   return ids;
 }
 
+/**
+ * The departments a department filter covers inside the viewer's scope. A filter that no longer exists
+ * (deleted or merged) or lies outside the scope matches nobody; it must never widen to the whole organisation.
+ */
+export function narrowToDepartment(scope: Set<string> | null, closure: Map<string, Set<string>>, departmentId: string): Set<string> {
+  return closure.has(departmentId) && (!scope || scope.has(departmentId)) ? closure.get(departmentId)! : new Set<string>();
+}
+
 export type PersonRow = {
   id: string;
   name: string;
