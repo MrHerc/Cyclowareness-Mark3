@@ -102,6 +102,6 @@ export async function simulationClickAction(token: string, via: "link" | "qr"): 
 
 /** Fake sign-in on the simulation page: only the fact is recorded, never what was typed. */
 export async function simulationSubmitAction(token: string): Promise<void> {
-  if (!/^[a-z2-7]{10,40}$/.test(token)) return;
+  if (!/^[a-z2-7]{10,40}$/.test(token) || (await isLikelyScanner())) return;
   await recordSubmit(db(), token);
 }

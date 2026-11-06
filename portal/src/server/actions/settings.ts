@@ -362,7 +362,8 @@ export async function saveEmailAction(input: z.infer<typeof emailSchema>): Promi
           fromAddress: d.fromAddress || undefined,
           replyTo: d.replyTo || undefined,
           helpdesk: d.helpdesk || undefined,
-          simulationFromAddress: d.simulationFromAddress || undefined,
+          // Decided again on the locked row: a proof of another domain may have landed since the check above.
+          simulationFromAddress: d.simulationFromAddress && addressDomain(d.simulationFromAddress) === s.email.simulationDomain ? d.simulationFromAddress : undefined,
           simulationDomain: s.email.simulationDomain,
           // Sending stays off after server changes until a new test succeeds.
           testedAt: changedServer ? undefined : s.email.testedAt,

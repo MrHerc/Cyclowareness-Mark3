@@ -27,7 +27,7 @@ vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src
 const { recordClick, recordOpen, recordSubmit } = await import("../src/server/services/campaigns");
 const { attestModule, completeLesson, issueCertificate, randomToken } = await import("../src/server/services/progress");
 const { trackingView } = await import("../src/server/tracking");
-const { simulationClickAction } = await import("../src/server/actions/campaigns");
+const { simulationClickAction, simulationSubmitAction } = await import("../src/server/actions/campaigns");
 const { emitEvent } = await import("../src/server/services/events");
 
 let tenantId = "";
@@ -141,6 +141,28 @@ describe("click beacon", () => {
     await simulationClickAction(token, "qr");
     expect((await recipientRow(r.id)).clickedAt).not.toBeNull();
     expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(db, tenantId, "qr.scanned", expect.objectContaining({ userId }));
+  });
+
+  it("never shows the fake sign-in to a known scanner, and records nothing", async () => {
+    const { recipient: r, token } = await recipient("running");
+    request.ua = "Mozilla/5.0 (Windows NT 10.0) Proofpoint URL Defense";
+    expect((await trackingView(token))?.harvest).toBe(false);
+    expect((await recipientRow(r.id)).clickedAt).toBeNull();
+  });
+
+  it("counts a submitted fake sign-in only after a click, never from a scanner", async () => {
+    const { recipient: r, token } = await recipient("running");
+    // No click yet (the beacon failed or was refused): the form's submit is not a risk.
+    await simulationSubmitAction(token);
+    expect((await recipientRow(r.id)).submittedAt).toBeNull();
+    await simulationClickAction(token, "link");
+    request.ua = "Mozilla/5.0 (Windows NT 10.0) Proofpoint URL Defense";
+    await simulationSubmitAction(token);
+    expect((await recipientRow(r.id)).submittedAt).toBeNull();
+    request.ua = BROWSER;
+    await simulationSubmitAction(token);
+    expect((await recipientRow(r.id)).submittedAt).not.toBeNull();
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(db, tenantId, "simulation.risky", expect.objectContaining({ userId, stage: "submitted" }));
   });
 });
 

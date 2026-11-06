@@ -22,13 +22,15 @@ export async function trackingView(token: string) {
   if (!/^[a-z2-7]{10,40}$/.test(token)) return null;
   const data = await peek(token);
   if (!data) return null;
+  const scanner = await isLikelyScanner();
   const [tenant] = await db().select({ name: t.tenants.name }).from(t.tenants).where(eq(t.tenants.id, data.tenantId));
   return {
     org: tenant?.name ?? "",
     flags: data.template.redFlags.map((f) => templateText(f, data.locale)),
     moduleSlug: data.template.moduleSlug,
-    // A cancelled campaign records nothing, so it goes straight to the teachable moment.
-    harvest: data.template.harvest && !data.cancelled,
+    // A cancelled campaign records nothing, so it goes straight to the teachable moment; a known
+    // scanner never sees the brand-named sign-in form (a gateway would classify the portal as phishing).
+    harvest: data.template.harvest && !data.cancelled && !scanner,
     submitted: data.submitted,
     brandName: templateText(data.template.sender.name, data.locale),
     // The recipient's profile language (that of the flags and sender above): /t and /q show the teachable moment in it.

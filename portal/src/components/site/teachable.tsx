@@ -39,7 +39,9 @@ export function TeachableMoment({
   const [pending, start] = useTransition();
   useEffect(() => {
     // The fake sign-in waits for the beacon either way: a failed request must not hide the lesson.
-    simulationClickAction(token, qr ? "qr" : "link").finally(() => setStage((s) => (s === "beacon" ? "login" : s)));
+    simulationClickAction(token, qr ? "qr" : "link")
+      .catch(() => undefined)
+      .finally(() => setStage((s) => (s === "beacon" ? "login" : s)));
   }, [token, qr]);
 
   if (stage === "beacon") return <div aria-busy="true" className="min-h-dvh bg-[#f3f2f1]" />;

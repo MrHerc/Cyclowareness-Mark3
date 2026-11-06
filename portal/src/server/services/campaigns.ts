@@ -176,14 +176,17 @@ export async function recordClick(db: DB, token: string, via: "link" | "qr") {
   return { recipientId: row.r.id, tenantId: row.c.tenantId, template: tpl, locale: row.user.locale, campaignName: row.c.name, submitted: !!row.r.submittedAt, cancelled };
 }
 
-/** The recipient typed into the fake login form. Only the fact is stored, never the input; nothing once the campaign is cancelled. */
+/**
+ * The recipient typed into the fake login form. Only the fact is stored, never the input; nothing once
+ * the campaign is cancelled, and nothing without a recorded click (the form is only shown after the beacon).
+ */
 export async function recordSubmit(db: DB, token: string) {
   const [row] = await db
     .select({ r: t.campaignRecipients, c: t.campaigns })
     .from(t.campaignRecipients)
     .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
     .where(eq(t.campaignRecipients.token, token));
-  if (!row || row.r.submittedAt || row.c.status === "cancelled") return;
+  if (!row || row.r.submittedAt || !row.r.clickedAt || row.c.status === "cancelled") return;
   // Claimed once, as the click is: a form sent twice raises the risk and emits the event once.
   const [claimed] = await db
     .update(t.campaignRecipients)
