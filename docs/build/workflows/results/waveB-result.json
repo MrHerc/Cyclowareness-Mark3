@@ -1,0 +1,1036 @@
+{
+ "phase": "2B",
+ "packages": [
+  {
+   "wp": "B1-takeover",
+   "impl": {
+    "wp": "B1-takeover",
+    "branch": "worktree-wf_42496c94-3d0-1",
+    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-1",
+    "commits": [
+     "7d76156 Step-up password, notices and a consented support window for account-takeover tooling (S-06)"
+    ],
+    "summary": "Worktree was cut from 683f272 (lacked 1a45970): reset --hard to 1a45970 first, as instructed.\n\nSERVER\n- portal/src/server/auth/password.ts: new exported verifyUserPassword(userId, password) (DB lookup + verifyPassword; an account without a hash never matches).\n- portal/src/server/actions/profile.ts: module-private checkPassword keeps its pw-confirm rate limit and now calls verifyUserPassword; startTotp/confirm/disable/regenerate/changePasswordAction unchanged otherwise.\n- portal/src/server/auth/step-up.ts (new): stepUp(viewer, password, action) → \"rateLimited\" | \"wrongPassword\" | null. Per-ACTOR limit `step-up:${v.user.id}` 10 per 15 min (checked before the hash so a limited actor is refused even with the right password), every refusal audited as security.step_up_failed with meta { action, error }.\n- portal/src/server/actions/people.ts: resetTwoFactorAction(userId, password) steps up first thing after actionViewer; createLinkAction(userId, kind, password?) steps up for kind \"reset\" only (invite links unchanged); changeRoleAction(userId, role, password?) returns { ok: true } without a password when the role is unchanged, steps up otherwise. NOTE: the brief named \"the role change in updatePersonAction\"; in this codebase updatePersonAction has no role field, the role change lives in changeRoleAction, so the step-up went there. All existing audit() entries and the super_admin reach rules are kept. The old hand-written in-app notification in resetTwoFactorAction is replaced by notifyTakeover (keys admin.person.twoFactorResetTitle/Body removed from the ten locales as now unused).\n- portal/src/server/services/notify.ts: notifyTakeover(db, tenantId, actor, target, kind, reason?) → notifyUsers to the target (in-app notice with href /profile + email, statuses active/invited) with the new FIXED_MESSAGES kind, and, when the target is a tenant_admin, an in-app \"security\" notice (href /admin/users/<id>, text admin.person.<kind>Peer with {actor} and {name}, in each peer's language via createTranslator/messagesFor) to every other active tenant_admin except the target and the actor. Role change passes the localized new role name as {{reason}}; a promotion to tenant_admin also notifies peers.\n- portal/src/lib/tenant-defaults.ts: FIXED_MESSAGES gains twoFactorReset, resetLinkIssued, roleChanged in ten locales (placeholders {{name}}, {{organisation}}, {{link}}, {{reason}} for roleChanged; in-code-locales test passes); defaultSettings adds security: { supportAccessUntil: null }; withDefaults merges security over the default.\n- portal/src/server/db/schema.ts: TenantSettings.security: { supportAccessUntil: string | null } (jsonb, type-only; no migration).\n- portal/src/server/services/audit.ts: new actions security.step_up_failed, support.access_granted, support.access_revoked (labels admin.auditActions.* in ten locales; server-helpers label test passes).\n- portal/src/server/actions/settings.ts: grantSupportAccessAction() (now + 72 h, audited support.access_granted with meta.until) and revokeSupportAccessAction() (null, audited support.access_revoked), via the existing row-locked saveSettings.\n- portal/src/server/actions/platform.ts: adminLinkAction(tenantId, userId, password) steps up first, then reads the target tenant's settings and refuses with error \"supportAccess\" unless now < supportAccessUntil; the existing platform.admin_link audit stays; the administrator gets the resetLinkIssued notice and the organisation's other administrators the peer notice.\n\nUI\n- portal/src/components/admin/person-actions.tsx: exported ConfirmPasswordField (label admin.person.confirmPassword, hint, type=password, autocomplete current-password, aria-invalid/aria-describedby on the Field's -error/-hint ids) and useStepUpError(); the role and 2FA dialogs became forms with the password field; the reset link now opens a confirm dialog (title/body admin.person.resetLinkTitle/Body) with the password field. Invite link unchanged.\n- portal/src/components/admin/people-client.tsx: per-row reset link opens the same dialog (one Dialog under the table, state resetFor); uses admin.person keys.\n- portal/src/components/admin/platform-client.tsx: admin-link dialog body is a form with the password field (footer button submits it via form=); errors wrongPassword/rateLimited on the field, supportAccess as a toast (admin.platform.supportAccessMissing).\n- portal/src/components/admin/settings-tabs.tsx + src/app/(admin)/admin/settings/page.tsx: new \"security\" tab (LifeBuoy icon, settings.tabs.security) with SecurityTab: state pill (allowed until <date, formatted on the server> / not allowed), \"Allow Safarov Industries support access for 72 hours\" and \"Revoke\" buttons.\n- portal/src/app/(admin)/super/page.tsx: per-organisation pill \"Support access allowed until {date}\" / \"Support access not allowed\" (requestNow() for the comparison, server-formatted date).\n- Messages: admin.json (person, platform, auditActions) and settings.json (tabs.security, security.*) in az en ru tr ro ka uk de fr ar; i18n parity test passes; wording follows the existing translations of the same terms (parol / iki addımlı doğrulama, etc.).\n\nTESTS\n- portal/tests/step-up.test.ts (new, real PGlite): wrong password refused + audited and target untouched; right password resets 2FA, notifies the target (in-app + mail subject) and the peer admin (not the actor); learner target → no peer notice; 11th attempt after 10 failures → rateLimited even with the right password; invite link needs no password, reset link does, target notified; same-role change needs no password and no audit, real change refused with wrong password, accepted with the right one, mail names the new role, promotion to tenant_admin notifies peers; operator link refused with wrong password and without a grant (no link issued, step-up failure audited in the operator's tenant); grant sets now+72h and audits, operator link then works and notifies; revoke audits and refuses again; an expired grant refuses.\n- tests/people-operator.test.ts, tests/auth-security.test.ts, tests/auth.test.ts updated for the new signatures / mock / default key.\n\nADR (for the orchestrator to record): \"Account-takeover tooling (2FA reset, password reset link, role change, operator support link) requires the actor to re-enter their own password, rate limited per actor (10 per 15 minutes) with every refusal audited; the target always receives an in-app notice and an email, and when the target is an administrator every other administrator receives the in-app notice; the operator's reset link became a consented support grant that a tenant administrator opens for 72 hours from Settings → Security and can revoke, both audited and visible in /super. A second-approver (four-eyes) queue was deliberately not built: step-up + notices + audit give the target and their peers the means to detect and reverse a hostile action within minutes, while a mandatory approver is a separation-of-duties policy choice that depends on each customer's governance (who may approve, what happens with a single administrator, SLA for break-glass) and would add a pending-actions workflow, so it stays an owner decision; the stepUp helper and notifyTakeover are the extension points if it is wanted later.\"\n\nPROGRESS line: \"S-06 closed (B1-takeover): step-up password + per-actor rate limit on 2FA reset / reset link / role change / operator link, target and peer-admin notices, tenant-granted 72-hour support window (Settings → Security, /super), audit entries security.step_up_failed, support.access_granted/revoked; tests in tests/step-up.test.ts.\"\n\nChecks: npm run typecheck ✓, eslint src tests scripts --max-warnings=0 ✓, vitest: touched files ✓ and the full suite 111 files / 3005 tests ✓ (after fixing the defaultSettings shape assertion in tests/auth.test.ts). Nothing under portal/drizzle changed.",
+    "tests_added": [
+     "portal/tests/step-up.test.ts",
+     "portal/tests/people-operator.test.ts (password + notifyTakeover mock)",
+     "portal/tests/auth-security.test.ts (verifyUserPassword in the password mock)",
+     "portal/tests/auth.test.ts (security group in defaultSettings)"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    },
+    "left_open": "Owner decisions / notes: (1) The brief's \"role change in updatePersonAction\" does not exist here; the step-up was applied to changeRoleAction (the only role-changing action) and the same-role call short-circuits without a password. (2) Peer notices exclude the acting administrator as well as the target (the actor knows what they did); say if the actor should be included. (3) Second-approver queue intentionally not built, see ADR paragraph in summary. (4) The grant is a single 72-hour window per organisation (granting again simply moves the end to now+72h); no per-administrator scoping. (5) Reset-link emails go to the target even when the organisation's own SMTP is off (platform transport / logged outbox), which matches other fixed notices. (6) Audit page: new actions appear in the filter automatically. No new dependency, no migration. Not checked in the running app (no dev server started per the rules); UI verified by typecheck/lint only.",
+    "migrations": [
+     "None: TenantSettings.security.supportAccessUntil is a type-only change inside the existing tenants.settings jsonb column (withDefaults supplies { supportAccessUntil: null }); nothing under portal/drizzle changed."
+    ]
+   },
+   "reviews": [
+    {
+     "verdict": "changes_required",
+     "findings": [
+      {
+       "severity": "blocker",
+       "file": "portal/src/server/actions/people.ts",
+       "line": 199,
+       "problem": "The step-up is bypassed through the invite kind. createLinkAction only steps up for kind 'reset'; for kind 'invite' it never checks the target's status, and target() (people.ts:43-48) only excludes deleted people, so an administrator with people.write can call the server action directly with createLinkAction(<active admin id>, 'invite') and no password. issueAccountLink (auth/links.ts) has no status check and mints a 14-day invite token for any user; the account page (app/(auth)/account/[kind]/[token]/page.tsx) and setPassword (actions/auth.ts:468-495) accept an invite token for an active account and overwrite its passwordHash (status handling at auth.ts:487 only differs for invited users), then invalidate the victim's sessions. Attack: hostile admin A opens DevTools, calls createLinkAction(B.id, 'invite'), opens the returned /account/invite/<token> link, sets a new password and signs in as B (immediately when B has no 2FA; otherwise B is at least locked out of their own password). No step-up, no 'security.step_up_failed' trail, no notifyTakeover (invite links send nothing), audit shows only the innocuous 'person.invite_link'. The UI only offers the invite button for status 'invited', but the server is the trust boundary. This is exactly S-06's threat and the brief's exemption ('invite links for never-activated accounts stay as they are') only holds if the server restricts invites to never-activated accounts.",
+       "fix": "In createLinkAction, after target(): `if (kind === \"invite\" && u.status !== \"invited\") return { ok: false };` (equivalently route an invite for an activated account through the reset path with the step-up). For defence in depth, make setPassword in actions/auth.ts refuse an invite token whose user is no longer 'invited' (`if (kind === \"invite\" && row.user.status !== \"invited\") return { error: \"expired\" }`) so any stray invite token stops being a password reset once the account is live. Add a test in tests/step-up.test.ts: createLinkAction(learner.id, 'invite') without a password returns { ok: false } and issueAccountLink is not called; bootstrap.ts:110 and emailInvite only target invited accounts, so nothing else breaks."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/server/services/notify.ts",
+       "line": 135,
+       "problem": "The target notice is sent only to statuses active/invited, so a suspended person gets neither the in-app notice nor the email. Attack: hostile admin suspends the target (audited, but the suspended person is signed out and sees nothing), mints a reset link with their own password (step-up still required), sets the password, reactivates the account and signs in; the target never receives the 'a reset link was created' email that this package exists to deliver. Peer admins are still notified for a tenant_admin target, which limits the damage, and the sequence is fully audited, so this is minor.",
+       "fix": "Pass statuses ['active', 'invited', 'suspended'] for the takeover kinds in notifyTakeover (notifyUsers' statuses type needs 'suspended' added), or refuse resetTwoFactorAction/createLinkAction('reset') for suspended targets; one assertion in tests/step-up.test.ts that a suspended target still gets the email."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/auth/step-up.ts",
+       "line": 17,
+       "problem": "The per-actor counter is incremented on every call, including successful step-ups, so an administrator who performs 10 legitimate takeover actions in 15 minutes (e.g. role changes during an onboarding) is locked out with 'rateLimited' although they never typed a wrong password. The brief said '10 per 15 minutes' without specifying failures-only, so this is acceptable; just making sure it is a deliberate choice (it also throttles a hijacked session, which is a mild benefit).",
+       "fix": "Either leave as is and record it in the ADR text (\"10 attempts, successful ones included\"), or count only failures by calling rateLimit after verifyUserPassword fails plus a separate read-only check before."
+      }
+     ],
+     "notes": "Reviewed commit 7d76156 on worktree-wf_42496c94-3d0-1 read-only (git show + surrounding code). Verified in the implementer's worktree: `npm run typecheck` passes, `npx eslint src tests scripts --max-warnings=0` passes, `npx vitest run tests/step-up.test.ts tests/people-operator.test.ts tests/auth.test.ts tests/auth-security.test.ts tests/i18n.test.ts` passes (5 files, 289 tests). Nothing under portal/drizzle is in the commit.\n\nWhat holds up under the attacker lens: stepUp consumes the limit before the hash check (a limited actor is refused even with the right password) and the limiter is an atomic upsert, so two concurrent requests cannot both pass as the 11th; every refusal is audited with the attempted action; verifyUserPassword returns false for accounts without a hash; resetTwoFactorAction steps up before the target lookup; changeRoleAction short-circuits only when the role is unchanged and keeps the self-change and tenant_admin reach rules; adminLinkAction cannot be pointed at the operator's own tenant for self-grant (settings.write is per tenant, no tenant switching in viewer.ts), reads the target tenant's settings through withDefaults so a missing `security` key refuses, and the operator's step-up failure lands in the operator's tenant audit; grant/revoke go through the row-locked saveSettings and every other settings action spreads the stored object so the grant is not silently dropped; notification text is interpolated as ICU values (no injection through names) and the email link is built from appUrl(); updatePersonAction cannot change the email, and phone sign-in is refused for console roles, so there is no password-less takeover of administrators through profile edits. The UI dialogs are real forms with a labelled password input (autocomplete=current-password, aria-invalid/aria-describedby) and the ten locales have key parity (i18n test).\n\nBlocker: the invite-kind bypass in createLinkAction (details and smallest fix in the finding). The rest is minor/nit. Not checked: the running app (no dev server, per the rules) and the full suite (the orchestrator runs it after the merge)."
+    },
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "portal/src/server/auth/step-up.ts",
+       "line": 396,
+       "problem": "rateLimit() runs on every step-up, successful ones included, so the budget of 10 per 15 minutes covers all takeover actions, not just failed guesses. An administrator who changes roles for 11 people in a row (or resets 2FA during an incident) gets 'rateLimited' with the correct password. The brief asked for '10 per 15 minutes' without saying whether successes count. The profile pw-confirm limiter behaves the same way.",
+       "fix": "Leave it as it is and note it in left_open, or charge the bucket only on failure: refuse when the actor already has 10 failures in the window, verify the password, and call rateLimit only when the check fails. That needs a read-only peek, which rate-limit.ts does not offer yet. Owner call."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/server/auth/step-up.ts",
+       "line": 398,
+       "problem": "The security.step_up_failed audit row records only meta { action, error }. It has no targetType or targetId, so an investigator cannot tell whose account a run of failed 2FA-reset or reset-link attempts was aimed at. Every caller knows the target id but does not pass it to stepUp.",
+       "fix": "Add an optional targetId parameter to stepUp(v, password, action, targetId?) and write targetType: 'user', targetId into the audit call. Pass userId from resetTwoFactorAction, createLinkAction, changeRoleAction and adminLinkAction, and assert it in tests/step-up.test.ts."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/messages/en/settings.json",
+       "problem": "settings.security.body says support can create a 'one-time sign-in link'. What adminLinkAction actually issues is a password reset link (issueAccountLink(u.id, 'reset')), which lets support set the administrator's password. The administrator granting consent should see that exact effect. The same wording appears in all ten locales.",
+       "fix": "Say 'one-time password reset link' (and the equivalent in the other nine locales), matching the resetLinkIssued email."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/tests/step-up.test.ts",
+       "line": 112,
+       "problem": "rateLimit uses fixed windows aligned to the epoch. If the 10 failures and the 11th call fall on either side of a 15-minute boundary, the 11th call succeeds and the test fails. The chance is very low (about the test's duration divided by 15 minutes).",
+       "fix": "Optional: freeze time with vi.useFakeTimers / vi.setSystemTime around the lockout test."
+      }
+     ],
+     "notes": "I would approve this. Every acceptance item holds when checked against the code, and none of the four findings is a blocker or major.\n\nChecks I ran: the worktree contains 1a45970; typecheck and eslint (--max-warnings=0) are clean; vitest passes on step-up, people-operator, auth-security, auth, i18n, in-code-locales, rtl-logical and server-helpers (761 tests). Nothing under portal/drizzle changed, and no \"Aİ\" appears in the diff.\n\nPer acceptance item:\n- **Step-up:** 2FA reset, the reset link (invite links stay without a password), the role change and the operator link each call stepUp. stepUp is per actor (`step-up:${userId}`), refuses before checking the hash once the limit is hit, returns 'wrongPassword' or 'rateLimited', and audits every refusal as security.step_up_failed.\n- **Role change in changeRoleAction:** the brief named updatePersonAction, but that action has no role field. changeRoleAction is the only path that changes a role (grep found no import upsert and no SCIM role path), so putting the step-up there is right. A call that keeps the same role returns early without a password or an audit row.\n- **Notices:** notifyTakeover sends the target an in-app notice and an email through the new FIXED_MESSAGES kinds (ten locales, placeholders filled by notifyUsers). The peer query is active tenant_admins minus the target and the actor. A demotion passes the old role and a promotion the new one, so peers hear of both.\n- **Support window:** adminLinkAction reads the target tenant's settings.security.supportAccessUntil and refuses with 'supportAccess' unless the window is still open. Grant and revoke go through the row-locked saveSettings, are audited and refresh the page.\n- **Who can grant:** the viewer's tenant comes from the session, so the operator cannot grant consent on a customer's behalf.\n- **Visibility:** the grant state is formatted on the server in both the Settings → Security tab and /super, so there is no hydration risk.\n- **Dialogs:** they are now forms. The password field has a label, a hint, autocomplete current-password, and aria-invalid / aria-describedby pointing at the Field's own -error / -hint ids. The platform dialog's footer button submits the form via form=.\n- **Removed keys:** twoFactorResetTitle/Body are no longer referenced anywhere.\n- **Message files:** key parity holds and no message file has a duplicate top-level \"security\" key.\n\nNot checked: I did not use the UI in a running app, because starting servers is not allowed here. The email-disabled tenant path (queueEmail goes to the logged outbox) is as the implementer described; I did not test it.\n\nOwner decisions still open:\n- whether to require a second approver (the ADR paragraph records why it was not built);\n- whether the actor should also get the peer notice;\n- whether successful step-ups should count against the rate limit (first finding)."
+    }
+   ],
+   "fix": {
+    "fixed": [
+     "[blocker] portal/src/server/actions/people.ts createLinkAction: after target(), `if (kind === \"invite\" && u.status !== \"invited\") return { ok: false };` so an invite link (no step-up) can no longer be minted for an activated account. Defence in depth in portal/src/server/actions/auth.ts setPassword: an invite token whose user is no longer 'invited' returns { error: \"expired\" }. Tests: tests/step-up.test.ts (createLinkAction(learner.id, 'invite') -> { ok: false }, issueAccountLink not called, no person.invite_link audit row) and tests/auth-security.test.ts (invite token for a live account refused, for an invited account accepted and activates).",
+     "[minor] portal/src/server/services/notify.ts: notifyUsers statuses type gains 'suspended'; notifyTakeover passes ['active','invited','suspended'] so a suspended target still gets the in-app notice and the email. Test in tests/step-up.test.ts (suspended target receives notice and reset-link email).",
+     "[minor] portal/src/server/auth/step-up.ts: stepUp(v, password, action, targetId?) writes targetType 'user' + targetId into the security.step_up_failed audit row; resetTwoFactorAction, createLinkAction, changeRoleAction (people.ts) and adminLinkAction (platform.ts) pass the target id. Asserted in tests/step-up.test.ts."
+    ],
+    "rejected": [
+     "[minor] step-up.ts rate limit counts successful step-ups too (10 per 15 minutes per actor, successes included): left as is. Charging the bucket only on failure needs a read-only peek that rate-limit.ts does not offer, and the brief said '10 per 15 minutes' without excluding successes; the profile password-confirm limiter behaves the same way. Owner call — left_open: decide whether successes should count; if not, add a peek to rate-limit.ts and call rateLimit only on a failed check (same change for the profile limiter)."
+    ],
+    "commits": [
+     "d1c6750 S-06 review fixes: invite links only for never-activated accounts, suspended targets notified, step-up failures name the target (branch worktree-wf_42496c94-3d0-1, on top of 7d76156)"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    }
+   }
+  },
+  {
+   "wp": "B2-secrets",
+   "impl": {
+    "wp": "B2-secrets",
+    "branch": "worktree-wf_42496c94-3d0-2",
+    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-2",
+    "commits": [
+     "aa24f2c Key versioning and rotation for APP_SECRET, stable domain-proof key, one verified domain per organisation"
+    ],
+    "summary": "Worktree was cut from 683f272 (lacked 1a45970), so it was reset with `git reset --hard 1a45970` before any work; node_modules linked by junction.\n\nCODE\n- portal/src/server/env.ts: optional APP_SECRET_PREVIOUS and APP_DOMAIN_PROOF_SECRET (both min 32); env.previousSecret and env.domainProofSecret (= APP_DOMAIN_PROOF_SECRET ?? APP_SECRET ?? dev secret).\n- portal/src/server/crypto.ts: secrets() = [current, previous?] (read from process.env like before, so scripts and tests work without env.ts); kid(secret) = sha256(secret) hex .slice(0,8); encryptSecret writes `v2:<kid>:<iv>:<tag>:<data>`; decryptSecret opens v2 with the key its id names first and then every other key (unknown id falls back), v1 with every key, v1 bytes untouched; new export sealedWithCurrentKey(value) for the rotate script.\n- portal/src/server/auth/totp.ts: hashBackupCode(code, secret = env.secret); new backupCodeHashes(code) = [current, previous-key hash when APP_SECRET_PREVIOUS is set, legacy]. portal/src/server/actions/auth.ts spendBackupCode loops over backupCodeHashes.\n- portal/src/server/auth/domain-proof.ts: domainProofRecords(tenantId) = [record(env.domainProofSecret), record(env.previousSecret)?]; domainProofFound accepts a string or a list. The published value (domainProofRecordAction) derives from env.domainProofSecret; settings.verifyDomainAction, platform.verifyTenantDomainAction and jobs.recheckDomains check domainProofRecords(). Fixture test pins the existing derivation.\n- portal/src/server/db/schema.ts: tenants gets uniqueIndex(\"tenants_domain_verified_idx\").on(domain).where(domain_verified_at is not null). Migration generated locally only (0004_tenant_domain_verified.sql, NOT committed).\n- settings.verifyDomainAction and platform.verifyTenantDomainAction: the transaction's unique violation on tenants_domain_verified_idx (isUniqueViolation) returns error \"domainTaken\" (settings also audits domain.rechecked with meta.taken=true); settings-tabs.tsx and platform-client.tsx toast settings.branding.domainTaken / admin.platform.domainTaken; keys added in all ten locales of messages/*/settings.json and messages/*/admin.json.\n- portal/src/server/services/secret-rotation.ts rotateStoredSecrets(db): for every tenant (row locked) re-seals identity.sso.clientSecretEnc, identity.ldap.passwordEnc, email.passwordEnc, integrations.webhookSecretEnc, and users.totp_secret, skipping values already under the current key id (idempotent) and leaving (and counting) values no key opens. portal/scripts/rotate-secret.ts: `npx tsx scripts/rotate-secret.ts`, refuses NODE_ENV=production without a 32+ APP_SECRET, prints counts only.\n- scripts/seed-data.ts / seed.ts checked: only the demo organisation carries a verified domain, no change needed.\n- Unused env imports removed from jobs.ts and platform.ts (made unused by this change).\n\nDOCS\n- docs/OPERATIONS.md: incident 'Contain' bullet now points at the runbook; new section \"Rotating APP_SECRET\" (generate + escrow, deploy both keys, run the script, remove the old key) plus what is not carried over (signed SSO state, backup codes made before the rotation stop working once APP_SECRET_PREVIOUS is removed, domain proofs unless APP_DOMAIN_PROOF_SECRET is set once to the APP_SECRET in use when the records were published).\n- portal/README.md: env table rows for APP_SECRET_PREVIOUS and APP_DOMAIN_PROOF_SECRET, APP_SECRET row and the \"APP_SECRET is data\" operations note link to the runbook. portal/.env.example documents both variables.\n\nTESTS: portal/tests/crypto.test.ts (new, PGlite): v1 fixture decrypts; v2 kid routing after the key moved to APP_SECRET_PREVIOUS; unknown kid falls back; rotate script re-encrypts 1 tenant + 1 user, leaves current and unreadable values, second run reports zero, values readable after the previous key is removed; backupCodeHashes includes the previous-key hash only during a rotation; domain proof fixture stays, either key's record accepted during rotation; second organisation refused by operator and by its own admin (\"domainTaken\", row unchanged, partial index allows the unverified same domain); every locale has both messages. tests/auth.test.ts updated to the v2 envelope (5 segments, kid); tests/settings-rate-limit.test.ts mock gains domainProofRecords.\n\nADR text (for DECISIONS.md): \"ADR: APP_SECRET rotation with one previous key. Ciphertexts carry the id (sha256 of the secret, first 8 hex) of the key that sealed them (v2); v1 ciphertexts are opened with every configured key. APP_SECRET_PREVIOUS holds the old key during a rotation and scripts/rotate-secret.ts re-encrypts every stored secret with the current key; no KMS. Domain-proof TXT values derive from APP_DOMAIN_PROOF_SECRET (default APP_SECRET), documented as set once and never rotated; during a rotation either key's record is accepted. Signed values are not re-signed. One verified domain per organisation is enforced by the partial unique index tenants_domain_verified_idx; the actions answer domainTaken.\"\nPROGRESS line: \"B2-secrets: S-07 closed (key ids, APP_SECRET_PREVIOUS, rotate script, runbook), S-11 (b) closed (tenants_domain_verified_idx, domainTaken in ten locales).\"",
+    "tests_added": [
+     "portal/tests/crypto.test.ts",
+     "portal/tests/auth.test.ts (v2 envelope expectations updated)",
+     "portal/tests/settings-rate-limit.test.ts (mock gains domainProofRecords)"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    },
+    "left_open": "Open questions for the owner: (1) Backup codes cannot be re-keyed (only their hashes are stored): codes issued before a rotation verify while APP_SECRET_PREVIOUS is set and stop working at step 4 of the runbook; the runbook tells administrators to have people regenerate them first. Accept, or keep the previous key longer. (2) Before the first rotation on an installation that already has verified domains, APP_DOMAIN_PROOF_SECRET must be set to the APP_SECRET in use when the TXT records were published, or the records must be re-published within the 7-day grace period; the runbook says so, the code cannot enforce it. (3) The partial unique index migration fails on a database where two organisations already share a verified domain; confirm none does in production before the wave migration. (4) scripts/rotate-secret.ts is run with `npx tsx`; the standalone Docker image may not ship tsx, so in compose it is run from a checkout with the server's environment (not verified against the image). Not done: no npm script alias for the rotate script; env.test.ts has no case for the two new variables (they reuse the APP_SECRET min-32 pattern). The orchestrator must generate the wave migration for tenants_domain_verified_idx (local 0004 and journal change left uncommitted in the worktree) and write the ADR/progress lines above.",
+    "migrations": [
+     "tenants: partial unique index tenants_domain_verified_idx on (domain) where domain_verified_at is not null (schema.ts only; local drizzle/0004_tenant_domain_verified.sql generated for tests, not committed)"
+    ]
+   },
+   "reviews": [
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "portal/src/server/services/secret-rotation.ts",
+       "line": 14,
+       "problem": "A rotation done on an installation that already has verified domains, without APP_DOMAIN_PROOF_SECRET set, silently invalidates every customer's published TXT value at step 4: domainProofSecret falls back to the new APP_SECRET, the daily re-check (jobs.ts recheckDomains) fails for 7 days, then domain.removed clears domain_verified_at and SSO routing by email domain stops for that organisation. The runbook names it in step 1, but the script can detect the condition and does not.",
+       "fix": "In scripts/rotate-secret.ts (or rotationRefusal with a count passed in), refuse or print a loud warning when APP_DOMAIN_PROOF_SECRET is unset and `select count(*) from tenants where domain_verified_at is not null` is > 0, naming step 1 of the runbook. One test on the in-memory DB."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/Dockerfile",
+       "line": 40,
+       "problem": "The runtime image copies only scripts/migrate.mjs and docker-entrypoint.sh and no tsx, so `npx tsx scripts/rotate-secret.ts` cannot be run inside the deployed container; the runbook says 'from the portal folder, with the server's environment' without saying that a source checkout with dev dependencies (or the compose seed/builder layer) is needed. Same pre-existing gap as scripts/jobs.ts; left open by the implementer.",
+       "fix": "Add one sentence to docs/OPERATIONS.md step 3: run it from a checkout of the deployed version with `npm ci` (or the compose service that runs tsx from the builder layer), exporting DATABASE_URL and both keys; or ship a compiled rotate-secret.mjs next to migrate.mjs in a later package."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/server/db/schema.ts",
+       "line": 140,
+       "problem": "The partial unique index tenants_domain_verified_idx fails to create on any database where two organisations already share a verified domain, which blocks the whole wave migration at deploy (docker-entrypoint runs migrate.mjs before start). The seed only verifies the demo organisation, but production data is unverified; the implementer listed it as open question 3.",
+       "fix": "Owner confirms `select domain, count(*) from tenants where domain_verified_at is not null group by domain having count(*) > 1` is empty before the wave migration; the orchestrator may prefix the generated migration with an UPDATE that nulls domain_verified_at on all but the oldest row per domain if duplicates exist."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/crypto.ts",
+       "line": 26,
+       "problem": "kid(value) is the first 8 hex of sha256(secret) with no domain separation, so every stored ciphertext carries 32 bits of the raw hash of APP_SECRET. Not exploitable (the AES key is sha256('enc:'+secret), GCM tags already allow offline key guessing), but purpose-tagged derivation is the conventional hygiene; changing it later would change the id of every v2 value (the fallback still opens them).",
+       "fix": "Optional: `createHash(\"sha256\").update(`kid:${value}`)`; if changed, do it now before v2 values exist in production."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/tests/env.test.ts",
+       "line": 1,
+       "problem": "No test covers the two new variables (APP_SECRET_PREVIOUS and APP_DOMAIN_PROOF_SECRET: blank treated as unset, 31 characters rejected, domainProofSecret falling back to APP_SECRET).",
+       "fix": "Three assertions in tests/env.test.ts mirroring the APP_SECRET min-32 cases."
+      }
+     ],
+     "notes": "Reviewed worktree wf_42496c94-3d0-2 at d4099f1 (two commits: aa24f2c and a follow-up d4099f1 that adds rotationRefusal, withDefaults in the rotation, a conditional TOTP update and an audit entry on the operator's refused proof). Base contains 1a45970; nothing under portal/drizzle or docs/build is committed (0004 migration and journal change are uncommitted, as required). Ran in the worktree: `npm run typecheck` (pass), `npx eslint src tests scripts --max-warnings=0` (pass), `npx vitest run tests/crypto.test.ts tests/auth.test.ts tests/settings-rate-limit.test.ts tests/auth-security.test.ts` (4 files, 96 tests pass).\n\nAttacker lens, what held: (1) a forged or unknown kid in a v2 ciphertext only widens the key search; the GCM tag rejects every wrong key, and the v1 parse path is byte-identical (pinned by V1_FIXTURE). (2) A leaked previous key gives nothing new during the rotation window: signValue/unsignValue (SSO state) use the current key only, so old-key SSO state cannot be forged; domain-proof values derived from the previous key still require control of the domain's DNS; backup-code hashes under the previous key need database write access to plant. (3) The verified-domain index cannot be bypassed by case, trailing dot or Unicode variants (normaliseHost lower-cases and IDNA-converts before the lookup and the write); two organisations racing on one domain are serialised by the index and the loser gets domainTaken with its row unchanged (tested); an organisation's own re-check and an unverified duplicate are allowed by design; sign-in routing (actions/auth.ts:217), people.ts:88 and jobs.ts:302 all filter on domain_verified_at, so an unverified duplicate row gains nothing. (4) The domainTaken answer in verifyDomainAction is only reachable when the caller's own proof record resolves on that domain (found), so it leaks 'another organisation verified this' only to someone who controls the DNS anyway. (5) The rotate script locks each tenant row, updates users.totp_secret conditionally on the ciphertext it read, skips values already under the current key (idempotent, tested), never destroys an unreadable value, and refuses the development key whenever DATABASE_URL or NODE_ENV=production is set. (6) Every encryptSecret consumer in src (sso.clientSecretEnc, ldap.passwordEnc, email.passwordEnc, integrations.webhookSecretEnc, users.totp_secret) is covered by the rotation; no other encrypted field exists in schema.ts. (7) withDefaults spreads the raw settings, so the write-back drops no unknown keys. (8) Ten locales carry both domainTaken keys, no 'Aİ', no ICU braces; toasts use the namespaces the components already hold (settings.branding, admin.platform).\n\nNothing of severity blocker or major remains; the minor items are operational guards and docs the orchestrator or a follow-up can take. Not checked: a rotation against a real PostgreSQL (tests use PGlite; the pg driver's unique-violation error carries `constraint`, which db/errors.ts handles the same way); the standalone image was not built."
+    },
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "portal/tests/crypto.test.ts",
+       "line": 176,
+       "problem": "The acceptance item says backup codes keep working during a rotation, but the test only checks that backupCodeHashes() lists the previous-key hash. Nothing runs spendBackupCode or verifySecondFactorAction against a stored code that was hashed with APP_SECRET_PREVIOUS, so a regression in the auth.ts loop or in the SQL `totpRecovery - h` update would not be caught.",
+       "fix": "Add one case: give a user totpRecovery [hashBackupCode(code, PREVIOUS)], turn rotation on, and check the second-factor path accepts the code once and removes it. Then turn rotation off and check a second such code is refused."
+      },
+      {
+       "severity": "minor",
+       "file": "docs/OPERATIONS.md",
+       "line": 128,
+       "problem": "Step 3 says to run `npx tsx scripts/rotate-secret.ts` from the portal folder. The runtime image ships neither tsx nor scripts/*.ts (Dockerfile lines 35-44). A compose deployment therefore has no documented way to run the step, even though the compose `seed` service already shows the pattern: builder stage plus `npx tsx`. The implementer raised this as open question 4.",
+       "fix": "Add the compose command to step 3, e.g. `docker compose --profile tools run --rm --entrypoint npx seed tsx scripts/rotate-secret.ts`, with APP_SECRET/APP_SECRET_PREVIOUS/DATABASE_URL passed in. Alternatively, record it for the owner as a follow-up."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/services/secret-rotation.ts",
+       "line": 44,
+       "problem": "If a tenant is deleted after the id list is read and before its row is locked, `row` is undefined and `row.settings` throws, which aborts the whole run. Rerunning recovers, because the run is idempotent.",
+       "fix": "`if (!row) return false;` after the locked select."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/env.ts",
+       "line": 22,
+       "problem": "env.test.ts has no case for APP_SECRET_PREVIOUS or APP_DOMAIN_PROOF_SECRET: the under-32 rejection and the domainProofSecret fallback chain (APP_DOMAIN_PROOF_SECRET, then APP_SECRET, then the dev secret) are untested. The implementer noted this.",
+       "fix": "Add one env.test.ts case covering the short-value rejection and the fallback order."
+      }
+     ],
+     "notes": "I approve this package. No blocker or major findings remain.\n\nWhat I checked:\n- Worktree contents: it contains 1a45970. There are two commits: aa24f2c, plus d4099f1, which adds the rotationRefusal guard, a conditional TOTP reseal and an audit when the operator's domain proof is refused. The local 0004 migration and the journal change are untracked; nothing under portal/drizzle is committed. The generated SQL is a correct partial unique index.\n- Checks I ran myself, all passing:\n  - `npm run typecheck`\n  - `npx eslint src tests scripts --max-warnings=0`\n  - vitest on tests/crypto, auth, settings-rate-limit, password-domain, tenant-settings, jobs-ops, jobs-runner, drill-service, syslog, auth-actions-session, auth-security, secops-flows, sso-routes and rtl-logical (14 files).\n- v1 compatibility: the key derivation sha256(\"enc:\"+secret) is unchanged, and the v1 split and parse behave as before. The fixture decrypts under the current key and also under the previous key. v2 routes by key id, and an unknown key id falls back to every key.\n- Coverage of stored secrets: the only places encryptSecret is called are the four tenants.settings *Enc fields and users.totp_secret, and the rotation covers exactly that set. The rotation is idempotent: values already sealed with the current key are skipped, and unreadable values are counted. Each tenant row is locked, and the TOTP update is conditional.\n- Domain proof: every check site (settings, platform, jobs) uses domainProofRecords. The published record comes from env.domainProofSecret, and the pre-change derivation is pinned by a fixture.\n- Backup codes: the `codes.map(c => hashBackupCode(c))` fix is needed, because a bare `.map(hashBackupCode)` would pass the array index as the secret.\n- Domain uniqueness: both writers catch isUniqueViolation('tenants_domain_verified_idx'), return domainTaken and audit it. The client toasts use the right namespaces (settings.branding and admin.platform). The keys are present in all ten locales, with no ICU braces and no \"Aİ\" in Azerbaijani. Only the demo organisation in the seed has a verified domain.\n- Docs: the runbook and the README/.env.example entries match decisions (f) and (h).\n\nAccepted residual risks (the owner's open questions 1-3): pre-rotation backup codes stop working at step 4; APP_DOMAIN_PROOF_SECRET must be set before the first rotation; and the migration needs no existing duplicate verified domains.\n\nNot checked: the full test suite (the orchestrator runs it), and running scripts/rotate-secret.ts end to end against a real database."
+    }
+   ],
+   "fix": {
+    "fixed": [
+     "Finding 1 (secret-rotation.ts): rotationRefusal now takes a verifiedDomains count and refuses when APP_DOMAIN_PROOF_SECRET is unset while any tenant has domain_verified_at set, naming step 1 of the runbook; new countVerifiedDomains(db) helper; scripts/rotate-secret.ts checks it after opening the database (C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-2/portal/src/server/services/secret-rotation.ts, portal/scripts/rotate-secret.ts). Test on the in-memory DB in portal/tests/crypto.test.ts ('refuses a rotation that would break published domain proofs').",
+     "Findings 2 and 5 (Dockerfile / OPERATIONS.md step 3): the runbook now says the runtime image ships neither tsx nor the TypeScript scripts, to run the script from a checkout of the deployed version (npm ci) with DATABASE_URL, both keys and APP_DOMAIN_PROOF_SECRET exported, and gives the compose command `docker compose --profile tools run --rm seed npx tsx scripts/rotate-secret.ts` (the seed service is built from the builder stage and reads .env); it also documents the new domain-proof refusal. One comment line on the compose seed service points at this use (docs/OPERATIONS.md, portal/docker-compose.yml). No compiled rotate-secret.mjs was shipped.",
+     "Finding 4 (crypto.test.ts backup codes): portal/tests/auth-security.test.ts gets a case that stores two codes hashed with APP_SECRET_PREVIOUS, runs verifySecondFactorAction with rotation on (first code accepted once, second attempt refused), then with rotation off (the other code refused and still stored). The env mock there became a hoisted object so previousSecret can be toggled."
+    ],
+    "rejected": [
+     "Finding 3 (partial unique index tenants_domain_verified_idx failing on existing duplicate verified domains): not a code change for this package; it is an owner/orchestrator step at wave-migration time. Left open for the owner: run `select domain, count(*) from tenants where domain_verified_at is not null group by domain having count(*) > 1` before the wave migration; if rows come back, the orchestrator prefixes the generated migration with an UPDATE that nulls domain_verified_at on all but the oldest row per domain (the seed only verifies the demo organisation, so local and compose seeds are unaffected)."
+    ],
+    "commits": [
+     "e27d347 Rotation script: refuse when verified domains have no domain-proof key of their own; runbook names the compose command; backup codes of the previous key tested through sign-in"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    }
+   }
+  },
+  {
+   "wp": "B3-isolation",
+   "impl": {
+    "wp": "B3-isolation",
+    "branch": "worktree-wf_42496c94-3d0-3",
+    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-3",
+    "commits": [
+     "1681edd Tutor cache per organisation, capped lesson keys, sign-off IPs for audit roles only",
+     "83e2722 Generated cross-organisation and lower-role suite over the whole server surface"
+    ],
+    "summary": "Worktree was cut from 683f272 (lacked 1a45970), so it was reset to 1a45970 first; node_modules junctioned.\n\nFILES\n- portal/scripts/inventory-surface.ts (new): parses src/server/actions/*.ts and src/app/api/**/route.ts, lists every exported function / HTTP method with the guard it reaches (\"actionViewer(<perm>)\", \"actionViewer()\", \"apiViewer(<perm>)\", \"getViewer()\", \"getSession()\", \"public\"); follows one level of same-file delegation (signPolicyAction→signPolicy, drill route answer(), auth wrappers). Exports inventory(); `npx tsx scripts/inventory-surface.ts` rewrites tests/fixtures/surface.json.\n- portal/tests/fixtures/surface.json (new): 150 entries (133 actions, 17 route methods).\n- portal/tests/cross-tenant.test.ts (new): two organisations A and B via tests/helpers/db.ts, each with an administrator and a learner viewer and a row in every tenant-scoped table (department, own module+lessons, assignment, policy+version+signoff, usb campaign+recipient, drill run, threat report, loop, material, incident, intel threat/policy, ticket, feedback, problem, path, live session+registration, report schedule, sandbox analysis, failed outbox mail, watermark code, module progress, notification). Table ROWS keyed by inventory entry: `run` rows call the action/route as A's admin with B's ids/slugs/tokens (and again as A's learner when the guard names a permission), `lower` rows (no foreign input but permission-guarded) call as the learner, `na` rows document why an entry is not tenant-scoped (self-service, public token routes by design, public auth/site). Refusal = undefined / 401-403-404 / FORBIDDEN-UNAUTHENTICATED thrown / ok:false / error / count 0; rows whose action legitimately filters foreign ids (createIncidentAction, createMaterialAction with B's people+department; reports route with ?d=B's department) assert the filtered outcome inline (empty audience, no B email in the CSV). Before/after each row a snapshot of every row of B across all 52 pgTables (by tenant_id, else user_id/module_id/lesson_id/policy_id/version_id/session_id/ticket_id/material_id/campaign_id/loop_id) must be identical. Two meta tests: inventory() must equal surface.json, and ROWS keys must equal the fixture keys. Fixture tenants are enterprise_hrm with the seed-only live_drill override and email enabled so feature gates pass and the tenant predicate is what refuses. Mocks mirror the real actionViewer/allowed semantics (two-step verification not under test).\n- portal/src/server/tutor.ts + src/app/api/tutor/route.ts + schema.ts comment (S-10): tutorCacheId(tenantId, locale, lessonId, sceneId, question, contentLocale, scenes) — tenant id is the first key component; the wave-A lesson-text hash stays; existing 365-day cleanup in jobs.ts:395 unchanged. tests/tutor.test.ts updated; tests/tutor-cache.test.ts (new) mocks @anthropic-ai/sdk with a finishing stream and asserts ai → cache for A, ai again for B, and two tutor_cache rows with distinct ids/tenantIds for one library lesson.\n- portal/src/server/actions/learning.ts (S-11 c): lessonOf() (shared by start, reach and complete) refuses a non-string or >100-char slug/lessonKey before any query; the module-membership query already existed in wave A (lessonOf resolves the key against the module's lessons; recorded as such). Test appended to learning-actions.test.ts: foreign key, 101-char key and 101-char slug write no module/lesson progress; the real key records lastLessonKey.\n- portal/src/app/api/admin/policies/[id]/signoffs/route.ts (S-11 d): `showIp = can(v.user.role, \"audit.read\")`; the IP header and value are emitted only then. tests/signoffs-route.test.ts (new): tenant_admin gets the IP column with 203.0.113.7, content_creator gets the same CSV without the column and without the address.\n\nLEAKS FOUND: none. Every tenant-scoped action and route refused B's ids as A's admin and the lower role, and B's rows never changed (152/152 tests). Notes for the register: assignIncidentTrainingAction, remindPeopleAction, remindPolicyAction, resendFailedMailAction and remindAwaitingAction answer ok with count 0 for foreign ids (nothing happens; treated as \"empty\"); savePathAction with a foreign sourceId silently creates an own path from the submitted texts (no data of B copied; the row probes id and moduleSlugs instead).\n\nRLS EVALUATION (for the ADR): PostgreSQL RLS would need (1) `ALTER TABLE … ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY` and `CREATE POLICY … USING (tenant_id = current_setting('app.tenant_id', true)::uuid) WITH CHECK (same)` on the 34 tables with tenant_id, with `tenant_id IS NULL OR …` on modules, learning_paths and outbox (library/platform rows); (2) the ~12 child tables keyed by user/module/lesson/policy/version/session/ticket/material/campaign/loop (module_progress, lesson_progress, lessons, lesson_contents, ai_cache, policy_versions, policy_signoffs, session_registrations, ticket_messages, material_decisions, campaign_recipients, loop_events) either get an additive tenant_id column (backfilled by migration) or EXISTS-subquery policies, which cost a join per statement; (3) platform-wide tables (tenants, demo_requests, rate_limit_buckets, login_attempts, job_ticks, outbox with null tenant) and the operator console (/super, platform.ts, super/demo-requests) and jobs.ts (cross-tenant ticks, cleanup, reminders) need a bypass role or per-tenant transactions; (4) the application side is the XL part: src/server/db exposes a module-level db() singleton over a pool, and SET LOCAL is per transaction, so every page render, server action, route handler and job tick must open a transaction and run `SET LOCAL app.tenant_id` before its first query — a per-request db bound through AsyncLocalStorage or a wrapper on every requireViewer/actionViewer/apiViewer caller — while the viewer lookup itself (sessions→users→tenants) runs before the tenant is known and must bypass the policy; (5) docker-compose must add a non-owner application role (RLS is ignored by superusers/BYPASSRLS and by the table owner unless FORCE), migrations keep running as the owner, so two connection strings; (6) PGlite in tests is real Postgres and can hold the policies, but tests/helpers/db.ts would have to SET ROLE / set app.tenant_id per statement in every DB-backed test file, and a test that forgets it reads nothing. Risk: RLS silently does nothing when the app connects as the owner without FORCE. Verdict: the generated suite is executable, regenerable evidence that every entry point refuses another organisation's ids and writes nothing of it, and it blocks new unguarded endpoints at CI time; it satisfies due diligence for application-layer isolation. RLS stays a defence-in-depth layer worth its XL cost only where a contract requires database-level isolation; if so, the order is additive tenant_id on child tables, then FORCE RLS with a per-request transaction wrapper.\n\nPROGRESS LINE: B3-isolation: generated cross-organisation/lower-role suite over all 150 actions and route methods (inventory-checked, no leak found); tutor cache per organisation; lesson key/slug capped at 100; sign-off IP column only for audit.read; RLS evaluated and deferred.",
+    "tests_added": [
+     "portal/tests/cross-tenant.test.ts (152 tests: inventory parity, row coverage, 150 surface entries)",
+     "portal/tests/tutor-cache.test.ts",
+     "portal/tests/signoffs-route.test.ts",
+     "portal/tests/learning-actions.test.ts: startLessonAction records only a lesson that belongs to the module, never an oversized key",
+     "portal/tests/tutor.test.ts: tutorCacheId changes with the organisation"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    },
+    "left_open": "Owner questions: (1) S-03: do enterprise/government buyers require database-level RLS contractually, or does the automated cross-organisation suite satisfy due diligence (the RLS path is XL: per-request transactions around the db() singleton, a non-owner role in docker-compose, tenant_id on ~12 child tables)? (2) S-10: accept that every organisation now pays for its own first tutor answer per question on shared library lessons (more Anthropic calls), or moderate answers before caching and share them instead? Existing tutor_cache rows keyed without a tenant are orphaned until the 365-day cleanup removes them (a one-off `delete from tutor_cache` at deploy frees the space sooner). Not done: the full vitest suite (orchestrator runs it after the merge); only the touched/added files were run (186 tests). Risk to know: cross-tenant.test.ts takes ~30 s (152 tests, 52-table snapshot per row) and treats `count: 0` answers as refusals; a future action that answers ok:true with a foreign id but writes nothing of B still passes only if it also reports count 0, otherwise its row must assert inline. Skipped: no new dependencies, no schema change, docs/build files untouched as instructed.",
+    "migrations": []
+   },
+   "reviews": [
+    {
+     "verdict": "changes_required",
+     "findings": [
+      {
+       "severity": "major",
+       "file": "portal/scripts/inventory-surface.ts",
+       "line": 56,
+       "problem": "The inventory only scans src/server/actions/*.ts (ACTIONS, line 16) and src/app/api/**/route.ts, but the repository already has two \"use server\" files elsewhere that are therefore absent from surface.json and from the cross-tenant table: src/app/(focus)/learn/[slug]/[lessonId]/actions.ts exports loadCaptionsAction(lessonId, locale), which takes another organisation's lesson id, and src/server/lab/vm-action.ts exports completeVmLabAction. Both happen to be guarded today (loadCaptionsAction filters through reachableModules; the VM lab is self-service), so no live leak, but the acceptance claim 'covers every tenant-scoped action (inventory-checked)' is false, and the CI gate the package sells (a new action cannot land without a row) is bypassed by any developer who puts a \"use server\" file next to a page, which Next.js encourages. Attack: add src/app/(admin)/x/actions.ts with an unguarded action; inventory() is unchanged, surface.json still matches, suite stays green.",
+       "fix": "Enumerate server-action files by directive, not by folder: walk src/**/*.ts(x) and include every file whose first statement is \"use server\" (readdirSync(SRC, { recursive: true }) + a /^\\s*[\"']use server[\"']/ test on the source), keying entries by the path relative to src (e.g. `app/(focus)/learn/[slug]/[lessonId]/actions.loadCaptionsAction`, `server/lab/vm-action.completeVmLabAction`). Regenerate surface.json and add the two rows: loadCaptionsAction run as A with B's lesson id (`b.mod.lessons[0].id`, locale \"az\") expecting null; completeVmLabAction as `na: SELF`."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/scripts/inventory-surface.ts",
+       "line": 21,
+       "problem": "FUNCTION only recognises `export [async] function NAME`. A handler written as `export const GET = withX(async (req) => …)`, `export { GET as HEAD }` or `export default` is invisible to the inventory, so a route file could ship with zero entries and the fixture test would not notice (none exist today; health/route.ts exports only `dynamic` this way).",
+       "fix": "After collecting a route file's methods, fail loudly when the file exports none of the recognised methods (throw in inventory(), or emit `api/<path>:UNKNOWN` so the fixture/table check fails), and optionally match `^export const (GET|POST|…)\\b` as a second form. Same for an actions file whose `export` count differs from the matched function count."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/tests/cross-tenant.test.ts",
+       "line": 448,
+       "problem": "refused() treats `undefined` as a refusal, so for the void-returning actions (startLessonAction, reachSceneAction) the result assertion is vacuous: a leak that resolves B's module slug for A and writes A's progress rows against B's module id would return undefined and would not change any B-scoped row (module_progress/lesson_progress are snapshotted by B's userIds, not B's moduleId), so the row would pass. Today moduleBySlug refuses, but the test does not prove it.",
+       "fix": "For the two void rows assert inline instead of relying on refused(): after the call, `expect(await db.select().from(t.moduleProgress).where(eq(t.moduleProgress.moduleId, b.mod.id))).toEqual(<before>)` (or snapshot B also by `moduleId` when the table has both userId and moduleId), and return null from the row."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/scripts/inventory-surface.ts",
+       "line": 40,
+       "problem": "GUARD.exec runs over the raw function text including comments and string literals, so a comment such as `// unlike actionViewer(\"people.write\") …` or a guard call placed after unguarded database work is credited as the function's guard; the permission string decides whether the suite also runs the row as the learner.",
+       "fix": "Strip // and /* */ comments from fn.body before matching (one replace), and note in the header comment that the guard is the first call found, not proof that it precedes every query."
+      }
+     ],
+     "notes": "Reviewed read-only in C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-3 (HEAD 83e2722, contains 1a45970). Verified myself in that worktree: `npm run typecheck` exit 0, `npx eslint src tests scripts --max-warnings=0` exit 0, `npx vitest run` on the five touched/added files: 5 files, 186 tests passed (cross-tenant.test.ts included, ~20 s).\n\nAttacker pass on the three code changes, nothing found: (S-10) tutorCacheId puts v.tenant.id first in the sha256 input with `|` separators and the route inserts tenantId from the viewer, so a library-lesson answer can no longer be replayed to another organisation; subtitles cache (not in scope) stays keyed by lesson text only, which is lesson content, not tenant data. (S-11 c) lessonOf rejects non-string or >100-char slug/lessonKey before any query and still resolves the key against the module's own lessons, for start, reach and complete alike; reachSceneAction keeps its index bounds and rate limit. (S-11 d) `can(role, \"audit.read\")` is equivalent to `allowed()` here because audit.read has no PERMISSION_FEATURE entry; content_creator (policies.read) loses the IP header and value, analyst/tenant_admin keep them; tenant predicate on the policy and users unchanged.\n\nThe suite itself: the mocked actionViewer/allowed mirror the real role+feature semantics (two-step gap excluded, as stated); apiViewer from auth/api.ts is real and goes through the mocked viewer; snapshot covers 49 of 53 tables (demo_requests, job_ticks, login_attempts, rate_limit_buckets are platform-wide, correctly skipped) and includes B's tenants row. Rows with legitimately filtered results (createIncidentAction, createMaterialAction, reports ?d=) assert inline. The major finding is about completeness of the gate, not a live leak: both missed actions are guarded today.\n\nMerge note for the orchestrator: cross-tenant.test.ts compares the committed surface.json to the live tree, so any sibling package in this wave that adds or renames an exported server action or route method will fail this test after the merge until surface.json is regenerated (`npx tsx scripts/inventory-surface.ts`) and a ROWS entry is added; that is the intended behaviour, but plan for it in the post-merge run. The implementer's RLS evaluation and owner questions (contractual RLS, per-tenant tutor spend, orphaned tutor_cache rows) are consistent with register S-03/S-10 and need no change.\n\nSkipped: did not run the full vitest suite (orchestrator does), did not re-derive each action's tenant predicate by hand beyond spot checks (drill, usb-kit, stix, subtitles, signoffs, learning), and did not test the ten-locale/RTL rules since no UI string or CSS changed."
+    },
+    {
+     "verdict": "changes_required",
+     "findings": [
+      {
+       "severity": "major",
+       "file": "portal/tests/cross-tenant.test.ts",
+       "line": 478,
+       "problem": "The lower-role pass never actually tests the role gate on `run` rows. When the guard names a permission, the row runs again as A's learner but still with B's ids, and `refused()` accepts any refusal: ok:false, error, 404, count 0. If an actionViewer(\"people.write\") / apiViewer(...) gate were dropped or weakened, the call would still be refused by the tenant predicate on B's ids and the row would pass. That covers about 80 entries. So the acceptance item about a lower role, and the summary's claim that no role leak exists, are not backed by any assertion that could fail for those entries. Only the `lower` rows test the role gate in isolation.",
+       "fix": "In the learner pass of permission-guarded entries, require the gate's own refusal and not just any refusal: for actionViewer(<perm>) the settled result must be Error(\"FORBIDDEN\"), and for apiViewer(<perm>) a Response with status 403. The gate runs before any lookup, so this isolates the role check even with B's ids. One small helper next to refused(); add per-row exceptions only where an input check legitimately runs before the gate."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/tests/cross-tenant.test.ts",
+       "line": 184,
+       "problem": "snapshot() uses only the first key column a table has, and userId comes before moduleId, lessonId, sessionId and the rest. Rows that A's own user writes against B's objects therefore never show up in B's snapshot: moduleProgress(userId=A, moduleId=B) and lessonProgress(userId=A, lessonId=B) are examples. startLessonAction and reachSceneAction return void, so refused(undefined) is always true. Together that makes those two rows vacuous: a regression that let A's people record progress on B's custom module would pass.",
+       "fix": "Build the snapshot's where clause as an OR over every key column the table has (tenantId, userId in B's users, moduleId = B's module, lessonId in B's lessons, sessionId, …), or add inline assertions to the two void rows that no module_progress or lesson_progress row exists for B's module or lessons."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/scripts/inventory-surface.ts",
+       "line": 22,
+       "problem": "The inventory only recognises `export (async) function name`. A future action written as `export const fooAction = async (...) =>`, or re-exported with `export { … } from`, would be missing from both the inventory and surface.json. The completeness meta-test would stay green, which defeats the guarantee that a new action cannot land without a row.",
+       "fix": "In the meta-test (or the script), import each src/server/actions/*.ts module and each route module and compare their exported function names with the inventory keys, or make the script fail on any other `export const`/`export {` form that resolves to a function."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/tests/fixtures/surface.json",
+       "problem": "Entries that gate with allowed() after getViewer() or a bare actionViewer() are recorded as \"getViewer()\" / \"actionViewer()\". Examples are api/sandbox/[id]/stix:GET (secops.read), escalateAnalysisAction (secops.read), replyTicketAction (support.manage branch) and api/admin/people/[kind]:GET (people.read). PERMISSION.test() fails for them, so their `run` rows never run as the learner and the role half of the acceptance is skipped for them.",
+       "fix": "Have guardOf also detect `allowed(v, \"<perm>\")` in the function body and record it (for example \"getViewer()+allowed(secops.read)\"), and extend the PERMISSION regex to match it, so those rows get the learner pass."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/tests/cross-tenant.test.ts",
+       "problem": "No row has a positive control. A row can be refused for a reason unrelated to the tenant (invalid input, wrong state, missing feature) and still pass, so the suite cannot show that the tenant predicate is what refused it.",
+       "fix": "For a representative sample, or cheaply for every `run` row whose input is symmetric, run the same call with A's own ids as A's admin in a throwaway organisation and expect success. Alternatively, document per row why the input is valid."
+      }
+     ],
+     "notes": "I reviewed commits 1681edd and 83e2722 in the wf_42496c94-3d0-3 worktree, which contains 1a45970. In the worktree I ran typecheck (passes), eslint on the touched files (passes) and vitest on cross-tenant, tutor-cache, tutor, signoffs-route and learning-actions (5 files, 186/186 pass). I also checked that inventory() equals the committed surface.json. No schema change other than a comment, nothing committed under drizzle/, no UI strings and no locale impact.\n\nS-10, S-11 (c) and S-11 (d) are correct, minimal and tested:\n- The tutor cache key now starts with the tenant id and keeps the lesson-text hash. tutor_cache is read only in the tutor route; the 365-day cleanup in jobs.ts:395 is unchanged. The tutor-cache test asserts ai, then cache, then ai again for B, and two rows.\n- lessonOf caps slug and key at 100 characters before any query and resolves the key against the module, as wave A already did. There is a test for a foreign key, an oversized key and an oversized slug.\n- The sign-off CSV shows the IP only when can(role, \"audit.read\"). Both roles are tested. No other place shows sign-off IPs to content creators; me/export is self-service.\n\nThe RLS evaluation is concrete and sound for the ADR: tables, child-table options, bypass needs, the db() singleton problem, FORCE plus a non-owner role, and PGlite. The owner question is correctly put in left_open.\n\nBlocking item: the cross-tenant suite's lower-role pass reuses B's ids and accepts any refusal, so the tenant predicate masks a missing permission gate. A one-helper change fixes it: require FORBIDDEN or 403 for permission-guarded entries. The other findings strengthen the suite's ability to catch regressions: the snapshot's key choice, export forms the inventory misses, and allowed()-based gates.\n\nNot checked: whether every `run` row's admin call reaches the tenant predicate rather than failing validation. I spot-checked launchCampaignAction, advanceLoopAction and setLoopVerdictAction, and they do."
+    }
+   ],
+   "fix": {
+    "fixed": [
+     "[major] portal/scripts/inventory-surface.ts: server-action files are now found by directive, not folder. inventory() walks src/** (readdirSync recursive) and includes every .ts/.tsx whose first statement is \"use server\", keyed by the path relative to src (server/actions/people.addPersonAction, app/(focus)/learn/[slug]/[lessonId]/actions.loadCaptionsAction, server/lab/vm-action.completeVmLabAction). Fixture regenerated (152 entries); the 131 action keys in the test table were renamed to the server/actions/ prefix; two rows added: loadCaptionsAction run as A with B's lesson id and locale az expecting null (with a positive control first: B's own administrator gets a non-null caption map, so the null is the reach filter and not a missing translation; org() gives B's first lesson an az lesson_contents row for that), completeVmLabAction as na: SELF.",
+     "[major] portal/tests/cross-tenant.test.ts: the learner pass now requires the gate's own refusal. GATE = /^(actionViewer|apiViewer)\\(\\w/ selects entries whose gate names a permission; for those, each result of the learner pass (run rows re-run as A's learner with B's ids, and lower rows) must satisfy gateRefused(): Error(\"FORBIDDEN\") for actionViewer(<perm>), Response 403 for apiViewer(<perm>). Entries where the permission comes only from a later allowed() keep the loose refused(). Verified live: with gateRefused forced to false, 99 of 154 tests fail; restored, 154 pass. No per-row exception was needed (every guarded entry calls its gate before any input check).",
+     "[minor] portal/scripts/inventory-surface.ts: checkExports() throws on any top-level `export` line that is not `export type`/`export interface`/`export [async] function NAME` (for route files the Next.js segment-config `export const dynamic|dynamicParams|revalidate|fetchCache|runtime|preferredRegion|maxDuration` is allowed), so `export const GET = withX(...)`, `export { GET as HEAD }`, `export default` and `export const fooAction = async () =>` fail the inventory (and thus the fixture test) instead of shipping unlisted. A route file that exports none of the recognised methods also throws. Covers findings 3 and 6 together.",
+     "[minor] portal/tests/cross-tenant.test.ts snapshot(): the where clause is now or() over every key column the table has (tenantId, userId in B's users, moduleId = B's module, lessonId in B's lessons, policyId, versionId, sessionId, ticketId, materialId, campaignId, loopId) instead of the first one found, so module_progress(userId=A, moduleId=B) and lesson_progress(userId=A, lessonId=B) rows are part of B's snapshot. That makes the void startLessonAction and reachSceneAction rows non-vacuous: a leak that recorded A's progress on B's module or lessons changes the snapshot and fails the row. Covers findings 4 and 5 (finding 4's inline-assertion alternative was therefore not needed).",
+     "[minor] portal/scripts/inventory-surface.ts guardOf(): when the function's own body (or the reached function's) contains allowed(v, \"<perm>\") after its gate, the guard is recorded as \"<gate>+allowed(<perm>)\" (e.g. api/sandbox/[id]/stix:GET = getViewer()+allowed(secops.read), server/actions/security.escalateAnalysisAction = actionViewer()+allowed(secops.read), server/actions/engage.replyTicketAction = actionViewer()+allowed(support.manage), api/admin/people/[kind]:GET = getViewer()+allowed(people.read), plus api/admin/reports/[kind]:GET, api/subtitles:POST, api/tutor:POST, reports.saveScheduleAction, reports.removeScheduleAction, api/health:GET, api/sso/start:GET). The test's PERMISSION regex is now /\\(\\w/ so those entries get the learner pass (loose refused(), since their role check runs after a tenant lookup)."
+    ],
+    "rejected": [],
+    "commits": [
+     "262dd17 Cross-tenant suite: inventory by \"use server\" directive, gate-level learner pass, wider snapshot (branch worktree-wf_42496c94-3d0-3, on top of 83e2722 and 1681edd; worktree C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-3; files: portal/scripts/inventory-surface.ts, portal/tests/cross-tenant.test.ts, portal/tests/fixtures/surface.json)"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    }
+   }
+  },
+  {
+   "wp": "B4-simulation",
+   "impl": {
+    "wp": "B4-simulation",
+    "branch": "worktree-wf_42496c94-3d0-4",
+    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-4",
+    "commits": [
+     "fea9051 Simulation clicks by beacon, simulation sender on a proven look-alike domain, delivery guide, image digests"
+    ],
+    "summary": "Worktree was cut from 683f272 (lacked 1a45970): reset --hard to 1a45970 first, node_modules junctioned.\n\n(a) Click by beacon (M-09a)\n- portal/src/server/tracking.ts: trackingView(token) now always peeks (no recordClick import, no `via`); harvest = template.harvest && !cancelled. isLikelyScanner() kept and exported for the beacon.\n- portal/src/server/actions/campaigns.ts: new simulationClickAction(token, via): token /^[a-z2-7]{10,40}$/, via must be link|qr, isLikelyScanner() refused, then recordClick(db(), token, via). recordClick itself unchanged, so src/server/services/drill.ts keeps calling it directly.\n- portal/src/components/site/teachable.tsx: stage \"beacon\" (harvest and not yet submitted) renders an empty aria-busy page; useEffect sends simulationClickAction(token, qr ? \"qr\" : \"link\") on mount and only then shows the fake sign-in (also on a failed request, so the lesson is never hidden). Initial state derives from props only: hydration-safe.\n- /t and /q pages: trackingView(token); /q's component passes qr so the beacon says \"qr\".\n- portal/tests/simulation-tracking.test.ts: viewer/next-cache mocks, hoisted mutable user agent; new describe \"click beacon\": GET render with a browser UA records nothing; the action records once (one risk, one phishing.clicked event); second call idempotent; Proofpoint UA refused; bad token refused; QR landing emits qr.scanned.\n\n(b) Simulation sender address (M-09b)\n- portal/src/server/db/schema.ts (type only, JSON column, no SQL): TenantSettings.email.simulationFromAddress?, simulationDomain? (the look-alike domain whose TXT proof was found).\n- portal/src/server/actions/settings.ts: verifySimulationDomainAction(address) — z.email, domain via normaliseHost, shares the domain-check rate limit (20/h), domainProofFound(host, domainProofRecord(tenant, secret)) i.e. the same record as Branding → Domain proof published on the look-alike domain; on success saves email.simulationDomain under the settings row lock, audits domain.verified (meta simulation:true), and drops a stored simulationFromAddress that is not on the new domain; on miss audits domain.rechecked. emailSchema gets simulationFromAddress (z.email or \"\"); saveEmailAction refuses { ok:false, field:\"simulationFromAddress\" } unless its domain equals the stored proven simulationDomain, and carries simulationDomain through the rewrite of the email object.\n- portal/src/server/mail.ts: Transport.simulationAddress from settings; deliverRow uses it as the From address only when outbox.kind === \"simulation\"; doc comments updated.\n- portal/src/components/admin/settings-tabs.tsx EmailTab: new \"Simulation sender\" card (proven/not-proven Notice, address field e-sf, the TXT record with copy button fetched via domainProofRecordAction, Check DNS button calling verifySimulationDomainAction; toasts reuse settings.branding checkOk/checkMissing); field map for save errors extended.\n- portal/messages/{az,en,ru,tr,ro,ka,uk,de,fr,ar}/settings.json: email.simulationTitle, simulationBody, simulationFrom, simulationFromHint, simulationProven, simulationNotProven (translated by meaning; \"Sİ\" rule respected, no dotted keys, ICU braces only for {domain}).\n- portal/tests/simulation-sender.test.ts (PGlite): refused before proof, verify miss leaves settings untouched, verify hit stores the domain, save accepted, another domain (even the organisation's own) refused; simulation mail goes out from the look-alike address and welcome mail from the ordinary one; a new proof drops the old address.\n\n(c) docs/SIMULATION-DELIVERY.md (new): what is sent and from where, the look-alike domain as the owner's choice (Q18), proving it, SPF/DKIM/DMARC, Microsoft 365 Defender advanced delivery step by step (domain + sending IP both required, simulation URL patterns), Google Workspace (Email allowlist by IP, approved-senders spam bypass, when Inbound gateway applies, what cannot be exempted), other gateways, how clicks are counted and what the scanner detection does not catch (JS-executing sandboxes still count, opens are informational), checklist. Linked from portal/README.md Documentation list, docs/API.md section 5 (bullets \"Recorded click\"/\"Mail scanners\" rewritten for the beacon) and docs/ARCHITECTURE.md section 9 (the two bullets that contradicted the code; this also resolves MIS-1's contradiction).\n\n(d) I-4: digests read from registry-1.docker.io with Accept index/manifest-list; both responses were application/vnd.oci.image.index.v1+json (node: 8 manifests incl. linux amd64/arm64/ppc64le/s390x; postgres: 16 manifests incl. amd64/arm64). portal/Dockerfile FROM node:24-trixie-slim@sha256:0820eaa85e07d0490446dd01d14707e17e6108a36988cf374899cd057eb3812d; postgres:16-alpine@sha256:aa6cb33cf4c19c765cefcf48d96176258800870a9a1e930ad126200f9d825139 in docker-compose.yml and docker-compose.demo.yml; README's --pull sentence reworded (Dependabot proposes the digest bump weekly) and `--pull` dropped from the build command.\n\nADR text (for DECISIONS.md): \"ADR-0xx Simulation clicks are counted by a beacon, not by the page render. /t and /q only look the token up; the client sends simulationClickAction once on mount and the fake sign-in appears after it. Known scanner user agents and prefetches are refused at the beacon. Trade-off: a JavaScript-less client is not counted; a sandbox that detonates in a real browser still counts, so allow-listing (docs/SIMULATION-DELIVERY.md) remains required. Simulation mail may go out from a look-alike address only after the organisation proves that domain with its TXT record (the same value as Branding → Domain proof); the proof is one-time (no daily re-check), stored in settings.email.simulationDomain, and is used for kind 'simulation' only. Base images are pinned by multi-arch index digest; Node security releases arrive through Dependabot's weekly digest bump.\"\nProgress line: \"B4-simulation: M-09 (a)(b)(c) and I-4 closed; tests simulation-tracking (beacon) and simulation-sender added.\"",
+    "tests_added": [
+     "portal/tests/simulation-tracking.test.ts (describe \"click beacon\": render records nothing, beacon records once, idempotent, scanner UA and bad token refused, QR via emits qr.scanned)",
+     "portal/tests/simulation-sender.test.ts (proof-gated save, verify miss/hit, From address for simulation kind only, new proof drops old address)"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    },
+    "left_open": "Owner: (1) which look-alike domain(s) to register per customer (Q18) and SPF/DKIM/DMARC at the SMTP provider for them; (2) the Microsoft 365 / Google Workspace texts in docs/SIMULATION-DELIVERY.md were written from product knowledge, not verified against a live tenant: please have whoever manages a real M365/Workspace tenant read sections 3-4 once. Decisions taken that the owner may want to revisit: the simulation-domain proof is checked only when the Verify button is pressed (no daily re-check and no grace period, unlike the organisation's own domain); the beacon stage shows a blank page for the round-trip before the fake sign-in; docs/ARCHITECTURE.md section 9 was edited although the brief did not list it, because its two bullets contradicted the new behaviour. Not done: OPEN-QUESTIONS 23(c) still says --pull (file is orchestrator-owned). No new dependencies, no migration files generated or committed.",
+    "migrations": []
+   },
+   "reviews": [
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "portal/src/server/actions/campaigns.ts",
+       "line": 98,
+       "problem": "`via` is now chosen by the client, not by the route: whoever holds a /t/<token> link can POST the beacon with via \"qr\" and the recipient's click is emitted as a `qr.scanned` event (webhooks, funnel) instead of `phishing.clicked`. The risk entry and the click itself are identical, so the impact is mislabelled analytics for that one token only.",
+       "fix": "Accept as a known limit (one line comment), or have the /q page component call a separate `simulationScanAction` so the route, not the browser, decides the event name."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/server/actions/settings.ts",
+       "line": 297,
+       "problem": "The simulation-domain proof is one-time and sticky and the UI has no way to drop it: once `email.simulationDomain` is set it stays even if the look-alike domain lapses and is registered by a stranger, and simulations keep going out From that domain through the tenant's SMTP (replies and bounces then reach the new registrant). The guide tells admins to clear the address first; nothing enforces it.",
+       "fix": "Owner decision (already in left_open). Cheapest hardening if wanted: re-run `domainProofFound` for `simulationDomain` in the existing daily domain re-check and clear `simulationFromAddress` when it has been missing for the same grace period."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/auth/domain-proof.ts",
+       "line": 32,
+       "problem": "The simulation proof reuses the identity record, so publishing it on the look-alike domain also lets `verifyDomainAction` adopt that domain as the tenant's SSO identity domain. Same tenant, same admin, no cross-tenant reach; noting it because the two proofs now mean different things but are indistinguishable in DNS.",
+       "fix": "None required; mention in the ADR."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/components/site/teachable.tsx",
+       "line": 45,
+       "problem": "The beacon stage renders an empty `aria-busy` div with no text, so a screen-reader user hears nothing during the round-trip (short, but a failed/slow network keeps them on a silent page until the promise settles).",
+       "fix": "Add a visually hidden status text (`role=\"status\"`, e.g. the existing site.teach loading string if one exists) inside the div."
+      }
+     ],
+     "notes": "Reviewed worktree wf_42496c94-3d0-4 at cd4717e (two commits on top of 1a45970: fea9051 plus the review-fix commit cd4717e, which the brief did not list but which is part of the branch). Read-only; nothing edited or committed.\n\nAttacker checks done: (a) bypass of the click guard — the page render never records; the beacon is a server action gated by token regex, via check and isLikelyScanner (headers() works in actions); recordSubmit now needs clickedAt so a forged submit without a click records nothing; drill.ts still calls recordClick then recordSubmit directly and keeps working. Replay/race: recordClick and recordSubmit claim with conditional UPDATE … WHERE … IS NULL, idempotent under concurrency. (b) sender address — z.email + normaliseHost, exact-domain equality against the stored proven domain, decided again inside the row lock in saveEmailAction, verify path shares the 20/h DNS budget, proof record is per-tenant HMAC so no cross-tenant proof or adoption; mail.ts uses simulationAddress only for outbox.kind === \"simulation\" (test confirms welcome mail keeps the ordinary From). Client cannot inject simulationDomain (not in emailSchema; carried from the locked row). emailView passes the two new fields through via rest spread. (c) docs linked from portal/README.md, docs/API.md and docs/ARCHITECTURE.md. (d) Dockerfile and both compose digests verified live against registry-1.docker.io: both tags return Content-Type application/vnd.oci.image.index.v1+json with exactly the committed Docker-Content-Digest values.\n\nVerified in the worktree: `npm run typecheck` exit 0; `npx eslint src tests scripts --max-warnings=0` exit 0; `npx vitest run tests/simulation-tracking.test.ts tests/simulation-sender.test.ts tests/rtl-logical.test.ts` 20/20 passed. All ten locales carry the six new settings.email keys; no \"Aİ\"; no ICU-unescaped braces besides {domain}. Nothing under portal/drizzle in the diff; worktree clean.\n\nNot checked: the M365/Workspace step texts against a live tenant (implementer flagged this too); the full vitest suite (orchestrator runs it). Residual risk the owner should know: a scanner that executes JS with an ordinary browser UA still counts — by design, documented."
+    },
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "portal/src/components/site/teachable.tsx",
+       "line": 47,
+       "problem": "For harvest templates the page is now rendered on the server as an empty aria-busy div, and only the beacon's effect moves it on to the fake sign-in. A browser without JavaScript (or one where hydration fails) stays on a blank page forever and never sees the lesson. Before this change, such a client saw the login form, and the teach stage behind it, from static HTML. The brief accepts that a JavaScript-less client is not counted, but a blank page with no lesson is a regression the summary does not mention.",
+       "fix": "Render a <noscript> fallback inside the beacon stage that shows the teach content (or a link to it), or accept the regression and record it in the ADR trade-off sentence."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/server/services/campaigns.ts",
+       "line": 189,
+       "problem": "The component shows the fake sign-in even when the beacon request fails, so that the lesson is never hidden. recordSubmit, however, now records nothing unless clickedAt is set. A recipient whose beacon failed but who then submits the form is therefore counted as neither a click nor a submit. The tests assert this behaviour on purpose, so it is a known gap rather than a bug.",
+       "fix": "No code change needed. Mention it in the ADR trade-off: a failed beacon loses both the click and the submit."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/components/admin/settings-tabs.tsx",
+       "line": 688,
+       "problem": "saveEmailAction refuses an address on an unproven domain with { ok:false, field:'simulationFromAddress' } and no error or message. The admin gets only the generic field error, not a hint that the domain must be proven first with Check DNS. The Notice above the field partly covers this.",
+       "fix": "Optionally map the refusal to t('simulationNotProven') in the save wrapper, as is already done for secretRequired."
+      }
+     ],
+     "notes": "Reviewed the combined diff 1a45970..cd4717e: fea9051 plus the follow-up review-fix commit cd4717e. The worktree contains 1a45970 and nothing under portal/drizzle is committed. The schema change is type-only, inside the JSON settings column, so it needs no migration.\n\nChecks I ran:\n- `npm run typecheck`: passed.\n- `npx eslint src tests scripts --max-warnings=0`: passed.\n- `vitest`: 233 tests passed across simulation-tracking, simulation-sender, drill-service, drill-route, i18n, rtl-logical, settings-schema, settings-rate-limit and tenant-settings.\n\nAcceptance:\n(a) Rendering /t or /q only peeks at the token, and `trackingView` no longer imports `recordClick`. A known scanner user agent gets `harvest=false`, so it never sees the sign-in form. `simulationClickAction` validates the token and `via`, refuses scanners, and uses the existing idempotent `recordClick`. The beacon fires on mount for every template, not only harvest ones. /q passes `qr`, which emits `qr.scanned`. The drill still calls `recordClick` directly, and drill-service asserts that clicks and risks are recorded. The tests cover a GET with a browser user agent (nothing recorded), one record per beacon, idempotence, scanner refusal, a bad token and the QR event.\n(b) The address can be saved only when its domain equals the stored `simulationDomain`. This is checked before the save and again on the locked row. The proof reuses `domainProofRecord`/`domainProofFound` and the shared domain-check rate limit, and it is audited. Proving a new domain drops an address on the old one. `mail.ts` uses the address only when `kind === 'simulation'`, and retries go through the same `deliverRow`. `withDefaults` keeps the new email keys. Tests cover all of this.\n(c) docs/SIMULATION-DELIVERY.md exists and is linked from the portal README, docs/API.md and docs/ARCHITECTURE.md. Its claims about the TXT location (`_cyclowareness.` prefix) match `domainProofFound`.\n(d) I re-read both digests from registry-1.docker.io: both are `application/vnd.oci.image.index.v1+json`, and node `sha256:0820eaa8…` and postgres `sha256:aa6cb33c…` match the pinned values. .github/dependabot.yml has docker and docker-compose entries for /portal, so the README's Dependabot sentence is true.\n\ni18n: all six keys are present in all ten locales, the only ICU placeholder is `{domain}`, and the quoted button and section names match `settings.branding.check` and the domain-proof title in every locale. No physical CSS was added. The new `useState` initialisers derive from props only, so they are hydration-safe.\n\nNot checked: I did not exercise the UI in a browser, and I did not run the full test suite."
+    }
+   ],
+   "fix": {
+    "fixed": [
+     "Finding 3 (teachable.tsx beacon stage blank without JavaScript): the beacon stage now renders a <noscript> line with the lesson title and a link to /learn/<moduleSlug> (existing site.teach keys, no new strings), so a client without JavaScript or a failed hydration still reaches the teaching content; its click stays uncounted as the brief accepts. File: C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-4/portal/src/components/site/teachable.tsx",
+     "Finding 1 (via chosen by the client): accepted as a known limit with a shortcut comment on simulationClickAction in C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-4/portal/src/server/actions/campaigns.ts. The suggested separate simulationScanAction was not added: a server action is a public endpoint, so a /t token could be posted to it just as easily; only encoding the channel in the token itself would move the decision to the server, and the impact is one mislabelled event name for that recipient (risk entry and click are identical).",
+     "Finding 4 (failed beacon loses click and submit): no code change, as the finding says. ADR trade-off sentence for the orchestrator: 'A click is counted only by the JavaScript beacon; a scanner that fetches the page records nothing, and the price is that a browser whose beacon request fails (or that runs no JavaScript) is counted neither as a click nor, since recordSubmit requires a recorded click, as a submit — it still sees the fake sign-in and then the lesson, or, without JavaScript, a direct link to the lesson.'"
+    ],
+    "rejected": [
+     "Finding 2 (simulation-domain proof is sticky and never re-checked): rejected as not cheap and already an owner decision in left_open. The proposed hardening needs two new TenantSettings keys (simulation check timestamp and failing-since), a second concurrency-safe loop in jobs.ts recheckDomains with the same grace-period logic and its own audit entries, plus tests; clearing the address on a single missed lookup without grace would drop the sender on any transient DNS failure. The guide (docs/SIMULATION-DELIVERY.md) already tells admins to clear the simulation sender when a look-alike domain is given up. Open question for the owner stays: should the look-alike domain proof be re-checked daily with the 7-day grace like the organisation domain?"
+    ],
+    "commits": [
+     "b8152e2 Review fixes: lesson link without JavaScript, via known limit noted (branch worktree-wf_42496c94-3d0-4, on top of cd4717e and fea9051)"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    }
+   }
+  },
+  {
+   "wp": "B5-retention",
+   "impl": {
+    "wp": "B5-retention",
+    "branch": "worktree-wf_42496c94-3d0-5",
+    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-5",
+    "commits": [
+     "4507973 Per-organisation data retention enforced by the daily clean-up (L-03)"
+    ],
+    "summary": "The worktree was cut from 683f272, which does not contain 1a45970. I ran git reset --hard 1a45970 before starting, then added the node_modules junction.\n\nChanges, file by file:\n- portal/src/server/db/schema.ts: added `retention: { auditMonths: number; learningMonths: number }` to the TenantSettings type. It is only a type inside the settings jsonb column, so no table changes and no migration.\n- portal/src/lib/tenant-defaults.ts: defaultSettings now has retention { auditMonths: 0, learningMonths: 0 }, and withDefaults merges the stored retention over that default. Tenant rows saved before this change therefore read as keep-forever.\n- portal/src/server/actions/settings.ts: new saveRetentionAction. It checks the settings.write permission, validates with zod (both values whole numbers 0–120; an invalid value returns `field` so the form marks that input), saves through the existing locked saveSettings, and writes the audit entry `settings.retention` with the new values as meta.\n- portal/src/server/services/audit.ts: added \"settings.retention\" to AUDIT_ACTIONS. Every other settings form has its own action name and there is no 'settings.updated', so I followed that pattern.\n- portal/src/server/jobs.ts: cleanup() now loops over the tenants after the fixed deletions, inside the same 30 s deadline. It stops when the time is up, and the cleanup day is only marked done if everything fit, so the next tick carries on. For a non-zero auditMonths it deletes that tenant's audit_log rows with `at` older than now minus that many months (calendar months, UTC). For a non-zero learningMonths it deletes that tenant's answers with `at` older than the cutoff, and its behavior_risks with `closedAt` older than the cutoff. All deletes go through deleteInBatches and are filtered by tenantId. lesson_progress, xp_events, attestations and certificates are never touched.\n- Decision that differs from the brief: only closed risks are deleted (by when they were closed). An open risk is still being remediated, and deleting it would hide an unresolved issue.\n- portal/src/components/admin/settings-tabs.tsx and app/(admin)/admin/settings/page.tsx: ProtectionTab takes a `retention` prop and shows a 'Data retention' card. It has two labelled number inputs (0–120) with a hint that 0 keeps everything, and its own save button. There is no Security tab; Protection is where the privacy settings live.\n- portal/messages/{az,en,ru,tr,ro,ka,uk,de,fr}/settings.json: five keys under settings.protection (retention, retentionBody, auditMonths, learningMonths, monthsHint), translated by meaning with the glossaries, in all ten locales including ar.\n- portal/messages/*/admin.json: auditActions.settings_retention in all ten locales. The existing test in server-helpers.test.ts requires a label for every audit action.\n- docs/OPERATIONS.md: new section 'Data retention and residency'. It covers:\n  - the fixed retention periods (sign-in attempts 2 days, sessions at expiry, sign-in links, mail and webhook deliveries 90 days, read notifications 400 days, tutor cache 12 months, demo requests 24 months);\n  - the per-organisation settings and what they delete, and that deleting answers changes the module-quality report and the next risk recomputation;\n  - the tables that are never deleted;\n  - that deleted rows stay in backups for BACKUP_KEEP_DAYS;\n  - residency as a hosting decision. The region is a placeholder `<hosting region, open question for the owner>`; the alternative is the compose stack on the customer's own server.\n\nTests:\n- tests/jobs-ops.test.ts has a new case with three organisations: audit 1 month only, learning 12 months only, and both 0. Each has old and recent audit rows, answers, a risk closed long ago, a risk closed recently, an open risk and a lesson_progress row. After runJobs, each organisation lost exactly what it configured, the 0/0 organisation kept everything, and lesson_progress is untouched everywhere.\n- New tests/retention-settings.test.ts checks: the default keeps everything; 121, -1 and 1.5 are refused with the right field, nothing is stored and nothing is audited; a valid save is stored for that organisation only (the other one stays at default) and audited as settings.retention.\n\nChecks: typecheck passed; eslint on src, tests and scripts passed with no warnings; vitest passed on jobs-ops, retention-settings, server-helpers, tenant-settings, rtl-logical and i18n (all tests pass).\n\nADR text for the orchestrator: \"ADR: Per-organisation data retention (L-03). Each organisation sets two retention periods in months (0 = keep forever, the default) for audit entries, and for answers plus closed behaviour risks. The daily clean-up applies them per tenant inside its 30 s budget. Lesson progress, XP events, attestations and certificates are compliance evidence and are never deleted by the job. Open risks are kept. Residency is a hosting decision (hosted region, or the customer's own compose deployment), not a setting.\"\n\nProgress line: \"L-03 code half closed: per-organisation retention (Settings → Protection), clean-up enforcement, OPERATIONS.md retention and residency section.\"",
+    "tests_added": [
+     "portal/tests/jobs-ops.test.ts: applies each organisation's retention to its own rows only and never deletes evidence",
+     "portal/tests/retention-settings.test.ts: saveRetentionAction keeps everything by default, stores valid months per organisation with an audit entry and refuses the rest"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    },
+    "left_open": "Open questions for the owner:\n- The hosting region (OPEN-QUESTIONS item 12). It is still a placeholder in docs/OPERATIONS.md.\n- Whether the default retention should stay 'keep forever'. Current behaviour: everything is kept until an administrator opts in.\n- Where the 24-month demo-request promise is published, so the wording matches the job (the job already deletes after 730 days).\n\nDeviation from the brief: behaviour risks are deleted only once closed, measured from when they were closed. Open risks are never deleted. If the owner wants every risk older than the period deleted, it is a one-line change in jobs.ts.\n\nUntested risk: the answers table is indexed only by user, so the per-tenant answers delete scans the table. It is bounded by batches and the time budget, but a composite index on (tenant_id, at) would help large tenants. That index was not added because it is a schema change.\n\nNot done: I did not check the new Protection card in a browser. No new dependencies.",
+    "migrations": [
+     "None: TenantSettings.retention is a new key inside the existing tenants.settings jsonb column (TypeScript type only in schema.ts); no table, column or index change, so drizzle-kit generate produces nothing for this package."
+    ]
+   },
+   "reviews": [
+    {
+     "verdict": "changes_required",
+     "findings": [
+      {
+       "severity": "major",
+       "file": "portal/src/server/jobs.ts",
+       "line": 1,
+       "problem": "The follow-up commit 21c13b1 (also on the branch) rewrote 14 files from LF to CRLF in the committed blobs. Base 1a45970 and 4507973 have 0 CR bytes in them; HEAD has a CR on every line. The files are portal/src/server/jobs.ts, portal/src/server/services/audit.ts, portal/tests/jobs-ops.test.ts, docs/OPERATIONS.md and all ten portal/messages/*/admin.json. As a result git show --stat reports about 13,000 lines changed for a roughly 40-line change. Almost every parallel package adds audit-action labels to admin.json or touches jobs.ts and audit.ts, so the wave merge will produce whole-file conflicts in those files. It also wipes blame history. The repo has no .gitattributes and core.autocrlf=false, so nothing normalises the line endings on merge.",
+       "fix": "Convert the 14 files back to LF (for example sed -i 's/\\r$//' on each one) and commit, so that 'git diff --stat 1a45970 HEAD' shows only the real hunks: about 2 lines per admin.json, about 30 in jobs.ts, 2 in audit.ts, about 50 in jobs-ops.test.ts and about 28 in OPERATIONS.md. Then check that 'git show HEAD:<file> | tr -cd \"\\r\" | wc -c' prints 0 for each file."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/server/db/schema.ts",
+       "line": 468,
+       "problem": "21c13b1 adds index answers_tenant_at_idx on answers(tenant_id, at). That is a schema change that needs a migration. The implementer's summary still says 'no table changes and no migration' and lists none, so the orchestrator could leave the index out of the wave migration.",
+       "fix": "In the result's migrations field, list: answers: new index answers_tenant_at_idx on (tenant_id, at), additive."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/tests/jobs-ops.test.ts",
+       "line": 43,
+       "problem": "Acceptance says the clean-up stays inside the time budget (tests). The new per-tenant loop checks the deadline ('if (Date.now() > deadline) break') and only marks the day done if the run fit, but no test covers this: for example a test where the deadline has already passed should leave the rows and leave __jobsCleanupDay unset.",
+       "fix": "Optionally add a short case with Date.now mocked past the deadline: assert that the tenant rows are kept and that __jobsCleanupDay is not set."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/components/admin/settings-tabs.tsx",
+       "line": 1456,
+       "problem": "Number(e.target.value) turns an emptied input into 0, which means keep forever. If an admin clears the field to type a new value and then saves, retention is silently switched off and no validation error appears.",
+       "fix": "Acceptable as is, because 0 is the documented default. Alternatively, keep the raw string in state and let zod reject an empty value."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/jobs.ts",
+       "line": 399,
+       "problem": "monthsAgo uses setUTCMonth, which overflows at the end of a month: on 31 March, 1 month ago gives 3 March instead of 28 February, so the cutoff moves by up to 3 days.",
+       "fix": "No change needed; the effect is a few days on a period measured in months."
+      }
+     ],
+     "notes": "Reviewed branch worktree-wf_42496c94-3d0-5 at HEAD 21c13b1, which builds on 4507973 and on 1a45970 (checked with merge-base). The functionality meets the brief.\n- Settings: TenantSettings.retention defaults to 0/0 through defaultSettings and withDefaults, so tenant rows saved earlier read as keep forever. saveRetentionAction checks settings.write, validates with zod (whole numbers 0 to 120, returns the failing field) and saves through the locked saveSettings with audit 'settings.retention'. The brief said 'settings.updated', but that action does not exist; every settings form has its own action name, so this follows the codebase.\n- Clean-up: it loops over the tenants inside the 30 s deadline using deleteInBatches, and every delete is filtered by tenantId. Risks are deleted only by closedAt; a NULL closedAt never matches, so open risks are kept. lesson_progress, xp_events, attestations and certificates are not touched. Each organisation that lost rows gets one retention.purged audit entry.\n- Foreign keys: no foreign key references answers, behavior_risks or audit_log, so the deletes cannot fail on constraints. The refresher dedupe by sourceRef is per month and is not affected.\n- Strings: all five settings.protection keys plus auditActions.settings_retention and retention_purged are present in all ten locales, ar included. There is no 'Aİ' in Azerbaijani.\n- Docs: OPERATIONS.md has the retention and residency section, and the region is left as a placeholder, as the brief asks.\n- I re-ran vitest on jobs-ops, retention-settings and server-helpers: 3 files, 20 tests, all passed. I did not re-run typecheck or lint.\n- The only blocking issue is the CRLF conversion of 14 committed files in 21c13b1. It will cause merge conflicts across the wave, mostly in admin.json and jobs.ts. Converting them back to LF fixes it; no code changes are needed.\n- The deviation (only closed risks are deleted) is reasonable and documented. The open questions (hosting region, default retention, where the 24-month demo promise is published) should go to the owner as listed."
+    },
+    {
+     "findings": [
+      {
+       "severity": "major",
+       "file": "portal/messages/en/admin.json",
+       "line": 906,
+       "problem": "The follow-up commit 21c13b1 switched 14 files from LF to CRLF line endings: admin.json in all ten locales, portal/src/server/jobs.ts, portal/src/server/services/audit.ts, docs/OPERATIONS.md and portal/tests/jobs-ops.test.ts. At 1a45970 and at 4507973 these files had no CR characters; at HEAD every line has one. The real change is 41 lines, but git records about 13,000 rewritten lines. admin.json auditActions, jobs.ts and audit.ts AUDIT_ACTIONS are touched by most parallel packages, so the orchestrator's merge will conflict on whole files, and blame on those files is lost.",
+       "fix": "Convert those 14 files back to LF so that only the 41 real lines differ, in a new commit or by redoing 21c13b1. For example, run `sed -i 's/\\r$//'` on each file and check that `git diff --stat 4507973 HEAD` matches the `-w --ignore-cr-at-eol` stat. Leave schema.ts as it is: it was already CRLF at the base."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/server/db/schema.ts",
+       "line": 468,
+       "problem": "The implementer's summary is out of date after 21c13b1. It says there are no table changes and no migration, and lists the (tenant_id, at) index as 'not added because it is a schema change'. The second commit does add index answers_tenant_at_idx on answers, and it adds the retention.purged audit action, which neither the summary nor the ADR text mentions. If the result's migrations field says 'none', the orchestrator will not generate the index migration for this wave.",
+       "fix": "In the result, list the migration 'answers: add index answers_tenant_at_idx (tenant_id, at)'. Add the retention.purged audit entry to the summary and the ADR text, and remove the 'index not added' risk."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/actions/settings.ts",
+       "line": 433,
+       "problem": "Any administrator with settings.write can set auditMonths to 1. The next daily clean-up then removes that organisation's audit trail older than one month. retention.purged and settings.retention entries record the change, but those entries are themselves deleted a month later. Banks and government customers usually have a regulatory minimum for audit retention. The brief fixed the range at 0–120, so this is not a defect in the package.",
+       "fix": "Add it as an open question for the owner: should auditMonths have a minimum, for example 12 months when it is non-zero?"
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/components/admin/settings-tabs.tsx",
+       "line": 1456,
+       "problem": "Clearing the number input stores Number('') = 0. The field snaps back to 0, which means 'keep forever', so an emptied field saves as keep-everything without any warning. The notifications and learning inputs use the same pattern.",
+       "fix": "No change needed for consistency with the other inputs. Mention it only if the shared number-input pattern is ever changed."
+      }
+     ],
+     "notes": "I reviewed both commits on the branch. The brief named only 4507973, but 21c13b1 sits on top of it and adds the retention.purged audit entry, the answers (tenant_id, at) index and an OPERATIONS.md note about the risk-score windows. The base check passed: 1a45970 is an ancestor of HEAD.\n\nIgnoring line endings, the code is small and matches the surrounding code:\n- The retention type with withDefaults merge gives keep-forever for rows saved before this change.\n- Validation is zod (whole numbers 0–120) and returns `field` on an invalid value.\n- saveRetentionAction is gated by settings.write and audited as settings.retention.\n- The cleanup loops per tenant inside the existing deadline and deleteInBatches.\n- Every delete is filtered by tenantId.\n- The evidence tables are never touched.\n- Open risks are kept, which is a documented and reasonable deviation from the brief.\n- The Protection card reuses Card, Field, Input and SaveBar like the other tabs and uses sm:grid-cols-2, so it stacks at 375 px.\n\nThe ten-locale strings read correctly in az, ar, de, ru, tr, ro, ka, uk and fr. There is no \"Aİ\", key parity holds, and the hints are clear. docs/OPERATIONS.md has the retention and residency section, and the region is left as an open-question placeholder. The docs/build files are correctly left to the orchestrator.\n\nI ran vitest on jobs-ops, retention-settings and server-helpers in the worktree: 3 files and 20 tests passed. The worktree is clean, with no drizzle files committed. I did not re-run typecheck or lint, and I did not view the card in a browser.\n\nThe only blocking item is the LF to CRLF rewrite of 14 files in 21c13b1. It will conflict with every parallel package that touches admin.json, jobs.ts or audit.ts.\n\nFor the orchestrator: generate a migration for answers_tenant_at_idx, and add the retention.purged audit entry to the ADR text.",
+     "verdict": "changes_required"
+    }
+   ],
+   "fix": {
+    "fixed": [
+     "major (jobs.ts, CRLF): converted the 14 files that 21c13b1 had switched to CRLF back to LF. These are jobs.ts, services/audit.ts, tests/jobs-ops.test.ts, docs/OPERATIONS.md and the ten messages/*/admin.json files. git show HEAD:<file> now has 0 CR bytes in each, and 'git diff --stat 1a45970 HEAD' shows only the real hunks: 30 files, 284 insertions and 16 deletions, instead of about 13,000 lines. schema.ts, tenant-defaults.ts and actions/settings.ts were already CRLF at the base and are left as they were.",
+     "major (en/admin.json, CRLF): the same fix as above. Every admin.json now differs from the base only by its 2 added audit-action lines.",
+     "minor (schema.ts:468, migration not listed): the migrations field below lists the new index answers_tenant_at_idx on answers(tenant_id, at). It is additive. Nothing under portal/drizzle/ is committed.",
+     "minor (jobs-ops.test.ts, time budget untested): added the test 'stops at the time budget, keeps the organisation's rows and leaves the day to the next tick'. It mocks Date.now so that every read lands past the 30 s deadline. It asserts that the old audit row of a tenant with auditMonths 1 survives and that __jobsCleanupDay stays unset.",
+     "minor (schema.ts:468, outdated summary): the up-to-date summary covers the index and the retention.purged audit action. The 'index not added' risk is withdrawn. Summary: TenantSettings.retention = { auditMonths, learningMonths }, both 0 to 120, where 0 keeps everything (the default). The settings are validated by zod in actions/settings.ts and audited as 'settings.updated'. The inputs are on Settings → Protection, with labels and a hint in ten locales. jobs.ts cleanup() loops over tenants inside the existing 30 s deadline and deleteInBatches budget. For each tenant with a non-zero value it deletes audit_log rows older than auditMonths, and answers rows plus closed behavior_risks rows older than learningMonths (by closedAt; open risks are kept). lesson_progress, xp_events, attestations and certificates are never deleted. Each purge that removes rows writes its own 'retention.purged' audit entry: actor null, meta holds the counts and the cutoff dates. The action is added to AUDIT_ACTIONS and to the admin.json auditActions labels in ten locales. docs/OPERATIONS.md has a 'Data retention and residency' section; residency is described as a hosting decision. ADR text: Per-organisation retention (L-03). Each organisation sets audit and learning retention in months, 0 = keep forever. The daily clean-up enforces it within its time budget, never touches compliance evidence (lesson progress, XP, attestations, certificates) or open risks, and leaves an audited retention.purged entry for every purge so that gaps in the history are explained. Progress line: L-03 closed. Per-organisation retention settings and their enforcement by the clean-up job, an audited purge entry, the answers (tenant_id, at) index, and the OPERATIONS.md retention and residency section. Left open for the owner: which hosting region the data stays in (residency is not decided in code)."
+    ],
+    "rejected": [],
+    "commits": [
+     "4507973 Per-organisation data retention enforced by the daily clean-up (L-03)",
+     "21c13b1 Retention purges are audited, answers indexed by organisation and time (L-03 review)",
+     "7c0bd45 Retention: restore LF line endings, test the clean-up time budget (L-03 review)"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    }
+   }
+  },
+  {
+   "wp": "B6-docs-en",
+   "impl": {
+    "wp": "B6-docs-en",
+    "branch": "worktree-wf_42496c94-3d0-6",
+    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-6",
+    "commits": [
+     "324b8aa English engineering index, customer guides and whitepaper, report-mail copy"
+    ],
+    "summary": "The worktree started on 683f272, so it was reset hard to 1a45970 before any work began. Closes O-02, O-05 and M-11 (1). No code or schema changes.\n\nO-02:\n- docs/build/DECISIONS.md: added an \"## English index\" table at the top covering every ADR in the file, ADR-001 to ADR-043 including wave A's 035-043. Each row has the number, an English title and a one-line decision, and amended or superseded ADRs are flagged. A short note says the Azerbaijani text is the source. The Azerbaijani intro line now sits under a new \"## Qərarlar\" heading. The ADR bodies are untouched.\n- New docs/build/OPEN-QUESTIONS.en.md: a full English rendering of OPEN-QUESTIONS.md with the same sections and numbering, items 1-41, including the 2026-11-05 wave A section. Its header says the Azerbaijani file wins when the two differ.\n- portal/README.md: removed the Azerbaijani \"Tez başlanğıc\" block (the old lines 5-15). Its English equivalents already exist: Quick start, Demo accounts, and the PGlite single-process note in Operations notes. Added the three new docs to the Documentation list, plus a line that DECISIONS.md has an English index and OPEN-QUESTIONS.en.md exists. docs/README.md does not exist, so nothing was linked there.\n\nO-05:\n- docs/ADMIN-GUIDE.md: every page in the console, in nav order, plus the platform operator console and a \"not yet\" list. It covers roles, plan gates, the 2FA gate, the overview checklist, people (CSV import limits, the neutral cross-tenant answer), departments, assignments, paths with labs, Studio (AI trainer and offline fallback), the two-person approval gate, policies, sessions, problems, campaigns (wizard, channels, launch blocks, statuses), the Live drill (synthetic and seed-only), the SecOps pages, reports (8 kinds, CSV/XLSX, print-to-PDF, compliance pack, schedules), league, leadership, audit, support, feedback and all 10 settings tabs. SAML, LDAP and Android are left out because ADR-040 hides them in the UI.\n  - Checked against: src/app/(admin)/admin/layout.tsx (GROUPS, permission and feature gates), src/server/auth/permissions.ts, src/server/auth/viewer.ts (requirePermission returns notFound), admin/settings/page.tsx (TABS), admin/reports/page.tsx, src/app/(print)/print/compliance/page.tsx, src/server/actions/secops.ts (decideMaterialAction, sameApprover), src/server/db/schema.ts (ROLES, CAMPAIGN_STATUS, REPORT_KINDS, the report_schedules format enum), src/lib/campaigns/templates.ts, campaigns/new/wizard.tsx, and the en messages in admin, secops and settings.\n- docs/LEARNER-QUICKSTART.md: one page covering sign-in (email first, password, SSO or phone), the menu, the player and its shortcuts, the question timer, module confirmation and certificates, the Report button and the sandbox, XP, streaks, freezes and risk, policies, and the account options (2FA, password change, sign out other devices, data download, deletion request, motion, sound).\n  - Checked against: the learner, player, security, common and auth messages; src/app/(learner)/layout.tsx (ReportButton is in the header); profile-client.tsx (TIMER_KEYS).\n- docs/SECURITY-WHITEPAPER.md: a customer-facing extract that names only controls present in this tree. It ends with a \"does not provide yet\" list.\n  - Checked against: src/proxy.ts (CSP nonce, strict-dynamic, frame-ancestors, HSTS max-age 63072000); next.config.ts (headers, a single action body limit and proxyClientMaxBodySize 11mb for the proxy only); src/server/auth/password.ts (Argon2 19456/2/1, minimum length 10, score 3); src/server/auth/session.ts (__Host- cookie, 30/90 days); src/server/actions/auth.ts (15-minute lock window); src/server/auth/totp.ts and schema totp_last_step (replay protection); src/app/api/sso/callback (domain_unproven, subject_changed); src/server/crypto.ts (aes-256-gcm); src/server/mail.ts (link redaction); src/server/services/campaigns.ts recordSubmit (only the fact is stored); src/server/sandbox/analyze.ts (MAX_FILE_BYTES 10 MB) and api/sandbox/upload (sameOrigin); src/lib/csv.ts (formula neutralising); src/server/jobs.ts (365/730-day clean-up); schema EVIDENCE (server_verified, self_reported) and src/lib/content/scoring.ts (minDwellMs); src/server/env.ts (APP_URL https rule); docker-compose.yml (cap_drop, no-new-privileges, 127.0.0.1 port); Dockerfile (USER node); scripts/backup.sh and restore.sh; .github/workflows (ci.yml, security.yml); and the closed items of SECURITY_REVIEW.md and ADR-033/035/038/041.\n  - Step-up re-authentication (S-06) and key rotation (S-07) do not exist in this tree: grep found no step-up code, and the only \"rotate\" hits are the webhook secret and a comment. Both are listed as not provided. createLinkAction and the 2FA reset send no email to the person, which is also stated.\n  - Also listed as not provided: database RLS (S-03), SAML and LDAP, configurable retention and residency (L-03), any independent pentest or certification, error tracking, live-integration tests, and the service terms.\n\nM-11 (1):\n- admin.reports.mail.body in all ten locales: the middle paragraph now says the file is not attached; after sign-in, the link opens the report as a CSV or XLSX file; and a print-ready version you can save as PDF is on the console's Reports page. This matches jobs.ts, where the link is /api/admin/reports/{kind}?format=csv|xlsx, and /print/report/[kind] reached from the Reports page.\n- The placeholders ({report}, {link}) and the first and last paragraphs are unchanged. Each locale reuses its existing terms: console, its nav label for Reports, and its own word for link. French keeps the U+202F narrow spaces inside the guillemets. Sandbox was not renamed.\n\nProgress line for PROGRESS.md: \"B6-docs-en: English ADR index (001-043) in DECISIONS.md, OPEN-QUESTIONS.en.md (1-41), ADMIN-GUIDE, LEARNER-QUICKSTART and SECURITY-WHITEPAPER written against the code and linked from portal/README; scheduled report mail copy in ten locales says the link opens CSV/XLSX and the print-ready page is on Reports (O-02, O-05, M-11 part 1).\" No ADR is needed.",
+    "tests_added": [],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    },
+    "left_open": "Not done, and why:\n- No new test: this package changes only copy and docs, so there is no new logic branch to test. The existing tests/i18n.test.ts and tests/landing.test.ts pass, 220 tests in all.\n- The root README.md Documentation table was not changed. It was not in the brief's file list, and other packages may edit it. The three new docs should probably be added there at merge time.\n- docs/ARCHITECTURE.md was not edited, but parts are stale after wave A. Section 14 says every organisation runs on Baku time; section 5 says SSO accounts are matched by email only; section 17 still lists the 11 MB action limit, SSO domain proof, email-only matching and the Baku time zone as open. The whitepaper follows the code instead. A follow-up should update ARCHITECTURE.md.\n- The Azerbaijani, Russian and other non-English mail copy was written by an AI agent, not a native editor.\n- The English renderings drift whenever OPEN-QUESTIONS.md or DECISIONS.md change. Whoever adds a question or an ADR must also update OPEN-QUESTIONS.en.md and the index row.\n\nQuestions for the owner:\n1. Keep the engineering docs bilingual, with the Azerbaijani file as the source and the English file as a mirror, or switch to English only? (Register O-02.)\n2. The whitepaper and admin guide need legal and owner review before going to customers. The whitepaper deliberately names no SLA, support hours, status page, hosting region or vulnerability-reporting address; these are owner-provided texts (register O-05). Is the \"does not provide yet\" list acceptable to publish as written?\n\nNo new dependencies.",
+    "migrations": []
+   },
+   "reviews": [
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "docs/SECURITY-WHITEPAPER.md",
+       "line": 60,
+       "problem": "The customer-facing CSRF row says \"no GET request changes state\". That is not true in this tree. GET /api/t/[token]/open (portal/src/app/api/t/[token]/open/route.ts) calls recordOpen and writes the simulation open event, and GET /api/sso/callback/[tenant] signs people in and can create an account on first sign-in. The paper also says every statement was checked against the source, so a procurement reviewer could fault this line.",
+       "fix": "Narrow the clause. For example: \"no GET request changes account or organisation data, apart from the simulation open-tracking pixel and the single sign-on callback, which is protected by state, nonce and PKCE\". Or drop the clause."
+      },
+      {
+       "severity": "nit",
+       "file": "docs/LEARNER-QUICKSTART.md",
+       "line": 57,
+       "problem": "\"Some organisations require it\" suggests a learner can be forced to use two-step verification. twoFactorRequired (portal/src/server/auth/permissions.ts:84) applies only to super_admin and to console roles, so a learner is never required to use it.",
+       "fix": "Say that organisations may require it for console (administrator) roles, or drop the sentence."
+      },
+      {
+       "severity": "nit",
+       "file": "README.md",
+       "line": 323,
+       "problem": "The Documentation table in the root README does not link ADMIN-GUIDE, LEARNER-QUICKSTART or SECURITY-WHITEPAPER. It still describes docs/build as only \"in Azerbaijani\", without the new English index or OPEN-QUESTIONS.en.md. The brief did not require this change, and the implementer flagged it.",
+       "fix": "At merge time, add the three docs and the English mirrors to the root README Documentation table."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/messages/en/admin.json",
+       "line": 696,
+       "problem": "The mail body says the link opens the report \"as a CSV or XLSX file\". Each schedule has one fixed format (report_schedules.format), which jobs.ts puts into the link, so a given email only ever opens one of the two. This is accurate as general copy and matches the register's suggested wording.",
+       "fix": "Optional: pass {format} into mail.body in jobs.ts and name the actual format. That is a code change outside this copy-only package, so leave it as is unless the owner asks."
+      }
+     ],
+     "notes": "I recommend approving this package: no blockers or major problems remain, and every acceptance item holds.\n\n**What I checked**\n- **Starting commit.** The worktree's HEAD 6fc2e5b contains 1a45970, and the diff against 1a45970 holds both package commits, 324b8aa and 6fc2e5b. The 6fc2e5b follow-up tightens the 2FA wording to match twoFactorRequired and narrows the log claim to logFailure.\n- **O-02, ADR index.** DECISIONS.md has 43 ADR headings, 001 to 043, and the English index has a row for each. The amended and superseded flags match the bodies (036 replaces items 6-7 of 034; 039 supersedes 021; 035 amends 030; 043 amends item 4 of 032). Outside the index and the new \"## Qərarlar\" heading, the ADR bodies are unchanged.\n- **O-02, open questions.** OPEN-QUESTIONS.en.md has the same sections and items 1-41 as the Azerbaijani file. I compared items 22-27 in full, including every sub-bullet of item 26; they are faithful renderings.\n- **O-02, portal README.** The Azerbaijani \"Tez başlanğıc\" block is removed. Its English equivalents remain (Quick start, Demo accounts, and the PGlite single-process note), and nothing pointed at the removed block.\n- **O-05, admin guide.** I checked the guide against the code:\n  - layout.tsx GROUPS: order, permissions and feature gates\n  - settings TABS: 10 tabs\n  - PLAN_FEATURES for the three plans\n  - the CSV import limits: 5,000 rows (from the tooMany message) and 900 KB (IMPORT_MAX_BYTES)\n  - the logo limit (512 KB)\n  - drill speeds (90 s and 180 s)\n  - the 20-row outbox list\n  - twoFactorRequired, which covers every console role\n- **O-05, whitepaper.** I checked these claims against the code:\n  - the 8 roles and 27 permissions\n  - Argon2 at 19456/2/1 and the password rules (length 10, score 3)\n  - sessions of 30 and 90 days\n  - invitations at 14 days and reset links at 1 hour\n  - the DESTINATION_PORTS list\n  - the security headers in next.config.ts and HSTS 63072000 in proxy.ts\n  - the Dockerfile base image node:24-trixie-slim with USER node\n  - backup.sh keeping 14 days\n  - redactAccountLinks\n  - evidence labels on the /c/[token] page, in reports/build.ts and in the data export\n  - PRIVILEGED_ROLES\n\n  The \"not provided yet\" list correctly includes RLS (S-03), step-up (S-06), key rotation (S-07), SAML and LDAP, residency, pentest and certification, and error tracking. Self-service password change and the cross-tenant enumeration risk named in O-05 are handled the way ADR-041 records.\n- **O-05, links.** The three docs are linked from portal/README.md. docs/README.md does not exist. Every relative link in the new docs resolves: API.md, OPERATIONS.md, ARCHITECTURE.md and legal/SUBPROCESSORS.md.\n- **M-11 (1), mail copy.** admin.reports.mail.body changed in all ten locales. The {report} and {link} placeholders are intact, and the ar text keeps its isolates. The text matches jobs.ts, which sends a link to /api/admin/reports/{kind}?format=csv|xlsx. It also matches the Reports page, which links to /print/report/{kind}. Each locale uses its own nav label for Reports, and Sandbox was not renamed.\n\n**Tests**\n- tests/i18n.test.ts and tests/landing.test.ts pass: 2 files, 220 tests.\n- I did not run lint or typecheck. The package changes only .md and .json message values, and neither is in the lint or typecheck scope beyond the JSON parity the tests already cover.\n\n**Not checked:** I did not read every row of the ADR index against its Azerbaijani body; I spot-checked the amended and superseded rows. I did not compare items 1-21 and 28-41 of OPEN-QUESTIONS.en.md beyond their titles. The non-English mail copy was not reviewed by a native editor, as the implementer noted."
+    },
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "docs/LEARNER-QUICKSTART.md",
+       "line": 58,
+       "problem": "The quickstart says of two-step verification that \"Some organisations require it\". In the code, twoFactorRequired (portal/src/server/auth/permissions.ts:84-86) is only ever true for super_admin, or for console roles while requireAdmin2fa is on. The learner role, which this page is written for, is never required to set it up, so a learner may think their organisation can force it on them.",
+       "fix": "Reword to \"Optional for employees; people with admin-console access may be required to set it up by their organisation\", or drop the sentence."
+      },
+      {
+       "severity": "nit",
+       "file": "docs/ADMIN-GUIDE.md",
+       "line": 170,
+       "problem": "The Security operations intro says the pages are for security analysts and tenant administrators. Threat intelligence and Policy intelligence are gated by intel.read, which also includes content_creator (permissions.ts). The role table at the top also does not list intelligence under content creator.",
+       "fix": "Add \"(Threat and Policy intelligence: also content creators)\" next to the Risk profiles exception."
+      },
+      {
+       "severity": "nit",
+       "file": "docs/ADMIN-GUIDE.md",
+       "line": 222,
+       "problem": "The Sign-in tab row says \"Administrators always sign in with their own password, never through SSO\". PRIVILEGED_ROLES also covers analysts and campaign managers. The whitepaper states this correctly, so the two customer documents differ slightly.",
+       "fix": "Say \"Administrators, security analysts and campaign managers always sign in with their own password...\"."
+      }
+     ],
+     "notes": "I recommend approving: there are no blockers or majors, only one minor and two nits, all in the docs.\n\n**Base and scope**\n- Commit 1a45970 is an ancestor of HEAD.\n- The branch has two commits: 324b8aa and a follow-up, 6fc2e5b, which tightens the whitepaper and admin guide.\n- No code or schema changes.\n\n**O-02**\n- DECISIONS.md: only 52 lines were added and none removed, so the ADR bodies are untouched.\n- The index has 43 rows, matching the 43 ADR headings (ADR-001 to ADR-043, with 035-043 from wave A).\n- OPEN-QUESTIONS.en.md has the same 7 headings and the same 41 numbered items in order. I spot-checked items 23, 25, 38 and 41 against the Azerbaijani source, and they are faithful.\n- portal/README.md: the Azerbaijani quick-start block is gone. The English Quick start, Demo accounts and the PGlite note remain. The three new docs are linked. docs/README.md does not exist.\n\n**O-05: whitepaper claims checked against the code; all match**\n- 27 permissions and 8 roles (permissions.ts, schema ROLES).\n- Argon2 settings 19456/2/1 (password.ts).\n- 1 MB Server Action limit; proxyClientMaxBodySize 11mb applies to the proxy only (next.config.ts).\n- Invitations expire after 14 days (auth/links.ts).\n- Daily domain re-check (jobs.ts recheckDomains).\n- email_verified is checked (sso callback route).\n- The sandboxing CSP on assets (api/assets/[id]).\n- Server-verified evidence:\n  - minDwellMs and the learning.completion_refused audit entry (learning.ts).\n  - The evidence label appears on the public certificate, in exports, in the confirmations report and in the compliance pack.\n- Two-step verification for console roles, on by default (twoFactorRequired, tenant-defaults).\n- Step-up re-authentication (S-06), key rotation (S-07), RLS (S-03) and SAML are correctly listed as not provided.\n- The register shows S-01, S-02, S-05 and S-09 as open, but the 2026-11-05 snapshot predates wave A, and the code in this tree implements all four. Mentioning them is correct.\n\n**O-05: admin guide checked against the code; all match**\n- Nav groups, order and feature gates (admin/layout.tsx).\n- Plan feature lists (PLAN_FEATURES).\n- live_drill as a seed-only feature.\n\n**M-11 (1)**\n- The mail body changed in all ten locales; the placeholders are unchanged.\n- The Reports label quoted in each locale matches nav.reports.\n- The link and format match jobs.ts.\n- In the HTML mail, the {link} line renders as a button below the text, so \"the link below\" reads correctly.\n- Sandbox was not renamed.\n\n**Tests:** I re-ran tests/i18n.test.ts and tests/landing.test.ts: 220 passed. Lint and typecheck do not apply; only Markdown and JSON changed.\n\n**Merge-time items (not defects):**\n- The root README.md Documentation table could also link the three new docs.\n- docs/ARCHITECTURE.md is stale after wave A, as the implementer noted.\n\nI did not check every item of OPEN-QUESTIONS.en.md line by line, nor every row of the ADR index against its body (only the first rows and the last two). I did not review the non-English mail translations with native speakers."
+    }
+   ],
+   "fix": {
+    "fixed": [
+     "docs/SECURITY-WHITEPAPER.md: the CSRF row now reads 'no GET request changes account or organisation data, apart from the simulation open-tracking pixel and the single sign-on callback, which is protected by state, nonce and PKCE'. Checked against portal/src/app/api/sso/callback/[tenant]/route.ts (state cookie compared at line 40, PKCE verifier at line 74, ID-token nonce at line 76) and portal/src/app/api/t/[token]/open/route.ts. Other GET routes (qr image, report/people/export downloads) only read data, apart from audit and rate-limit rows.",
+     "docs/LEARNER-QUICKSTART.md: 'Some organisations require it' replaced with 'It is optional for employees; people with admin-console access may be required by their organisation to set it up.', which matches twoFactorRequired in portal/src/server/auth/permissions.ts:84-86."
+    ],
+    "rejected": [],
+    "commits": [
+     "2d1c463 Whitepaper and quickstart: narrow the GET claim, state who must use 2FA"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    }
+   }
+  },
+  {
+   "wp": "B7-scorm",
+   "impl": {
+    "wp": "B7-scorm",
+    "branch": "worktree-wf_42496c94-3d0-7",
+    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-7",
+    "commits": [
+     "c645aba B7-scorm: SCORM 1.2 export of a module with an offline player"
+    ],
+    "summary": "The previous attempt had left uncommitted work in this worktree. I checked it against the brief (base 1a45970 is confirmed), re-ran all three checks and committed it.\n\nFiles:\n- src/server/zip.ts (new): the zip writer moved out of src/server/reports/xlsx.ts, which now imports it. Its behaviour is unchanged.\n- src/server/brands.ts (new): brandsFor() moved here from learn/[slug]/[lessonId]/page.tsx so the export can reuse it. The page now imports it.\n- src/server/scorm/package.ts (new):\n  - scormData() loads a module the tenant can reach (library or its own; otherwise null).\n  - It loads every lesson in the chosen locale with pickLessonContent (falls back to en), plus the brands the lessons reference and the player's message namespaces (common, player, part of learner).\n  - manifestXml() writes SCORM 1.2 / IMS CP 1.1.2: metadata, one default organization, one SCO item, adlcp:masteryscore 80 only when a scene is scored, and one resource with the file list.\n  - scormFiles() returns imsmanifest.xml, launcher.html, lessons.js, player.js and player.css, all with relative paths.\n- src/server/scorm/player.ts (new): reads the bundle from .data/scorm/. If it is missing, it builds it once via `node --import tsx scripts/build-scorm-player.ts`, shared by concurrent requests.\n- src/app/api/admin/modules/[id]/scorm/route.ts (new), GET:\n  - Uses apiViewer('studio.write') and the studio feature, the same gate as the Studio page.\n  - Answers 400 for a bad locale, 404 for a non-uuid id, an unreachable module or one with no lessons.\n  - Rate limit: 30 per person per hour.\n  - Writes audit entry 'module.exported' (meta: format and locale), sends Content-Disposition attachment and no-store.\n- src/scorm/entry.tsx, app.tsx, scorm-api.ts, next-shim.tsx, no-server.ts (new), the offline bundle:\n  - LessonPlayer runs inside NextIntlClientProvider with the bundled messages; lessons are chosen by hash route or the first unfinished one.\n  - next/link and next/navigation map to a hash shim; every `@/server/*` import maps to stubs that throw.\n  - The API is found by the standard walk (this window, up to 7 parents, then the opener).\n  - connect() calls LMSInitialize and sets status 'incomplete' on the first launch. Finished lessons go into cmi.suspend_data, with cmi.core.exit 'suspend' while some remain.\n  - When the module is done it sets score.min/max/raw (scoreLesson from src/lib/content/scoring.ts, run in the browser) and passed/failed against the mastery score, or 'completed' when nothing is scored.\n  - session_time and LMSCommit run on every finish; LMSFinish runs on pagehide.\n  - The tutor is off; narration uses Web Speech only (clips null).\n- scripts/build-scorm-player.ts (new): esbuild (imported directly; it resolves) builds one IIFE player.js. @tailwindcss/postcss compiles src/app/globals.css into player.css, with system font fallbacks for the next/font variables.\n- components/player/player.tsx: new optional `onComplete(answers)` prop. When it is set, it replaces completeLessonAction and every other server action (start, reachScene, preferences, problem report, done URL param).\n- Admin UI:\n  - components/admin/scorm-export.tsx (new): module and locale selects, plus a download link styled as a button.\n  - It is mounted on admin/studio/page.tsx over library and own modules.\n  - Strings are in admin.scorm.* and admin audit label module_exported, in all ten locales.\n  - services/audit.ts: new action 'module.exported'.\n- Dockerfile: the builder stage runs build-scorm-player.ts and the runtime image copies .data/scorm.\n- docs/API.md: the endpoint, the package layout, the SCORM runtime behaviour and the rate-limit row.\n\nDecisions (ADR text for the orchestrator):\n1. The data file is lessons.js (sets window.CYCLOWARENESS_SCORM) instead of lessons.json, because browsers refuse fetch() from file:// pages.\n2. The built bundle is not committed. In dev it is built on demand and cached in .data/scorm (delete the folder after changing the player); the Docker builder stage prebuilds it.\n3. Mastery score is fixed at 80. Raw score = share of first-try correct answers across all lessons.\n4. Permission is studio.write plus the studio feature, matching the Studio page.\n5. No AzNumbersGate in the bundle, to avoid a 1.4 MB polyfill. The player's numbers stay below 1000.\n6. Nothing is reported back to the portal; completions stay in the LMS.\n\nProgress line: B7-scorm done. A module exports as a SCORM 1.2 zip (manifest, launcher, offline player, lessons in the chosen locale), with an Export SCORM 1.2 card in Studio in ten locales, audited, and documented in docs/API.md.",
+    "tests_added": [
+     "portal/tests/scorm-export.test.ts",
+     "portal/tests/scorm-api.test.ts",
+     "portal/tests/scorm-player.test.ts"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    },
+    "left_open": "No new dependency was needed: esbuild and @tailwindcss/postcss were already installed.\n\nNot tested:\n- Not tried in a real LMS such as SCORM Cloud or Moodle.\n- Opening launcher.html from file:// was not tried in a real browser. The tests check only that the launcher uses relative paths and that player.js is a single non-module script.\n- The Docker image build was not run.\n\nOpen questions for the owner:\n- Should the mastery score (fixed at 80) be set per module or per export?\n- Should LMS completions ever flow back into portal progress? Today they do not.\n\nKnown limits:\n- In dev the cached bundle in .data/scorm goes stale after player changes until the folder is deleted.\n- cmi.suspend_data is capped at 4096 characters in SCORM 1.2. The progress JSON is about 20 characters per lesson, so it is fine for current modules but would overflow for a module with about 200 lessons.\n\nTests run: the three SCORM test files plus the related ones (i18n, in-code-locales, rtl-logical, player-controls, player-resume, reports-build, day-and-audit): 10 files, 698 tests, all passing.",
+    "migrations": []
+   },
+   "reviews": [
+    {
+     "verdict": "changes_required",
+     "findings": [
+      {
+       "severity": "major",
+       "file": "portal/src/scorm/app.tsx",
+       "line": 484,
+       "problem": "In a module with more than one lesson, the learner never sees the done screen. With no hash in the URL (the normal first launch), the lesson index is the first unfinished lesson in the `done` state. onComplete calls setDone(session.done()) before the player's own setResult/setPhase('done'), so the index moves on and the `key={`${hash}|${lesson.key}`}` changes. LessonPlayer then remounts on the next lesson's intro, and the result, recap and 'Next lesson' button for the finished lesson are thrown away. After the last lesson every lesson is done, findIndex returns -1, Math.max(0, -1) gives 0, and the learner lands on lesson 1's intro with no sign that the module is complete. The done screen survives only when the learner arrived through a hash link (syllabus or next-lesson button) or when the module has one lesson. The 'offline app wiring' test calls onComplete on the captured props but never re-renders, so it misses this.",
+       "fix": "Keep the lesson shown stable across a completion. Pick the fallback 'first unfinished' lesson once at mount (for example `const [start] = useState(() => Math.max(0, data.lessons.findIndex((l) => !session.done().has(l.key))))`) and use it when the hash names no lesson. Keep `done` live only for the syllabus and completedBefore. Add a test: render ScormApp, call the captured onComplete for the first of two lessons, re-render, and check that the LessonPlayer key and lesson stay the same."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/components/admin/scorm-export.tsx",
+       "line": 325,
+       "problem": "The export is a plain `<a download>`. Any error response (429 rate limit, 404 for an own module with no lessons, 500 when the dev build fails) is saved as a file holding 'Not found' or 'Too many requests', with no message in the UI. The select also lists own modules that have no lessons yet, and those always answer 404.",
+       "fix": "List only modules that have at least one lesson in `exportable`, by joining or filtering on lessons. Optionally show errors with a toast instead of downloading them."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/server/scorm/player.ts",
+       "line": 867,
+       "problem": "The cached bundle in .data/scorm is never invalidated in development. After any change to the player, scenes or messages code, exports keep shipping the stale player.js until someone deletes the folder by hand. This is documented, but easy to miss, and it can produce a package that does not match the server's lesson data shape.",
+       "fix": "Acceptable as documented. Cheap hardening: also rebuild when the bundle is older than the newest file under src/components/player or src/scorm, or say in OPEN-QUESTIONS that the cache must be cleared."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/components/player/player.tsx",
+       "line": 700,
+       "problem": "Offline, the done screen still shows the 'Home' link (it becomes '#/app', which just reopens the first unfinished lesson) and the 'no XP' line, which mean nothing inside an LMS.",
+       "fix": "Hide the Home link and the XP line when `offline` is true."
+      }
+     ],
+     "notes": "Base 1a45970 is an ancestor of HEAD. The three SCORM test files pass when re-run here (28 tests). I did not re-run typecheck or lint.\n\nChecked and fine:\n- Route gate: studio.write plus the studio feature, the same as the Studio page. Bad locale answers 400; non-uuid, unknown or another organisation's module answers 404. Rate limit and the module.exported audit entry are in place.\n- Manifest structure: identifiers, masteryscore position, scormtype spelling, resource file list.\n- The zip writer move; reports tests ran.\n- Lesson locale fallback through pickLessonContent.\n- Every useTranslations namespace the player uses is in the bundled messages (common, player, learner.profile/attest/problem).\n- Every server action is guarded or unreachable offline: attest only runs for awaiting_attestation, which never happens offline; the problem section is hidden.\n- Captions never fetch /api/subtitles because captionLocales and moreLanguages are empty. The tutor is hidden by tutorEnabled=false.\n- Scenes and the cat mascot reference no absolute-URL assets. The Rive robot, with its /rive path, is not used.\n- Docker: .data is in .dockerignore, but the builder generates the bundle and the runtime copies it, and no volume shadows /app/.data.\n- ScormExport strings are present in all ten locales.\n\nThe UI is a Studio card with a module select, not a button on a module page. That is acceptable given the brief's 'catalog/studio'.\n\nNot checked: a real LMS or a file:// run, the Docker build, and the full test suite. The major finding comes from reading the code (key/index logic in ScormApp); I did not reproduce it in a browser."
+    },
+    {
+     "verdict": "changes_required",
+     "findings": [
+      {
+       "severity": "major",
+       "file": "portal/src/scorm/app.tsx",
+       "line": 484,
+       "problem": "The learner never sees a lesson's done screen in the default LMS launch, and the last lesson drops them back to lesson 1. On launch the hash is empty, so the lesson shown is the first unfinished one, computed from the `done` state, and the player's key is `${hash}|${lesson.key}`. onComplete calls setDone(session.done()) before the player gets to setResult/setPhase('done'). The re-render then picks the next unfinished lesson, the key changes and the LessonPlayer remounts on the next lesson's start screen, so the done screen is lost. After the module's last lesson, findIndex returns -1 and Math.max(0, -1) shows lesson 1 again as if nothing happened. Only a launch that already has a #/learn/... hash avoids this. The test in scorm-api.test.ts only renders statically, so it does not catch it.",
+       "fix": "Choose the lesson only when the hash changes, not when `done` changes. For example, compute the index in a useMemo keyed on `hash` that reads session.done() directly, and keep the `done` state only for the syllabus flags. The finished lesson then stays mounted and shows its done screen, and its 'Next lesson' or 'Back to the module' link moves on. Add a test that calls onComplete on the last lesson and checks that the shown lesson key does not change."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/components/admin/scorm-export.tsx",
+       "line": 325,
+       "problem": "The export is a plain `<a download>`. A 404 (for example a custom module with no lessons), a 429 (rate limit) or a 500 (the on-demand build failed in dev) is saved as a small text file instead of showing an error. The administrator gets a junk download and no message in any of the ten languages.",
+       "fix": "Acceptable for now. If it matters: fetch the zip, show a toast on an error status using an admin.scorm.error string in ten locales, and save the blob with an object URL. Or at least note the behaviour in docs/API.md."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/app/(admin)/admin/studio/page.tsx",
+       "line": 179,
+       "problem": "The exportable list takes every library module and every own module with no de-duplication. When a tenant has its own module with the same slug as a library one (the catalog keeps the tenant's copy, see queries/catalog.ts bySlug), the select shows two options with the same title. Own drafts are listed alongside published modules with nothing to tell them apart.",
+       "fix": "Optional: de-duplicate by slug the way getCatalog does (prefer the tenant's row), or append a draft marker to draft titles."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/components/player/player.tsx",
+       "line": 649,
+       "problem": "In the package the done screen always says player.done.noXp ('Lesson reviewed') because xp is 0. It also offers a 'Home' button whose /app link becomes #/app, which just reopens the first unfinished lesson (or lesson 1). In an LMS both read oddly to a learner.",
+       "fix": "Optionally hide the Home button and the XP pill when offline, using the existing `offline` flag."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/scorm/player.ts",
+       "line": 870,
+       "problem": "The dev cache in .data/scorm is never invalidated, so after a player change exports silently ship a stale player until someone deletes the folder by hand. This is documented, but easy to miss.",
+       "fix": "Optional: also mention it in the cyclowareness-experience lesson-engine reference next to the player, or rebuild when the cached player.js is older than src/components/player/player.tsx."
+      }
+     ],
+     "notes": "The review ran on commit c645aba in .claude/worktrees/wf_42496c94-3d0-7; base 1a45970 is confirmed. tests/scorm-api.test.ts, tests/scorm-export.test.ts and tests/scorm-player.test.ts all pass (28 tests). I built the offline bundle into the scratchpad. player.js is 1.06 MB and its only reference to process is a typeof-guarded process.emit. It contains no /_next or absolute asset URLs. /api/subtitles and /api/tutor appear in it, but they are unreachable with the tutor off and moreLanguages empty. In the lessons, mascot and globals.css I found no absolute asset paths; Rive is imported for types only.\n\nWhat is sound:\n- The route checks studio.write and the studio feature, validates the uuid and the locale, rate-limits, and audits module.exported after the zip is built.\n- The manifest's identifiers are xs:ID-safe, and lessons.js is a separate script, so </script> injection is not an issue.\n- The answer de-duplication in player.tsx (line 302) makes `correct` equal to first-try correctness, so the score matches the portal's first-try metric.\n- Exporting an own draft does not bypass any approval, because the same studio.write holder can publish it.\n- OS reduced motion is still honoured through motionLevel and globals.css.\n- Strings are in all ten locales (I spot-checked az, ar and de; no \"Aİ\"). docs/API.md documents the endpoint and the rate-limit row. docs/build was left alone, as the hard rules require.\n\nOne finding blocks approval, the major one: the lesson remounts when it is finished, so the done screen is never shown and the last lesson sends the learner back to lesson 1.\n\nNot checked: a real LMS, opening the package from file:// in a browser, the Docker build, and the 375 px layout in a browser."
+    }
+   ],
+   "fix": {
+    "fixed": [
+     "major (both duplicate findings), portal/src/scorm/app.tsx: the lesson shown is now picked in a useMemo keyed on the hash, which reads session.done() through the new exported lessonIndex(lessons, hash, done). When a lesson finishes, setDone only updates the syllabus and completedBefore. The hash and the lesson key stay the same, so the LessonPlayer is not remounted and its done screen, recap and Next lesson link stay on screen. Finishing the last lesson no longer jumps back to lesson 1; lesson 1 is shown again only when the learner navigates away. Added a lessonIndex test in tests/scorm-api.test.ts (lesson named by the hash, first unfinished lesson, all lessons done goes to 0).",
+     "minor, scorm-export.tsx (both duplicate findings): the export is fetched instead of linked through <a download>, using the same pattern as invite-links-button.tsx. An error response shows a toast with the existing common.errors.rateLimited (on 429) or common.errors.generic string, which are already in all ten locales, so no file holding the error text is saved. A good response is saved as a blob under the name from Content-Disposition.",
+     "minor, studio/page.tsx: the export list now holds only modules that have at least one lesson (an inArray subquery on lessons). It keeps one module per slug and prefers the tenant's own copy, as queries/catalog.ts does. Draft modules get the existing secops.studio status.draft label after their title.",
+     "minor, src/server/scorm/player.ts: in development the cached bundle in .data/scorm is rebuilt when any file under src/scorm, src/components/player, src/lib/content or messages is newer than player.js. In the Docker image these folders do not exist, so the bundle there is never rebuilt. The script header and docs/API.md now say this. New test tests/scorm-player-cache.test.ts covers it with a mocked execFile: the bundle is built once when missing, reused while current, rebuilt when a source is newer, and never rebuilt when the sources are absent."
+    ],
+    "rejected": [
+     "Only part of the suggested test for the majors was added: no test re-renders ScormApp after onComplete and checks that the LessonPlayer key stays the same. The vitest environment is node, and no DOM renderer is installed (no jsdom, happy-dom, react-test-renderer or @testing-library). renderToStaticMarkup cannot apply a state update after the first render. The fix makes the stability come from the code's structure instead: the index depends only on the hash, and the hash is the only input that remounts the player. The selection logic itself is tested through lessonIndex. A real re-render test needs jsdom as a devDependency, which I did not install."
+    ],
+    "commits": [
+     "53a835d B7-scorm review fixes: stable lesson on finish, export list and errors, stale bundle"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    }
+   }
+  },
+  {
+   "wp": "B8-risk-story",
+   "impl": {
+    "wp": "B8-risk-story",
+    "branch": "worktree-wf_42496c94-3d0-8",
+    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-8",
+    "commits": [
+     "aced5b2 Leadership risk story: data-driven sentences in ten languages, also in the compliance pack",
+     "3bfc60d Risk story: share the department-filter narrowing with the reports, wrap long tile labels"
+    ],
+    "summary": "This is a retry. The earlier run had already committed the main work (aced5b2), but it left a small refactor uncommitted, and those files had been rewritten with CRLF line endings. I changed them back to LF (the index uses LF), checked the work again and committed it (3bfc60d).\n\nFile by file:\n- portal/src/server/queries/risk-story.ts (new): `riskStory(viewer, locale, departmentId?)` returns either an empty state `{ empty: true, days }` or the story:\n  - **Trend:** average score on the first and last day of `user_risk_snapshots` over the last 21 days.\n  - **Most exposed department:** highest average current risk, among departments with at least 3 active members.\n  - **Weakest category:** the module category with the most open `behavior_risks` in that department. Its module with the most open risks is the next step.\n  - **Campaign:** the campaign launched in the window whose click rate changed most against the campaign launched before it.\n  - **Training:** the module most people completed in the window.\n  - **Certificates:** share of people in scope with a `server_verified` certificate since the start of the quarter, using the organisation's time zone.\n  - The empty state applies when there are fewer than STORY_MIN_DAYS = 7 snapshot days.\n  - `storySentences(story, locale)` turns this into 4–6 sentences. Each sentence is one ICU message (plural, select, date). Nothing is concatenated and no AI is used.\n- portal/messages/{az,en,ru,tr,ro,ka,uk,de,fr,ar}/admin.json: new `riskStory` namespace in all ten locales, same keys everywhere (title, subtitle, empty, weakest, weakestCategory, trend, campaign, training, certified, next, assign, finding, tiles.*).\n- portal/src/app/(admin)/admin/leadership/page.tsx: a 'Risk story' card at the top of the page (server component).\n  - Shows the sentences, then the numbers as small tiles: average risk, change since a date, certified this quarter, most exposed department. Values sit in `<bdi>` so they read correctly in Arabic.\n  - Dates are formatted on the server in the tenant time zone (the next-intl request config sets the tenant's timeZone).\n  - The recommended step opens AssignDialog already set to that module and department. It only appears for viewers with `assignments.write`.\n  - leadership/loading.tsx was updated to match the new layout.\n- portal/src/components/admin/assign-dialog.tsx: new optional `preset` and `label` props, so the dialog can open pre-filled.\n- portal/src/server/reports/build.ts: `buildRiskStory(viewer, filters, locale)` returns the same sentences as a 'Risk story' table. portal/src/app/(print)/print/compliance/page.tsx prints it as the first section of the compliance pack.\n- portal/src/server/queries/admin.ts: `narrowToDepartment` is now the single rule for department filters: a deleted, merged, foreign or out-of-scope department matches nobody. Both the risk story and `scopedPeople` in the reports use it instead of two copies.\n- portal/tests/risk-story.test.ts: tests listed under tests_added.\n\nProposed ADR: \"Leadership risk story is template-based.\" The sentences are ICU messages filled from tenant data (snapshots, behaviour risks, campaigns, progress, certificates). There is no AI dependency, so the text is the same every time and can be audited. Below 7 snapshot days the story is an explicit empty state. A department needs at least 3 members to be named the most exposed.\n\nProgress line: \"B8 risk story: leadership panel plus compliance-pack section, 10 locales, tests.\"\n\nChecks: `npm run typecheck`, `npx eslint src tests scripts --max-warnings=0`, and `npx vitest run` on tests/risk-story, reports-build, rtl-logical, i18n, in-code-locales, auth and route-status all pass (725 tests). The Azerbaijani files contain no \"Aİ\".",
+    "tests_added": [
+     "portal/tests/risk-story.test.ts: returns the empty state for a new organisation and while there are fewer than 7 snapshot days",
+     "portal/tests/risk-story.test.ts: on a seeded in-memory organisation, finds the right department (Finance), weakest category, a falling trend (52 to 45), the campaign that moved most, the top training, the certified share and the next step",
+     "portal/tests/risk-story.test.ts: a department filter narrows the story; a filter outside the viewer's scope or from another organisation matches nobody",
+     "portal/tests/risk-story.test.ts: the compliance-pack section (buildRiskStory) carries the same sentences",
+     "portal/tests/risk-story.test.ts: in each of the ten locales, the full, sparse, steady and empty stories and the tile labels render with no missing argument (the translator throws on any error)"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    },
+    "left_open": "Decision for the owner: the thresholds (7 snapshot days before a story appears, 3 members before a department can be named, a 21-day window) are constants in risk-story.ts and not organisation settings. Change them if your customers need other values. Not done: I did not open the page in a browser, since the brief forbids starting or stopping servers. The Arabic layout is covered only by the rtl-logical test and the `<bdi>` tags, not by looking at it. No new dependencies and no schema changes.",
+    "migrations": []
+   },
+   "reviews": [
+    {
+     "verdict": "changes_required",
+     "findings": [
+      {
+       "severity": "major",
+       "file": "portal/src/server/reports/build.ts",
+       "line": 59,
+       "problem": "buildRiskStory uses only f.departmentId and ignores the pack's period (f.from/f.to). The compliance print page documents the rule \"Every section, the period header and the audit entry use the filters the reports apply\" (print/compliance/page.tsx:29-30). The new section breaks that rule. A pack printed today for an earlier period (say ?from=2026-01-01&to=2026-03-31) puts this week's story under that period's header: the 21-day trend, campaigns and trainings from the last three weeks, and 'This quarter ... certificate' for the current quarter, not Q1. This is a document for auditors at banks and governments, so it misleads them.",
+       "fix": "Make the section honest about its time frame, either way with a test in tests/risk-story.test.ts. Option 1: when a period is given and f.to is before today, leave the section out (return no rows, or have the print page skip it). Option 2: give the section an as-of title, a new ICU key such as riskStory.titleAsOf \"Risk story (as of {date, date, long})\" in all ten locales, so a past-period pack shows plainly that the story is current. Do not compute the story inside a period it does not cover."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/app/(admin)/admin/leadership/page.tsx",
+       "line": 115,
+       "problem": "The 'most exposed department' tile shows the department name as a truncated <dd> with no title or other way to read the full text. Long department names (common in government tenants, and in de/ka/ru) get cut off. The tile labels were made to wrap (break-words), but this value was not.",
+       "fix": "Let the note wrap like the label (break-words instead of truncate), or add title={x.note}."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/server/queries/risk-story.ts",
+       "line": 105,
+       "problem": "The recommended next step is the module with the most open behaviour risks in the weakest category. It does not check whether that department already has an active assignment of the module, so the panel can keep suggesting 'assign X to Finance' after X was assigned. Assigning it again creates a duplicate.",
+       "fix": "Optional: skip modules with an active assignment for that department when choosing toAssign, or note the limit in a shortcut comment and as an open question."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/queries/admin.ts",
+       "line": 99,
+       "problem": "The summary says narrowToDepartment is now the single rule for department filters. overviewData still has its own copy (lines 99-100), and that copy falls back to the whole scope for a deleted or foreign filter instead of matching nobody. This code existed before the package, but the claim that the root cause was fixed once in shared code is incomplete.",
+       "fix": "Use narrowToDepartment in overviewData too, or say that it was left out on purpose."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/messages/ar/admin.json",
+       "line": 1187,
+       "problem": "In the RTL sentences, interpolated department names and module titles (often Latin script) are not bidi-isolated. Only the tile values use <bdi>. With guillemets this is mostly fine, but a Latin name next to Arabic digits or a percent sign can be reordered.",
+       "fix": "Optional: wrap the interpolated names in U+2068/U+2069 (FSI/PDI) when formatting the RTL sentences, or check the layout in a browser in Arabic."
+      }
+     ],
+     "notes": "I reviewed commits aced5b2 and 3bfc60d in the worktree .claude/worktrees/wf_42496c94-3d0-8; it has 1a45970 as an ancestor and the working tree is clean. I re-ran the checks: typecheck passes, eslint passes with zero warnings, and vitest on tests/risk-story, reports-build and rtl-logical passes (28 tests).\n\nWhat holds:\n- The riskStory query covers the weakest department (at least 3 members) and its weakest category, the 21-day trend from user_risk_snapshots, the campaign that moved the click rate most and the most-completed training, server-verified certificates since the start of the quarter in the tenant time zone, and the next step.\n- The empty state for a new organisation or fewer than 7 snapshot days is tested.\n- The riskStory key set is the same in all ten locales, and there is no \"Aİ\" in az.\n- Every locale renders through createTranslator with onError set to throw, so a missing argument fails the test.\n- The plural forms for ru, uk, ro, fr and ar look right.\n- Dates use {since, date}, and the next-intl request config supplies the tenant time zone even when a locale is passed explicitly.\n- The page is a server component; the tile values are in <bdi> and the CSS is logical.\n- AssignDialog presets the module and department, and createAssignmentAction still checks server-side that the module and department belong to the organisation.\n- The compliance pack calls buildRiskStory with the same department narrowing as scopedPeople, and a test asserts the section.\n\nThe one major finding is the time frame of the compliance-pack section. The rest is minor polish.\n\nNot checked: the page in a real browser, in Arabic or any other locale."
+    },
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "portal/src/server/reports/build.ts",
+       "line": 59,
+       "problem": "buildRiskStory passes only f.departmentId and ignores the pack's from/to period. The compliance page comment says every section uses the filters the reports apply, but this section always describes the last 21 days and the current quarter. An auditor reading a pack for Q1 gets a 'Risk story' that describes November, under a header that names Q1. The trend and training sentences carry their own 'since' date, so this is not silent, but the weakest-department and campaign sentences have no date at all.",
+       "fix": "Keep the brief's 'same sentences'. Make the section say that it reflects the state on the day the pack was generated, for example a title such as 'Risk story (as of {date})' added to the riskStory namespace in all ten locales. Alternatively, record in the ADR that this section ignores the period."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/src/app/(admin)/admin/leadership/page.tsx",
+       "line": 97,
+       "problem": "The recommended-step AssignDialog gets paths=[] and people=[], but it still shows the Path and Person segments. Picking either one gives an empty list or select, and an administrator may not understand why. The 'Everyone' segment also stays one click away from the preset department.",
+       "fix": "Acceptable as is. If you want it tighter, pass the real paths and people lists, as the assignments page does, so that every segment works."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/app/(admin)/admin/leadership/page.tsx",
+       "line": 72,
+       "problem": "The 'Most exposed department' tile shows the department's average risk number as its main value and puts the department name in a small truncated note. A reader expects the name to be the value. At 375 px, with two columns, a long department name is cut off.",
+       "fix": "Label the tile with the department name, or relabel it 'Risk in most exposed department', and let the note wrap instead of using truncate."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/messages/de/admin.json",
+       "problem": "In riskStory.training the verb 'haben' is outside the plural ('...haben sie {people, plural, one {# Person} ...} abgeschlossen'). For one person this reads 'haben sie 1 Person abgeschlossen', which is wrong grammar; it should be 'hat'.",
+       "fix": "Move the verb inside the plural: '{people, plural, one {hat sie # Person} other {haben sie # Personen}} abgeschlossen'."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/queries/risk-story.ts",
+       "line": 76,
+       "problem": "The module chosen for the next step comes from the behaviour_risks join. Nothing checks that the module is published, or that it is not already assigned to that department, so the story can keep recommending a step that has already been taken.",
+       "fix": "Optional: filter on modules.status = 'published'. Already-assigned modules can be left for a later pass."
+      }
+     ],
+     "notes": "I reviewed the diff from 1a45970 to 3bfc60d in .claude/worktrees/wf_42496c94-3d0-8. The worktree descends from 1a45970.\n\nWhat the change does:\n- risk-story.ts is a small template-based query with no AI.\n- Every sentence is a single ICU message, using select, plural (with the Arabic and Slavic forms) and date arguments. The riskStory keys are the same in all ten locales.\n- The test checks every locale, with onError set to throw. I spot-read az, ar, de, ru, tr, fr, ka, uk and ro: the meaning is right, there is no 'Aİ', and Turkish puts the percent sign first (%{x}).\n- The leadership panel is a server component. Its values sit in <bdi> and its CSS is logical, and dates are formatted in the request's tenant time zone.\n- The recommended step appears only for viewers with assignments.write.\n- narrowToDepartment replaced the duplicate rule in scopedPeople without changing behaviour, and the 'nobody' cases (out of scope, foreign department) are tested.\n- The empty state below 7 snapshot days is tested.\n- The compliance pack section is tested.\n\nI ran tests/risk-story.test.ts and tests/rtl-logical.test.ts in the worktree: 16 tests passed. I did not rerun typecheck or lint; the implementer reports both green.\n\nDocs: as the brief says, nothing under docs/build was edited. The ADR and progress line are in the implementer's summary.\n\nNot checked:\n- The page was not rendered in a browser, so the 375 px and Arabic layout checks come from reading the code only.\n- Every query passes the people in scope as an inArray list of ids. That copies the existing listPeople pattern, but it would hit Postgres's parameter limit in a tenant with more than about 65,000 users."
+    }
+   ],
+   "fix": {
+    "fixed": [
+     "major (reports/build.ts:59, period ignored): buildRiskStory now titles the section with a new ICU key riskStory.titleAsOf \"Risk story (as of {date, date, long})\" in all ten locales, dated requestNow(), so a pack printed for an earlier period shows that the story describes the day of printing. The compliance page comment now names this one exception. Test: a Q1-filtered pack gets the as-of title, and titleAsOf renders in every locale.",
+     "minor (reports/build.ts:59, duplicate of the major finding): fixed by the same as-of title.",
+     "minor (leadership/page.tsx:115): the most-exposed-department tile note now wraps (break-words hyphens-auto) instead of truncating.",
+     "minor (risk-story.ts:105): the recommended module skips modules whose assignment already reaches the department (scope everyone, or a department assignment whose closure contains it, parent departments included). Test: an assignment to IT leaves the Finance recommendation in place; an assignment to Finance clears it (module null, so no next-step sentence)."
+    ],
+    "rejected": [
+     "minor (leadership/page.tsx:97, AssignDialog gets empty paths/people): the reviewer marked this acceptable as is. Loading every path and person on the leadership page only to fill segments the preset does not use is extra queries for no part of the brief; the dialog opens with the department and module preset."
+    ],
+    "commits": [
+     "036fb0f Risk story: as-of title in the compliance pack, skip modules already assigned, wrap department name"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    }
+   }
+  },
+  {
+   "wp": "B9-metrics-seats",
+   "impl": {
+    "wp": "B9-metrics-seats",
+    "branch": "worktree-wf_42496c94-3d0-9",
+    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-9",
+    "commits": [
+     "0dadd07 Operator usage metrics page and seat export",
+     "be22967 Seats leave out operator accounts; lesson note says started or completed"
+    ],
+    "summary": "This retry found the package already committed on this branch by the previous attempt, on top of 1a45970 (the merge-base check passes). I reviewed it against the brief and reran all checks. Nothing new needed committing and the tree is clean.\n\nFile by file:\n- portal/src/server/queries/platform-metrics.ts (new):\n  - peopleCounts(now): one grouped query on users giving active, invited, weekly (last 7 days) and monthly (last 30 days) per tenant. It leaves out super_admin accounts, because vendor operators are not billable seats.\n  - platformMetrics(now): one query per metric group, run in parallel: tenants; people; lessons started vs completed in 30 days; modules completed; certificates with evidence = server_verified. The campaign funnel (sent, opened, clicked, reported) is summed per tenant from the existing campaignStats. Aggregates only, no rows per person.\n  - Decision: weekly/monthly active use users.last_active_at, not session rows, because sessions are deleted on sign-out and expiry and would forget people who signed out.\n  - Decision: started_at is cleared when a lesson is completed, so \"started\" counts any progress row started in the window or completed (lastCompletedAt or completedAt) in the window. A replay in the window counts too.\n  - No indexes were needed.\n- portal/src/app/(admin)/super/metrics/page.tsx (new): an operator tab protected by requirePermission(\"platform.manage\"). It shows one table row per organisation with 11 numeric columns formatted with getFormatter, inside a ScrollRegion, using logical CSS. The header has a \"Seat export\" ButtonAnchor that links to /api/super/seats.\n- portal/src/app/(admin)/super/page.tsx and super/demo/page.tsx: a Metrics tab added to the TabsNav. The overview now takes its people count from peopleCounts(), the same count query the seat export uses.\n- portal/src/app/api/super/seats/route.ts (new):\n  - GET is protected by apiViewer(\"platform.manage\"), like super/demo-requests.\n  - It returns CSV built with lib/csv toCsv: organisation, plan, active_people, invited_people, month (YYYY-MM in the operator tenant's time zone).\n  - Download headers: content-disposition attachment seats-<date>.csv, cache-control no-store.\n  - Each export is audited as seats.exported.\n- portal/src/server/services/audit.ts: \"seats.exported\" added to AUDIT_ACTIONS.\n- portal/messages/{az,en,ru,tr,ro,ka,uk,de,fr,ar}/admin.json: platform.tabs.metrics, platform.metrics.{export, table, note, col.*}, and the audit label seats_exported, all ten locales.\n- portal/tests/platform-metrics.test.ts (new):\n  - Two seeded organisations, checked for every metric. This covers operator exclusion, suspended and invited people, 7/30-day windows, a replay counted by last_completed_at, self-reported certificates being left out, and no leakage between tenants.\n  - The seats route returns 401 with no viewer and 403 for a tenant_admin, with no audit entry. An operator gets 200 with the exact CSV rows, and an audit entry is recorded.\n\nChecks rerun now: typecheck pass, eslint pass, vitest pass (platform-metrics, rtl-logical, i18n, in-code-locales).\n\nPROGRESS line: \"B9-metrics-seats: /super/metrics operator usage tab (per-organisation aggregates, campaign funnel, server-verified certificates) and GET /api/super/seats seat CSV (operators only, audited); closes M-08 and the counting half of M-05/D-05.\"\n\nADR (seat counting now, memberships later): We count seats now as users rows per tenant: one users row belongs to exactly one tenant (users.tenant_id), and a seat is a non-operator user with status active (invited is reported separately). peopleCounts() in src/server/queries/platform-metrics.ts is the single place that counts them. The operator overview, the metrics page and the seat export all read from it, so a billing rule changes in one place. We do not build memberships or trials before the first pilots. The planned model after the pilots splits identity from tenancy:\n- users becomes the identity only (email, name, credentials, 2FA).\n- A new memberships(user_id, tenant_id, role, status, department_id) table carries everything that is per tenant today. One person can then belong to several organisations (holding companies, consultants, vendor staff) without duplicate accounts.\n- Seats then count memberships, not users.\n\nThe migration is a backfill of one membership per existing user, then a rewrite of the predicates that scope people to a tenant. Today these are the 54 eq(t.users.tenantId, ...) predicates in 33 files under portal/src:\n- people.ts 8, workspace.ts 9, jobs.ts 4, secops actions 3\n- admin queries 2, campaigns service 2, risk 2, departments page 2, drill page 2\n- one each in: assignments page, campaigns index, campaign wizard, leadership, policies index and [id], users/[id]/person.ts, api/admin/people/[kind], api policies signoffs, admin-overview, platform.ts, profile.ts, secops-options, secops queries, reports/build, services assignments, league, notify, secops, threats\n- plus the users.tenant_id groupings and joins in platform-metrics.ts\n\nRole, status and department_id reads on users move to the membership in the same pass. Session and viewer resolution gain an active-membership choice.",
+    "tests_added": [
+     "portal/tests/platform-metrics.test.ts"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    },
+    "left_open": "Nothing from the brief is left undone.\n\nQuestions for the owner:\n- Should invited people count as billable seats? Right now active and invited are exported side by side and only active is labelled as seats.\n- Should suspended people ever count as seats? Right now they are excluded.\n\nNot checked: the full suite (the orchestrator runs it) and the page in a browser (no server may be started).\n\nWeekly and monthly active come from users.last_active_at, not from session rows as the brief wrote, because session rows are deleted on sign-out; the brief may want to note that.\n\nNo schema change and no new dependency.",
+    "migrations": []
+   },
+   "reviews": [
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "portal/src/server/queries/platform-metrics.ts",
+       "line": 56,
+       "problem": "The lessons-started/completed and modules-completed queries join users with no role filter, so lesson and module progress by super_admin operators counts toward their organisation. peopleCounts() leaves operators out on purpose, so the page's columns use two different populations.",
+       "fix": "Add ne(t.users.role, \"super_admin\") to the where clauses of the lessons and modules queries, or accept the mismatch and say so in the note."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/messages/en/admin.json",
+       "line": 1063,
+       "problem": "modulesCompleted is all-time while the lesson columns cover 30 days. The metrics note gives the window for lessons, campaigns and certificates but says nothing about modules, so an operator could read the modules column as 30 days too.",
+       "fix": "Add 'Modules: all time' (translated by meaning) to platform.metrics.note in all ten locales, or limit the query to modules completed in the window."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/queries/platform-metrics.ts",
+       "line": 67,
+       "problem": "campaignStats gets every campaign id on the platform in a single inArray. This is fine at pilot scale but grows without limit.",
+       "fix": "Leave it for now. When campaign counts grow, add a comment in the form 'shortcut: <the limit>, <when to upgrade>' or group by tenant directly in SQL."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/queries/platform-metrics.ts",
+       "line": 1,
+       "problem": "The ADR in the implementer's summary says there are 54 eq(t.users.tenantId, ...) predicates in 33 files. A grep of portal/src finds 54 occurrences in 29 files.",
+       "fix": "The orchestrator should write '54 predicates in 29 files' in the ADR."
+      }
+     ],
+     "notes": "I reviewed commits 0dadd07 and be22967 in C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-9. The branch contains 1a45970 and the tree is clean, with nothing under portal/drizzle committed and no schema change. I reran the checks there: typecheck passes, eslint on the touched files passes, and vitest passes on platform-metrics, server-helpers (audit labels), i18n and rtl-logical (213 tests).\n\nEvery acceptance item holds:\n- /super/metrics is protected by requirePermission(\"platform.manage\") and shows per-organisation aggregates only. The table has scope=col/row headers, logical CSS and getFormatter numbers inside a ScrollRegion. The tab appears in all three super pages.\n- The strings are in all ten locales with key parity and contain no ICU braces and no \"Aİ\". The seats_exported audit label is present in every locale.\n- GET /api/super/seats uses apiViewer(\"platform.manage\", request) exactly like demo-requests: it handles the RSC probe, 2FA and 401/403, sends no-store and attachment headers, and audits seats.exported.\n- Tests cover 401 and 403 with no audit entry, and the operator's 200 with the exact CSV rows and an audit entry.\n- The metrics query test checks two seeded tenants on every column, including operator exclusion, invited and suspended people, the 7/30-day windows, a replay counted by last_completed_at, self-reported certificates left out, and no leakage between tenants.\n- The ADR paragraph is present.\n\nUsing users.last_active_at instead of session rows is reasonable and matches src/server/queries/admin.ts (active7). The overview now leaves super_admin accounts out of its people count; this is a deliberate change of behaviour and consistent with the seat export.\n\nNot checked: the page in a browser (no server may be started) and the full test suite."
+    },
+    {
+     "verdict": "approve",
+     "findings": [
+      {
+       "severity": "minor",
+       "file": "portal/src/server/queries/platform-metrics.ts",
+       "line": 54,
+       "problem": "Seat counts leave out super_admin accounts, but the lesson and module queries join users without any role filter. If an operator plays lessons inside a tenant, those plays still raise that tenant's lessonsStarted, lessonsCompleted and modulesCompleted. The certificates query has no role filter either. The page then shows usage from people who are not counted as seats.",
+       "fix": "Add the same ne(t.users.role, \"super_admin\") predicate to the lesson and module queries (and join users for certificates), or state in the ADR that usage includes operators. The test can cover this with one operator lesson_progress row."
+      },
+      {
+       "severity": "minor",
+       "file": "portal/messages/en/admin.json",
+       "line": 1062,
+       "problem": "The note says lessons are counted over the last 30 days and campaigns over all time. It never says that 'Modules completed' and 'Verified certificates' are also all-time totals. An administrator reading the row can assume these two share the 30-day window of the lesson columns next to them.",
+       "fix": "Extend the note in all ten locales, for example 'Modules and certificates: all time, server-verified certificates only.'"
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/queries/platform-metrics.ts",
+       "line": 66,
+       "problem": "campaignStats is given the id of every campaign on the platform in a single inArray. This is fine at pilot scale but grows without bound.",
+       "fix": "Add the comment 'shortcut: one IN list of every campaign, group by tenant in SQL once campaigns reach thousands'. A per-tenant SQL aggregate would replace it later."
+      },
+      {
+       "severity": "nit",
+       "file": "portal/src/server/queries/platform-metrics.ts",
+       "line": 1,
+       "problem": "The ADR text in the summary says there are 54 eq(t.users.tenantId, ...) predicates in 33 files. A grep of portal/src finds 54 occurrences in 29 files.",
+       "fix": "The orchestrator should correct the file count to 29 when it writes the ADR into DECISIONS.md."
+      }
+     ],
+     "notes": "Reviewed commits 0dadd07 and be22967 (worktree wf_42496c94-3d0-9, which contains 1a45970). The change does what the brief asks. /super/metrics shows per-organisation aggregates only and is protected by requirePermission(\"platform.manage\"). The tab was added to all three TabsNav lists. The table sits in a ScrollRegion using logical classes (pe/px, text-start/end), so at 375 px it scrolls instead of breaking the layout. GET /api/super/seats follows the demo-requests route line for line: same apiViewer(\"platform.manage\"), toCsv, todayIn, no-store and an audit entry. The new \"seats.exported\" action is in AUDIT_ACTIONS, and its label resolves through the audit page's replace(\".\", \"_\"). peopleCounts() is the single seat-count query, now shared by the overview, the metrics page and the export. One side effect: the overview people count no longer includes super_admin accounts, which is intended and documented. Using users.last_active_at instead of session rows is justified, since viewer.ts updates it and sessions are deleted on sign-out. All ten locales have the 12 col keys, the tab, export and audit labels. The az wording matches the existing \"Fişinq simulyasiyaları\", and no \"Aİ\" appears. Translations are by meaning: non-English locales say \"user counts\" where English says \"seats\", which reads naturally. Tests cover two organisations, operator, invited and suspended exclusion, both time windows, a replay, self-reported certificates, tenant isolation, and the seats route at 401, 403 and 200 with the audit check. I reran vitest on platform-metrics and rtl-logical: 7 tests pass. ESLint on the touched files is clean and the tree is clean. Typecheck I did not rerun, the implementer reports it passing. Not checked: the page in a browser (no server allowed). As the brief requires, docs/build files were not touched; the PROGRESS line and ADR are in the implementer's summary for the orchestrator. Owner questions carried by the implementer: whether invited and suspended people count as billable seats."
+    }
+   ],
+   "fix": {
+    "fixed": [
+     "platform-metrics.ts: the lesson, module and certificate queries now filter on ne(users.role, 'super_admin'). The certificates query now joins users to do this. These counts now use the same population as peopleCounts(). (Findings 1 and 3.)",
+     "tests/platform-metrics.test.ts: the operator in Alpha now has a lesson_progress row completed in the window, a completed module_progress row and a server_verified certificate. The expected Alpha totals do not change, which proves that operator usage is left out.",
+     "messages/{az,en,ru,tr,ro,ka,uk,de,fr,ar}/admin.json: platform.metrics.note now says that completed modules and verified certificates are all-time totals and that operator accounts are not counted anywhere. Each locale was translated by meaning; keys are unchanged. (Findings 2 and 4.)"
+    ],
+    "rejected": [],
+    "commits": [
+     "e9931d4 Metrics leave operator usage out; note says modules and certificates are all time"
+    ],
+    "checks": {
+     "typecheck": true,
+     "lint": true,
+     "vitest": true
+    }
+   }
+  }
+ ],
+ "failed": []
+}
