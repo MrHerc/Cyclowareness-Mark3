@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore, type ReactNode } from "react";
+import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
 import { LessonPlayer } from "@/components/player/player";
 import { Toaster } from "@/components/ui/toast";
@@ -39,6 +39,13 @@ export function ScormProviders({ data, children }: { data: ScormData; children?:
   );
 }
 
+/** The lesson a hash names ("#/learn/<module>/<lesson>"), else the first one not finished, else the first. */
+export function lessonIndex(lessons: { key: string }[], hash: string, done: ReadonlySet<string>) {
+  const wanted = /^#\/learn\/[^/]+\/([^/?#]+)$/.exec(hash)?.[1];
+  const linked = lessons.findIndex((l) => l.key === wanted);
+  return Math.max(0, linked >= 0 ? linked : lessons.findIndex((l) => !done.has(l.key)));
+}
+
 /**
  * The module in an LMS: the app's own lesson player without a server. The lesson shown follows the hash the
  * player's links set (see next-shim.tsx), else the first one not finished yet; each finish goes to the session.
@@ -46,9 +53,8 @@ export function ScormProviders({ data, children }: { data: ScormData; children?:
 export function ScormApp({ data, session }: { data: ScormData; session: ScormSession }) {
   const hash = useSyncExternalStore(subscribeHash, () => window.location.hash, () => "");
   const [done, setDone] = useState(session.done);
-  const wanted = /^#\/learn\/[^/]+\/([^/?#]+)$/.exec(hash)?.[1];
-  const linked = data.lessons.findIndex((l) => l.key === wanted);
-  const index = Math.max(0, linked >= 0 ? linked : data.lessons.findIndex((l) => !done.has(l.key)));
+  // Chosen on navigation only: a finish must leave its lesson, and its done screen, on show.
+  const index = useMemo(() => lessonIndex(data.lessons, hash, session.done()), [data.lessons, hash, session]);
   const lesson = data.lessons[index];
   const next = data.lessons[index + 1] ?? null;
   return (

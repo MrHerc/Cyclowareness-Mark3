@@ -343,7 +343,7 @@ The zip holds:
 
 The package finds the LMS's `API` object by the standard walk (this window and up to seven parents, then the opener). It sets `cmi.core.lesson_status` to `incomplete` on the first launch, keeps the finished lessons in `cmi.suspend_data` (with `cmi.core.exit` `suspend` while some remain), and when every lesson is done sets `cmi.core.score.raw` (min 0, max 100: the share of first-try correct answers, scored in the browser by `src/lib/content/scoring.ts`) and `passed` or `failed` against the mastery score, or `completed` for a module without scored scenes. Each finish and the page's close set `cmi.core.session_time` and call `LMSCommit`; the close calls `LMSFinish`. Narration uses the browser's voices only, AI Sel's tutor and problem reports are off, and nothing is reported back to the portal: completions stay in the LMS.
 
-The player files are built on first use into `.data/scorm/` (development; delete the folder after changing the player) or in the Docker image's builder stage.
+The player files are built on first use into `.data/scorm/` (development, rebuilt when `src/scorm`, `src/components/player`, `src/lib/content` or `messages` is newer) or in the Docker image's builder stage.
 
 ### GET and POST /api/admin/drill/{id}
 

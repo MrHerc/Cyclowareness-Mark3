@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { PlayerProps } from "@/components/player/player";
-import { ScormApp, type ScormData } from "@/scorm/app";
+import { ScormApp, lessonIndex, type ScormData } from "@/scorm/app";
 import { MASTERY_SCORE, cmiTimespan, connect, findApi, hasScoredScene, type Scorm12Api } from "@/scorm/scorm-api";
 import type { Scene } from "@/lib/content/types";
 import { TEST_SCENES } from "./helpers/db";
@@ -137,6 +137,14 @@ describe("SCORM 1.2 session", () => {
 });
 
 describe("offline app wiring", () => {
+  it("shows the lesson the hash names, else the first unfinished, else the first", () => {
+    expect(lessonIndex(lessons, "#/learn/demo/two", new Set())).toBe(1);
+    expect(lessonIndex(lessons, "#/learn/demo/missing", new Set(["one"]))).toBe(1);
+    expect(lessonIndex(lessons, "", new Set())).toBe(0);
+    expect(lessonIndex(lessons, "#/learn/demo", new Set(["one", "two"]))).toBe(0);
+  });
+
+
   it("opens the next unfinished lesson and sends each finish to the LMS through the session", async () => {
     const { api, data } = fakeApi({ "cmi.suspend_data": JSON.stringify({ one: [2, 2] }) });
     const pkg: ScormData = {

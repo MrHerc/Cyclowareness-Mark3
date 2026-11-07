@@ -39,13 +39,17 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
       .orderBy(desc(t.modules.createdAt)),
     db().select().from(t.materials).where(eq(t.materials.tenantId, v.tenant.id)).orderBy(desc(t.materials.createdAt)).limit(100),
     formOptions(v.tenant.id, locale),
-    // The library's modules and the organisation's own: what a SCORM export may package.
+    // The library's modules and the organisation's own that have lessons: what a SCORM export may package.
     db()
-      .select({ id: t.modules.id, title: t.modules.title })
+      .select({ id: t.modules.id, slug: t.modules.slug, tenantId: t.modules.tenantId, title: t.modules.title, status: t.modules.status })
       .from(t.modules)
-      .where(or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)))
+      .where(and(or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)), inArray(t.modules.id, db().select({ id: t.lessons.moduleId }).from(t.lessons))))
       .orderBy(asc(t.modules.sortOrder)),
   ]);
+  // One per slug, the organisation's copy over the library's, as the catalog shows them (queries/catalog.ts).
+  const bySlug = new Map<string, (typeof exportable)[number]>();
+  for (const m of exportable) if (!bySlug.has(m.slug) || m.tenantId) bySlug.set(m.slug, m);
+  const scormModules = [...bySlug.values()].map((m) => ({ id: m.id, title: m.status === "draft" ? `${pick(m.title, locale)} (${tr("status.draft")})` : pick(m.title, locale) }));
   const lessons = own.length
     ? await db().select({ moduleId: t.lessons.moduleId, key: t.lessons.key }).from(t.lessons).where(inArray(t.lessons.moduleId, own.map((m) => m.id))).orderBy(asc(t.lessons.position))
     : [];
@@ -72,7 +76,7 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
         defaultLocale={locale}
         categories={categories}
       />
-      <ScormExport modules={exportable.map((m) => ({ id: m.id, title: pick(m.title, locale) }))} defaultLocale={isLocale(locale) ? locale : "en"} />
+      <ScormExport modules={scormModules} defaultLocale={isLocale(locale) ? locale : "en"} />
       <TabsNav items={TABS.map((k) => ({ href: `?tab=${k}`, label: tr(`tabs.${k}`), active: tab === k, count: k === "lessons" ? own.length : materials.length }))} />
       {tab === "lessons" ? (
         own.length ? (

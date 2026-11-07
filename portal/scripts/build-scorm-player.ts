@@ -3,7 +3,7 @@
  * that runs from file:// (no modules, no chunks, no absolute URLs), and player.css, the app's Tailwind CSS.
  *   npx tsx scripts/build-scorm-player.ts [outDir]      (default .data/scorm)
  * The export route builds it on first use when it is missing (src/server/scorm/player.ts); the Docker image
- * builds it in its builder stage. Delete .data/scorm after changing the player to rebuild it in development.
+ * builds it in its builder stage. In development the route also rebuilds it once its sources are newer.
  */
 import fs from "node:fs";
 import path from "node:path";
