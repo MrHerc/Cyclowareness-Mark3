@@ -1,5 +1,5 @@
 import "server-only";
-import { asc, eq, gte, ne, or, sql } from "drizzle-orm";
+import { and, asc, eq, gte, ne, or, sql } from "drizzle-orm";
 import { db, t } from "../db";
 import { campaignStats } from "../services/campaigns";
 
@@ -49,6 +49,8 @@ export async function platformMetrics(now = new Date()): Promise<OrganisationMet
   const month = new Date(now.getTime() - 30 * DAY);
   const since = month.toISOString();
   const lastDone = sql`coalesce(${t.lessonProgress.lastCompletedAt}, ${t.lessonProgress.completedAt})`;
+  // Same population as the seats: an operator playing lessons inside a tenant is not its usage.
+  const notOperator = ne(t.users.role, "super_admin");
   const [tenants, people, lessons, modules, campaigns, certificates] = await Promise.all([
     db().select({ id: t.tenants.id, slug: t.tenants.slug, name: t.tenants.name, plan: t.tenants.plan }).from(t.tenants).orderBy(asc(t.tenants.name)),
     peopleCounts(now),
@@ -57,16 +59,21 @@ export async function platformMetrics(now = new Date()): Promise<OrganisationMet
       .select({ tenantId: t.users.tenantId, started: sql<number>`count(*)`, completed: sql<number>`count(*) filter (where ${lastDone} >= ${since})` })
       .from(t.lessonProgress)
       .innerJoin(t.users, eq(t.users.id, t.lessonProgress.userId))
-      .where(or(gte(t.lessonProgress.startedAt, month), sql`${lastDone} >= ${since}`))
+      .where(and(notOperator, or(gte(t.lessonProgress.startedAt, month), sql`${lastDone} >= ${since}`)))
       .groupBy(t.users.tenantId),
     db()
       .select({ tenantId: t.users.tenantId, n: sql<number>`count(*)` })
       .from(t.moduleProgress)
       .innerJoin(t.users, eq(t.users.id, t.moduleProgress.userId))
-      .where(eq(t.moduleProgress.status, "completed"))
+      .where(and(notOperator, eq(t.moduleProgress.status, "completed")))
       .groupBy(t.users.tenantId),
     db().select({ id: t.campaigns.id, tenantId: t.campaigns.tenantId }).from(t.campaigns),
-    db().select({ tenantId: t.certificates.tenantId, n: sql<number>`count(*)` }).from(t.certificates).where(eq(t.certificates.evidence, "server_verified")).groupBy(t.certificates.tenantId),
+    db()
+      .select({ tenantId: t.certificates.tenantId, n: sql<number>`count(*)` })
+      .from(t.certificates)
+      .innerJoin(t.users, eq(t.users.id, t.certificates.userId))
+      .where(and(notOperator, eq(t.certificates.evidence, "server_verified")))
+      .groupBy(t.certificates.tenantId),
   ]);
   const stats = await campaignStats(db(), campaigns.map((c) => c.id));
   const funnel = new Map<string, { sent: number; opened: number; clicked: number; reported: number }>();

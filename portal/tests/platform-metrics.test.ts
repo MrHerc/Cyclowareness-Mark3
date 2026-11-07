@@ -47,14 +47,18 @@ beforeAll(async () => {
     { userId: lastMonth.id, lessonId: l1.id, completedAt: daysAgo(60) },
     { userId: lastMonth.id, lessonId: l3.id, startedAt: daysAgo(45) },
     { userId: ad.id, lessonId: l1.id, completedAt: daysAgo(90), lastCompletedAt: daysAgo(5) },
+    // Operator usage is not the organisation's usage.
+    { userId: op.id, lessonId: l2.id, completedAt: daysAgo(2), lastCompletedAt: daysAgo(2) },
   ]);
   await db.insert(t.moduleProgress).values([
     { userId: recent.id, moduleId: mod.id, status: "completed", percent: 100 },
     { userId: lastMonth.id, moduleId: mod.id, status: "in_progress", percent: 30 },
+    { userId: op.id, moduleId: mod.id, status: "completed", percent: 100 },
   ]);
   await db.insert(t.certificates).values([
     { tenantId: alpha, userId: recent.id, moduleId: mod.id, serial: "S-1", publicToken: "p1", evidence: "server_verified" },
     { tenantId: alpha, userId: lastMonth.id, moduleId: mod.id, serial: "S-2", publicToken: "p2", evidence: "self_reported" },
+    { tenantId: alpha, userId: op.id, moduleId: mod.id, serial: "S-3", publicToken: "p3", evidence: "server_verified" },
   ]);
   const [c1] = await db.insert(t.campaigns).values({ tenantId: alpha, name: "Q1", channel: "email", templateKey: "payroll", audience: "all", status: "completed" }).returning();
   const [c2] = await db.insert(t.campaigns).values({ tenantId: alpha, name: "Q2", channel: "email", templateKey: "payroll", audience: "all", status: "running" }).returning();
@@ -72,7 +76,7 @@ describe("platformMetrics", () => {
     expect(byId.get(alpha)).toMatchObject({
       slug: "alpha",
       plan: "professional",
-      // The operator account in Alpha is not a seat.
+      // The operator account in Alpha is neither a seat nor usage.
       active: 2,
       invited: 1,
       weekly: 1,
