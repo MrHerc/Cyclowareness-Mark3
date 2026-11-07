@@ -28,6 +28,7 @@ export default async function CompliancePack({ searchParams }: PageProps<"/print
   const str = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : undefined);
   // Every section, the period header and the audit entry use the filters the reports apply; a period they
   // would ignore (2026-13-01, a start after the end) is refused, never shown to auditors as that period.
+  // The risk story alone is the state on the day of printing; its title says so.
   const { filters, rejected } = parseReportFilters({ from: str("from"), to: str("to"), d: str("d") });
   if (rejected) {
     return (

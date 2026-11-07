@@ -114,15 +114,23 @@ describe("riskStory", () => {
     expect(it.weakest).toMatchObject({ name: "IT", category: "accounts", inCategory: 1 });
     expect(it.certified).toEqual({ people: 0, total: 3, share: 0 });
 
-    // The compliance pack carries the same sentences as its own section.
-    const section = await buildRiskStory(as(o.tenant.id, o.admin), {}, "en");
-    expect(section).toEqual({ title: "Risk story", headers: ["Finding"], rows: sentences.map((x) => [x]) });
+    // The compliance pack carries the same sentences as its own section, titled with the day it describes
+    // (a pack printed for an earlier period must not pass today's story off as that period's).
+    const section = await buildRiskStory(as(o.tenant.id, o.admin), { from: "2026-01-01", to: "2026-03-31" }, "en");
+    expect(section).toEqual({ title: expect.stringMatching(/^Risk story \(as of .+ \d{4}\)$/), headers: ["Finding"], rows: sentences.map((x) => [x]) });
 
     // A filter outside the viewer's scope, or another organisation's department, matches nobody.
     const head = await addUser(db, o.tenant.id, { departmentId: o.it_.id, role: "department_head", riskScore: 0 });
     expect(await riskStory(as(o.tenant.id, head), "en", o.finance.id)).toEqual({ empty: true, days: 0 });
     const foreign = await addDepartment(db, (await addTenant(db)).id, "Elsewhere");
     expect(await riskStory(as(o.tenant.id, o.admin), "en", foreign.id)).toEqual({ empty: true, days: 0 });
+
+    // The next step skips a module already assigned to that department; another department's assignment does not count.
+    const assign = (departmentId: string) => db.insert(t.assignments).values({ tenantId: o.tenant.id, moduleId: email.id, scope: "department", departmentId });
+    await assign(o.it_.id);
+    expect(await riskStory(as(o.tenant.id, o.admin), "en")).toMatchObject({ weakest: { name: "Finance", module: { id: email.id } } });
+    await assign(o.finance.id);
+    expect(await riskStory(as(o.tenant.id, o.admin), "en")).toMatchObject({ weakest: { name: "Finance", category: "email", module: null } });
   });
 });
 
@@ -149,6 +157,7 @@ describe("storySentences", () => {
       const tr = createTranslator({ ...(await messagesFor(locale)), namespace: "admin.riskStory", onError: (e) => { throw e; } });
       for (const k of ["risk", "certified", "weakest"] as const) expect(tr(`tiles.${k}`)).toBeTruthy();
       expect(tr("tiles.change", { since })).not.toMatch(/[{}]/);
+      expect(tr("titleAsOf", { date: since })).not.toMatch(/[{}]/);
     });
   }
 });

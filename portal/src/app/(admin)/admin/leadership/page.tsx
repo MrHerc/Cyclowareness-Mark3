@@ -113,7 +113,7 @@ export default async function LeadershipPage() {
                   <dd className="text-title-sm font-bold tabular-nums">
                     <bdi>{x.value}</bdi>
                   </dd>
-                  {"note" in x ? <dd className="truncate text-tab text-ink-subtle">{x.note}</dd> : null}
+                  {"note" in x ? <dd className="text-tab text-ink-subtle break-words hyphens-auto">{x.note}</dd> : null}
                 </div>
               ))}
             </dl>

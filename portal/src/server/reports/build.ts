@@ -10,7 +10,7 @@ import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { riskBand } from "../../lib/domain/risk";
 import { levelFor } from "../../lib/domain/gamification";
 import { LOCALE_NAMES, pick, type Locale } from "../../i18n/config";
-import { dayRange, todayIn } from "../../lib/time";
+import { dayRange, requestNow, todayIn } from "../../lib/time";
 import { isUuid } from "../../lib/ids";
 import type { ReportKind } from "../db/schema";
 
@@ -55,11 +55,15 @@ export async function scopedPeople(v: Viewer, f: ReportFilters) {
   return { users: users.filter((u) => !dept || (u.departmentId && dept.has(u.departmentId))), deptName };
 }
 
-/** The leadership risk story as a one-column section of the compliance pack, for the people the pack covers. */
+/**
+ * The leadership risk story as a one-column section of the compliance pack, for the people the pack covers.
+ * The story is always today's (the last three weeks, this quarter), never the pack's period, so its title
+ * carries the date it describes and a pack printed for an earlier period cannot pass it off as that period's.
+ */
 export async function buildRiskStory(v: Viewer, f: ReportFilters, locale: string): Promise<ReportTable> {
   const tr = await getTranslations({ locale, namespace: "admin.riskStory" });
   const sentences = await storySentences(await riskStory(v, locale, f.departmentId), locale);
-  return { title: tr("title"), headers: [tr("finding")], rows: sentences.map((s) => [s]) };
+  return { title: tr("titleAsOf", { date: requestNow() }), headers: [tr("finding")], rows: sentences.map((s) => [s]) };
 }
 
 export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters, locale: string): Promise<ReportTable> {

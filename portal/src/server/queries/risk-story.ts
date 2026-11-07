@@ -40,10 +40,9 @@ export async function riskStory(v: Viewer, locale: string, departmentId?: string
   const tid = v.tenant.id;
   const tz = v.tenant.settings.timeZone;
   const now = requestNow();
+  const closure = departmentClosure(await getDepartments(tid));
   let dept = await scopeDepartmentIds(v);
-  if (departmentId) {
-    dept = narrowToDepartment(dept, departmentClosure(await getDepartments(tid)), departmentId);
-  }
+  if (departmentId) dept = narrowToDepartment(dept, closure, departmentId);
   const people = (await listPeople(v, { departmentIds: dept })).filter((p) => p.status === "active");
   const ids = people.map((p) => p.id);
   if (!ids.length) return { empty: true, days: 0 };
@@ -70,7 +69,7 @@ export async function riskStory(v: Viewer, locale: string, departmentId?: string
   const month = Number(today.slice(5, 7));
   const quarterStart = zonedTime(`${today.slice(0, 4)}-${String(month - ((month - 1) % 3)).padStart(2, "0")}-01`, "00:00:00", tz);
 
-  const [risks, campaigns, completions, [certified]] = await Promise.all([
+  const [risks, assigned, campaigns, completions, [certified]] = await Promise.all([
     top
       ? db()
           .select({ moduleId: t.behaviorRisks.moduleId, category: t.modules.category, title: t.modules.title, n: count() })
@@ -78,6 +77,13 @@ export async function riskStory(v: Viewer, locale: string, departmentId?: string
           .innerJoin(t.modules, eq(t.modules.id, t.behaviorRisks.moduleId))
           .where(and(eq(t.behaviorRisks.tenantId, tid), eq(t.behaviorRisks.status, "open"), inArray(t.behaviorRisks.userId, top.ids)))
           .groupBy(t.behaviorRisks.moduleId, t.modules.category, t.modules.title)
+      : Promise.resolve([]),
+    // Module assignments that already reach the whole organisation or a department; the next step skips them.
+    top
+      ? db()
+          .select({ moduleId: t.assignments.moduleId, scope: t.assignments.scope, departmentId: t.assignments.departmentId })
+          .from(t.assignments)
+          .where(and(eq(t.assignments.tenantId, tid), isNotNull(t.assignments.moduleId), inArray(t.assignments.scope, ["everyone", "department"])))
       : Promise.resolve([]),
     db()
       .select({ name: t.campaigns.name, launchedAt: t.campaigns.launchedAt, sent: count(t.campaignRecipients.sentAt), clicked: count(t.campaignRecipients.clickedAt) })
@@ -100,11 +106,13 @@ export async function riskStory(v: Viewer, locale: string, departmentId?: string
       .where(and(eq(t.certificates.tenantId, tid), eq(t.certificates.evidence, "server_verified"), gte(t.certificates.issuedAt, quarterStart), inArray(t.certificates.userId, ids))),
   ]);
 
-  // The weakest category is the one with the most open risks; its module with the most open risks is the one to assign.
+  // The weakest category is the one with the most open risks; its module with the most open risks is the one to
+  // assign, unless an assignment already reaches that department (to everyone, to it or to a parent department).
+  const covered = new Set(assigned.filter((a) => a.scope === "everyone" || (a.departmentId && closure.get(a.departmentId)?.has(top!.id))).map((a) => a.moduleId));
   const byCategory = new Map<string, number>();
   for (const r of risks) byCategory.set(r.category, (byCategory.get(r.category) ?? 0) + Number(r.n));
   const category = [...byCategory.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0];
-  const toAssign = category ? risks.filter((r) => r.category === category[0]).sort((a, b) => Number(b.n) - Number(a.n))[0] : undefined;
+  const toAssign = category ? risks.filter((r) => r.category === category[0] && !covered.has(r.moduleId)).sort((a, b) => Number(b.n) - Number(a.n))[0] : undefined;
 
   let campaign: { name: string; from: number; to: number; change: number } | null = null;
   const rate = (c: { sent: number; clicked: number }) => Math.round((Number(c.clicked) / Number(c.sent)) * 100);
