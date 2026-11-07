@@ -277,6 +277,22 @@ describe("time-based codes", () => {
   });
 });
 
+describe("setting a password from a link", () => {
+  const token = async (userId: string, kind: "invite" | "reset", value: string) => {
+    await db().insert(t.authTokens).values({ id: sha256Hex(value), userId, kind, expiresAt: new Date(Date.now() + 60_000) });
+    return form({ token: value, kind, password: "N3w-passw0rd-long", confirm: "N3w-passw0rd-long" });
+  };
+
+  it("takes an invite token only while the account is still invited", async () => {
+    const live = await person({ email: "live@acme.test" });
+    const fresh = await person({ email: "fresh@acme.test", status: "invited", passwordHash: null });
+    expect(await auth.setPasswordAction(undefined, await token(live.id, "invite", "stray-invite"))).toEqual({ error: "expired" });
+    expect(await auth.setPasswordAction(undefined, await token(fresh.id, "invite", "real-invite"))).toEqual({ done: true });
+    const [row] = await db().select({ status: t.users.status }).from(t.users).where(eq(t.users.id, fresh.id));
+    expect(row.status).toBe("active");
+  });
+});
+
 describe("changing the password", () => {
   it("needs the current password, applies the password rules and signs the other devices out", async () => {
     const { changePasswordAction } = await import("../src/server/actions/profile");

@@ -476,6 +476,8 @@ async function setPassword(_: AuthState, form: FormData): Promise<AuthState> {
     .innerJoin(t.users, eq(t.users.id, t.authTokens.userId))
     .where(and(eq(t.authTokens.id, sha256Hex(token)), eq(t.authTokens.kind, kind)));
   if (!row || row.token.usedAt || row.token.expiresAt < new Date()) return { error: "expired" };
+  // A stray invite token stops being a password reset once the account is live.
+  if (kind === "invite" && row.user.status !== "invited") return { error: "expired" };
   if (!password) return { error: "required" };
   if (password !== confirm) return { error: "mismatch" };
   if (password.toLowerCase() === row.user.email) return { error: "sameAsEmail" };

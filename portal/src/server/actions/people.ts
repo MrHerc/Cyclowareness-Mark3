@@ -196,10 +196,12 @@ export async function createLinkAction(userId: string, kind: "invite" | "reset",
   const v = await actionViewer("people.write");
   if (kind !== "invite" && kind !== "reset") return { ok: false };
   // A reset link takes over a live account; an invite only activates one nobody has used yet.
-  const refused = kind === "reset" ? await stepUp(v, password, "person.reset_link") : null;
+  const refused = kind === "reset" ? await stepUp(v, password, "person.reset_link", userId) : null;
   if (refused) return { ok: false, error: refused };
   const u = await target(v, userId);
   if (!u) return { ok: false };
+  // The server is the trust boundary: an invite for an activated account would be a reset link without the step-up.
+  if (kind === "invite" && u.status !== "invited") return { ok: false };
   const url = await issueAccountLink(u.id, kind);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: kind === "invite" ? "person.invite_link" : "person.reset_link", targetType: "user", targetId: u.id, ip: await clientIp() });
   if (kind === "reset") await notifyTakeover(db(), v.tenant.id, v.user, u, "resetLinkIssued");
@@ -247,7 +249,7 @@ export async function changeRoleAction(userId: string, role: Role, password?: st
   if (!u || u.id === v.user.id || !ASSIGNABLE_ROLES.includes(role)) return { ok: false };
   if ((role === "tenant_admin" || u.role === "tenant_admin") && v.user.role !== "tenant_admin" && v.user.role !== "super_admin") return { ok: false };
   if (u.role === role) return { ok: true };
-  const refused = await stepUp(v, password, "person.role_changed");
+  const refused = await stepUp(v, password, "person.role_changed", u.id);
   if (refused) return { ok: false, error: refused };
   await db().update(t.users).set({ role }).where(eq(t.users.id, u.id));
   // Privilege changes take effect on the next sign-in.
@@ -262,7 +264,7 @@ export async function changeRoleAction(userId: string, role: Role, password?: st
 /** Clears the authenticator and backup codes and signs the person out everywhere; they set it up again from their profile. */
 export async function resetTwoFactorAction(userId: string, password?: string): Promise<{ ok: boolean; error?: StepUpError }> {
   const v = await actionViewer("people.write");
-  const refused = await stepUp(v, password, "auth.2fa_reset");
+  const refused = await stepUp(v, password, "auth.2fa_reset", userId);
   if (refused) return { ok: false, error: refused };
   const u = await target(v, userId);
   if (!u || u.id === v.user.id) return { ok: false };

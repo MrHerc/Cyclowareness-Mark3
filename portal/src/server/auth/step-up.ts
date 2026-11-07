@@ -13,9 +13,10 @@ export type StepUpError = "wrongPassword" | "rateLimited";
  * their own password again, 10 tries per actor per 15 minutes (per actor, so one administrator
  * cannot lock the others out), and every refusal is in the audit log.
  */
-export async function stepUp(v: Viewer, password: unknown, action: string): Promise<StepUpError | null> {
+export async function stepUp(v: Viewer, password: unknown, action: string, targetId?: string): Promise<StepUpError | null> {
   const limited = !(await rateLimit(`step-up:${v.user.id}`, 10, 15 * 60_000)).ok;
   const error: StepUpError | null = limited ? "rateLimited" : (await verifyUserPassword(v.user.id, typeof password === "string" ? password : "")) ? null : "wrongPassword";
-  if (error) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "security.step_up_failed", ip: await clientIp(), meta: { action, error } });
+  // The target is recorded as given (before any lookup): an investigator needs to see whose account a run of failures aimed at.
+  if (error) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "security.step_up_failed", targetType: targetId ? "user" : undefined, targetId, ip: await clientIp(), meta: { action, error } });
   return error;
 }

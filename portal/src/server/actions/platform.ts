@@ -139,7 +139,7 @@ export async function verifyTenantDomainAction(tenantId: string, domain: string,
  */
 export async function adminLinkAction(tenantId: string, userId: string, password?: string): Promise<Result & { link?: string }> {
   const v = await actionViewer("platform.manage");
-  const refused = await stepUp(v, password, "platform.admin_link");
+  const refused = await stepUp(v, password, "platform.admin_link", userId);
   if (refused) return { ok: false, error: refused };
   if (!uuid.safeParse(tenantId).success || !uuid.safeParse(userId).success) return { ok: false };
   const [tenant] = await db().select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId));

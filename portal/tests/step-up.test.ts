@@ -48,7 +48,7 @@ const PW = "Correct-Horse-Battery-9";
 type U = typeof t.users.$inferSelect;
 let org: { id: string; name: string };
 let platformOrg: { id: string; name: string };
-let admin: U, admin2: U, limited: U, peer: U, targetAdmin: U, learner: U, invited: U, operator: U;
+let admin: U, admin2: U, limited: U, peer: U, targetAdmin: U, learner: U, invited: U, suspended: U, operator: U;
 
 const as = (u: U) => {
   actor = { id: u.id, name: u.name, email: u.email, role: u.role };
@@ -72,6 +72,7 @@ beforeAll(async () => {
   targetAdmin = await adminOf(org, "Murad Target");
   learner = await addUser(db, org.id, { name: "Kamran Learner", totpEnabled: true, totpSecret: "secret" });
   invited = await addUser(db, org.id, { name: "Invited Person", status: "invited" });
+  suspended = await addUser(db, org.id, { name: "Suspended Person", status: "suspended" });
   operator = await adminOf(platformOrg, "Platform Operator", "super_admin");
 }, DB_SETUP_TIMEOUT);
 
@@ -81,7 +82,7 @@ describe("step-up before account-takeover actions", () => {
     expect(await people.resetTwoFactorAction(targetAdmin.id, "not-it")).toEqual({ ok: false, error: "wrongPassword" });
     expect((await row(targetAdmin.id)).totpEnabled).toBe(true);
     const [failed] = await audits(org.id, "security.step_up_failed");
-    expect(failed).toMatchObject({ actorId: admin.id, meta: { action: "auth.2fa_reset", error: "wrongPassword" } });
+    expect(failed).toMatchObject({ actorId: admin.id, targetType: "user", targetId: targetAdmin.id, meta: { action: "auth.2fa_reset", error: "wrongPassword" } });
   });
 
   it("resets 2FA with the right password and tells the person and every other administrator", async () => {
@@ -115,13 +116,25 @@ describe("step-up before account-takeover actions", () => {
     expect(refusals.map((a) => a.meta?.error)).toEqual([...Array(10).fill("wrongPassword"), "rateLimited"]);
   });
 
-  it("asks for the password for a reset link but not for an invite link", async () => {
+  it("asks for the password for a reset link but not for an invite link, which only a never-activated account gets", async () => {
     as(admin2);
+    // Without this an invite link for a live account would be a password reset without the step-up.
+    issueAccountLink.mockClear();
+    expect(await people.createLinkAction(learner.id, "invite")).toEqual({ ok: false });
+    expect(issueAccountLink).not.toHaveBeenCalled();
+    expect(await audits(org.id, "person.invite_link")).toEqual([]);
     expect(await people.createLinkAction(invited.id, "invite")).toMatchObject({ ok: true, url: expect.stringContaining("/invite/") });
     expect(await people.createLinkAction(learner.id, "reset")).toEqual({ ok: false, error: "wrongPassword" });
     expect(await people.createLinkAction(learner.id, "reset", PW)).toMatchObject({ ok: true, url: expect.stringContaining("/reset/") });
     expect(await notices(learner.id)).toMatchObject([{ kind: "twoFactorReset" }, { kind: "resetLinkIssued", href: "/profile" }]);
     expect(sent.at(-1)).toMatchObject({ to: learner.email, subject: "A password reset link was created for your account" });
+  });
+
+  it("still tells a suspended person, so suspend-reset-reactivate leaves a trace", async () => {
+    as(admin);
+    expect(await people.createLinkAction(suspended.id, "reset", PW)).toMatchObject({ ok: true });
+    expect(await notices(suspended.id)).toMatchObject([{ kind: "resetLinkIssued" }]);
+    expect(sent.at(-1)).toMatchObject({ to: suspended.email, subject: "A password reset link was created for your account" });
   });
 
   it("asks for the password only when the role actually changes, and names the new role", async () => {
