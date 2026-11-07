@@ -57,7 +57,7 @@ This paper describes the controls that exist in the platform's code today. It is
 |---|---|
 | Content Security Policy | A fresh nonce on every request with `strict-dynamic`, and `frame-ancestors 'none'` |
 | Security headers | `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Cross-Origin-Opener-Policy: same-origin`, a restrictive `Permissions-Policy`, and HSTS for two years on HTTPS |
-| Cross-site request forgery | Server actions use the framework's origin check, POST API routes check `Origin`, cookies are SameSite=Lax, and no GET request changes state |
+| Cross-site request forgery | Server actions use the framework's origin check, POST API routes check `Origin`, cookies are SameSite=Lax, and no GET request changes account or organisation data, apart from the simulation open-tracking pixel and the single sign-on callback, which is protected by state, nonce and PKCE |
 | Input validation | Schemas on every action and request body, strict identifier checks on route parameters, a 1 MB body limit for server actions, and a separate upload route for sandbox files with its own size cap |
 | Rate limits | Fixed windows kept in the database and shared by every application instance, on sign-in, account actions, imports, domain checks, test emails, downloads and AI features |
 | Output encoding | The interface escapes all values; emails escape every value; CSV exports neutralise spreadsheet formulas and XLSX cells are never formulas |

@@ -54,7 +54,7 @@ Policies to sign are on Home and in Profile → Policies. Read the text, tick "I
 
 Profile → **Security**:
 
-- Turn on **two-step verification** with an authenticator app (for example Google Authenticator or Microsoft Authenticator), and keep the one-time backup codes shown at setup. Some organisations require it.
+- Turn on **two-step verification** with an authenticator app (for example Google Authenticator or Microsoft Authenticator), and keep the one-time backup codes shown at setup. It is optional for employees; people with admin-console access may be required by their organisation to set it up.
 - **Change password** (your other devices are signed out) and **Sign out other devices**.
 
 Profile → **Your data**:
