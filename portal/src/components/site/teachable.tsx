@@ -44,7 +44,18 @@ export function TeachableMoment({
       .finally(() => setStage((s) => (s === "beacon" ? "login" : s)));
   }, [token, qr]);
 
-  if (stage === "beacon") return <div aria-busy="true" className="min-h-dvh bg-[#f3f2f1]" />;
+  if (stage === "beacon") {
+    return (
+      <div aria-busy="true" className="min-h-dvh bg-[#f3f2f1]">
+        {/* Without JavaScript the beacon never runs: the lesson is still one click away (the click itself is not counted). */}
+        <noscript>
+          <p className="p-6 text-body text-[#1b1b1b]">
+            {t("title")} <Link href={`/learn/${moduleSlug}`} className="underline">{t("learnCta")}</Link>
+          </p>
+        </noscript>
+      </div>
+    );
+  }
 
   if (stage === "login") {
     return (
