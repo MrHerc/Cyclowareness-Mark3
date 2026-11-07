@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { runJobs } from "../src/server/jobs";
 import { defaultSettings } from "../src/lib/tenant-defaults";
@@ -89,5 +89,22 @@ describe("job runner tick", () => {
         { auditEntries: 0, answers: 1, risks: 1, learningBefore: "2025-11-07T10:00:00.000Z" },
       ]),
     );
+  }, 60_000);
+
+  it("stops at the time budget, keeps the organisation's rows and leaves the day to the next tick", async () => {
+    const now = new Date("2026-11-08T10:00:00Z");
+    const tenant = await addTenant(db, { settings: { ...defaultSettings("en"), retention: { auditMonths: 1, learningMonths: 0 } } });
+    await db.insert(t.auditLog).values({ tenantId: tenant.id, action: "old", at: new Date(now.getTime() - 400 * DAY) });
+    // Every clock read lands past the 30-second budget set at the start of the clean-up.
+    let clock = Date.now();
+    const spy = vi.spyOn(Date, "now").mockImplementation(() => (clock += 31_000));
+    globalThis.__jobsCleanupDay = undefined;
+    try {
+      await runJobs(db, now);
+    } finally {
+      spy.mockRestore();
+    }
+    expect(globalThis.__jobsCleanupDay).toBeUndefined();
+    expect((await db.select({ a: t.auditLog.action }).from(t.auditLog).where(eq(t.auditLog.tenantId, tenant.id))).map((r) => r.a)).toContain("old");
   }, 60_000);
 });
