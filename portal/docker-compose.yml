@@ -82,6 +82,7 @@ services:
   # It TRUNCATES EVERY TABLE first: only for a fresh or throwaway stack, never for customer data (it
   # refuses a database that holds other organisations unless SEED_FORCE=1).
   # Built from the builder stage because the seed is TypeScript and uses the app's own services.
+  # The same service runs the other TypeScript scripts, e.g. `run --rm seed npx tsx scripts/rotate-secret.ts`.
   seed:
     profiles: [tools]
     build:

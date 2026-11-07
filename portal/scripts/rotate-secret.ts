@@ -5,13 +5,15 @@
  *   npx tsx scripts/rotate-secret.ts
  */
 import { createDb } from "../src/server/db/client";
-import { rotateStoredSecrets, rotationRefusal } from "../src/server/services/secret-rotation";
+import { countVerifiedDomains, rotateStoredSecrets, rotationRefusal } from "../src/server/services/secret-rotation";
 
 async function main() {
   const refusal = rotationRefusal(process.env);
   if (refusal) throw new Error(`Refusing to rotate: ${refusal}`);
   const handle = createDb();
   try {
+    const proofRefusal = rotationRefusal(process.env, await countVerifiedDomains(handle.db));
+    if (proofRefusal) throw new Error(`Refusing to rotate: ${proofRefusal}`);
     const counts = await rotateStoredSecrets(handle.db);
     console.log(`Re-encrypted the secrets of ${counts.tenants} organisation(s) and ${counts.users} authenticator key(s)${counts.unreadable ? `; ${counts.unreadable} value(s) open with neither key and were left as they are` : ""}.`);
   } finally {

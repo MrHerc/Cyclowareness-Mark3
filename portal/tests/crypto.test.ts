@@ -51,7 +51,7 @@ vi.mock("node:dns/promises", () => ({
 const { decryptSecret, encryptSecret, sealedWithCurrentKey } = await import("../src/server/crypto");
 const { backupCodeHashes, hashBackupCode, legacyBackupHash } = await import("../src/server/auth/totp");
 const { domainProofFound, domainProofRecord, domainProofRecords } = await import("../src/server/auth/domain-proof");
-const { rotateStoredSecrets, rotationRefusal } = await import("../src/server/services/secret-rotation");
+const { countVerifiedDomains, rotateStoredSecrets, rotationRefusal } = await import("../src/server/services/secret-rotation");
 const { verifyDomainAction } = await import("../src/server/actions/settings");
 const { verifyTenantDomainAction } = await import("../src/server/actions/platform");
 
@@ -163,6 +163,17 @@ describe("rotate-secret refusal", () => {
     expect(rotationRefusal({ DATABASE_URL: "postgres://db/portal", APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: PREVIOUS })).toBeNull();
     // The embedded development database is the only place the fallback key may be used.
     expect(rotationRefusal({ APP_SECRET: "" })).toBeNull();
+  });
+
+  it("refuses a rotation that would break published domain proofs: verified domains and no domain-proof key of its own", async () => {
+    const before = await countVerifiedDomains(db);
+    await addTenant(db, { domain: "proven.gov.az", domainVerifiedAt: new Date() });
+    await addTenant(db, { domain: "unproven.gov.az" });
+    const verified = await countVerifiedDomains(db);
+    expect(verified).toBe(before + 1);
+    expect(rotationRefusal({ APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: PREVIOUS }, verified)).toMatch(/APP_DOMAIN_PROOF_SECRET.*step 1/);
+    expect(rotationRefusal({ APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: PREVIOUS, APP_DOMAIN_PROOF_SECRET: CURRENT }, verified)).toBeNull();
+    expect(rotationRefusal({ APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: PREVIOUS }, 0)).toBeNull();
   });
 });
 
