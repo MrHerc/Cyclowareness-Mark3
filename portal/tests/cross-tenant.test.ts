@@ -1,11 +1,12 @@
 /**
  * Tenant isolation, generated over the whole surface: two organisations A and B, and for every server
  * action and route handler in tests/fixtures/surface.json a row that calls it as A's administrator with
- * B's ids, slugs and tokens (and as A's learner where a permission is required). Each call must be
- * refused, and no row of B may change. The first two tests keep the table complete: the fixture must
- * match the live inventory (scripts/inventory-surface.ts) and every entry must have a row.
+ * B's ids, slugs and tokens (and as A's learner where a permission is named). Each call must be refused,
+ * the learner by the permission gate itself where there is one, and no row of B may change. The first two
+ * tests keep the table complete: the fixture must match the live inventory (scripts/inventory-surface.ts)
+ * and every entry must have a row.
  */
-import { eq, getTableColumns, inArray, type Column, type SQL } from "drizzle-orm";
+import { eq, getTableColumns, inArray, or, type Column, type SQL } from "drizzle-orm";
 import { getTableConfig, PgTable } from "drizzle-orm/pg-core";
 import { createTranslator } from "next-intl";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -16,7 +17,7 @@ import { featuresFor, withDefaults } from "../src/lib/tenant-defaults";
 import { messagesFor } from "../src/i18n/translator";
 import { inventory } from "../scripts/inventory-surface";
 import surface from "./fixtures/surface.json";
-import { DB_SETUP_TIMEOUT, addDepartment, addModule, addTenant, addUser, assignEveryone, testDb } from "./helpers/db";
+import { DB_SETUP_TIMEOUT, TEST_SCENES, addDepartment, addModule, addTenant, addUser, assignEveryone, testDb } from "./helpers/db";
 
 const { db, ready } = testDb();
 let viewer: Viewer;
@@ -70,6 +71,7 @@ const secops = await import("../src/server/actions/secops");
 const security = await import("../src/server/actions/security");
 const settings = await import("../src/server/actions/settings");
 const workspace = await import("../src/server/actions/workspace");
+const captions = await import("../src/app/(focus)/learn/[slug]/[lessonId]/actions");
 const usbKit = await import("../src/app/api/admin/campaigns/[id]/usb-kit/route");
 const drillRoute = await import("../src/app/api/admin/drill/[id]/route");
 const peopleRoute = await import("../src/app/api/admin/people/[kind]/route");
@@ -102,6 +104,8 @@ async function org() {
   const invited = await addUser(db, tenantId, { status: "invited" });
   const department = await addDepartment(db, tenantId, `Finance ${n}`);
   const mod = await addModule(db, { tenantId, origin: "custom", lessons: 2 });
+  // A second language on the first lesson, so captions exist for the organisation's own people (loadCaptionsAction).
+  await db.insert(t.lessonContents).values({ lessonId: mod.lessons[0].id, locale: "az", scenes: TEST_SCENES });
   const assignment = await assignEveryone(db, tenantId, mod.id);
   const [policy] = await db.insert(t.policies).values({ tenantId, title: "Acceptable use", createdBy: adminUser.id }).returning();
   const [version] = await db.insert(t.policyVersions).values({ policyId: policy.id, version: 1, title: "Acceptable use", bodyMd: "Use the systems responsibly, always.", publishedAt: new Date() }).returning();
@@ -176,27 +180,33 @@ async function org() {
   };
 }
 
-/** Every row that belongs to the organisation, over every table of the schema, as one comparable string. */
+/**
+ * Every row that touches the organisation, over every table of the schema, as one comparable string. A row
+ * counts when any of its key columns points at the organisation, so A's own user writing against B's module
+ * or lesson (module_progress, lesson_progress) shows up too.
+ */
 const TABLES: PgTable[] = Object.values(t).flatMap((x) => (x instanceof PgTable ? [x] : []));
 async function snapshot(o: Org): Promise<string> {
   const lessonIds = o.mod.lessons.map((l) => l.id);
   const parts: string[] = [];
   for (const table of TABLES) {
     const c: Record<string, Column | undefined> = getTableColumns(table);
-    let where: SQL | undefined;
-    if (table === t.tenants) where = eq(t.tenants.id, o.tenant.id);
-    else if (c.tenantId) where = eq(c.tenantId, o.tenant.id);
-    else if (c.userId) where = inArray(c.userId, o.userIds);
-    else if (c.moduleId) where = eq(c.moduleId, o.mod.id);
-    else if (c.lessonId) where = inArray(c.lessonId, lessonIds);
-    else if (c.policyId) where = eq(c.policyId, o.policy.id);
-    else if (c.versionId) where = eq(c.versionId, o.version.id);
-    else if (c.sessionId) where = eq(c.sessionId, o.session.id);
-    else if (c.ticketId) where = eq(c.ticketId, o.ticket.id);
-    else if (c.materialId) where = eq(c.materialId, o.material.id);
-    else if (c.campaignId) where = eq(c.campaignId, o.campaign.id);
-    else if (c.loopId) where = eq(c.loopId, o.loop.id);
-    else continue; // platform-wide tables: rate limits, job ticks, demo requests
+    const keys: (SQL | undefined)[] = [
+      table === t.tenants ? eq(t.tenants.id, o.tenant.id) : undefined,
+      c.tenantId && eq(c.tenantId, o.tenant.id),
+      c.userId && inArray(c.userId, o.userIds),
+      c.moduleId && eq(c.moduleId, o.mod.id),
+      c.lessonId && inArray(c.lessonId, lessonIds),
+      c.policyId && eq(c.policyId, o.policy.id),
+      c.versionId && eq(c.versionId, o.version.id),
+      c.sessionId && eq(c.sessionId, o.session.id),
+      c.ticketId && eq(c.ticketId, o.ticket.id),
+      c.materialId && eq(c.materialId, o.material.id),
+      c.campaignId && eq(c.campaignId, o.campaign.id),
+      c.loopId && eq(c.loopId, o.loop.id),
+    ];
+    const where = or(...keys.filter((k): k is SQL => !!k));
+    if (!where) continue; // platform-wide tables: rate limits, job ticks, demo requests
     const rows = await db.select().from(table).where(where);
     parts.push(getTableConfig(table).name, ...rows.map((r) => JSON.stringify(r)).sort());
   }
@@ -228,90 +238,90 @@ const PATH = { sourceId: null, title: "Onboarding", description: "", audience: "
 const INCIDENT = { title: "Fake invoices", description: "", severity: "high" as const, source: "analyst" as const, confidential: false, live: false, iocs: "", mitre: "", moduleId: null, minScore: null, dueDate: null, departmentId: null, userIds: [], sandboxId: null, assignNow: false };
 
 const ROWS: Record<string, Row> = {
-  "actions/admin-overview.hideSetupAction": { lower: () => adminOverview.hideSetupAction(true) },
-  "actions/admin-overview.remindAwaitingAction": { run: (_, b) => adminOverview.remindAwaitingAction(b.mod.id) },
-  "actions/admin-overview.skipSetupStepAction": { lower: () => adminOverview.skipSetupStepAction("twofa") },
-  "actions/ai-training.generateTrainingAction": { lower: () => aiTraining.generateTrainingAction({} as never) },
-  "actions/ai-training.libraryTrainingAction": { lower: () => aiTraining.libraryTrainingAction({} as never) },
-  "actions/ai-training.saveTrainingDraftAction": { lower: () => aiTraining.saveTrainingDraftAction({} as never) },
-  "actions/auth.checkEmailAction": { na: PUBLIC },
-  "actions/auth.forgotPasswordAction": { na: PUBLIC },
-  "actions/auth.requestPhoneCodeAction": { na: PUBLIC },
-  "actions/auth.setLocaleAction": { na: SELF },
-  "actions/auth.setPasswordAction": { na: PUBLIC },
-  "actions/auth.signInAction": { na: PUBLIC },
-  "actions/auth.signOutAction": { na: SELF },
-  "actions/auth.verifyPhoneCodeAction": { na: PUBLIC },
-  "actions/auth.verifySecondFactorAction": { na: SELF },
-  "actions/campaigns.launchCampaignAction": { run: (_, b) => campaigns.launchCampaignAction(b.campaign.id) },
-  "actions/campaigns.saveCampaignAction": {
+  "server/actions/admin-overview.hideSetupAction": { lower: () => adminOverview.hideSetupAction(true) },
+  "server/actions/admin-overview.remindAwaitingAction": { run: (_, b) => adminOverview.remindAwaitingAction(b.mod.id) },
+  "server/actions/admin-overview.skipSetupStepAction": { lower: () => adminOverview.skipSetupStepAction("twofa") },
+  "server/actions/ai-training.generateTrainingAction": { lower: () => aiTraining.generateTrainingAction({} as never) },
+  "server/actions/ai-training.libraryTrainingAction": { lower: () => aiTraining.libraryTrainingAction({} as never) },
+  "server/actions/ai-training.saveTrainingDraftAction": { lower: () => aiTraining.saveTrainingDraftAction({} as never) },
+  "server/actions/auth.checkEmailAction": { na: PUBLIC },
+  "server/actions/auth.forgotPasswordAction": { na: PUBLIC },
+  "server/actions/auth.requestPhoneCodeAction": { na: PUBLIC },
+  "server/actions/auth.setLocaleAction": { na: SELF },
+  "server/actions/auth.setPasswordAction": { na: PUBLIC },
+  "server/actions/auth.signInAction": { na: PUBLIC },
+  "server/actions/auth.signOutAction": { na: SELF },
+  "server/actions/auth.verifyPhoneCodeAction": { na: PUBLIC },
+  "server/actions/auth.verifySecondFactorAction": { na: SELF },
+  "server/actions/campaigns.launchCampaignAction": { run: (_, b) => campaigns.launchCampaignAction(b.campaign.id) },
+  "server/actions/campaigns.saveCampaignAction": {
     run: async (_, b) => [
       await campaigns.saveCampaignAction({ id: b.campaign.id, name: "Payslip", templateKey: "payslip", audience: "all", departmentId: null, scheduledAt: null }),
       await campaigns.saveCampaignAction({ name: "Payslip", templateKey: "payslip", audience: "department", departmentId: b.department.id, scheduledAt: null }),
     ],
   },
-  "actions/campaigns.setCampaignStatusAction": { run: (_, b) => campaigns.setCampaignStatusAction(b.campaign.id, "cancelled") },
-  "actions/campaigns.simulationSubmitAction": { na: "public simulation token: records the click on that token's own recipient, by design" },
-  "actions/drill.skipDrillAction": { run: (_, b) => drill.skipDrillAction(b.drillRun.id) },
-  "actions/drill.startDrillAction": { run: (_, b) => drill.startDrillAction({ templateKey: "payslip", audience: "department", departmentId: b.department.id, speed: "quick" }) },
-  "actions/engage.createTicketAction": { na: SELF },
-  "actions/engage.playLabAction": { na: SELF },
-  "actions/engage.replyTicketAction": { run: (_, b) => engage.replyTicketAction(b.ticket.id, "Any news?") },
-  "actions/engage.sendFeedbackAction": { na: SELF },
-  "actions/engage.toggleSessionAction": { run: (_, b) => engage.toggleSessionAction(b.session.id, true) },
-  "actions/learning.attestModuleAction": { run: (_, b) => learning.attestModuleAction(b.mod.slug) },
-  "actions/learning.completeLessonAction": { run: (_, b) => learning.completeLessonAction({ slug: b.mod.slug, lessonKey: "lesson-1", answers: [] }) },
-  "actions/learning.rateModuleAction": { run: (_, b) => learning.rateModuleAction({ slug: b.mod.slug, rating: 5 }) },
-  "actions/learning.reachSceneAction": { run: (_, b) => learning.reachSceneAction(b.mod.slug, "lesson-1", 1) },
-  "actions/learning.reportProblemAction": { na: SELF },
-  "actions/learning.startLessonAction": { run: (_, b) => learning.startLessonAction(b.mod.slug, "lesson-1") },
-  "actions/notifications.markNotificationsReadAction": { na: SELF },
-  "actions/people.addPersonAction": { run: (_, b) => people.addPersonAction(undefined, form({ name: "Taylor Example", email: `taylor${++seq}@example.com`, role: "learner", departmentId: b.department.id, locale: "en" })) },
-  "actions/people.changeRoleAction": { run: (_, b) => people.changeRoleAction(b.learner.user.id, "analyst") },
-  "actions/people.createLinkAction": { run: (_, b) => people.createLinkAction(b.learner.user.id, "reset") },
-  "actions/people.decideDeletionAction": { run: (_, b) => people.decideDeletionAction(b.learner.user.id, true) },
-  "actions/people.deletePersonAction": { run: (_, b) => people.deletePersonAction(b.learner.user.id) },
-  "actions/people.emailInvitesAction": { run: (_, b) => people.emailInvitesAction([b.invited.id]) },
-  "actions/people.importPeopleAction": { lower: () => people.importPeopleAction("name,email\n", false) },
-  "actions/people.moveDepartmentAction": {
+  "server/actions/campaigns.setCampaignStatusAction": { run: (_, b) => campaigns.setCampaignStatusAction(b.campaign.id, "cancelled") },
+  "server/actions/campaigns.simulationSubmitAction": { na: "public simulation token: records the click on that token's own recipient, by design" },
+  "server/actions/drill.skipDrillAction": { run: (_, b) => drill.skipDrillAction(b.drillRun.id) },
+  "server/actions/drill.startDrillAction": { run: (_, b) => drill.startDrillAction({ templateKey: "payslip", audience: "department", departmentId: b.department.id, speed: "quick" }) },
+  "server/actions/engage.createTicketAction": { na: SELF },
+  "server/actions/engage.playLabAction": { na: SELF },
+  "server/actions/engage.replyTicketAction": { run: (_, b) => engage.replyTicketAction(b.ticket.id, "Any news?") },
+  "server/actions/engage.sendFeedbackAction": { na: SELF },
+  "server/actions/engage.toggleSessionAction": { run: (_, b) => engage.toggleSessionAction(b.session.id, true) },
+  "server/actions/learning.attestModuleAction": { run: (_, b) => learning.attestModuleAction(b.mod.slug) },
+  "server/actions/learning.completeLessonAction": { run: (_, b) => learning.completeLessonAction({ slug: b.mod.slug, lessonKey: "lesson-1", answers: [] }) },
+  "server/actions/learning.rateModuleAction": { run: (_, b) => learning.rateModuleAction({ slug: b.mod.slug, rating: 5 }) },
+  "server/actions/learning.reachSceneAction": { run: (_, b) => learning.reachSceneAction(b.mod.slug, "lesson-1", 1) },
+  "server/actions/learning.reportProblemAction": { na: SELF },
+  "server/actions/learning.startLessonAction": { run: (_, b) => learning.startLessonAction(b.mod.slug, "lesson-1") },
+  "server/actions/notifications.markNotificationsReadAction": { na: SELF },
+  "server/actions/people.addPersonAction": { run: (_, b) => people.addPersonAction(undefined, form({ name: "Taylor Example", email: `taylor${++seq}@example.com`, role: "learner", departmentId: b.department.id, locale: "en" })) },
+  "server/actions/people.changeRoleAction": { run: (_, b) => people.changeRoleAction(b.learner.user.id, "analyst") },
+  "server/actions/people.createLinkAction": { run: (_, b) => people.createLinkAction(b.learner.user.id, "reset") },
+  "server/actions/people.decideDeletionAction": { run: (_, b) => people.decideDeletionAction(b.learner.user.id, true) },
+  "server/actions/people.deletePersonAction": { run: (_, b) => people.deletePersonAction(b.learner.user.id) },
+  "server/actions/people.emailInvitesAction": { run: (_, b) => people.emailInvitesAction([b.invited.id]) },
+  "server/actions/people.importPeopleAction": { lower: () => people.importPeopleAction("name,email\n", false) },
+  "server/actions/people.moveDepartmentAction": {
     run: async (a, b) => [await people.moveDepartmentAction([a.learner.user.id], b.department.id), await people.moveDepartmentAction([b.learner.user.id], a.department.id)],
   },
-  "actions/people.remindPeopleAction": { run: (_, b) => people.remindPeopleAction([b.learner.user.id]) },
-  "actions/people.resetTwoFactorAction": { run: (_, b) => people.resetTwoFactorAction(b.learner.user.id) },
-  "actions/people.setStatusAction": { run: (_, b) => people.setStatusAction([b.learner.user.id], "suspended") },
-  "actions/people.unlinkSsoAction": { run: (_, b) => people.unlinkSsoAction(b.learner.user.id) },
-  "actions/people.updatePersonAction": { run: (_, b) => people.updatePersonAction(b.learner.user.id, { name: "Renamed Person", locale: "en" }) },
-  "actions/platform.adminLinkAction": { run: (_, b) => platform.adminLinkAction(b.tenant.id, b.admin.user.id) },
-  "actions/platform.createTenantAction": { lower: () => platform.createTenantAction({} as never) },
-  "actions/platform.deleteDemoAction": { lower: () => platform.deleteDemoAction("00000000-0000-4000-8000-000000000001") },
-  "actions/platform.renameTenantAction": { run: (_, b) => platform.renameTenantAction(b.tenant.id, "Renamed") },
-  "actions/platform.setDemoStatusAction": { lower: () => platform.setDemoStatusAction("00000000-0000-4000-8000-000000000001", "won") },
-  "actions/platform.setTenantFeatureAction": { run: (_, b) => platform.setTenantFeatureAction(b.tenant.id, "studio", "off") },
-  "actions/platform.setTenantPlanAction": { run: (_, b) => platform.setTenantPlanAction(b.tenant.id, "essentials") },
-  "actions/platform.verifyTenantDomainAction": { run: (_, b) => platform.verifyTenantDomainAction(b.tenant.id, "example.com", true) },
-  "actions/policies.signPolicyAction": { run: (_, b) => policies.signPolicyAction(undefined, form({ versionId: b.version.id, agree: "on", password: "pw" })) },
-  "actions/preferences.setPreferencesAction": { na: SELF },
-  "actions/profile.cancelDeletionAction": { na: SELF },
-  "actions/profile.changePasswordAction": { na: SELF },
-  "actions/profile.confirmTotpAction": { na: SELF },
-  "actions/profile.disableTotpAction": { na: SELF },
-  "actions/profile.markTourDoneAction": { na: SELF },
-  "actions/profile.regenerateBackupCodesAction": { na: SELF },
-  "actions/profile.requestDeletionAction": { na: SELF },
-  "actions/profile.resetTourAction": { na: SELF },
-  "actions/profile.setAvatarAction": { na: SELF },
-  "actions/profile.signOutOtherDevicesAction": { na: SELF },
-  "actions/profile.startTotpAction": { na: SELF },
-  "actions/reports.removeScheduleAction": { run: (_, b) => reports.removeScheduleAction(b.schedule.id) },
-  "actions/reports.saveScheduleAction": { run: (_, b) => reports.saveScheduleAction({ kind: "completion", format: "csv", frequency: "weekly", day: 1, recipients: "reports@example.com", departmentId: b.department.id }) },
-  "actions/secops.advanceLoopAction": { run: (_, b) => secops.advanceLoopAction(b.loop.id, "feedback", "") },
-  "actions/secops.analyzeReportUrlAction": { run: (_, b) => secops.analyzeReportUrlAction(b.report.id) },
-  "actions/secops.assignIncidentTrainingAction": { run: (_, b) => secops.assignIncidentTrainingAction(b.incident.id) },
-  "actions/secops.closeLoopAction": { run: (_, b) => secops.closeLoopAction(b.loop.id, "") },
-  "actions/secops.convertPolicyIntelAction": { run: (_, b) => secops.convertPolicyIntelAction(b.intelPolicy.id) },
-  "actions/secops.convertReportAction": { run: (_, b) => secops.convertReportAction(b.report.id, { title: "Phishing wave", severity: "high", incident: false }) },
-  "actions/secops.convertThreatIntelAction": { run: (_, b) => secops.convertThreatIntelAction(b.intelThreat.id, { moduleId: null, departmentId: null }) },
-  "actions/secops.createIncidentAction": {
+  "server/actions/people.remindPeopleAction": { run: (_, b) => people.remindPeopleAction([b.learner.user.id]) },
+  "server/actions/people.resetTwoFactorAction": { run: (_, b) => people.resetTwoFactorAction(b.learner.user.id) },
+  "server/actions/people.setStatusAction": { run: (_, b) => people.setStatusAction([b.learner.user.id], "suspended") },
+  "server/actions/people.unlinkSsoAction": { run: (_, b) => people.unlinkSsoAction(b.learner.user.id) },
+  "server/actions/people.updatePersonAction": { run: (_, b) => people.updatePersonAction(b.learner.user.id, { name: "Renamed Person", locale: "en" }) },
+  "server/actions/platform.adminLinkAction": { run: (_, b) => platform.adminLinkAction(b.tenant.id, b.admin.user.id) },
+  "server/actions/platform.createTenantAction": { lower: () => platform.createTenantAction({} as never) },
+  "server/actions/platform.deleteDemoAction": { lower: () => platform.deleteDemoAction("00000000-0000-4000-8000-000000000001") },
+  "server/actions/platform.renameTenantAction": { run: (_, b) => platform.renameTenantAction(b.tenant.id, "Renamed") },
+  "server/actions/platform.setDemoStatusAction": { lower: () => platform.setDemoStatusAction("00000000-0000-4000-8000-000000000001", "won") },
+  "server/actions/platform.setTenantFeatureAction": { run: (_, b) => platform.setTenantFeatureAction(b.tenant.id, "studio", "off") },
+  "server/actions/platform.setTenantPlanAction": { run: (_, b) => platform.setTenantPlanAction(b.tenant.id, "essentials") },
+  "server/actions/platform.verifyTenantDomainAction": { run: (_, b) => platform.verifyTenantDomainAction(b.tenant.id, "example.com", true) },
+  "server/actions/policies.signPolicyAction": { run: (_, b) => policies.signPolicyAction(undefined, form({ versionId: b.version.id, agree: "on", password: "pw" })) },
+  "server/actions/preferences.setPreferencesAction": { na: SELF },
+  "server/actions/profile.cancelDeletionAction": { na: SELF },
+  "server/actions/profile.changePasswordAction": { na: SELF },
+  "server/actions/profile.confirmTotpAction": { na: SELF },
+  "server/actions/profile.disableTotpAction": { na: SELF },
+  "server/actions/profile.markTourDoneAction": { na: SELF },
+  "server/actions/profile.regenerateBackupCodesAction": { na: SELF },
+  "server/actions/profile.requestDeletionAction": { na: SELF },
+  "server/actions/profile.resetTourAction": { na: SELF },
+  "server/actions/profile.setAvatarAction": { na: SELF },
+  "server/actions/profile.signOutOtherDevicesAction": { na: SELF },
+  "server/actions/profile.startTotpAction": { na: SELF },
+  "server/actions/reports.removeScheduleAction": { run: (_, b) => reports.removeScheduleAction(b.schedule.id) },
+  "server/actions/reports.saveScheduleAction": { run: (_, b) => reports.saveScheduleAction({ kind: "completion", format: "csv", frequency: "weekly", day: 1, recipients: "reports@example.com", departmentId: b.department.id }) },
+  "server/actions/secops.advanceLoopAction": { run: (_, b) => secops.advanceLoopAction(b.loop.id, "feedback", "") },
+  "server/actions/secops.analyzeReportUrlAction": { run: (_, b) => secops.analyzeReportUrlAction(b.report.id) },
+  "server/actions/secops.assignIncidentTrainingAction": { run: (_, b) => secops.assignIncidentTrainingAction(b.incident.id) },
+  "server/actions/secops.closeLoopAction": { run: (_, b) => secops.closeLoopAction(b.loop.id, "") },
+  "server/actions/secops.convertPolicyIntelAction": { run: (_, b) => secops.convertPolicyIntelAction(b.intelPolicy.id) },
+  "server/actions/secops.convertReportAction": { run: (_, b) => secops.convertReportAction(b.report.id, { title: "Phishing wave", severity: "high", incident: false }) },
+  "server/actions/secops.convertThreatIntelAction": { run: (_, b) => secops.convertThreatIntelAction(b.intelThreat.id, { moduleId: null, departmentId: null }) },
+  "server/actions/secops.createIncidentAction": {
     run: async (_, b) => {
       const refusedModule = await secops.createIncidentAction({ ...INCIDENT, moduleId: b.mod.id });
       const refusedSandbox = await secops.createIncidentAction({ ...INCIDENT, sandboxId: b.sandbox.id });
@@ -323,7 +333,7 @@ const ROWS: Record<string, Row> = {
       return [refusedModule, refusedSandbox, null];
     },
   },
-  "actions/secops.createMaterialAction": {
+  "server/actions/secops.createMaterialAction": {
     run: async (_, b) => {
       const refusedModule = await secops.createMaterialAction({ title: "Read this", body: "Check the sender first.", moduleId: b.mod.id, departmentId: null, requiresTwo: false });
       const own = await secops.createMaterialAction({ title: "Read this", body: "Check the sender first.", moduleId: null, departmentId: b.department.id, requiresTwo: false });
@@ -334,56 +344,56 @@ const ROWS: Record<string, Row> = {
       return [refusedModule, null];
     },
   },
-  "actions/secops.decideMaterialAction": { run: (_, b) => secops.decideMaterialAction(b.material.id, "approve") },
-  "actions/secops.deleteModuleAction": { run: (_, b) => secops.deleteModuleAction(b.mod.id) },
-  "actions/secops.deletePathAction": { run: (_, b) => secops.deletePathAction(b.path.id) },
-  "actions/secops.deleteSessionAction": { run: (_, b) => secops.deleteSessionAction(b.session.id) },
-  "actions/secops.dismissReportAction": { run: (_, b) => secops.dismissReportAction(b.report.id) },
-  "actions/secops.draftLessonAction": { lower: () => secops.draftLessonAction("Phishing basics", "en") },
-  "actions/secops.editMaterialAction": { run: (_, b) => secops.editMaterialAction(b.material.id, { title: "Edited", body: "Check the sender first." }) },
-  "actions/secops.reviewFeedbackAction": { run: (_, b) => secops.reviewFeedbackAction(b.feedback.id) },
-  "actions/secops.savePathAction": {
+  "server/actions/secops.decideMaterialAction": { run: (_, b) => secops.decideMaterialAction(b.material.id, "approve") },
+  "server/actions/secops.deleteModuleAction": { run: (_, b) => secops.deleteModuleAction(b.mod.id) },
+  "server/actions/secops.deletePathAction": { run: (_, b) => secops.deletePathAction(b.path.id) },
+  "server/actions/secops.deleteSessionAction": { run: (_, b) => secops.deleteSessionAction(b.session.id) },
+  "server/actions/secops.dismissReportAction": { run: (_, b) => secops.dismissReportAction(b.report.id) },
+  "server/actions/secops.draftLessonAction": { lower: () => secops.draftLessonAction("Phishing basics", "en") },
+  "server/actions/secops.editMaterialAction": { run: (_, b) => secops.editMaterialAction(b.material.id, { title: "Edited", body: "Check the sender first." }) },
+  "server/actions/secops.reviewFeedbackAction": { run: (_, b) => secops.reviewFeedbackAction(b.feedback.id) },
+  "server/actions/secops.savePathAction": {
     run: async (a, b) => [
       await secops.savePathAction({ ...PATH, id: b.path.id, moduleSlugs: [a.mod.slug] }),
       await secops.savePathAction({ ...PATH, id: null, moduleSlugs: [b.mod.slug] }),
       await secops.savePathAction({ ...PATH, id: null, sourceId: b.path.id, moduleSlugs: [b.mod.slug] }),
     ],
   },
-  "actions/secops.saveSessionAction": { run: (_, b) => secops.saveSessionAction({ ...SESSION, id: b.session.id }) },
-  "actions/secops.saveStudioLessonAction": { lower: () => secops.saveStudioLessonAction({} as never) },
-  "actions/secops.setAttendanceAction": { run: (a, b) => secops.setAttendanceAction(b.session.id, a.learner.user.id, true) },
-  "actions/secops.setIncidentTrainingAction": { run: (_, b) => secops.setIncidentTrainingAction(b.incident.id, { moduleId: null, minScore: null, dueDate: null, departmentId: null, userIds: [] }) },
-  "actions/secops.setIntelStatusAction": { run: (_, b) => secops.setIntelStatusAction(b.intelThreat.id, "reviewed") },
-  "actions/secops.setLoopVerdictAction": { run: (_, b) => secops.setLoopVerdictAction(b.loop.id, "benign") },
-  "actions/secops.setModuleStatusAction": { run: (_, b) => secops.setModuleStatusAction(b.mod.id, "draft") },
-  "actions/secops.setTicketStatusAction": { run: (_, b) => secops.setTicketStatusAction(b.ticket.id, "closed") },
-  "actions/secops.triageReportAction": { run: (_, b) => secops.triageReportAction(b.report.id, "low") },
-  "actions/secops.updateIncidentAction": { run: (_, b) => secops.updateIncidentAction(b.incident.id, { status: "resolved" }) },
-  "actions/security.analyzeAction": { na: SELF },
-  "actions/security.escalateAnalysisAction": { run: (_, b) => security.escalateAnalysisAction(b.sandbox.id) },
-  "actions/security.reportThreatAction": { na: SELF },
-  "actions/settings.domainProofRecordAction": { lower: () => settings.domainProofRecordAction() },
-  "actions/settings.lookupWatermarkAction": { run: (_, b) => settings.lookupWatermarkAction(b.watermark) },
-  "actions/settings.resendFailedMailAction": { run: (_, b) => settings.resendFailedMailAction(b.mail.id) },
-  "actions/settings.rotateWebhookSecretAction": { lower: () => settings.rotateWebhookSecretAction() },
-  "actions/settings.saveAttestationAction": { lower: () => settings.saveAttestationAction("en", "I confirm that I completed this module.") },
-  "actions/settings.saveBrandingAction": { lower: () => settings.saveBrandingAction({} as never) },
-  "actions/settings.saveCertificateAction": { lower: () => settings.saveCertificateAction({} as never) },
-  "actions/settings.saveEmailAction": { lower: () => settings.saveEmailAction({} as never) },
-  "actions/settings.saveIdentityAction": { lower: () => settings.saveIdentityAction({} as never) },
-  "actions/settings.saveIntegrationsAction": { lower: () => settings.saveIntegrationsAction({} as never) },
-  "actions/settings.saveLanguagesAction": { lower: () => settings.saveLanguagesAction("en", ["en"]) },
-  "actions/settings.saveLearningAction": { lower: () => settings.saveLearningAction({} as never) },
-  "actions/settings.saveNotificationsAction": { lower: () => settings.saveNotificationsAction({} as never) },
-  "actions/settings.saveProtectionAction": { lower: () => settings.saveProtectionAction(true, true) },
-  "actions/settings.saveTimeZoneAction": { lower: () => settings.saveTimeZoneAction("Asia/Baku") },
-  "actions/settings.sendTestEventAction": { lower: () => settings.sendTestEventAction() },
-  "actions/settings.setLogoAction": { lower: () => settings.setLogoAction(null) },
-  "actions/settings.testEmailAction": { lower: () => settings.testEmailAction("admin@example.com") },
-  "actions/settings.verifyDomainAction": { lower: () => settings.verifyDomainAction("example.com") },
-  "actions/site.requestDemoAction": { na: PUBLIC },
-  "actions/workspace.archivePolicyAction": { run: (_, b) => workspace.archivePolicyAction(b.policy.id, true) },
-  "actions/workspace.createAssignmentAction": {
+  "server/actions/secops.saveSessionAction": { run: (_, b) => secops.saveSessionAction({ ...SESSION, id: b.session.id }) },
+  "server/actions/secops.saveStudioLessonAction": { lower: () => secops.saveStudioLessonAction({} as never) },
+  "server/actions/secops.setAttendanceAction": { run: (a, b) => secops.setAttendanceAction(b.session.id, a.learner.user.id, true) },
+  "server/actions/secops.setIncidentTrainingAction": { run: (_, b) => secops.setIncidentTrainingAction(b.incident.id, { moduleId: null, minScore: null, dueDate: null, departmentId: null, userIds: [] }) },
+  "server/actions/secops.setIntelStatusAction": { run: (_, b) => secops.setIntelStatusAction(b.intelThreat.id, "reviewed") },
+  "server/actions/secops.setLoopVerdictAction": { run: (_, b) => secops.setLoopVerdictAction(b.loop.id, "benign") },
+  "server/actions/secops.setModuleStatusAction": { run: (_, b) => secops.setModuleStatusAction(b.mod.id, "draft") },
+  "server/actions/secops.setTicketStatusAction": { run: (_, b) => secops.setTicketStatusAction(b.ticket.id, "closed") },
+  "server/actions/secops.triageReportAction": { run: (_, b) => secops.triageReportAction(b.report.id, "low") },
+  "server/actions/secops.updateIncidentAction": { run: (_, b) => secops.updateIncidentAction(b.incident.id, { status: "resolved" }) },
+  "server/actions/security.analyzeAction": { na: SELF },
+  "server/actions/security.escalateAnalysisAction": { run: (_, b) => security.escalateAnalysisAction(b.sandbox.id) },
+  "server/actions/security.reportThreatAction": { na: SELF },
+  "server/actions/settings.domainProofRecordAction": { lower: () => settings.domainProofRecordAction() },
+  "server/actions/settings.lookupWatermarkAction": { run: (_, b) => settings.lookupWatermarkAction(b.watermark) },
+  "server/actions/settings.resendFailedMailAction": { run: (_, b) => settings.resendFailedMailAction(b.mail.id) },
+  "server/actions/settings.rotateWebhookSecretAction": { lower: () => settings.rotateWebhookSecretAction() },
+  "server/actions/settings.saveAttestationAction": { lower: () => settings.saveAttestationAction("en", "I confirm that I completed this module.") },
+  "server/actions/settings.saveBrandingAction": { lower: () => settings.saveBrandingAction({} as never) },
+  "server/actions/settings.saveCertificateAction": { lower: () => settings.saveCertificateAction({} as never) },
+  "server/actions/settings.saveEmailAction": { lower: () => settings.saveEmailAction({} as never) },
+  "server/actions/settings.saveIdentityAction": { lower: () => settings.saveIdentityAction({} as never) },
+  "server/actions/settings.saveIntegrationsAction": { lower: () => settings.saveIntegrationsAction({} as never) },
+  "server/actions/settings.saveLanguagesAction": { lower: () => settings.saveLanguagesAction("en", ["en"]) },
+  "server/actions/settings.saveLearningAction": { lower: () => settings.saveLearningAction({} as never) },
+  "server/actions/settings.saveNotificationsAction": { lower: () => settings.saveNotificationsAction({} as never) },
+  "server/actions/settings.saveProtectionAction": { lower: () => settings.saveProtectionAction(true, true) },
+  "server/actions/settings.saveTimeZoneAction": { lower: () => settings.saveTimeZoneAction("Asia/Baku") },
+  "server/actions/settings.sendTestEventAction": { lower: () => settings.sendTestEventAction() },
+  "server/actions/settings.setLogoAction": { lower: () => settings.setLogoAction(null) },
+  "server/actions/settings.testEmailAction": { lower: () => settings.testEmailAction("admin@example.com") },
+  "server/actions/settings.verifyDomainAction": { lower: () => settings.verifyDomainAction("example.com") },
+  "server/actions/site.requestDemoAction": { na: PUBLIC },
+  "server/actions/workspace.archivePolicyAction": { run: (_, b) => workspace.archivePolicyAction(b.policy.id, true) },
+  "server/actions/workspace.createAssignmentAction": {
     run: async (a, b) => {
       const base = { scope: "everyone" as const, departmentId: null, userId: null, dueKind: "none" as const, dueDate: null, dueDays: null, reason: null };
       return [
@@ -394,23 +404,23 @@ const ROWS: Record<string, Row> = {
       ];
     },
   },
-  "actions/workspace.createPolicyAction": { lower: () => workspace.createPolicyAction("Acceptable use") },
-  "actions/workspace.deleteDepartmentAction": { run: (_, b) => workspace.deleteDepartmentAction(b.department.id) },
-  "actions/workspace.mergeDepartmentAction": {
+  "server/actions/workspace.createPolicyAction": { lower: () => workspace.createPolicyAction("Acceptable use") },
+  "server/actions/workspace.deleteDepartmentAction": { run: (_, b) => workspace.deleteDepartmentAction(b.department.id) },
+  "server/actions/workspace.mergeDepartmentAction": {
     run: async (a, b) => [await workspace.mergeDepartmentAction(b.department.id, a.department.id), await workspace.mergeDepartmentAction(a.department.id, b.department.id)],
   },
-  "actions/workspace.publishVersionAction": { run: (_, b) => workspace.publishVersionAction({ policyId: b.policy.id, title: "Acceptable use", bodyMd: "Use the systems responsibly, always." }) },
-  "actions/workspace.remindPolicyAction": { run: (_, b) => workspace.remindPolicyAction(b.version.id) },
-  "actions/workspace.removeAssignmentAction": { run: (_, b) => workspace.removeAssignmentAction(b.assignment.id) },
-  "actions/workspace.saveDepartmentAction": {
+  "server/actions/workspace.publishVersionAction": { run: (_, b) => workspace.publishVersionAction({ policyId: b.policy.id, title: "Acceptable use", bodyMd: "Use the systems responsibly, always." }) },
+  "server/actions/workspace.remindPolicyAction": { run: (_, b) => workspace.remindPolicyAction(b.version.id) },
+  "server/actions/workspace.removeAssignmentAction": { run: (_, b) => workspace.removeAssignmentAction(b.assignment.id) },
+  "server/actions/workspace.saveDepartmentAction": {
     run: async (_, b) => [
       await workspace.saveDepartmentAction({ id: b.department.id, name: "Renamed", parentId: null, headUserId: null }),
       await workspace.saveDepartmentAction({ name: "Child", parentId: b.department.id, headUserId: null }),
       await workspace.saveDepartmentAction({ name: "Headed", parentId: null, headUserId: b.learner.user.id }),
     ],
   },
-  "actions/workspace.setProblemStatusAction": { run: (_, b) => workspace.setProblemStatusAction(b.problem.id, "resolved") },
-  "actions/workspace.updateDueAction": { run: (_, b) => workspace.updateDueAction(b.assignment.id, "none", null, null) },
+  "server/actions/workspace.setProblemStatusAction": { run: (_, b) => workspace.setProblemStatusAction(b.problem.id, "resolved") },
+  "server/actions/workspace.updateDueAction": { run: (_, b) => workspace.updateDueAction(b.assignment.id, "none", null, null) },
   "api/admin/campaigns/[id]/usb-kit:GET": { run: (_, b) => usbKit.GET(req(`/api/admin/campaigns/${b.campaign.id}/usb-kit`), ctx({ id: b.campaign.id })) },
   "api/admin/drill/[id]:GET": { run: (_, b) => drillRoute.GET(req(`/api/admin/drill/${b.drillRun.id}`), ctx({ id: b.drillRun.id })) },
   "api/admin/drill/[id]:POST": { run: (_, b) => drillRoute.POST(req(`/api/admin/drill/${b.drillRun.id}`, { method: "POST" }), ctx({ id: b.drillRun.id })) },
@@ -439,6 +449,17 @@ const ROWS: Record<string, Row> = {
   "api/super/demo-requests:GET": { run: () => demoRequests.GET(req("/api/super/demo-requests")) },
   "api/t/[token]/open:GET": { na: "public simulation token: the open pixel of that token's own recipient, by design" },
   "api/tutor:POST": { run: (_, b) => tutor.POST(req("/api/tutor", { method: "POST", body: JSON.stringify({ slug: b.mod.slug, lessonKey: "lesson-1", question: "Why is this unsafe?", locale: "en" }) })) },
+  "app/(focus)/learn/[slug]/[lessonId]/actions.loadCaptionsAction": {
+    // B's own administrator gets the captions, so the null A gets is the reach filter, not a missing translation.
+    run: async (_, b) => {
+      const caller = viewer;
+      viewer = b.admin;
+      expect(await captions.loadCaptionsAction(b.mod.lessons[0].id, "az")).not.toBeNull();
+      viewer = caller;
+      return captions.loadCaptionsAction(b.mod.lessons[0].id, "az");
+    },
+  },
+  "server/lab/vm-action.completeVmLabAction": { na: SELF },
 };
 
 /* ───────── the checks ───────── */
@@ -453,8 +474,14 @@ function refused(r: unknown): boolean {
   return o.ok === false || !!o.error || o.count === 0;
 }
 
+/** The gate's own refusal, which comes before any lookup: actionViewer(<permission>) throws FORBIDDEN, apiViewer(<permission>) answers 403. */
+const gateRefused = (r: unknown) => (r instanceof Response ? r.status === 403 : r instanceof Error && r.message === "FORBIDDEN");
+
 const settle = (call: () => Promise<unknown>) => call().catch((e: unknown) => (e instanceof Error ? e : new Error(String(e))));
-const PERMISSION = /^(actionViewer|apiViewer)\(.+\)$/;
+/** The guard names a permission somewhere (`actionViewer(people.write)`, `getViewer()+allowed(secops.read)`): the learner gets a pass too. */
+const PERMISSION = /\(\w/;
+/** The gate itself names the permission, so with B's ids the learner must still be refused by the gate and not by the tenant predicate. */
+const GATE = /^(actionViewer|apiViewer)\(\w/;
 const guards: Record<string, string> = surface;
 
 let A: Org;
@@ -479,19 +506,22 @@ describe("another organisation's ids and a lower role are refused, and nothing o
     it(key, async () => {
       if ("na" in row) return;
       const before = await snapshot(B);
-      const results: unknown[] = [];
+      const asAdmin: unknown[] = [];
+      const asLearner: unknown[] = [];
       if ("run" in row) {
         viewer = A.admin;
-        results.push(await settle(() => row.run(A, B)));
+        asAdmin.push(await settle(() => row.run(A, B)));
         if (PERMISSION.test(guards[key])) {
           viewer = A.learner;
-          results.push(await settle(() => row.run(A, B)));
+          asLearner.push(await settle(() => row.run(A, B)));
         }
       } else {
         viewer = A.learner;
-        results.push(await settle(() => row.lower(A)));
+        asLearner.push(await settle(() => row.lower(A)));
       }
-      for (const r of results.flat()) expect(r, `${key} answered ${r instanceof Response ? r.status : JSON.stringify(r)}`).toSatisfy(refused);
+      const answered = (r: unknown) => `${key} answered ${r instanceof Response ? r.status : r instanceof Error ? r.message : JSON.stringify(r)}`;
+      for (const r of asAdmin.flat()) expect(r, answered(r)).toSatisfy(refused);
+      for (const r of asLearner.flat()) expect(r, `as the learner, ${answered(r)}`).toSatisfy(GATE.test(guards[key]) ? gateRefused : refused);
       expect(await snapshot(B), `${key} changed rows of the other organisation`).toBe(before);
     });
   }
