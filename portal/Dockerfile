@@ -23,6 +23,9 @@ RUN sed -i 's/\r$//' scripts/docker-entrypoint.sh
 # Every lesson file and translation is checked here (schema, integrity, parity with English): a bad
 # file fails `docker build` instead of the start-up import of a running deployment.
 RUN npx tsx scripts/check-lesson-locales.ts --coverage
+# The SCORM export's offline player (src/scorm): built here, where its sources and esbuild are; the runtime
+# image has neither, so the export route (src/server/scorm/player.ts) reads the files copied below.
+RUN npx tsx scripts/build-scorm-player.ts
 RUN npm run build
 
 # 3. Runtime: the standalone server plus everything the app reads from disk at runtime
@@ -38,6 +41,7 @@ COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 COPY --from=builder --chown=node:node /app/public ./public
 COPY --from=builder --chown=node:node /app/drizzle ./drizzle
 COPY --from=builder --chown=node:node /app/content ./content
+COPY --from=builder --chown=node:node /app/.data/scorm ./.data/scorm
 COPY --from=builder --chown=node:node /app/scripts/migrate.mjs /app/scripts/docker-entrypoint.sh ./scripts/
 # drizzle-orm is bundled into the server chunks by webpack (it is not a server-external package),
 # so the standalone output does not keep it in node_modules; the migration script imports it

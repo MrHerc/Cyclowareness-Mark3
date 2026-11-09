@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { eq } from "drizzle-orm";
@@ -8,34 +6,14 @@ import { allowed, requireViewer } from "@/server/auth/viewer";
 import { getCatalog } from "@/server/queries/catalog";
 import { loadNarrationClips } from "@/server/narration";
 import { LessonPlayer } from "@/components/player/player";
-import type { Brand, Scene } from "@/lib/content/types";
+import type { Scene } from "@/lib/content/types";
+import { brandsFor } from "@/server/brands";
 import { pickLessonContent } from "@/lib/content/lesson-locale";
 import { CATEGORY_TOPIC } from "@/lib/domain/catalog";
 import { DEFAULT_ATTESTATION } from "@/lib/tenant-defaults";
 import { LOCALES, pick } from "@/i18n/config";
 import { subtitleLanguageOptions } from "@/lib/content/subtitle-languages";
 import { loadCaptionsAction } from "./actions";
-
-let brandCache: Record<string, Brand> | null = null;
-function allBrands(): Record<string, Brand> {
-  brandCache ??= JSON.parse(fs.readFileSync(path.join(process.cwd(), "content", "library", "brands.json"), "utf8")) as Record<string, Brand>;
-  return brandCache;
-}
-
-/** Only the brands a lesson references are sent to the browser. */
-function brandsFor(scenes: unknown): Record<string, Brand> {
-  const refs = new Set<string>();
-  const walk = (v: unknown) => {
-    if (!v || typeof v !== "object") return;
-    if (Array.isArray(v)) return v.forEach(walk);
-    const o = v as Record<string, unknown>;
-    if (typeof o.brandRef === "string") refs.add(o.brandRef);
-    Object.values(o).forEach(walk);
-  };
-  walk(scenes);
-  const all = allBrands();
-  return Object.fromEntries([...refs].filter((r) => all[r]).map((r) => [r, all[r]]));
-}
 
 export async function generateMetadata({ params }: PageProps<"/learn/[slug]/[lessonId]">) {
   const { slug, lessonId } = await params;

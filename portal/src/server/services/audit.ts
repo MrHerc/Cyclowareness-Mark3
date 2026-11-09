@@ -114,6 +114,7 @@ export const AUDIT_ACTIONS = [
   "module.created",
   "module.published",
   "module.deleted",
+  "module.exported",
   "path.created",
   "path.changed",
   "session.created",

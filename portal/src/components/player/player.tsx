@@ -77,6 +77,11 @@ export type PlayerProps = {
   /** The tenant's "tutor_voice" feature: microphone input and spoken tutor answers (default on). */
   tutorVoice?: boolean;
   attestationText: string;
+  /**
+   * Offline use (the SCORM package, src/scorm): finishing the lesson hands its answers to this instead of
+   * the server, and no server action runs (no attempt start, scene reports, preferences or problem reports).
+   */
+  onComplete?: (answers: PlayerAnswer[]) => LessonResult | Promise<LessonResult>;
 };
 
 /**
@@ -147,6 +152,7 @@ export function LessonPlayer(p: PlayerProps) {
   // No voice for the lesson's language in this browser: as with the sound off, every text shows in
   // full and the learner moves on by hand; a notice says why and where natural voices exist.
   const voiceMissing = soundOn && narrator.voice === "missing";
+  const offline = !!p.onComplete;
 
   // Subtitles: the narration's own words, a stored translation of the lesson, or an AI translation (with AI Sel on).
   const [lines] = useState(createLineStore);
@@ -229,6 +235,7 @@ export function LessonPlayer(p: PlayerProps) {
     setPhase("playing");
     savePosition(at, from?.inner ?? 0, reach);
     if (doneParam) setDoneParam(false);
+    if (offline) return;
     // The attempt's start, then its furthest scene, are the server's: a resumed one tells it where it already was.
     void startLessonAction(p.slug, p.lesson.key).then(() => (reach > 0 ? reachSceneAction(p.slug, p.lesson.key, reach) : undefined));
   };
@@ -242,7 +249,7 @@ export function LessonPlayer(p: PlayerProps) {
     setIndex(at);
     setMaxIndex(reach);
     savePosition(at, 0, reach);
-    if (reach > maxIndex) void reachSceneAction(p.slug, p.lesson.key, reach);
+    if (reach > maxIndex && !offline) void reachSceneAction(p.slug, p.lesson.key, reach);
   };
   const nextScene = () => {
     if (index + 1 < scenes.length) goTo(index + 1, Math.max(maxIndex, index + 1));
@@ -254,13 +261,17 @@ export function LessonPlayer(p: PlayerProps) {
     setSaving(true);
     stop();
     try {
-      // The last scene is reported again first: a report lost on the way must not refuse an honest attempt.
-      await reachSceneAction(p.slug, p.lesson.key, index);
-      const res = await completeLessonAction({ slug: p.slug, lessonKey: p.lesson.key, answers: answers.current.slice(0, 400) });
+      let res: LessonResult;
+      if (p.onComplete) res = await p.onComplete(answers.current);
+      else {
+        // The last scene is reported again first: a report lost on the way must not refuse an honest attempt.
+        await reachSceneAction(p.slug, p.lesson.key, index);
+        res = await completeLessonAction({ slug: p.slug, lessonKey: p.lesson.key, answers: answers.current.slice(0, 400) });
+      }
       if (!res.ok) {
         // A refused attempt may have no start any more (used up by another tab, or opened before the
         // server kept starts): open one again, so that pressing Finish later can succeed. A valid start is kept.
-        if (res.error) void startLessonAction(p.slug, p.lesson.key);
+        if (res.error && !offline) void startLessonAction(p.slug, p.lesson.key);
         toast(t(res.error ? "recap.unverified" : "recap.saveError"), "error");
         return;
       }
@@ -268,7 +279,7 @@ export function LessonPlayer(p: PlayerProps) {
       // and a refresh that fell back to a full reload would drop this screen (XP, attestation
       // prompt). The result is saved as well, so reloading this history entry shows it again.
       save({ kind: "done", result: res, token: null });
-      setDoneParam(true);
+      if (!offline) setDoneParam(true);
       setResult(res);
       setPhase("done");
     } catch {
@@ -304,7 +315,7 @@ export function LessonPlayer(p: PlayerProps) {
     const v = !soundOn;
     setSoundOn(v);
     if (!v) narrator.stop();
-    void setPreferencesAction({ soundOn: v });
+    if (!offline) void setPreferencesAction({ soundOn: v });
   };
   // Lesson text in another language than the interface (a missing translation) carries its own `lang`.
   const contentLang = p.contentLocale !== locale ? p.contentLocale : undefined;
@@ -526,12 +537,12 @@ export function LessonPlayer(p: PlayerProps) {
                   onChange={(m) => {
                     setMotion(m);
                     document.documentElement.dataset.motion = m;
-                    void setPreferencesAction({ motion: m });
+                    if (!offline) void setPreferencesAction({ motion: m });
                   }}
                 />
               </div>
             </div>
-            <ProblemSection context={`lesson:${p.slug}/${p.lesson.key}${scene ? `#${scene.id}` : ""}`} onSent={() => setOptionsOpen(false)} />
+            {offline ? null : <ProblemSection context={`lesson:${p.slug}/${p.lesson.key}${scene ? `#${scene.id}` : ""}`} onSent={() => setOptionsOpen(false)} />}
           </Dialog>
           <Drawer side="start" open={syllabusDrawer} onClose={() => setSyllabusDrawer(false)} title={t("syllabus.title")}>
             <SyllabusContents {...syllabus} onNavigate={() => setSyllabusDrawer(false)} />
