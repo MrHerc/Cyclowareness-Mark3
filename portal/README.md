@@ -2,17 +2,6 @@
 
 The Cyclowareness security-awareness portal by Safarov Industries: the learner and admin interface (lessons with the AI Sel mascot, league, certificates, policies, phishing simulations), in ten interface languages including right-to-left Arabic plus security operations (operations centre, threat intake and approvals, incident risk, sandbox, labs, leadership view, support desk). It was rebuilt from an earlier product, following the audit in `../docs/audit/`. Built with Next.js 16 (App Router, webpack), React 19, TypeScript strict, Tailwind CSS v4, Drizzle ORM and PostgreSQL; locally it runs on an embedded database with no services to install.
 
-## Tez başlanğıc
-
-```bash
-npm install
-cp .env.example .env.local        # PowerShell: Copy-Item .env.example .env.local
-npm run setup                     # miqrasiyalar + demo məlumatlar (.data/pg, Docker lazım deyil)
-npm run dev                       # http://localhost:3000
-```
-
-Demo hesablar: `admin@safarovindustries.com` (tenant admin), `learner@safarovindustries.com` (işçi) və aşağıdakı cədvəldəki digər rollar. Parol: `npm run setup` / `npm run demo` təşkilatı quranda bir dəfə çap edir, ya da `.env.local` faylında öz `SEED_PASSWORD` dəyəriniz. Dev server işləyərkən `db:*` skriptlərini çalışdırmayın: lokal baza (PGlite) eyni anda yalnız bir prosesə açılır, əvvəlcə serveri dayandırın. Production üçün Docker bölməsinə baxın. Sənədin qalanı ingiliscədir.
-
 **Three-minute demo:** `npm --prefix portal run demo` from the repository root, then follow [docs/DEMO.md](../docs/DEMO.md) (the Live drill: a phishing attack on the demo organisation, compressed into 90 seconds).
 
 ## Contents
@@ -350,9 +339,12 @@ CI=1 npm run e2e                           # the same against the production bui
 ## Documentation
 
 - `../docs/audit/` — the audit of the earlier portal that this rebuild follows: overview and routes, design tokens, learner app, admin panel, training catalogue (53 modules, 106 lessons), landing, lesson engine and mascot, screenshots, extracted content.
+- `../docs/ADMIN-GUIDE.md` — for customer administrators: every page of the admin console, the settings tabs, campaigns and the Live drill, policies, reports, security operations and the Studio.
+- `../docs/LEARNER-QUICKSTART.md` — a one-page start for employees: signing in, lessons, reporting, certificates and the profile.
+- `../docs/SECURITY-WHITEPAPER.md` — for customers' security and procurement teams: the security controls in the code, and what the platform does not yet provide.
 - `../docs/OPERATIONS.md` — incident response, post-mortem template, on-call, quarterly access review, backups, checking `TRUST_PROXY`.
 - `../docs/SIMULATION-DELIVERY.md` — getting phishing simulations into the inbox: the look-alike sending domain and its proof, SPF/DKIM/DMARC, allow-listing in Microsoft 365 (Defender advanced delivery) and Google Workspace, and how clicks are counted so mail scanners do not create false ones.
 - `../docs/DEMO.md` — the three-minute demo: how to run it, the talk track, what the Live drill simulates and what is real, the calibration sources.
-- `../docs/build/PLAN.md` — the build phases of the hybrid portal; `DECISIONS.md` (ADRs, including the ten languages, translation, narration, captions, player, mascot, light/motion and security hardening), `PROGRESS.md`, `OPEN-QUESTIONS.md` (what still needs the owner's decision or a key).
+- `../docs/build/PLAN.md` — the build phases of the hybrid portal; `DECISIONS.md` (ADRs, including the ten languages, translation, narration, captions, player, mascot, light/motion and security hardening), `PROGRESS.md`, `OPEN-QUESTIONS.md` (what still needs the owner's decision or a key). These are in Azerbaijani; `DECISIONS.md` starts with an English index, and `OPEN-QUESTIONS.en.md` is the English rendering of the open questions.
 - `../.claude/skills/cyclowareness-experience/` — the working reference for the mascot, motion, lessons, translations and the training pipeline, with the per-language glossaries.
 - Next.js itself: [documentation](https://nextjs.org/docs) and the version-specific guides shipped in `node_modules/next/dist/docs/` (this Next.js version has breaking changes compared with older tutorials; `AGENTS.md` says the same).

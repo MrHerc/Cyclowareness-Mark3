@@ -1,5 +1,57 @@
 # Arxitektura qərarları (ADR)
 
+## English index
+
+The records below are written in Azerbaijani, and the Azerbaijani text is the source. This index gives each record's number, an English title and its decision in one line. A record marked "amended" was later changed by the record named in its line.
+
+| ADR | Title | Decision |
+|---|---|---|
+| 001 | Next.js 16 App Router, RSC and Server Actions | All reads in server components, all writes in `"use server"` actions that start with `actionViewer(permission)`; nothing but actions is exported from those files. |
+| 002 | `cacheComponents` turned off | Every page is dynamic and refreshed with `refresh()` after changes; only the public site, legal pages and metadata routes are static. |
+| 003 | Webpack, not Turbopack | `dev` and `build` run with `--webpack` because Turbopack segfaults on the development machine; Tailwind runs through PostCSS. |
+| 004 | PostgreSQL and Drizzle; PGlite locally, node-postgres in production | One schema, one migrations folder, two drivers: `pg` when `DATABASE_URL` is set, otherwise PGlite in `.data/pg`. |
+| 005 | Own authentication layer | Email-first sign-in, Argon2id, database sessions keyed by the token's SHA-256, TOTP with backup codes, phone codes, lockout and a per-session watermark code. |
+| 006 | PDF through the browser's print, no server Chromium | Print-ready pages under `/print/*` are saved as PDF by the browser; CSV and XLSX are written on the server without dependencies. |
+| 007 | Voice: Web Speech API first, a TTS provider later | The browser's speech synthesis with word-boundary karaoke behind a `speak()` interface a provider can replace (continued by ADR-028). |
+| 008 | AI: Claude API, no personal data sent, human approval | `@anthropic-ai/sdk` with separate Studio and tutor models; the tutor gets lesson context only, Studio drafts are validated and always saved as drafts for approval. |
+| 009 | The sandbox is static analysis | URL heuristics, file type and signature, archive and macro checks, IOC extraction, MITRE mapping and STIX export; bytes are analysed in memory and only the hash is kept. |
+| 010 | Tailwind v4 and the audit tokens | The original product's design tokens live in `globals.css` `@theme`; tenant brand colours are CSS variables. |
+| 011 | next-intl, cookie based, namespaces | Typed messages in `messages/{locale}/{namespace}.json`, no dots in keys, escaped ICU braces, parity tests. |
+| 012 | Jobs in-process, no queue | `src/instrumentation.ts` calls `runJobs()` every minute under a Postgres advisory lock; every step is idempotent; `JOBS_ENABLED=0` turns it off. |
+| 013 | Webhook signature and syslog format | HMAC-SHA256 signature headers (plain and timestamped) and a delivery id; the secret is encrypted and shown once; syslog RFC 5424 with CEF or JSON over TLS, TCP or UDP. |
+| 014 | Service worker for the offline fallback only | Pages and API responses are never cached; static build files are, and `/offline` is shown without a connection. |
+| 015 | Content in files, synced to the database | 53 modules and 106 lessons as zod-validated JSON in `content/library`, imported by `content:sync` without losing progress; Studio lessons live only in the database. |
+| 016 | Product name Cyclowareness, demo organisation Safarov Industries | "Cyclowareness" in every user-facing text, header, DNS token and export name; internal identifiers stay; the demo tenant is Safarov Industries. |
+| 017 | Own Azerbaijani date formatting in the browser | Client components use `useClientFormat()`, which builds ICU `az` patterns itself; relative times render only after hydration. |
+| 018 | Outbound addresses on the public internet only; errors in broad categories | `net-guard.ts` resolves and checks every destination when saved and before each connection, limits ports and maps SMTP errors to categories; admin 2FA is enforced in actions and API routes too. |
+| 019 | Rate limits in the database, retake evidence, a person's real start | Atomic fixed-window buckets in `rate_limit_buckets`; retakes only move `last_completed_at`; module risks close only after every lesson is completed again. |
+| 020 | A live reference skill for mascot, motion and training in the repository | `.claude/skills/cyclowareness-experience/` with four reference documents checked against the code. |
+| 021 | Scheduled times in Baku time | All scheduling fields read and write +04:00 with a hint (superseded by ADR-039). |
+| 022 | AI Sel as a cat (trial); Rive can return | The `Mascot` API stays; `mascot.tsx` is the only switch point; the still mode freezes the cat. |
+| 023 | Lessons in three languages: separate files, parity checker, voice rule | `<lesson>.az.json` and `.ru.json` beside each lesson; only learner-visible text may differ; addresses and identifiers never change; a checker enforces it. |
+| 024 | Interface localisation decisions | Locale resolution order, recipient-language emails, fixed terms per language, translated policy versions and certificates, Azerbaijani relative times, multilingual risk titles. |
+| 025 | Portal in ten languages, Arabic right to left | `LOCALES` = az en ru tr ro ka uk de fr ar; `ar` formats with Western digits and the Gregorian calendar; logical CSS only; code, URLs and numbers stay left to right. |
+| 026 | Translation process for the seven new languages; stories stay in an Azerbaijani company | Glossary first, translator plus independent editor per unit, consistency passes, machine checks; the stories keep Safarov Industries, AZN and +994. |
+| 027 | Labs come after the lessons in learning paths | `learning_paths.lab_ids`; a lab unlocks when its modules' lessons are done; display rule only; labs do not count toward certificates. |
+| 028 | Natural narration: ElevenLabs clips, Web Speech fallback | One clip per spoken text and language with word timings, content-addressed and immutable; Web Speech reads whatever has no clip; the key is for the script only. |
+| 029 | AI subtitles for languages outside the library | Stored translations for the ten languages; 65 more through `POST /api/subtitles`, lesson text only, cached in `ai_cache`, rate-limited per learner and organisation. |
+| 030 | Lesson player structure | Syllabus, controls, captions, transcript and keyboard shortcuts; the furthest scene was kept in the browser only (amended by ADR-035). |
+| 031 | Storybook cat and decorative idle acts | New drawing and acts; `auto` only in decorative places; Still freezes and Calm limits the acts; "Play with Sel" card on Home. |
+| 032 | Light and motion foundation | Light and motion tokens, `motion-ok:` and `motion-full:` variants, `useMotion`; Still and Calm rules for every effect (item 4 amended by ADR-043). |
+| 033 | Security hardening of 2026-10-27 | Fixes from a six-area audit (38 findings, 36 confirmed): atomic code attempts, HMAC backup codes, enumeration-safe answers, peer and operator protection, linear regexes, IPv6 and DNS-rebinding guards, outbox redaction, container hardening. |
+| 034 | Live drill: a phishing attack in compressed time for a three-minute demo | `/admin/drill` plays a deterministic, calibrated plan through the real services without sending mail or SMS; polled, leased and idempotent (items 6 and 7 amended by ADR-036). |
+| 035 | Lesson completion is verified on the server (training evidence) | Attempts start on the server, scenes reached are reported, answers are re-scored from stored content, too-fast or unanswered attempts are refused, and evidence is `self_reported` or `server_verified`. |
+| 036 | Hardening of the seed, the demo and the drill | No published demo password, seed refusals outside local use, no secrets in compose files, the demo keeps its data by default, `live_drill` is seed-only, the drill panel polls with POST. |
+| 037 | Legal texts match the code's data flows; licence and chain of title | Privacy v3 and Terms v2 name Anthropic and ElevenLabs as the code does; a subprocessor list and DPA template; proprietary `LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`, `CODEOWNERS`; chain-of-title register. |
+| 038 | Operations foundation: logs, health check, backup | JSON log lines with `logFailure`, a `job_ticks` table, `/api/health` with database, job and backlog state, retention clean-up, nightly `pg_dump` and a restore script. |
+| 039 | The organisation's own time zone | `TenantSettings.timeZone` (default `Asia/Baku`) drives day keys, streaks, due dates, report hours, exports and SQL; chosen under Settings, Languages. |
+| 040 | The offer matches the software | Unbuilt features (SAML, LDAP, Android screen block, voice calls) are hidden and not sold; voice campaigns are refused at launch; `risk.threshold_crossed` is now emitted. |
+| 041 | Identity hardening | Server Actions back to a 1 MB body with a separate sandbox upload route; SSO requires a proven domain and binds issuer plus `sub`; TOTP steps cannot be replayed; password change in Profile; new rate limits; neutral cross-tenant answers. |
+| 042 | CI: migrations on PostgreSQL, browser smoke suite, coverage threshold | SHA-pinned actions, Node from `.nvmrc`, coverage at 60 %, migrations run twice on PostgreSQL 16 with a schema-drift check, a Docker build and a Playwright smoke suite. |
+| 043 | Lesson checkpoint schema and small corrections (amends ADR-032 item 4) | `checkpointSchema` validates tutor checkpoints; tutor cache ids include a content hash; sender domains stored as ASCII; a `launched` launch block; the guide stays closed on the drill; `flyToXp` removed and `CountUp` honours Calm. |
+
+## Qərarlar
+
 Hər qərar qısa: kontekst → qərar → nəticə. Dəyişdirmək lazım olsa, yeni ADR yazın və köhnəsinə istinad edin.
 
 ## ADR-001 · Next.js 16 App Router, RSC və Server Actions
