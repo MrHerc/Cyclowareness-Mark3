@@ -268,6 +268,13 @@ describe("analyzeFile", () => {
     expect(a.objectName).toHaveLength(255);
   });
 
+  it("caps e-mail IOC values at the 254-character address maximum", () => {
+    const a = analyzeFile("x.txt", Buffer.from("a".repeat(5000) + "@example.com"));
+    const emails = a.iocs.filter((i) => i.type === "email");
+    expect(emails.length).toBeGreaterThan(0);
+    for (const e of emails) expect(e.value.length).toBeLessThanOrEqual(254);
+  });
+
   it("exports MAX_FILE_BYTES and re-exports defang", () => {
     expect(MAX_FILE_BYTES).toBe(10 * 1024 * 1024);
     expect(defang("https://evil.top/x")).toBe("hxxps://evil[.]top/x");

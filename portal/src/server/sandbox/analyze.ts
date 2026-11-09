@@ -287,7 +287,7 @@ function extractIndicators(source: string, iocs: Ioc[]) {
       /* ignore malformed */
     }
   }
-  for (const m of [...text.matchAll(EMAIL)].slice(0, 10)) iocs.push({ type: "email", value: (m[1] + m[0]).toLowerCase() });
+  for (const m of [...text.matchAll(EMAIL)].slice(0, 10)) iocs.push({ type: "email", value: (m[1] + m[0]).toLowerCase().slice(0, 254) });
 }
 
 export function analyzeFile(fileName: string, bytes: Buffer): Analysis {
