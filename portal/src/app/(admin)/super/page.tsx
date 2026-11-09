@@ -1,8 +1,9 @@
-import { and, asc, count, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Globe2 } from "lucide-react";
 import { requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
+import { peopleCounts } from "@/server/queries/platform-metrics";
 import { Card, CardBody } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { PageHeader, TabsNav } from "@/components/ui/layout";
@@ -20,14 +21,13 @@ export default async function OperatorTenantsPage() {
   const [tr, format] = await Promise.all([getTranslations("admin.platform"), getFormatter()]);
   const [tenants, counts, admins] = await Promise.all([
     db().select().from(t.tenants).orderBy(asc(t.tenants.name)),
-    db().select({ tenantId: t.users.tenantId, n: count() }).from(t.users).where(eq(t.users.status, "active")).groupBy(t.users.tenantId),
+    peopleCounts(),
     db()
       .select({ id: t.users.id, tenantId: t.users.tenantId, name: t.users.name, email: t.users.email })
       .from(t.users)
       .where(and(eq(t.users.role, "tenant_admin"), inArray(t.users.status, ["active", "invited"])))
       .orderBy(asc(t.users.name)),
   ]);
-  const countBy = new Map(counts.map((c) => [c.tenantId, Number(c.n)]));
   const allFeatures = [...ALL_FEATURES] as string[];
   const now = requestNow().getTime();
 
@@ -37,6 +37,7 @@ export default async function OperatorTenantsPage() {
       <TabsNav
         items={[
           { href: "/super", label: tr("tabs.tenants"), active: true, count: tenants.length },
+          { href: "/super/metrics", label: tr("tabs.metrics"), active: false },
           { href: "/super/demo", label: tr("tabs.demo"), active: false },
         ]}
       />
@@ -58,7 +59,7 @@ export default async function OperatorTenantsPage() {
                       </p>
                       <p className="mt-1 text-caption text-ink-muted">
                         <span className="font-mono">{x.slug}</span>
-                        {x.domain ? ` · ${x.domain}` : ""} · {tr("people", { count: countBy.get(x.id) ?? 0 })} · {tr("created", { date: format.dateTime(x.createdAt, { dateStyle: "medium" }) })}
+                        {x.domain ? ` · ${x.domain}` : ""} · {tr("people", { count: counts.get(x.id)?.active ?? 0 })} · {tr("created", { date: format.dateTime(x.createdAt, { dateStyle: "medium" }) })}
                       </p>
                     </div>
                     <Pill tone="brand">{tr(`plans.${x.plan}`)}</Pill>

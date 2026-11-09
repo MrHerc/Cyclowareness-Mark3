@@ -43,6 +43,7 @@ export default async function DemoRequestsPage({ searchParams }: PageProps<"/sup
       <TabsNav
         items={[
           { href: "/super", label: tr("tabs.tenants"), active: false },
+          { href: "/super/metrics", label: tr("tabs.metrics"), active: false },
           { href: "/super/demo", label: tr("tabs.demo"), active: true, count: all.length },
         ]}
       />
