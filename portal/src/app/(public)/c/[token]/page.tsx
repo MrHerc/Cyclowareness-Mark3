@@ -6,6 +6,7 @@ import { ShieldCheck } from "lucide-react";
 import { db, t } from "@/server/db";
 import { getViewer } from "@/server/auth/viewer";
 import { appUrl } from "@/server/env";
+import { audit } from "@/server/services/audit";
 import { DEFAULT_CERTIFICATE_TEXT, DEFAULT_PATH_CERTIFICATE_TEXT, withDefaults } from "@/lib/tenant-defaults";
 import { pick } from "@/i18n/config";
 import { brandStyle } from "@/lib/color";
@@ -32,6 +33,9 @@ export default async function CertificatePage({ params }: PageProps<"/c/[token]"
   const viewer = await getViewer();
   const own = viewer?.user.id === row.user.id || (viewer?.tenant.id === row.tenant.id && viewer.user.role !== "learner");
   if (!settings.certificate.publicLink && !own) notFound();
+  // A signed-in view (the owner printing it, an administrator checking it) is recorded; anonymous verifications are
+  // not, so the public link cannot flood the log.
+  if (own) await audit(db(), { tenantId: row.tenant.id, actorId: viewer!.user.id, action: "certificate.downloaded", targetType: "certificate", targetId: row.cert.id });
 
   const locale = await getLocale();
   const [tr, tc, format] = await Promise.all([getTranslations("learner.certificate"), getTranslations("common"), getFormatter()]);

@@ -450,7 +450,8 @@ export async function draftLessonAction(topic: string, locale: string): Promise<
   const v = await actionViewer("studio.write");
   const text = topic.trim();
   if (text.length < 5) return { ok: false, error: "failed" };
-  if (!(await rateLimit(`ai-draft:${v.user.id}`, 20, 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
+  // Per person an hour, and per organisation a day: the model budget is the operator's.
+  if (!(await rateLimit(`ai-draft:${v.user.id}`, 20, 60 * 60_000)).ok || !(await rateLimit(`ai-draft-day:t:${v.tenant.id}`, 100, 24 * 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
   const lang = (LOCALES as readonly string[]).includes(locale) ? locale : v.tenant.settings.defaultLocale;
   try {
     const draft = await draftLesson(text, lang);

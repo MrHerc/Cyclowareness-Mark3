@@ -3,6 +3,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { db, t } from "@/server/db";
 import { apiViewer } from "@/server/auth/api";
+import { audit } from "@/server/services/audit";
 import { appUrl } from "@/server/env";
 import { toCsv } from "@/lib/csv";
 import { TEMPLATE_BY_KEY, templateText } from "@/lib/campaigns/templates";
@@ -36,5 +37,7 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
     [tr("drive"), tr("labelFor"), tr("fileName"), tr("fileContents")],
     rows.map((r, i) => [`USB-${String(i + 1).padStart(3, "0")}`, r.name, fileName, beacon(r.token)]),
   );
+  // Each row carries a live tracking token against a named employee: recorded like every other export.
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "campaign.usb_kit_downloaded", targetType: "campaign", targetId: c.id, meta: { drives: rows.length } });
   return new Response(csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="usb-kit-${c.id.slice(0, 8)}.csv"`, "cache-control": "no-store" } });
 }

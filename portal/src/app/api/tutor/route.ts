@@ -68,6 +68,8 @@ export async function POST(request: Request) {
   if (!env.ANTHROPIC_API_KEY) {
     return new Response(offlineAnswer(scenes, sceneId, question), { headers: { ...headers, "x-tutor-mode": "offline" } });
   }
+  // Model calls only (a cached answer costs nothing): what one organisation can spend in a day, on top of the per-person limit above.
+  if (!(await rateLimit(`tutor-day:t:${v.tenant.id}`, 2000, 24 * 60 * 60_000)).ok) return new Response("Too many questions", { status: 429 });
 
   client ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   const context = lessonContext(pick(mod.title, row.locale), pick(row.title, row.locale), scenes);

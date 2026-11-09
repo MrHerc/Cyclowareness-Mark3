@@ -56,6 +56,7 @@ export const AUDIT_ACTIONS = [
   "campaign.launched",
   "campaign.cancelled",
   "campaign.launch_blocked",
+  "campaign.usb_kit_downloaded",
   "drill.started",
   "drill.finished",
   "report.downloaded",
