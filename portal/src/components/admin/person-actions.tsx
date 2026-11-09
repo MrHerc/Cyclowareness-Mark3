@@ -46,7 +46,7 @@ export function PersonActions({
   const tp = useTranslations("admin.people");
   const tc = useTranslations("common");
   const router = useRouter();
-  const [open, setOpen] = useState<null | "edit" | "role" | "move" | "twofa" | "reset">(null);
+  const [open, setOpen] = useState<null | "edit" | "role" | "move" | "twofa" | "reset" | "unlink">(null);
   const [pending, start] = useTransition();
   const [password, setPassword] = useState("");
   const [pwError, setPwError] = useState<string | null>(null);
@@ -59,6 +59,8 @@ export function PersonActions({
   const [dept, setDept] = useState(person.departmentId ?? "");
   // A rejected phone is reported on its own field (taken by another account, or not a usable number).
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  // A new number signs the person in by SMS, so the server asks for the actor's password (updatePersonAction).
+  const newPhone = phone.trim() !== "" && phone.trim() !== (person.phone ?? "");
   const close = () => {
     setOpen(null);
     setPassword("");
@@ -111,7 +113,7 @@ export function PersonActions({
         </Button>
       ) : null}
       {person.ssoLinked ? (
-        <Button size="sm" variant="secondary" icon={<Unlink />} disabled={pending} onClick={() => start(async () => void ((await unlinkSsoAction(person.id)).ok ? done(t("ssoUnlinked")) : toast(tc("errors.forbidden"), "error")))}>
+        <Button size="sm" variant="secondary" icon={<Unlink />} onClick={() => setOpen("unlink")}>
           {t("unlinkSso")}
         </Button>
       ) : null}
@@ -127,17 +129,19 @@ export function PersonActions({
         )
       ) : null}
 
-      <Dialog open={open === "edit"} onClose={() => setOpen(null)} title={t("edit")} size="sm">
+      <Dialog open={open === "edit"} onClose={close} title={t("edit")} size="sm">
         <form
           className="grid gap-4"
           onSubmit={(e) => {
             e.preventDefault();
             start(async () => {
-              const res = await updatePersonAction(person.id, { name, jobTitle, phone, locale: locale as "az" });
+              const res = await updatePersonAction(person.id, { name, jobTitle, phone, locale: locale as "az" }, newPhone ? password : undefined);
               const phoneProblem = res.error === "phoneTaken" ? tp("phoneTaken") : res.error === "cannotAdd" ? tp("cannotAdd") : res.fields?.includes("phone") ? tp("invalidPhone") : null;
               setPhoneError(res.ok ? null : phoneProblem);
+              const refusedPassword = newPhone ? stepUpError(res.error) : null;
+              setPwError(refusedPassword);
               if (res.ok) done();
-              else if (!phoneProblem || (res.fields?.length ?? 0) > 1) toast(res.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.invalid"), "error");
+              else if (!refusedPassword && (!phoneProblem || (res.fields?.length ?? 0) > 1)) toast(res.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.invalid"), "error");
             });
           }}
         >
@@ -170,8 +174,29 @@ export function PersonActions({
               ))}
             </Select>
           </Field>
-          <Button type="submit" disabled={pending}>
+          {newPhone ? <ConfirmPasswordField id="edit-pw" value={password} onChange={setPassword} error={pwError} /> : null}
+          <Button type="submit" disabled={pending || (newPhone && !password)}>
             {tc("save")}
+          </Button>
+        </form>
+      </Dialog>
+
+      <Dialog open={open === "unlink"} onClose={close} title={t("unlinkSso")} size="sm">
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            start(async () => {
+              const res = await unlinkSsoAction(person.id, password);
+              if (res.ok) done(t("ssoUnlinked"));
+              else if (res.error) setPwError(stepUpError(res.error));
+              else toast(tc("errors.forbidden"), "error");
+            });
+          }}
+        >
+          <ConfirmPasswordField id="unlink-pw" value={password} onChange={setPassword} error={pwError} />
+          <Button type="submit" disabled={pending || !password}>
+            {t("unlinkSso")}
           </Button>
         </form>
       </Dialog>

@@ -22,6 +22,7 @@ vi.mock("next-intl/server", () => ({
 vi.mock("../src/server/auth/viewer", () => ({
   actionViewer: async () => viewer,
   allowed: (v: V, p: Permission) => can(v.user.role, p) && (!PERMISSION_FEATURE[p] || v.tenant.features.has(PERMISSION_FEATURE[p]!)),
+  privileged: (v: V, p: Permission) => can(v.user.role, p) && (!PERMISSION_FEATURE[p] || v.tenant.features.has(PERMISSION_FEATURE[p]!)),
 }));
 const queueEmail = vi.fn();
 vi.mock("../src/server/mail", () => ({ queueEmail: (...a: unknown[]) => queueEmail(...a), renderEmailHtml: (text: string) => `<p>${text}</p>` }));

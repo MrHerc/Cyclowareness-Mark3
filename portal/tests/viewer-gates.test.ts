@@ -5,7 +5,7 @@ import { featuresFor, type Feature } from "../src/lib/tenant-defaults";
 vi.mock("../src/server/db", () => ({ db: () => ({}), t: {} }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
 
-const { allowed, twoFactorGap } = await import("../src/server/auth/viewer");
+const { allowed, privileged, twoFactorGap } = await import("../src/server/auth/viewer");
 type V = Parameters<typeof allowed>[0];
 
 const viewer = (role: Role, o: { requireAdmin2fa?: boolean; totpEnabled?: boolean; features?: Set<Feature> } = {}) =>
@@ -23,6 +23,16 @@ describe("two-step rule on admin pages and actions", () => {
       expect(twoFactorGap(viewer(role)), role).toBe(false);
     }
     expect(twoFactorGap(viewer("learner", { requireAdmin2fa: true }))).toBe(false);
+  });
+
+  it("also gates a console permission used inside a self-service action (privileged)", () => {
+    // An analyst who has not enrolled the mandatory authenticator gets no analyst powers on learner paths either.
+    expect(privileged(viewer("analyst", { requireAdmin2fa: true }), "secops.read")).toBe(false);
+    expect(privileged(viewer("analyst", { requireAdmin2fa: true }), "support.manage")).toBe(false);
+    expect(privileged(viewer("analyst", { requireAdmin2fa: true, totpEnabled: true }), "secops.read")).toBe(true);
+    expect(privileged(viewer("analyst"), "secops.read")).toBe(true);
+    expect(privileged(viewer("content_creator", { requireAdmin2fa: true }), "studio.write")).toBe(false);
+    expect(privileged(viewer("learner", { totpEnabled: true }), "secops.read")).toBe(false);
   });
 });
 

@@ -24,6 +24,7 @@ const viewer = () => ({
 vi.mock("../src/server/auth/viewer", () => ({
   actionViewer: async () => viewer(),
   allowed: () => staff,
+  privileged: () => staff,
   hasFeature: (v: ReturnType<typeof viewer>, f: Feature) => v.tenant.features.has(f),
 }));
 vi.mock("../src/server/auth/api", () => ({ apiViewer: async () => viewer(), deniedResponse: async (_: Request, status: number) => new Response(null, { status }) }));

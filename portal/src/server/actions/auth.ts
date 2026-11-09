@@ -45,6 +45,8 @@ const MAX_CODE_GUESSES = 5;
 const CHECK_EMAIL_PER_CLIENT = 300;
 /** Reset mails per organisation and hour. */
 const RESET_MAILS_PER_TENANT_HOUR = 1000;
+/** Sign-in codes per organisation and hour: the ceiling on its SMS bill when many of its numbers are asked for codes at once. */
+const SMS_PER_TENANT_HOUR = 500;
 let dummyHash: Promise<string> | null = null;
 /** A real hash of a random string so unknown accounts take as long to check as real ones. */
 function getDummyHash(): Promise<string> {
@@ -366,6 +368,11 @@ async function requestPhoneCode(_: AuthState, form: FormData): Promise<AuthState
 async function sendPhoneCode(phone: string, ip: string | null): Promise<string | undefined> {
   const user = await userByPhone(phone);
   if (!user || !(await phoneSignInAllowed(user))) return undefined;
+  // Counted only for real learners, after the answer (as the reset mails per organisation), so it reveals nothing.
+  if (!(await rateLimit(`sms-tenant:${user.tenantId}`, SMS_PER_TENANT_HOUR, HOUR_MS)).ok) {
+    if ((await rateLimit(`sms-tenant-warned:${user.tenantId}`, 1, HOUR_MS)).ok) log.warn("[auth] sign-in codes per organisation exhausted", { tenantId: user.tenantId, limit: SMS_PER_TENANT_HOUR });
+    return undefined;
+  }
   const digits = new Uint32Array(1);
   crypto.getRandomValues(digits);
   const code = String(digits[0] % 1_000_000).padStart(6, "0");

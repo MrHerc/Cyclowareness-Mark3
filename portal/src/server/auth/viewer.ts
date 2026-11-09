@@ -159,6 +159,11 @@ export function twoFactorGap(v: Viewer): boolean {
   return twoFactorRequired(v.user.role, v.tenant.settings.identity.requireAdmin2fa) && !v.user.totpEnabled;
 }
 
+/** A console permission exercised inside a self-service action: the permission plus the tenant's "admins use 2FA" rule, as actionViewer(permission) applies. */
+export function privileged(v: Viewer, permission: Permission): boolean {
+  return allowed(v, permission) && !twoFactorGap(v);
+}
+
 /** For admin pages: permission + plan feature + the tenant's "admins use 2FA" rule. */
 export async function requirePermission(permission: Permission): Promise<Viewer> {
   const v = await requireViewer();

@@ -24,22 +24,32 @@ vi.mock("../src/server/services/threats", () => ({ submitThreatReport: (...args:
 vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src/server/db/schema") }));
 
 let viewer: unknown = null;
-vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => viewer, allowed: () => false }));
+// The real permission gates (allowed, twoFactorGap, privileged) over the test's viewer.
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock("../src/server/auth/viewer", async (importOriginal) => ({ ...(await importOriginal<typeof import("../src/server/auth/viewer")>()), actionViewer: async () => viewer }));
 
 const { escalateAnalysisAction } = await import("../src/server/actions/security");
 
 let analysisId = "";
+let tenantId = "";
+const as = (user: { id: string; role: string }, totpEnabled: boolean) => {
+  viewer = { user: { id: user.id, role: user.role, totpEnabled }, tenant: { id: tenantId, features: new Set(["sandbox", "threat_intake"]), settings: { defaultLocale: "en", identity: { requireAdmin2fa: true } } } };
+};
+let learner: { id: string; role: string };
+let analyst: { id: string; role: string };
 
 beforeAll(async () => {
   await migrate(drizzle(pglite), { migrationsFolder: path.join(__dirname, "..", "drizzle") });
   const [tenant] = await db.insert(t.tenants).values({ slug: "acme", name: "Acme", branding: {} as never, settings: {} as never }).returning();
-  const [user] = await db.insert(t.users).values({ tenantId: tenant.id, email: "me@acme.test", name: "Me" }).returning();
+  tenantId = tenant.id;
+  [learner] = await db.insert(t.users).values({ tenantId: tenant.id, email: "me@acme.test", name: "Me" }).returning();
+  [analyst] = await db.insert(t.users).values({ tenantId: tenant.id, email: "analyst@acme.test", name: "Analyst", role: "analyst" }).returning();
   const [a] = await db
     .insert(t.sandboxAnalyses)
-    .values({ tenantId: tenant.id, number: 7, kind: "url", objectName: "https://evil.test", verdict: "malicious", score: 90, findings: [], iocs: [], mitre: [], submittedBy: user.id })
+    .values({ tenantId: tenant.id, number: 7, kind: "url", objectName: "https://evil.test", verdict: "malicious", score: 90, findings: [], iocs: [], mitre: [], submittedBy: learner.id })
     .returning();
   analysisId = a.id;
-  viewer = { user: { id: user.id, role: "learner" }, tenant: { id: tenant.id, features: new Set(["sandbox"]), settings: { defaultLocale: "en" } } };
+  as(learner, false);
   // Starting the embedded database and applying the migrations takes a while.
 }, 180_000);
 
@@ -50,5 +60,15 @@ describe("escalating a sandbox result", () => {
     expect(await escalateAnalysisAction(analysisId)).toEqual({ ok: true });
     expect(submitThreatReport).toHaveBeenCalledTimes(1);
     expect(submitThreatReport.mock.calls[0][1]).toMatchObject({ subject: "SB-7: https://evil.test", url: "https://evil.test" });
+  });
+
+  it("lets an analyst act on another person's analysis only once the organisation's mandatory two-step verification is set up", async () => {
+    as(analyst, false);
+    expect(await escalateAnalysisAction(analysisId)).toEqual({ ok: false });
+    as(analyst, true);
+    expect(await escalateAnalysisAction(analysisId)).toEqual({ ok: true });
+    // The learner's own analysis needs no console permission, so no authenticator either.
+    as(learner, false);
+    expect(await escalateAnalysisAction(analysisId)).toEqual({ ok: true });
   });
 });

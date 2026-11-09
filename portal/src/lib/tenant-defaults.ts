@@ -148,7 +148,7 @@ export const DEFAULT_TEMPLATES_NO_DUE: Record<"assignment" | "reminder", Record<
 };
 
 /** Messages with no editable template: a policy signature request and a nudge to confirm a finished module. */
-export const FIXED_MESSAGES: Record<"policy_reminder" | "confirmation_reminder" | "twoFactorReset" | "resetLinkIssued" | "roleChanged", Record<string, Mail>> = {
+export const FIXED_MESSAGES: Record<"policy_reminder" | "confirmation_reminder" | "twoFactorReset" | "resetLinkIssued" | "roleChanged" | "phoneChanged", Record<string, Mail>> = {
   policy_reminder: {
     az: { subject: "İmza gözlənilir: {{module}}", body: "Salam, {{name}}!\n\nZəhmət olmasa «{{module}}» siyasətini oxuyub imzalayın. Bir neçə dəqiqə kifayətdir.\n\n{{link}}" },
     en: { subject: "Signature needed: {{module}}", body: "Hello {{name}},\n\nPlease read and sign “{{module}}”. It only takes a few minutes.\n\n{{link}}" },
@@ -210,7 +210,19 @@ export const FIXED_MESSAGES: Record<"policy_reminder" | "confirmation_reminder" 
     fr: { subject: "Votre rôle dans {{organisation}} a changé", body: "Bonjour {{name}},\n\nUn administrateur de {{organisation}} a changé votre rôle : {{reason}}. Le changement s’applique dès votre prochaine connexion. Si vous ne vous y attendiez pas, prévenez votre équipe de sécurité.\n\n{{link}}" },
     ar: { subject: "تغيّر دورك في {{organisation}}", body: "مرحبًا {{name}}،\n\nغيّر مسؤول النظام في {{organisation}} دورك إلى: {{reason}}. يسري التغيير من تسجيل الدخول التالي. إذا لم تكن تتوقع ذلك، فأبلغ فريق الأمن.\n\n{{link}}" },
   },
-} satisfies Record<"policy_reminder" | "confirmation_reminder" | "twoFactorReset" | "resetLinkIssued" | "roleChanged", Record<Locale, Mail>>;
+  phoneChanged: {
+    az: { subject: "Hesabınızın telefon nömrəsi dəyişdirildi", body: "Salam, {{name}}!\n\n{{organisation}} administratoru hesabınız üçün yeni telefon nömrəsi təyin etdi. SMS ilə giriş kodları indi həmin nömrəyə göndərilir. Bunu gözləmirdinizsə, dərhal təhlükəsizlik komandasına bildirin.\n\n{{link}}" },
+    en: { subject: "The phone number of your account changed", body: "Hello {{name}},\n\nAn administrator of {{organisation}} set a new phone number for your account. Sign-in codes by text message now go to that number. If you did not expect this, tell your security team right away.\n\n{{link}}" },
+    ru: { subject: "Номер телефона вашей учётной записи изменён", body: "Здравствуйте, {{name}}!\n\nАдминистратор организации {{organisation}} указал новый номер телефона для вашей учётной записи. Коды входа по SMS теперь приходят на этот номер. Если вы этого не ожидали, сразу сообщите команде безопасности.\n\n{{link}}" },
+    tr: { subject: "Hesabınızın telefon numarası değiştirildi", body: "Merhaba {{name}},\n\n{{organisation}} sistem yöneticisi hesabınız için yeni bir telefon numarası belirledi. SMS ile giriş kodları artık bu numaraya gönderiliyor. Bunu beklemiyorsanız hemen güvenlik ekibine bildirin.\n\n{{link}}" },
+    ro: { subject: "Numărul de telefon al contului dvs. a fost schimbat", body: "Bună ziua, {{name}},\n\nUn administrator al organizației {{organisation}} a setat un nou număr de telefon pentru contul dvs. Codurile de autentificare prin SMS ajung acum la acest număr. Dacă nu vă așteptați la aceasta, anunțați imediat echipa de securitate.\n\n{{link}}" },
+    ka: { subject: "თქვენი ანგარიშის ტელეფონის ნომერი შეიცვალა", body: "გამარჯობა, {{name}}!\n\n{{organisation}}-ის ადმინისტრატორმა თქვენს ანგარიშს ახალი ტელეფონის ნომერი მიანიჭა. შესვლის SMS კოდები ახლა ამ ნომერზე იგზავნება. თუ ამას არ ელოდით, დაუყოვნებლივ აცნობეთ უსაფრთხოების გუნდს.\n\n{{link}}" },
+    uk: { subject: "Номер телефону вашого облікового запису змінено", body: "Вітаємо, {{name}}!\n\nАдміністратор організації {{organisation}} указав новий номер телефону для вашого облікового запису. Коди входу в SMS тепер надходять на цей номер. Якщо ви цього не очікували, негайно повідомте команду безпеки.\n\n{{link}}" },
+    de: { subject: "Die Telefonnummer Ihres Kontos wurde geändert", body: "Hallo {{name}},\n\nein Administrator von {{organisation}} hat für Ihr Konto eine neue Telefonnummer hinterlegt. Anmeldecodes per SMS gehen jetzt an diese Nummer. Falls Sie das nicht erwartet haben, melden Sie es sofort Ihrem Sicherheitsteam.\n\n{{link}}" },
+    fr: { subject: "Le numéro de téléphone de votre compte a été modifié", body: "Bonjour {{name}},\n\nUn administrateur de {{organisation}} a défini un nouveau numéro de téléphone pour votre compte. Les codes de connexion par SMS sont désormais envoyés à ce numéro. Si vous ne vous y attendiez pas, prévenez immédiatement votre équipe de sécurité.\n\n{{link}}" },
+    ar: { subject: "تم تغيير رقم هاتف حسابك", body: "مرحبًا {{name}}،\n\nحدّد مسؤول النظام في {{organisation}} رقم هاتف جديدًا لحسابك. رموز تسجيل الدخول عبر الرسائل النصية تُرسل الآن إلى هذا الرقم. إذا لم تكن تتوقع ذلك، فأبلغ فريق الأمن فورًا.\n\n{{link}}" },
+  },
+} satisfies Record<"policy_reminder" | "confirmation_reminder" | "twoFactorReset" | "resetLinkIssued" | "roleChanged" | "phoneChanged", Record<Locale, Mail>>;
 
 /** Label of the button that a link on its own line becomes in an email without a label of its own. */
 export const EMAIL_BUTTON_LABEL: Record<string, string> = {

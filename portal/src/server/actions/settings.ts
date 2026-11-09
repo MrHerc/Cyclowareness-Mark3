@@ -7,6 +7,7 @@ import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { db, t } from "../db";
 import { actionViewer, hasFeature, type Viewer } from "../auth/viewer";
+import { stepUp, type StepUpError } from "../auth/step-up";
 import { domainProofFound, domainProofRecord, domainProofRecords, normaliseHost } from "../auth/domain-proof";
 import { audit, type AuditAction } from "../services/audit";
 import { encryptSecret, sha256Hex } from "../crypto";
@@ -28,8 +29,9 @@ import { notificationsSchema } from "../schemas/notifications";
 /**
  * `field` is the zod path of the first rejected value (e.g. "sso.issuer"); the form marks that input.
  * `error: "secretRequired"`: the server changed, so the stored password or secret must be entered again.
+ * `wrongPassword` and `rateLimited`: the step-up the identity settings take (saveIdentityAction).
  */
-export type SaveResult = { ok: boolean; field?: string; error?: "secretRequired" };
+export type SaveResult = { ok: boolean; field?: string; error?: "secretRequired" | StepUpError };
 const invalid = (p: { error: { issues: { path: PropertyKey[] }[] } }): SaveResult => ({ ok: false, field: p.error.issues[0]?.path.map(String).join(".") || undefined });
 
 /**
@@ -239,7 +241,7 @@ const identitySchema = z.object({
   }),
 });
 
-export async function saveIdentityAction(input: z.infer<typeof identitySchema>): Promise<SaveResult> {
+export async function saveIdentityAction(input: z.infer<typeof identitySchema>, password?: string): Promise<SaveResult> {
   const v = await actionViewer("settings.write");
   const p = identitySchema.safeParse(input);
   if (!p.success) return invalid(p);
@@ -253,6 +255,21 @@ export async function saveIdentityAction(input: z.infer<typeof identitySchema>):
   const current = await currentSettings(v);
   if (ssoSecret(current) === "required") return { ok: false, field: "sso.clientSecret", error: "secretRequired" };
   if (ldapSecret(current) === "required") return { ok: false, field: "ldap.password", error: "secretRequired" };
+  // Whoever the organisation's sign-in trusts can sign in as its people: re-pointing it, or dropping the administrators'
+  // two-step rule, is account-takeover tooling and takes the actor's own password like a reset link (auth/step-up.ts).
+  const sso = current.identity.sso;
+  const issuerChanged = (sso?.issuer ?? "") !== (d.sso.issuer ?? "");
+  const trustChanged =
+    issuerChanged ||
+    (sso?.clientId ?? "") !== (d.sso.clientId ?? "") ||
+    (sso?.emailClaim || "email") !== (d.sso.emailClaim || "email") ||
+    (sso?.autoCreate ?? true) !== d.sso.autoCreate ||
+    current.identity.ssoEnabled !== d.ssoEnabled ||
+    (current.identity.requireAdmin2fa && !d.requireAdmin2fa);
+  if (trustChanged) {
+    const refused = await stepUp(v, password, "settings.identity");
+    if (refused) return { ok: false, error: refused };
+  }
   await saveSettings(
     v,
     (s) => ({
@@ -293,6 +310,7 @@ export async function saveIdentityAction(input: z.infer<typeof identitySchema>):
       },
     }),
     "settings.identity",
+    { issuerChanged, ...(issuerChanged ? { issuerBefore: sso?.issuer || null, issuerAfter: d.sso.issuer || null } : {}) },
   );
   return { ok: true };
 }
@@ -476,7 +494,8 @@ export async function saveLearningAction(input: z.infer<typeof learningSchema>):
 }
 
 const months = z.number().int().min(0).max(120);
-const retentionSchema = z.object({ auditMonths: months, learningMonths: months });
+// The audit log is the evidence of the administrators' own actions: when it is purged at all, it is kept at least a year.
+const retentionSchema = z.object({ auditMonths: months.refine((m) => m === 0 || m >= 12), learningMonths: months });
 
 export async function saveRetentionAction(input: z.infer<typeof retentionSchema>): Promise<SaveResult> {
   const v = await actionViewer("settings.write");

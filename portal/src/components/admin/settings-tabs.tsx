@@ -71,6 +71,7 @@ import { LOCALES, LOCALE_NAMES, langAttrs } from "@/i18n/config";
 import { readableOn } from "@/lib/color";
 import { cn } from "@/lib/cn";
 import { endpointKey } from "@/lib/stored-secret";
+import { useStepUpError } from "@/components/admin/person-actions";
 
 /*
  * Settings as the browser receives them: stored secrets (encrypted) stay on the server, the tabs
@@ -470,7 +471,13 @@ export function IdentityTab({
 }) {
   const t = useTranslations("settings.identity");
   const tc = useTranslations("common");
+  const tp = useTranslations("admin.person");
   const { pending, save } = useSave();
+  const stepUpError = useStepUpError();
+  // Re-pointing the organisation's sign-in takes the actor's password (saveIdentityAction); the field appears once such a value differs from the saved one.
+  const [password, setPassword] = useState("");
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwAsked, setPwAsked] = useState(false);
   const [s, setS] = useState({
     requireAdmin2fa: identity.requireAdmin2fa,
     maxDevices: identity.maxDevices,
@@ -503,8 +510,17 @@ export function IdentityTab({
       matchByEmail: identity.ldap?.matchByEmail ?? true,
     },
   });
+  const [initial] = useState(s);
   const sso = s.sso;
   const ldap = s.ldap;
+  const trustChanged =
+    sso.issuer !== initial.sso.issuer ||
+    sso.clientId !== initial.sso.clientId ||
+    sso.emailClaim !== initial.sso.emailClaim ||
+    sso.autoCreate !== initial.sso.autoCreate ||
+    s.ssoEnabled !== initial.ssoEnabled ||
+    (initial.requireAdmin2fa && !s.requireAdmin2fa);
+  const needsPassword = trustChanged || pwAsked;
   const copy = (v: string) => navigator.clipboard.writeText(v).then(() => toast(tc("copied")));
   const [checked, setChecked] = useState<boolean | null>(null);
   const checkSettings = () => {
@@ -625,19 +641,35 @@ export function IdentityTab({
           </Field>
         </CardBody>
       </Card>
+      {needsPassword ? (
+        <Card>
+          <CardBody>
+            <Field label={tp("confirmPassword")} htmlFor="i-password" hint={t("confirmHint")} error={pwError} className="max-w-sm">
+              <Input id="i-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} aria-invalid={pwError ? true : undefined} aria-describedby={pwError ? "i-password-error" : "i-password-hint"} />
+            </Field>
+          </CardBody>
+        </Card>
+      ) : null}
       <SaveBar
-        pending={pending}
+        pending={pending || (needsPassword && !password)}
         onSave={() =>
           save(
             async () => {
-              const res = await saveIdentityAction({
-                requireAdmin2fa: s.requireAdmin2fa,
-                maxDevices: s.maxDevices,
-                ssoEnabled: s.ssoEnabled,
-                sso: { ...sso, clientSecret: sso.clientSecret || undefined },
-                ldap: { ...ldap, password: ldap.password || undefined },
-              });
-              return res.error === "secretRequired" ? { ...res, message: t("secretReenter") } : res;
+              const res = await saveIdentityAction(
+                {
+                  requireAdmin2fa: s.requireAdmin2fa,
+                  maxDevices: s.maxDevices,
+                  ssoEnabled: s.ssoEnabled,
+                  sso: { ...sso, clientSecret: sso.clientSecret || undefined },
+                  ldap: { ...ldap, password: ldap.password || undefined },
+                },
+                needsPassword ? password : undefined,
+              );
+              const refused = stepUpError(res.error);
+              setPwError(refused);
+              if (refused) setPwAsked(true);
+              if (res.ok) setPassword("");
+              return refused ? { ...res, field: "password", message: refused } : res.error === "secretRequired" ? { ...res, message: t("secretReenter") } : res;
             },
             {
               maxDevices: "i-devices",
@@ -645,6 +677,7 @@ export function IdentityTab({
               "sso.clientId": "i-client",
               "sso.clientSecret": "i-secret",
               "sso.emailClaim": "i-claim",
+              password: "i-password",
             },
           )
         }
@@ -1502,7 +1535,7 @@ export function ProtectionTab({ protection, retention }: { protection: TenantSet
       <Card>
         <CardHeader title={t("retention")} description={t("retentionBody")} />
         <CardBody className="grid gap-5 sm:grid-cols-2">
-          <Field label={t("auditMonths")} htmlFor="p-audit-months" hint={t("monthsHint")}>
+          <Field label={t("auditMonths")} htmlFor="p-audit-months" hint={t("auditMonthsHint")}>
             <Input id="p-audit-months" type="number" min={0} max={120} value={r.auditMonths} onChange={(e) => setR({ ...r, auditMonths: Number(e.target.value) })} className="max-w-40" />
           </Field>
           <Field label={t("learningMonths")} htmlFor="p-learning-months" hint={t("monthsHint")}>

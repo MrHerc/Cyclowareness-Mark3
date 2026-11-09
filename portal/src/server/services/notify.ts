@@ -124,7 +124,7 @@ export async function notifyUsers(
   return users.length;
 }
 
-export type TakeoverKind = "twoFactorReset" | "resetLinkIssued" | "roleChanged";
+export type TakeoverKind = "twoFactorReset" | "resetLinkIssued" | "roleChanged" | "phoneChanged";
 
 /**
  * Account-takeover tooling (2FA reset, reset link, role change) always leaves the person a trace: an

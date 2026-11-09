@@ -405,7 +405,15 @@ async function cleanup(db: DB, now: Date): Promise<number> {
     if (Date.now() > deadline) break;
     const { auditMonths, learningMonths } = withDefaults(org.settings).retention;
     const purged = { auditEntries: 0, answers: 0, risks: 0 };
-    if (auditMonths > 0) purged.auditEntries = await deleteInBatches(db, t.auditLog, t.auditLog.id, and(eq(t.auditLog.tenantId, org.id), lt(t.auditLog.at, monthsAgo(auditMonths))), deadline);
+    // The entries that explain the gaps (the retention setting and earlier purges) are never purged themselves.
+    if (auditMonths > 0)
+      purged.auditEntries = await deleteInBatches(
+        db,
+        t.auditLog,
+        t.auditLog.id,
+        and(eq(t.auditLog.tenantId, org.id), lt(t.auditLog.at, monthsAgo(auditMonths)), notInArray(t.auditLog.action, ["settings.retention", "retention.purged"])),
+        deadline,
+      );
     if (learningMonths > 0) {
       purged.answers = await deleteInBatches(db, t.answers, t.answers.id, and(eq(t.answers.tenantId, org.id), lt(t.answers.at, monthsAgo(learningMonths))), deadline);
       purged.risks = await deleteInBatches(db, t.behaviorRisks, t.behaviorRisks.id, and(eq(t.behaviorRisks.tenantId, org.id), lt(t.behaviorRisks.closedAt, monthsAgo(learningMonths))), deadline);

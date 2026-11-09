@@ -8,7 +8,8 @@
  *
  * Guards: "actionViewer(<permission>)", "actionViewer()", "apiViewer(<permission>)", "getViewer()",
  * "getSession()" or "public", followed by "+allowed(<permission>)" when the body narrows the role after the
- * gate. A function that reaches its guard through another function of the same file (a wrapper that catches
+ * gate (allowed(), or privileged() which also applies the admin 2FA rule). A function that reaches its guard
+ * through another function of the same file (a wrapper that catches
  * failures, a shared handler for GET and POST) is credited with that guard. An export the inventory cannot
  * read (`export const GET = …`, a re-export) throws instead of shipping unlisted.
  */
@@ -24,7 +25,7 @@ const METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIO
 const USE_SERVER = /^\s*["']use server["']/;
 const FUNCTION = /^(export )?(?:async )?function (\w+)\b/gm;
 const GUARD = /\b(actionViewer|apiViewer)\(\s*(?:"([^"]+)")?/;
-const ALLOWED = /\ballowed\(\w+,\s*"([^"]+)"/;
+const ALLOWED = /\b(?:allowed|privileged)\(\w+,\s*"([^"]+)"/;
 const READABLE_EXPORT = /^export (?:type\b|interface\b|(?:async )?function \w+)/;
 const SEGMENT_CONFIG = /^export const (?:dynamic|dynamicParams|revalidate|fetchCache|runtime|preferredRegion|maxDuration)\b/;
 
