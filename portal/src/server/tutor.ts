@@ -33,12 +33,14 @@ export const tutorRequestSchema = z.object({
 export const TUTOR_BODY_LIMIT = 8 * 1024;
 
 /**
- * The tutor_cache row of an answer. Answers grounded in a translation are cached apart from those
- * grounded in the English text, and the hash of the lesson text makes a re-translated or edited lesson a new row.
+ * The tutor_cache row of an answer. Keyed by the organisation first: library lessons are shared, but an
+ * answer produced for one organisation is never replayed to another. Answers grounded in a translation are
+ * cached apart from those grounded in the English text, and the hash of the lesson text makes a
+ * re-translated or edited lesson a new row.
  */
-export function tutorCacheId(locale: string, lessonId: string, sceneId: string | null | undefined, question: string, contentLocale: string, scenes: unknown): string {
+export function tutorCacheId(tenantId: string, locale: string, lessonId: string, sceneId: string | null | undefined, question: string, contentLocale: string, scenes: unknown): string {
   const normalised = question.toLowerCase().replace(/\s+/g, " ").replace(/[?!.]+$/, "");
-  return sha256Hex(`${locale}|${lessonId}|${sceneId ?? ""}|${normalised}${contentLocale === "en" ? "" : `|${contentLocale}`}|${sha256Hex(JSON.stringify(scenes))}`);
+  return sha256Hex(`${tenantId}|${locale}|${lessonId}|${sceneId ?? ""}|${normalised}${contentLocale === "en" ? "" : `|${contentLocale}`}|${sha256Hex(JSON.stringify(scenes))}`);
 }
 
 /**

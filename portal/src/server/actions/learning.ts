@@ -88,6 +88,8 @@ export async function rateModuleAction(input: { slug: string; rating: number; co
 
 /** The module and the lesson the player names, if the viewer may act on them. */
 async function lessonOf(v: Viewer, slug: string, lessonKey: string) {
+  // Server actions take whatever the request carries; both reach text columns and lookups below.
+  if (typeof slug !== "string" || slug.length > 100 || typeof lessonKey !== "string" || lessonKey.length > 100) return null;
   const mod = await moduleBySlug(v, slug);
   if (!mod) return null;
   const lessons = await db().select().from(t.lessons).where(eq(t.lessons.moduleId, mod.id));

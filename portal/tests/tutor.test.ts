@@ -44,16 +44,18 @@ function streamed(parts: string[]): Request {
 }
 
 describe("tutorCacheId", () => {
-  it("changes when the lesson text the answer came from changes, and not for the case of the question", () => {
+  it("changes with the organisation and when the lesson text the answer came from changes, and not for the case of the question", () => {
     const scenes: Scene[] = [{ type: "tutor", id: "t", beats: [{ id: "b", say: "Check the sender.", mood: "talk" }] }];
-    const id = tutorCacheId("az", "lesson-1", "t", "Why?", "az", scenes);
+    const id = tutorCacheId("org-a", "az", "lesson-1", "t", "Why?", "az", scenes);
     expect(id).toMatch(/^[0-9a-f]{64}$/);
-    expect(tutorCacheId("az", "lesson-1", "t", "WHY?", "az", structuredClone(scenes))).toBe(id);
+    expect(tutorCacheId("org-a", "az", "lesson-1", "t", "WHY?", "az", structuredClone(scenes))).toBe(id);
+    // Library lessons are shared between organisations; their tutor answers are not.
+    expect(tutorCacheId("org-b", "az", "lesson-1", "t", "Why?", "az", scenes)).not.toBe(id);
     const retranslated = structuredClone(scenes);
     if (retranslated[0].type === "tutor") retranslated[0].beats[0].say = "Göndərəni yoxlayın.";
-    expect(tutorCacheId("az", "lesson-1", "t", "Why?", "az", retranslated)).not.toBe(id);
-    expect(tutorCacheId("az", "lesson-1", "t", "Why?", "en", scenes)).not.toBe(id);
-    expect(tutorCacheId("az", "lesson-2", "t", "Why?", "az", scenes)).not.toBe(id);
+    expect(tutorCacheId("org-a", "az", "lesson-1", "t", "Why?", "az", retranslated)).not.toBe(id);
+    expect(tutorCacheId("org-a", "az", "lesson-1", "t", "Why?", "en", scenes)).not.toBe(id);
+    expect(tutorCacheId("org-a", "az", "lesson-2", "t", "Why?", "az", scenes)).not.toBe(id);
   });
 });
 
