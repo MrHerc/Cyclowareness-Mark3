@@ -51,6 +51,37 @@ describe("Strict-Transport-Security", () => {
     expect(page.headers.get("content-security-policy")).toContain("default-src 'self'");
   });
 
+  it("sends the full production CSP and never forwards a client-sent nonce or policy", async () => {
+    const page = await run("/az", {}, { "x-nonce": "evil", "content-security-policy": "default-src *", "x-pathname": "/admin" });
+    const policy = page.headers.get("content-security-policy")!;
+    expect(policy).toMatch(/(^|; )script-src 'self' 'nonce-[A-Za-z0-9+/=]+' 'strict-dynamic' 'wasm-unsafe-eval'(;|$)/);
+    expect(policy).not.toContain("'unsafe-eval'");
+    expect(policy).not.toContain("ws:");
+    for (const directive of ["frame-ancestors 'none'", "object-src 'none'", "form-action 'self'", "base-uri 'self'", "upgrade-insecure-requests"]) {
+      expect(policy.split("; ")).toContain(directive);
+    }
+    // The page reads x-nonce and content-security-policy from the request: both must be the proxy's values.
+    const nonce = page.headers.get("x-middleware-request-x-nonce");
+    expect(nonce).not.toBe("evil");
+    expect(policy).toContain(`'nonce-${nonce}'`);
+    expect(page.headers.get("x-middleware-request-content-security-policy")).toBe(policy);
+    expect(page.headers.get("x-middleware-request-x-pathname")).toBe("/az");
+  });
+
+  it("declares the build-time security headers for every path (next.config.ts)", async () => {
+    const { default: config } = await import("../next.config");
+    const rules = await config.headers!();
+    const all = rules.find((r) => r.source === "/:path*")!.headers;
+    expect(Object.fromEntries(all.map((h) => [h.key, h.value]))).toEqual({
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Permissions-Policy": "camera=(), geolocation=(), payment=(), usb=(), microphone=(self)",
+    });
+    expect(config.poweredByHeader).toBe(false);
+  });
+
   it("never renews the session cookie on narration clips, which are cached as immutable", async () => {
     const signedIn = { cookie: "__Host-cy_session=token" };
     expect((await run(CLIP, {}, signedIn)).headers.get("set-cookie")).toBeNull();
