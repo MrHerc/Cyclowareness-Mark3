@@ -4,13 +4,15 @@
  * B's ids, slugs and tokens (and as A's learner where a permission is named). Each call must be refused,
  * the learner by the permission gate itself where there is one, and no row of B may change. The first two
  * tests keep the table complete: the fixture must match the live inventory (scripts/inventory-surface.ts)
- * and every entry must have a row.
+ * and every entry must have a row. The last block covers the one role scoped inside its organisation: a
+ * department head reaches only their own departments.
  */
-import { eq, getTableColumns, inArray, or, type Column, type SQL } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray, or, type Column, type SQL } from "drizzle-orm";
 import { getTableConfig, PgTable } from "drizzle-orm/pg-core";
 import { createTranslator } from "next-intl";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
+import { hashPassword } from "../src/server/auth/password";
 import { can, PERMISSION_FEATURE, type Permission } from "../src/server/auth/permissions";
 import type { Viewer } from "../src/server/auth/viewer";
 import { featuresFor, withDefaults } from "../src/lib/tenant-defaults";
@@ -91,6 +93,9 @@ beforeAll(ready, DB_SETUP_TIMEOUT);
 
 type Org = Awaited<ReturnType<typeof org>>;
 let seq = 0;
+/** The administrators' own password: the step-up before the account-takeover actions is passed, so the tenant predicate is what refuses. */
+const PASSWORD = "Correct-Horse-Battery-9";
+const passwordHash = await hashPassword(PASSWORD);
 
 function viewerOf(tenant: typeof t.tenants.$inferSelect, user: typeof t.users.$inferSelect): Viewer {
   return { sessionId: `session-${user.id}`, twoFactorVerified: true, user, tenant: { ...tenant, settings: withDefaults(tenant.settings), features: featuresFor(tenant.plan, tenant.features) } };
@@ -102,7 +107,7 @@ async function org() {
   // Every plan feature plus the seed-only live drill, so each gate is passed and the tenant predicate itself is what refuses.
   const tenant = await addTenant(db, { plan: "enterprise_hrm", features: { live_drill: true }, settings: { ...base, email: { ...base.email, enabled: true } } });
   const tenantId = tenant.id;
-  const adminUser = await addUser(db, tenantId, { role: "tenant_admin" });
+  const adminUser = await addUser(db, tenantId, { role: "tenant_admin", passwordHash });
   const learnerUser = await addUser(db, tenantId);
   const invited = await addUser(db, tenantId, { status: "invited" });
   const department = await addDepartment(db, tenantId, `Finance ${n}`);
@@ -282,7 +287,7 @@ const ROWS: Record<string, Row> = {
   "server/actions/notifications.markNotificationsReadAction": { na: SELF },
   "server/actions/people.addPersonAction": { run: (_, b) => people.addPersonAction(undefined, form({ name: "Taylor Example", email: `taylor${++seq}@example.com`, role: "learner", departmentId: b.department.id, locale: "en" })) },
   "server/actions/people.changeRoleAction": { run: (_, b) => people.changeRoleAction(b.learner.user.id, "analyst") },
-  "server/actions/people.createLinkAction": { run: (_, b) => people.createLinkAction(b.learner.user.id, "reset") },
+  "server/actions/people.createLinkAction": { run: (_, b) => steppedUp(people.createLinkAction(b.learner.user.id, "reset", PASSWORD)) },
   "server/actions/people.decideDeletionAction": { run: (_, b) => people.decideDeletionAction(b.learner.user.id, true) },
   "server/actions/people.deletePersonAction": { run: (_, b) => people.deletePersonAction(b.learner.user.id) },
   "server/actions/people.emailInvitesAction": { run: (_, b) => people.emailInvitesAction([b.invited.id]) },
@@ -291,7 +296,7 @@ const ROWS: Record<string, Row> = {
     run: async (a, b) => [await people.moveDepartmentAction([a.learner.user.id], b.department.id), await people.moveDepartmentAction([b.learner.user.id], a.department.id)],
   },
   "server/actions/people.remindPeopleAction": { run: (_, b) => people.remindPeopleAction([b.learner.user.id]) },
-  "server/actions/people.resetTwoFactorAction": { run: (_, b) => people.resetTwoFactorAction(b.learner.user.id) },
+  "server/actions/people.resetTwoFactorAction": { run: (_, b) => steppedUp(people.resetTwoFactorAction(b.learner.user.id, PASSWORD)) },
   "server/actions/people.setStatusAction": { run: (_, b) => people.setStatusAction([b.learner.user.id], "suspended") },
   "server/actions/people.unlinkSsoAction": { run: (_, b) => people.unlinkSsoAction(b.learner.user.id) },
   "server/actions/people.updatePersonAction": { run: (_, b) => people.updatePersonAction(b.learner.user.id, { name: "Renamed Person", locale: "en" }) },
@@ -484,6 +489,13 @@ function refused(r: unknown): boolean {
   return o.ok === false || !!o.error || o.count === 0;
 }
 
+/** The actor's own password was right, so a refusal of this step-up action has to come from the tenant predicate after it, not from the step-up. */
+async function steppedUp<R extends { error?: unknown }>(call: Promise<R>): Promise<R> {
+  const r = await call;
+  expect(r.error, "the step-up refused the actor's own correct password").toBeUndefined();
+  return r;
+}
+
 /** The gate's own refusal, which comes before any lookup: actionViewer(<permission>) throws FORBIDDEN, apiViewer(<permission>) answers 403. */
 const gateRefused = (r: unknown) => (r instanceof Response ? r.status === 403 : r instanceof Error && r.message === "FORBIDDEN");
 
@@ -535,4 +547,53 @@ describe("another organisation's ids and a lower role are refused, and nothing o
       expect(await snapshot(B), `${key} changed rows of the other organisation`).toBe(before);
     });
   }
+});
+
+/* ───────── the one role scoped inside its organisation ───────── */
+
+describe("a department head reaches only their own departments", () => {
+  let head: Viewer;
+  let sales: typeof t.departments.$inferSelect;
+  let financeLearner: typeof t.users.$inferSelect;
+  let salesLearner: typeof t.users.$inferSelect;
+  const schedule = { kind: "completion", format: "csv", frequency: "weekly", day: 1, recipients: "head@example.com" };
+
+  beforeAll(async () => {
+    sales = await addDepartment(db, A.tenant.id, "Sales");
+    head = viewerOf(A.tenant, await addUser(db, A.tenant.id, { role: "department_head", departmentId: A.department.id }));
+    financeLearner = await addUser(db, A.tenant.id, { departmentId: A.department.id });
+    salesLearner = await addUser(db, A.tenant.id, { departmentId: sales.id });
+    // Both have the module to confirm (remindAwaitingAction) and, not having completed it, a reminder due (remindPeopleAction).
+    await db.insert(t.moduleProgress).values([financeLearner, salesLearner].map((u) => ({ userId: u.id, moduleId: A.mod.id, status: "awaiting_attestation" as const, percent: 100 })));
+    viewer = head;
+  });
+
+  it("remindPeopleAction reminds the head's own learner and not another department's", async () => {
+    expect(await people.remindPeopleAction([salesLearner.id])).toEqual({ count: 0 });
+    expect(await people.remindPeopleAction([financeLearner.id])).toEqual({ count: 1 });
+  });
+
+  it("remindAwaitingAction notifies only the awaiting people of the head's departments", async () => {
+    expect(await adminOverview.remindAwaitingAction(null)).toEqual({ count: 1 });
+    const notified = await db
+      .select({ userId: t.notifications.userId })
+      .from(t.notifications)
+      .where(and(eq(t.notifications.tenantId, A.tenant.id), eq(t.notifications.kind, "confirmation_reminder")));
+    expect(notified.map((n) => n.userId)).toEqual([financeLearner.id]);
+  });
+
+  it("saveScheduleAction accepts the head's own department only, never the whole organisation", async () => {
+    expect(await reports.saveScheduleAction({ ...schedule, departmentId: null })).toEqual({ ok: false });
+    expect(await reports.saveScheduleAction({ ...schedule, departmentId: sales.id })).toEqual({ ok: false });
+    expect(await reports.saveScheduleAction({ ...schedule, departmentId: A.department.id })).toEqual({ ok: true });
+  });
+
+  it("removeScheduleAction removes the head's own schedule and not the administrator's", async () => {
+    const [own] = await db
+      .insert(t.reportSchedules)
+      .values({ tenantId: A.tenant.id, kind: "completion", format: "csv", frequency: "weekly", recipients: ["head@example.com"], departmentId: A.department.id, createdBy: head.user.id })
+      .returning({ id: t.reportSchedules.id });
+    expect(await reports.removeScheduleAction(A.schedule.id)).toEqual({ ok: false });
+    expect(await reports.removeScheduleAction(own.id)).toEqual({ ok: true });
+  });
 });
