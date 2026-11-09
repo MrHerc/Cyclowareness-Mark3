@@ -452,6 +452,20 @@ export async function saveProtectionAction(contentProtection: boolean, watermark
   return { ok: true };
 }
 
+/** Settings → Security: lets the platform operator issue a sign-in link for an administrator (adminLinkAction) for the next 72 hours. */
+export async function grantSupportAccessAction(): Promise<{ ok: boolean }> {
+  const v = await actionViewer("settings.write");
+  const until = new Date(Date.now() + 72 * 60 * 60_000).toISOString();
+  await saveSettings(v, (s) => ({ ...s, security: { ...s.security, supportAccessUntil: until } }), "support.access_granted", { until });
+  return { ok: true };
+}
+
+export async function revokeSupportAccessAction(): Promise<{ ok: boolean }> {
+  const v = await actionViewer("settings.write");
+  await saveSettings(v, (s) => ({ ...s, security: { ...s.security, supportAccessUntil: null } }), "support.access_revoked");
+  return { ok: true };
+}
+
 export async function lookupWatermarkAction(code: string): Promise<{ ok: boolean; name?: string; email?: string; at?: string }> {
   const v = await actionViewer("settings.write");
   const normal = code.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");

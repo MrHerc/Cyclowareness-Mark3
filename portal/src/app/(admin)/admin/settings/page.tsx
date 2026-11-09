@@ -1,6 +1,6 @@
 import { count, desc, eq, sql } from "drizzle-orm";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { Award, Bell, Fingerprint, GraduationCap, Languages, Mail, Palette, PenLine, ShieldCheck, Webhook, type LucideIcon } from "lucide-react";
+import { Award, Bell, Fingerprint, GraduationCap, Languages, LifeBuoy, Mail, Palette, PenLine, ShieldCheck, Webhook, type LucideIcon } from "lucide-react";
 import { requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { appUrl, env } from "@/server/env";
@@ -24,9 +24,10 @@ import {
   LearningTab,
   NotificationsTab,
   ProtectionTab,
+  SecurityTab,
 } from "@/components/admin/settings-tabs";
 
-const TABS = ["branding", "languages", "identity", "email", "notifications", "attestation", "certificate", "learning", "protection", "integrations"] as const;
+const TABS = ["branding", "languages", "identity", "email", "notifications", "attestation", "certificate", "learning", "protection", "security", "integrations"] as const;
 type Tab = (typeof TABS)[number];
 const TAB_ICONS: Record<Tab, LucideIcon> = {
   branding: Palette,
@@ -38,6 +39,7 @@ const TAB_ICONS: Record<Tab, LucideIcon> = {
   certificate: Award,
   learning: GraduationCap,
   protection: ShieldCheck,
+  security: LifeBuoy,
   integrations: Webhook,
 };
 
@@ -134,6 +136,12 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
     case "protection":
       body = <ProtectionTab protection={s.protection} />;
       break;
+    case "security": {
+      const until = s.security.supportAccessUntil ? new Date(s.security.supportAccessUntil) : null;
+      const live = until && until.getTime() > requestNow().getTime();
+      body = <SecurityTab allowedUntil={live ? (await getFormatter()).dateTime(until, { dateStyle: "medium", timeStyle: "short" }) : null} />;
+      break;
+    }
     case "integrations": {
       const rows = await db()
         .select({ id: t.webhookDeliveries.id, event: t.webhookDeliveries.event, target: t.webhookDeliveries.target, status: t.webhookDeliveries.status, responseCode: t.webhookDeliveries.responseCode, createdAt: t.webhookDeliveries.createdAt })

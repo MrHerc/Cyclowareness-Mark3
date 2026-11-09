@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, notInArray } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
@@ -56,7 +56,7 @@ export async function notifyUsers(
   kind: NotifyKind,
   vars: { module?: Localized; dueDate?: string; person?: string; reason?: Localized; link?: string },
   inApp?: { title?: Localized; body?: Localized; href?: string },
-  opts: { statuses?: ("active" | "invited")[]; defer?: boolean } = {},
+  opts: { statuses?: ("active" | "invited" | "suspended")[]; defer?: boolean } = {},
 ): Promise<number> {
   if (!userIds.length) return 0;
   const [tenant] = await db.select().from(t.tenants).where(eq(t.tenants.id, tenantId));
@@ -122,4 +122,27 @@ export async function notifyUsers(
     }
   }
   return users.length;
+}
+
+export type TakeoverKind = "twoFactorReset" | "resetLinkIssued" | "roleChanged";
+
+/**
+ * Account-takeover tooling (2FA reset, reset link, role change) always leaves the person a trace: an
+ * in-app notice and an email (a suspended person too, so a suspend-reset-reactivate sequence is not silent). When the person administers the organisation, every other active
+ * administrator gets the in-app notice too (a peer acted on a peer), each in their own language.
+ */
+export async function notifyTakeover(db: DB, tenantId: string, actor: { id: string; name: string }, target: { id: string; name: string; role: string }, kind: TakeoverKind, reason?: Localized): Promise<void> {
+  await notifyUsers(db, tenantId, [target.id], kind, { reason, link: "/profile" }, { href: "/profile" }, { statuses: ["active", "invited", "suspended"] });
+  if (target.role !== "tenant_admin") return;
+  const peers = await db
+    .select({ id: t.users.id, locale: t.users.locale })
+    .from(t.users)
+    .where(and(eq(t.users.tenantId, tenantId), eq(t.users.role, "tenant_admin"), eq(t.users.status, "active"), notInArray(t.users.id, [target.id, actor.id])));
+  if (!peers.length) return;
+  const title = new Map<string, string>();
+  for (const locale of new Set(peers.map((p) => p.locale))) {
+    const tr = createTranslator({ ...(await messagesFor(locale)), namespace: "admin.person" });
+    title.set(locale, tr(`${kind}Peer`, { actor: actor.name, name: target.name }));
+  }
+  await db.insert(t.notifications).values(peers.map((p) => ({ tenantId, userId: p.id, kind: "security", title: title.get(p.locale) ?? "", href: `/admin/users/${target.id}` })));
 }

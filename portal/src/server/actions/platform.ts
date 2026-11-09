@@ -6,8 +6,10 @@ import { z } from "zod";
 import { db, t } from "../db";
 import { actionViewer } from "../auth/viewer";
 import { issueAccountLink } from "../auth/links";
+import { stepUp } from "../auth/step-up";
 import { domainProofFound, domainProofRecords, normaliseHost } from "../auth/domain-proof";
 import { audit } from "../services/audit";
+import { notifyTakeover } from "../services/notify";
 import { isUniqueViolation } from "../db/errors";
 import { TENANT_SLUG_RE, createTenantWithAdmin } from "../services/tenants";
 import { ALL_FEATURES, withDefaults, type Feature } from "../../lib/tenant-defaults";
@@ -139,17 +141,26 @@ export async function verifyTenantDomainAction(tenantId: string, domain: string,
   return { ok: true, verified, found };
 }
 
-/** One-time password link for an administrator of another organisation (support access). */
-export async function adminLinkAction(tenantId: string, userId: string): Promise<Result & { link?: string }> {
+/**
+ * One-time password link for an administrator of another organisation (support access): only with the
+ * operator's own password and only while the organisation allows it (Settings → Security, 72 hours at a time).
+ */
+export async function adminLinkAction(tenantId: string, userId: string, password?: string): Promise<Result & { link?: string }> {
   const v = await actionViewer("platform.manage");
+  const refused = await stepUp(v, password, "platform.admin_link", userId);
+  if (refused) return { ok: false, error: refused };
   if (!uuid.safeParse(tenantId).success || !uuid.safeParse(userId).success) return { ok: false };
+  const [tenant] = await db().select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId));
+  const until = tenant ? withDefaults(tenant.settings).security.supportAccessUntil : null;
+  if (!until || !(Date.parse(until) > Date.now())) return { ok: false, error: "supportAccess" };
   const [u] = await db()
-    .select({ id: t.users.id, email: t.users.email })
+    .select({ id: t.users.id, name: t.users.name, email: t.users.email, role: t.users.role })
     .from(t.users)
     .where(and(eq(t.users.id, userId), eq(t.users.tenantId, tenantId), eq(t.users.role, "tenant_admin"), inArray(t.users.status, ["active", "invited"])));
   if (!u) return { ok: false };
   const link = await issueAccountLink(u.id, "reset");
   await audit(db(), { tenantId, actorId: v.user.id, action: "platform.admin_link", targetType: "user", targetId: u.id, meta: { email: u.email, by: v.user.email } });
+  await notifyTakeover(db(), tenantId, v.user, u, "resetLinkIssued");
   return { ok: true, link };
 }
 

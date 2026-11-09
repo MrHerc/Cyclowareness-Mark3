@@ -13,6 +13,23 @@ import { LOCALES, LOCALE_NAMES } from "@/i18n/config";
 
 const ROLES = ["learner", "department_head", "executive", "analyst", "campaign_manager", "content_creator", "tenant_admin"] as const;
 
+/** The actor's own password before an action that can take over an account (the server's step-up). */
+export function ConfirmPasswordField({ id, value, onChange, error }: { id: string; value: string; onChange: (v: string) => void; error: string | null }) {
+  const t = useTranslations("admin.person");
+  return (
+    <Field label={t("confirmPassword")} htmlFor={id} hint={t("confirmPasswordHint")} error={error}>
+      <Input id={id} type="password" autoComplete="current-password" value={value} onChange={(e) => onChange(e.target.value)} required autoFocus aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : `${id}-hint`} />
+    </Field>
+  );
+}
+
+/** The step-up refusal as the actor reads it; null for any other outcome. */
+export function useStepUpError() {
+  const t = useTranslations("admin.person");
+  const tc = useTranslations("common");
+  return (error: string | undefined) => (error === "wrongPassword" ? t("wrongPassword") : error === "rateLimited" ? tc("errors.rateLimited") : null);
+}
+
 export function PersonActions({
   person,
   departments,
@@ -29,8 +46,11 @@ export function PersonActions({
   const tp = useTranslations("admin.people");
   const tc = useTranslations("common");
   const router = useRouter();
-  const [open, setOpen] = useState<null | "edit" | "role" | "move" | "twofa">(null);
+  const [open, setOpen] = useState<null | "edit" | "role" | "move" | "twofa" | "reset">(null);
   const [pending, start] = useTransition();
+  const [password, setPassword] = useState("");
+  const [pwError, setPwError] = useState<string | null>(null);
+  const stepUpError = useStepUpError();
   const [name, setName] = useState(person.name);
   const [jobTitle, setJobTitle] = useState(person.jobTitle ?? "");
   const [phone, setPhone] = useState(person.phone ?? "");
@@ -39,22 +59,28 @@ export function PersonActions({
   const [dept, setDept] = useState(person.departmentId ?? "");
   // A rejected phone is reported on its own field (taken by another account, or not a usable number).
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const close = () => {
+    setOpen(null);
+    setPassword("");
+    setPwError(null);
+  };
   const done = (msg = t("saved")) => {
     toast(msg);
-    setOpen(null);
+    close();
     router.refresh();
   };
   const copy = (kind: "invite" | "reset") =>
     start(async () => {
-      const res = await createLinkAction(person.id, kind);
+      const res = await createLinkAction(person.id, kind, password);
       if (res.ok && res.url) {
+        close();
         try {
           await navigator.clipboard.writeText(res.url);
           toast(tp("linkCopied"));
         } catch {
           window.prompt(tp("linkCreated"), res.url);
         }
-      }
+      } else setPwError(stepUpError(res.error));
     });
 
   return (
@@ -67,7 +93,7 @@ export function PersonActions({
           {tp("inviteLink")}
         </Button>
       ) : (
-        <Button size="sm" variant="secondary" icon={<KeyRound />} disabled={pending} onClick={() => copy("reset")}>
+        <Button size="sm" variant="secondary" icon={<KeyRound />} onClick={() => setOpen("reset")}>
           {t("resetLink")}
         </Button>
       )}
@@ -150,8 +176,19 @@ export function PersonActions({
         </form>
       </Dialog>
 
-      <Dialog open={open === "role"} onClose={() => setOpen(null)} title={t("changeRole")} size="sm">
-        <div className="grid gap-4">
+      <Dialog open={open === "role"} onClose={close} title={t("changeRole")} size="sm">
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            start(async () => {
+              const res = await changeRoleAction(person.id, role as "learner", password);
+              if (res.ok) done();
+              else if (res.error) setPwError(stepUpError(res.error));
+              else toast(tc("errors.forbidden"), "error");
+            });
+          }}
+        >
           <Select value={role} onChange={(e) => setRole(e.target.value)} aria-label={tc("role")}>
             {ROLES.map((r) => (
               <option key={r} value={r}>
@@ -159,10 +196,27 @@ export function PersonActions({
               </option>
             ))}
           </Select>
-          <Button disabled={pending || role === person.role} onClick={() => start(async () => void ((await changeRoleAction(person.id, role as "learner")).ok ? done() : toast(tc("errors.forbidden"), "error")))}>
+          <ConfirmPasswordField id="role-pw" value={password} onChange={setPassword} error={pwError} />
+          <Button type="submit" disabled={pending || role === person.role || !password}>
             {tc("save")}
           </Button>
-        </div>
+        </form>
+      </Dialog>
+
+      <Dialog open={open === "reset"} onClose={close} title={t("resetLinkTitle", { name: person.name })} size="sm">
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            copy("reset");
+          }}
+        >
+          <p className="text-body-sm text-ink-muted">{t("resetLinkBody", { name: person.name })}</p>
+          <ConfirmPasswordField id="reset-pw" value={password} onChange={setPassword} error={pwError} />
+          <Button type="submit" disabled={pending || !password}>
+            {t("resetLink")}
+          </Button>
+        </form>
       </Dialog>
 
       <Dialog open={open === "move"} onClose={() => setOpen(null)} title={t("moveDepartment")} size="sm">
@@ -181,18 +235,25 @@ export function PersonActions({
         </div>
       </Dialog>
 
-      <Dialog
-        open={open === "twofa"}
-        onClose={() => setOpen(null)}
-        title={t("resetTwoFactorTitle", { name: person.name })}
-        size="sm"
-        footer={
-          <Button variant="danger" disabled={pending} onClick={() => start(async () => void ((await resetTwoFactorAction(person.id)).ok ? done(t("twoFactorReset")) : toast(tc("errors.forbidden"), "error")))}>
+      <Dialog open={open === "twofa"} onClose={close} title={t("resetTwoFactorTitle", { name: person.name })} size="sm">
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            start(async () => {
+              const res = await resetTwoFactorAction(person.id, password);
+              if (res.ok) done(t("twoFactorReset"));
+              else if (res.error) setPwError(stepUpError(res.error));
+              else toast(tc("errors.forbidden"), "error");
+            });
+          }}
+        >
+          <p className="text-body-sm text-ink-muted">{t("resetTwoFactorBody")}</p>
+          <ConfirmPasswordField id="twofa-pw" value={password} onChange={setPassword} error={pwError} />
+          <Button type="submit" variant="danger" disabled={pending || !password}>
             {t("resetTwoFactor")}
           </Button>
-        }
-      >
-        <p className="text-body-sm text-ink-muted">{t("resetTwoFactorBody")}</p>
+        </form>
       </Dialog>
     </div>
   );

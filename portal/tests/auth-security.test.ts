@@ -25,7 +25,7 @@ const h = vi.hoisted(() => ({
 vi.mock("../src/server/db", async () => ({ db: () => h.db, dbHandle: () => ({ driver: "pglite", db: h.db }), t: await import("../src/server/db/schema") }));
 vi.mock("../src/server/env", () => ({ env: h.env, appUrl: () => "http://localhost:3000" }));
 vi.mock("../src/server/request", async (original) => ({ ...(await original<typeof import("../src/server/request")>()), clientIp: async () => h.ip, userAgent: async () => null }));
-vi.mock("../src/server/auth/password", () => ({ hashPassword: async () => "hash", verifyPassword: async (_: string | null, pw: string) => pw === "right password", passwordProblem: () => null }));
+vi.mock("../src/server/auth/password", () => ({ hashPassword: async () => "hash", verifyPassword: async (_: string | null, pw: string) => pw === "right password", verifyUserPassword: async (_: string, pw: string) => pw === "right password", passwordProblem: () => null }));
 vi.mock("../src/server/auth/viewer", () => ({ getSession: async () => h.session, actionViewer: async () => h.session }));
 vi.mock("../src/server/sms", () => ({ smsAvailable: () => true, sendSms: async (to: string) => (h.sms.push(to), { ok: true, simulated: true }) }));
 vi.mock("../src/server/mail", () => ({ queueEmail: async (_db: unknown, _tenant: unknown, mail: { to: string }) => void h.mails.push(mail.to), renderEmailHtml: () => "" }));
@@ -290,6 +290,22 @@ describe("time-based codes", () => {
     expect(await outcome(auth.verifySecondFactorAction(undefined, form({ mode: "totp", code })))).toBe("invalidCode");
     const [row] = await db().select({ step: t.users.totpLastStep }).from(t.users).where(eq(t.users.id, u.id));
     expect(row.step).toBe(Math.floor(Date.now() / 30_000));
+  });
+});
+
+describe("setting a password from a link", () => {
+  const token = async (userId: string, kind: "invite" | "reset", value: string) => {
+    await db().insert(t.authTokens).values({ id: sha256Hex(value), userId, kind, expiresAt: new Date(Date.now() + 60_000) });
+    return form({ token: value, kind, password: "N3w-passw0rd-long", confirm: "N3w-passw0rd-long" });
+  };
+
+  it("takes an invite token only while the account is still invited", async () => {
+    const live = await person({ email: "live@acme.test" });
+    const fresh = await person({ email: "fresh@acme.test", status: "invited", passwordHash: null });
+    expect(await auth.setPasswordAction(undefined, await token(live.id, "invite", "stray-invite"))).toEqual({ error: "expired" });
+    expect(await auth.setPasswordAction(undefined, await token(fresh.id, "invite", "real-invite"))).toEqual({ done: true });
+    const [row] = await db().select({ status: t.users.status }).from(t.users).where(eq(t.users.id, fresh.id));
+    expect(row.status).toBe("active");
   });
 });
 

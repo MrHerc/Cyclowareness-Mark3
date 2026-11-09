@@ -156,7 +156,7 @@ describe("tenant defaults: defaultSettings", () => {
 
   it("has the documented shape and defaults", () => {
     const s = defaultSettings();
-    expect(Object.keys(s).sort()).toEqual(["attestationText", "certificate", "defaultLocale", "email", "identity", "integrations", "learning", "locales", "notifications", "protection", "timeZone"]);
+    expect(Object.keys(s).sort()).toEqual(["attestationText", "certificate", "defaultLocale", "email", "identity", "integrations", "learning", "locales", "notifications", "protection", "security", "timeZone"]);
     expect(s.timeZone).toBe("Asia/Baku");
     expect(s.protection).toEqual({ contentProtection: true, watermark: true });
     expect(s.learning).toEqual({ timeLimits: true, refresher: true, riskThreshold: 67, dailyGoalXp: 50 });
@@ -165,6 +165,7 @@ describe("tenant defaults: defaultSettings", () => {
     expect(s.identity).toEqual({ requireAdmin2fa: true, maxDevices: null, ssoEnabled: false });
     expect(s.email).toEqual({ enabled: false });
     expect(s.integrations).toEqual({ webhookEnabled: false, webhookEvents: [], syslogEnabled: false });
+    expect(s.security).toEqual({ supportAccessUntil: null });
   });
 
   it("copies the attestation text per interface language", () => {

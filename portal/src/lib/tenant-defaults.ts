@@ -148,7 +148,7 @@ export const DEFAULT_TEMPLATES_NO_DUE: Record<"assignment" | "reminder", Record<
 };
 
 /** Messages with no editable template: a policy signature request and a nudge to confirm a finished module. */
-export const FIXED_MESSAGES: Record<"policy_reminder" | "confirmation_reminder", Record<string, Mail>> = {
+export const FIXED_MESSAGES: Record<"policy_reminder" | "confirmation_reminder" | "twoFactorReset" | "resetLinkIssued" | "roleChanged", Record<string, Mail>> = {
   policy_reminder: {
     az: { subject: "İmza gözlənilir: {{module}}", body: "Salam, {{name}}!\n\nZəhmət olmasa «{{module}}» siyasətini oxuyub imzalayın. Bir neçə dəqiqə kifayətdir.\n\n{{link}}" },
     en: { subject: "Signature needed: {{module}}", body: "Hello {{name}},\n\nPlease read and sign “{{module}}”. It only takes a few minutes.\n\n{{link}}" },
@@ -173,7 +173,44 @@ export const FIXED_MESSAGES: Record<"policy_reminder" | "confirmation_reminder",
     fr: { subject: "Validation requise : {{module}}", body: "Bonjour {{name}},\n\nVous avez terminé « {{module}} », mais pas encore validé ce module. Merci de le valider, cela prend une minute.\n\n{{link}}" },
     ar: { subject: "مطلوب التأكيد: {{module}}", body: "مرحبًا {{name}}،\n\nأنهيت «{{module}}» ولم يتبق سوى تأكيد الإتمام. يرجى التأكيد، فالأمر لا يستغرق سوى دقيقة.\n\n{{link}}" },
   },
-} satisfies Record<"policy_reminder" | "confirmation_reminder", Record<Locale, Mail>>;
+  // Account-takeover tooling always leaves the person a trace (people.ts, platform.ts).
+  twoFactorReset: {
+    az: { subject: "İki addımlı doğrulamanız sıfırlandı", body: "Salam, {{name}}!\n\n{{organisation}} administratoru iki addımlı doğrulamanızı sıfırladı və bütün cihazlardan çıxış etdi. Onu profilinizdə yenidən qurun. Bunu gözləmirdinizsə, dərhal təhlükəsizlik komandasına bildirin.\n\n{{link}}" },
+    en: { subject: "Your two-step verification was reset", body: "Hello {{name}},\n\nAn administrator of {{organisation}} reset your two-step verification and signed you out everywhere. Set it up again in your profile. If you did not expect this, tell your security team right away.\n\n{{link}}" },
+    ru: { subject: "Ваша двухэтапная проверка сброшена", body: "Здравствуйте, {{name}}!\n\nАдминистратор организации {{organisation}} сбросил вашу двухэтапную проверку и завершил сеансы на всех устройствах. Настройте её заново в профиле. Если вы этого не ожидали, сразу сообщите команде безопасности.\n\n{{link}}" },
+    tr: { subject: "İki adımlı doğrulamanız sıfırlandı", body: "Merhaba {{name}},\n\n{{organisation}} sistem yöneticisi iki adımlı doğrulamanızı sıfırladı ve tüm cihazlardaki oturumlarınızı kapattı. Profilinizden yeniden kurun. Bunu beklemiyorsanız hemen güvenlik ekibine bildirin.\n\n{{link}}" },
+    ro: { subject: "Verificarea dvs. în doi pași a fost resetată", body: "Bună ziua, {{name}},\n\nUn administrator al organizației {{organisation}} v-a resetat verificarea în doi pași și v-a deconectat de pe toate dispozitivele. Configurați-o din nou în profil. Dacă nu vă așteptați la aceasta, anunțați imediat echipa de securitate.\n\n{{link}}" },
+    ka: { subject: "თქვენი ორსაფეხურიანი დადასტურება განულდა", body: "გამარჯობა, {{name}}!\n\n{{organisation}}-ის ადმინისტრატორმა განულა თქვენი ორსაფეხურიანი დადასტურება და დაასრულა სესია ყველა მოწყობილობაზე. ხელახლა გამართეთ ის თქვენს პროფილში. თუ ამას არ ელოდით, დაუყოვნებლივ აცნობეთ უსაფრთხოების გუნდს.\n\n{{link}}" },
+    uk: { subject: "Вашу двоетапну перевірку скинуто", body: "Вітаємо, {{name}}!\n\nАдміністратор організації {{organisation}} скинув вашу двоетапну перевірку та завершив сеанси на всіх пристроях. Налаштуйте її знову у своєму профілі. Якщо ви цього не очікували, негайно повідомте команду безпеки.\n\n{{link}}" },
+    de: { subject: "Ihre Zwei-Faktor-Authentisierung wurde zurückgesetzt", body: "Hallo {{name}},\n\nein Administrator von {{organisation}} hat Ihre Zwei-Faktor-Authentisierung zurückgesetzt und Sie überall abgemeldet. Richten Sie sie in Ihrem Profil neu ein. Falls Sie das nicht erwartet haben, melden Sie es sofort Ihrem Sicherheitsteam.\n\n{{link}}" },
+    fr: { subject: "Votre double authentification a été réinitialisée", body: "Bonjour {{name}},\n\nUn administrateur de {{organisation}} a réinitialisé votre double authentification et vous a déconnecté de tous vos appareils. Configurez-la à nouveau dans votre profil. Si vous ne vous y attendiez pas, prévenez immédiatement votre équipe de sécurité.\n\n{{link}}" },
+    ar: { subject: "تمت إعادة تعيين التحقق بخطوتين لحسابك", body: "مرحبًا {{name}}،\n\nأعاد مسؤول النظام في {{organisation}} تعيين التحقق بخطوتين لحسابك وسجّل خروجك من جميع الأجهزة. أعد إعداده من ملفك الشخصي. إذا لم تكن تتوقع ذلك، فأبلغ فريق الأمن فورًا.\n\n{{link}}" },
+  },
+  resetLinkIssued: {
+    az: { subject: "Hesabınız üçün parol sıfırlama linki yaradıldı", body: "Salam, {{name}}!\n\n{{organisation}} administratoru hesabınız üçün birdəfəlik parol sıfırlama linki yaratdı. Link bir saat işləyir. Bunu siz istəməmisinizsə, dərhal təhlükəsizlik komandasına bildirin.\n\n{{link}}" },
+    en: { subject: "A password reset link was created for your account", body: "Hello {{name}},\n\nAn administrator of {{organisation}} created a one-time password reset link for your account. It works for one hour. If you did not ask for it, tell your security team right away.\n\n{{link}}" },
+    ru: { subject: "Для вашей учётной записи создана ссылка для сброса пароля", body: "Здравствуйте, {{name}}!\n\nАдминистратор организации {{organisation}} создал одноразовую ссылку для сброса пароля вашей учётной записи. Она действует один час. Если вы её не запрашивали, сразу сообщите команде безопасности.\n\n{{link}}" },
+    tr: { subject: "Hesabınız için parola sıfırlama bağlantısı oluşturuldu", body: "Merhaba {{name}},\n\n{{organisation}} sistem yöneticisi hesabınız için tek kullanımlık bir parola sıfırlama bağlantısı oluşturdu. Bağlantı bir saat geçerlidir. Bunu siz istemediyseniz hemen güvenlik ekibine bildirin.\n\n{{link}}" },
+    ro: { subject: "A fost creat un link de resetare a parolei pentru contul dvs.", body: "Bună ziua, {{name}},\n\nUn administrator al organizației {{organisation}} a creat un link de unică folosință pentru resetarea parolei contului dvs. Linkul este valabil o oră. Dacă nu l-ați cerut, anunțați imediat echipa de securitate.\n\n{{link}}" },
+    ka: { subject: "თქვენი ანგარიშისთვის შეიქმნა პაროლის აღდგენის ბმული", body: "გამარჯობა, {{name}}!\n\n{{organisation}}-ის ადმინისტრატორმა თქვენი ანგარიშისთვის შექმნა პაროლის აღდგენის ერთჯერადი ბმული. ის ერთი საათი მოქმედებს. თუ ეს თქვენ არ მოგითხოვიათ, დაუყოვნებლივ აცნობეთ უსაფრთხოების გუნდს.\n\n{{link}}" },
+    uk: { subject: "Для вашого облікового запису створено посилання для скидання пароля", body: "Вітаємо, {{name}}!\n\nАдміністратор організації {{organisation}} створив одноразове посилання для скидання пароля вашого облікового запису. Воно дійсне протягом години. Якщо ви його не просили, негайно повідомте команду безпеки.\n\n{{link}}" },
+    de: { subject: "Für Ihr Konto wurde ein Link zum Zurücksetzen des Passworts erstellt", body: "Hallo {{name}},\n\nein Administrator von {{organisation}} hat einen einmaligen Link zum Zurücksetzen des Passworts für Ihr Konto erstellt. Er ist eine Stunde gültig. Falls Sie ihn nicht angefordert haben, melden Sie es sofort Ihrem Sicherheitsteam.\n\n{{link}}" },
+    fr: { subject: "Un lien de réinitialisation du mot de passe a été créé pour votre compte", body: "Bonjour {{name}},\n\nUn administrateur de {{organisation}} a créé un lien à usage unique pour réinitialiser le mot de passe de votre compte. Il est valable une heure. Si vous ne l’avez pas demandé, prévenez immédiatement votre équipe de sécurité.\n\n{{link}}" },
+    ar: { subject: "تم إنشاء رابط لإعادة تعيين كلمة المرور لحسابك", body: "مرحبًا {{name}}،\n\nأنشأ مسؤول النظام في {{organisation}} رابطًا يستخدم مرة واحدة لإعادة تعيين كلمة مرور حسابك. الرابط صالح لمدة ساعة واحدة. إذا لم تطلبه، فأبلغ فريق الأمن فورًا.\n\n{{link}}" },
+  },
+  roleChanged: {
+    az: { subject: "{{organisation}} təşkilatında rolunuz dəyişdi", body: "Salam, {{name}}!\n\n{{organisation}} administratoru rolunuzu dəyişdi: {{reason}}. Dəyişiklik növbəti girişdən qüvvəyə minir. Bunu gözləmirdinizsə, təhlükəsizlik komandasına bildirin.\n\n{{link}}" },
+    en: { subject: "Your role in {{organisation}} changed", body: "Hello {{name}},\n\nAn administrator of {{organisation}} changed your role to {{reason}}. It applies from your next sign-in. If you did not expect this, tell your security team.\n\n{{link}}" },
+    ru: { subject: "Ваша роль в организации {{organisation}} изменена", body: "Здравствуйте, {{name}}!\n\nАдминистратор организации {{organisation}} изменил вашу роль: {{reason}}. Изменение вступает в силу при следующем входе. Если вы этого не ожидали, сообщите команде безопасности.\n\n{{link}}" },
+    tr: { subject: "{{organisation}} kuruluşundaki rolünüz değişti", body: "Merhaba {{name}},\n\n{{organisation}} sistem yöneticisi rolünüzü değiştirdi: {{reason}}. Değişiklik bir sonraki oturum açışınızda geçerli olur. Bunu beklemiyorsanız güvenlik ekibine bildirin.\n\n{{link}}" },
+    ro: { subject: "Rolul dvs. în organizația {{organisation}} s-a schimbat", body: "Bună ziua, {{name}},\n\nUn administrator al organizației {{organisation}} v-a schimbat rolul: {{reason}}. Schimbarea se aplică de la următoarea autentificare. Dacă nu vă așteptați la aceasta, anunțați echipa de securitate.\n\n{{link}}" },
+    ka: { subject: "თქვენი როლი {{organisation}}-ში შეიცვალა", body: "გამარჯობა, {{name}}!\n\n{{organisation}}-ის ადმინისტრატორმა შეცვალა თქვენი როლი: {{reason}}. ცვლილება ძალაში შედის შემდეგი შესვლიდან. თუ ამას არ ელოდით, აცნობეთ უსაფრთხოების გუნდს.\n\n{{link}}" },
+    uk: { subject: "Вашу роль в організації {{organisation}} змінено", body: "Вітаємо, {{name}}!\n\nАдміністратор організації {{organisation}} змінив вашу роль: {{reason}}. Зміна набуває чинності з наступного входу. Якщо ви цього не очікували, повідомте команду безпеки.\n\n{{link}}" },
+    de: { subject: "Ihre Rolle bei {{organisation}} wurde geändert", body: "Hallo {{name}},\n\nein Administrator von {{organisation}} hat Ihre Rolle geändert: {{reason}}. Die Änderung gilt ab Ihrer nächsten Anmeldung. Falls Sie das nicht erwartet haben, melden Sie es Ihrem Sicherheitsteam.\n\n{{link}}" },
+    fr: { subject: "Votre rôle dans {{organisation}} a changé", body: "Bonjour {{name}},\n\nUn administrateur de {{organisation}} a changé votre rôle : {{reason}}. Le changement s’applique dès votre prochaine connexion. Si vous ne vous y attendiez pas, prévenez votre équipe de sécurité.\n\n{{link}}" },
+    ar: { subject: "تغيّر دورك في {{organisation}}", body: "مرحبًا {{name}}،\n\nغيّر مسؤول النظام في {{organisation}} دورك إلى: {{reason}}. يسري التغيير من تسجيل الدخول التالي. إذا لم تكن تتوقع ذلك، فأبلغ فريق الأمن.\n\n{{link}}" },
+  },
+} satisfies Record<"policy_reminder" | "confirmation_reminder" | "twoFactorReset" | "resetLinkIssued" | "roleChanged", Record<Locale, Mail>>;
 
 /** Label of the button that a link on its own line becomes in an email without a label of its own. */
 export const EMAIL_BUTTON_LABEL: Record<string, string> = {
@@ -233,6 +270,7 @@ export function defaultSettings(locale = "az"): TenantSettings {
     identity: { requireAdmin2fa: true, maxDevices: null, ssoEnabled: false },
     email: { enabled: false },
     integrations: { webhookEnabled: false, webhookEvents: [], syslogEnabled: false },
+    security: { supportAccessUntil: null },
   };
 }
 
@@ -296,6 +334,7 @@ export function withDefaults(raw: unknown): TenantSettings {
       ...integrations,
       webhookEvents: Array.isArray(integrations.webhookEvents) ? integrations.webhookEvents.filter((e): e is string => typeof e === "string") : [],
     },
+    security: { ...d.security, ...group(r.security) },
   } as TenantSettings;
 }
 
