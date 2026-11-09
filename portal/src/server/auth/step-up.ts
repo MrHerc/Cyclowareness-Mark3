@@ -1,7 +1,8 @@
 import "server-only";
-import { db } from "../db";
+import { eq } from "drizzle-orm";
+import { db, t } from "../db";
 import type { Viewer } from "./viewer";
-import { verifyUserPassword } from "./password";
+import { verifyPassword } from "./password";
 import { audit } from "../services/audit";
 import { clientIp } from "../request";
 import { rateLimit } from "../rate-limit";
@@ -19,4 +20,10 @@ export async function stepUp(v: Viewer, password: unknown, action: string, targe
   // The target is recorded as given (before any lookup): an investigator needs to see whose account a run of failures aimed at.
   if (error) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "security.step_up_failed", targetType: targetId ? "user" : undefined, targetId, ip: await clientIp(), meta: { action, error } });
   return error;
+}
+
+/** A signed-in person's own password against the stored hash (confirming a sensitive action). An account without a password never matches. */
+export async function verifyUserPassword(userId: string, password: string): Promise<boolean> {
+  const [u] = await db().select({ hash: t.users.passwordHash }).from(t.users).where(eq(t.users.id, userId));
+  return verifyPassword(u?.hash ?? null, password);
 }

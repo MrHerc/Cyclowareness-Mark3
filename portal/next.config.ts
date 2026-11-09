@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
   cacheComponents: false,
   poweredByHeader: false,
   reactStrictMode: true,
+  // Development logs print each Server Function call with its arguments, and some carry a password (step-up).
+  logging: { serverFunctions: false },
   output: "standalone",
   // Pins the standalone layout to .next/standalone/server.js (scripts/start-standalone.mjs and the
   // Dockerfile rely on it). Without it Next guesses the root from lockfiles, and one in a parent

@@ -332,9 +332,20 @@ The items below are open at this commit. They come from the code and from [docs/
 |---|---|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Engineers and technical evaluators |
 | [docs/API.md](docs/API.md) | Integrators: SIEM, SOAR, identity provider, SMS gateway |
+| [docs/ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) | Administrators and other console roles in a customer organisation |
+| [docs/LEARNER-QUICKSTART.md](docs/LEARNER-QUICKSTART.md) | Employees: a one-page start |
+| [docs/SIMULATION-DELIVERY.md](docs/SIMULATION-DELIVERY.md) | Mail administrators: delivering simulations and allow-listing in Microsoft 365 and Google Workspace |
+| [docs/SECURITY-WHITEPAPER.md](docs/SECURITY-WHITEPAPER.md) | Security, risk and procurement teams evaluating the platform |
+| [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Internal security review of 2026-11-05 |
+| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Operators: monitoring, incidents, backups and restores, secret rotation, retention |
 | [portal/README.md](portal/README.md) | Operators: environment variables, Docker, proxies, jobs, languages, narration |
+| [docs/DEMO.md](docs/DEMO.md) | Presenters: the three-minute demo |
+| [docs/AUDIT.md](docs/AUDIT.md) | Investors: technical due diligence audit |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Investors: 30 / 60 / 90-day roadmap that follows the audit |
 | [docs/build/DECISIONS.md](docs/build/DECISIONS.md) | Architecture decision records |
 | [docs/build/OPEN-QUESTIONS.md](docs/build/OPEN-QUESTIONS.md) | Decisions and accounts the owner still has to provide |
+| [docs/build/OPEN-QUESTIONS.en.md](docs/build/OPEN-QUESTIONS.en.md) | The same questions in English |
+| [docs/build/CHAIN-OF-TITLE.md](docs/build/CHAIN-OF-TITLE.md) | Ownership evidence for carried-over assets |
 
 ## Licence
 

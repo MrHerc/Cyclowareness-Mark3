@@ -1,0 +1,2 @@
+CREATE INDEX "answers_tenant_at_idx" ON "answers" USING btree ("tenant_id","at");--> statement-breakpoint
+CREATE UNIQUE INDEX "tenants_domain_verified_idx" ON "tenants" USING btree ("domain") WHERE domain_verified_at is not null;

@@ -50,6 +50,8 @@ This paper describes the controls that exist in the platform's code today. It is
 | Single sign-on | OpenID Connect authorization code flow with PKCE, state and nonce, over HTTPS. The ID token's signature, issuer, audience, expiry and nonce are checked, and the email claim counts only when the provider marks it verified. SSO works only for a domain the organisation has proven with a DNS TXT record (re-checked daily). On first sign-in the account is bound to the provider's issuer and subject identifier, and a different subject is refused later. |
 | Sessions | A random 192-bit token in a `__Host-` cookie (HttpOnly, Secure, SameSite=Lax). The database stores only its SHA-256 hash. The session slides to 30 days on use and ends at most 90 days after sign-in. An organisation can limit the number of devices signed in at once; people can sign out their other devices. |
 | Account links | Invitation and password-reset tokens are stored as hashes, work once, and invitations expire after 14 days. |
+| Sensitive administrator actions | Resetting someone's two-step verification, creating a password-reset link for them and changing their role ask the administrator to type their own password again (a password re-entry, not a second factor), limited to 10 attempts per administrator in 15 minutes; every refusal is written to the audit log. The affected person receives an in-app notice and an email, and when the person is or becomes an organisation administrator, the other administrators are told as well. |
+| Support access | The platform operator can create a password-reset link for an organisation administrator only with the operator's own password and only while that organisation has opened a 72-hour support window in its settings. Opening and closing the window are audited, and the administrator is notified when a link is created. |
 
 ## Application protections
 
@@ -76,12 +78,12 @@ Organisation administrators can point the platform at their own mail server (SMT
 
 ## Data protection and privacy
 
-- **Secrets at rest.** Mail-server passwords, SSO client secrets, webhook secrets and authenticator keys are encrypted with AES-256-GCM under a key derived from the installation's application secret. They are never sent back to the browser.
+- **Secrets at rest.** Mail-server passwords, SSO client secrets, webhook secrets and authenticator keys are encrypted with AES-256-GCM under a key derived from the installation's application secret. They are never sent back to the browser. The application secret can be rotated: each encrypted value records which key it was encrypted with, and an operator-run procedure ([OPERATIONS.md](OPERATIONS.md), "Rotating APP_SECRET") deploys the new and the previous key together and re-encrypts every stored secret under the new key. There is no automatic rotation schedule and no external key-management service, and backup codes issued before a rotation stop working once the previous key is removed.
 - **Mail log.** Every message passes through an outbox that is also the delivery log. Invitation and password-reset links are redacted from it after delivery.
 - **Simulations.** When someone types a password into a simulated phishing page, only the fact is recorded, never the password. The password exercise inside lessons never leaves the learner's browser.
 - **Sandbox.** Files are analysed in memory and not stored: only the SHA-256 hash and the findings are kept. Links are checked, not opened.
 - **Personal data rights.** A learner can download their profile and learning history. A deletion request goes to the organisation's administrator; on approval, name, email, photo and sign-in data are removed and learning results stay without the name.
-- **Retention clean-up.** A daily job deletes stored AI tutor answers after 365 days and demo requests after 730 days.
+- **Retention clean-up.** A daily job deletes stored AI tutor answers after 365 days and demo requests after 730 days. Each organisation can also set, in whole months up to 120, how long its audit log and its learning answers and closed risks are kept. The default is to keep everything until an administrator chooses a period. Lesson progress, XP, attestations and certificates are kept as compliance evidence and never deleted by this job; each clean-up writes an audit entry, and deleted rows remain in backups for the backup retention period.
 - **AI features.** The AI tutor, AI subtitles and Studio drafts use the Anthropic API. The tutor receives the lesson context and the learner's question; no account identifier is sent. Questions are not filtered, so learners are told not to write personal data. Narration audio is generated in advance from lesson text only (ElevenLabs), never from personal data. Subprocessors are listed in [legal/SUBPROCESSORS.md](legal/SUBPROCESSORS.md).
 - **Content protection.** Optional per organisation: lesson text cannot be copied, printing gives a blank page, the screen blurs when the window loses focus, and an invisible per-session watermark lets an administrator trace a leaked screenshot to the session it came from.
 
@@ -119,10 +121,8 @@ Certificates and the compliance pack are used as evidence for regulators and aud
 These are not in place at the time of writing. Do not rely on them until the platform's documentation says otherwise.
 
 - **Database row-level security.** Separation between organisations is enforced by the application only.
-- **Key rotation.** One application secret protects stored secrets; there is no key versioning or rotation procedure.
-- **Step-up re-authentication.** Sensitive administrator actions (resetting someone's two-step verification, creating a password-reset link) do not ask for the administrator's password or code again, and the affected person is not emailed.
 - **SAML and directory sync.** Single sign-on is OpenID Connect only; there is no SAML and no LDAP or Active Directory synchronisation.
-- **Configurable retention and residency.** Retention periods are fixed in the code, and the hosting region is agreed per contract, not selected in the product.
+- **Data residency.** The hosting region is agreed per contract, not selected in the product.
 - **Independent assurance.** No third-party penetration test, dynamic test of a running installation, or certification (such as ISO 27001 or SOC 2) has been completed.
 - **Error tracking and metrics.** There is no hosted error tracker, metrics or tracing yet.
 - **Live integrations.** Mail, SMS, Anthropic and identity-provider integrations have not yet been tested against live customer accounts.

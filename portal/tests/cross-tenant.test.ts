@@ -74,12 +74,14 @@ const workspace = await import("../src/server/actions/workspace");
 const captions = await import("../src/app/(focus)/learn/[slug]/[lessonId]/actions");
 const usbKit = await import("../src/app/api/admin/campaigns/[id]/usb-kit/route");
 const drillRoute = await import("../src/app/api/admin/drill/[id]/route");
+const scorm = await import("../src/app/api/admin/modules/[id]/scorm/route");
 const peopleRoute = await import("../src/app/api/admin/people/[kind]/route");
 const signoffs = await import("../src/app/api/admin/policies/[id]/signoffs/route");
 const reportsRoute = await import("../src/app/api/admin/reports/[kind]/route");
 const stix = await import("../src/app/api/sandbox/[id]/stix/route");
 const subtitles = await import("../src/app/api/subtitles/route");
 const demoRequests = await import("../src/app/api/super/demo-requests/route");
+const seats = await import("../src/app/api/super/seats/route");
 const tutor = await import("../src/app/api/tutor/route");
 
 beforeAll(ready, DB_SETUP_TIMEOUT);
@@ -261,6 +263,7 @@ const ROWS: Record<string, Row> = {
     ],
   },
   "server/actions/campaigns.setCampaignStatusAction": { run: (_, b) => campaigns.setCampaignStatusAction(b.campaign.id, "cancelled") },
+  "server/actions/campaigns.simulationClickAction": { na: "public simulation token: records the click on that token's own recipient, by design" },
   "server/actions/campaigns.simulationSubmitAction": { na: "public simulation token: records the click on that token's own recipient, by design" },
   "server/actions/drill.skipDrillAction": { run: (_, b) => drill.skipDrillAction(b.drillRun.id) },
   "server/actions/drill.startDrillAction": { run: (_, b) => drill.startDrillAction({ templateKey: "payslip", audience: "department", departmentId: b.department.id, speed: "quick" }) },
@@ -373,8 +376,10 @@ const ROWS: Record<string, Row> = {
   "server/actions/security.escalateAnalysisAction": { run: (_, b) => security.escalateAnalysisAction(b.sandbox.id) },
   "server/actions/security.reportThreatAction": { na: SELF },
   "server/actions/settings.domainProofRecordAction": { lower: () => settings.domainProofRecordAction() },
+  "server/actions/settings.grantSupportAccessAction": { lower: () => settings.grantSupportAccessAction() },
   "server/actions/settings.lookupWatermarkAction": { run: (_, b) => settings.lookupWatermarkAction(b.watermark) },
   "server/actions/settings.resendFailedMailAction": { run: (_, b) => settings.resendFailedMailAction(b.mail.id) },
+  "server/actions/settings.revokeSupportAccessAction": { lower: () => settings.revokeSupportAccessAction() },
   "server/actions/settings.rotateWebhookSecretAction": { lower: () => settings.rotateWebhookSecretAction() },
   "server/actions/settings.saveAttestationAction": { lower: () => settings.saveAttestationAction("en", "I confirm that I completed this module.") },
   "server/actions/settings.saveBrandingAction": { lower: () => settings.saveBrandingAction({} as never) },
@@ -386,11 +391,13 @@ const ROWS: Record<string, Row> = {
   "server/actions/settings.saveLearningAction": { lower: () => settings.saveLearningAction({} as never) },
   "server/actions/settings.saveNotificationsAction": { lower: () => settings.saveNotificationsAction({} as never) },
   "server/actions/settings.saveProtectionAction": { lower: () => settings.saveProtectionAction(true, true) },
+  "server/actions/settings.saveRetentionAction": { lower: () => settings.saveRetentionAction({} as never) },
   "server/actions/settings.saveTimeZoneAction": { lower: () => settings.saveTimeZoneAction("Asia/Baku") },
   "server/actions/settings.sendTestEventAction": { lower: () => settings.sendTestEventAction() },
   "server/actions/settings.setLogoAction": { lower: () => settings.setLogoAction(null) },
   "server/actions/settings.testEmailAction": { lower: () => settings.testEmailAction("admin@example.com") },
   "server/actions/settings.verifyDomainAction": { lower: () => settings.verifyDomainAction("example.com") },
+  "server/actions/settings.verifySimulationDomainAction": { lower: () => settings.verifySimulationDomainAction("admin@example.com") },
   "server/actions/site.requestDemoAction": { na: PUBLIC },
   "server/actions/workspace.archivePolicyAction": { run: (_, b) => workspace.archivePolicyAction(b.policy.id, true) },
   "server/actions/workspace.createAssignmentAction": {
@@ -424,6 +431,7 @@ const ROWS: Record<string, Row> = {
   "api/admin/campaigns/[id]/usb-kit:GET": { run: (_, b) => usbKit.GET(req(`/api/admin/campaigns/${b.campaign.id}/usb-kit`), ctx({ id: b.campaign.id })) },
   "api/admin/drill/[id]:GET": { run: (_, b) => drillRoute.GET(req(`/api/admin/drill/${b.drillRun.id}`), ctx({ id: b.drillRun.id })) },
   "api/admin/drill/[id]:POST": { run: (_, b) => drillRoute.POST(req(`/api/admin/drill/${b.drillRun.id}`, { method: "POST" }), ctx({ id: b.drillRun.id })) },
+  "api/admin/modules/[id]/scorm:GET": { run: (_, b) => scorm.GET(req(`/api/admin/modules/${b.mod.id}/scorm?locale=en`), ctx({ id: b.mod.id })) },
   "api/admin/people/[kind]:GET": { lower: () => peopleRoute.GET(req("/api/admin/people/export"), ctx({ kind: "export" })) },
   "api/admin/people/[kind]:POST": { lower: () => peopleRoute.POST(req("/api/admin/people/invite-links", { method: "POST" }), ctx({ kind: "invite-links" })) },
   "api/admin/policies/[id]/signoffs:GET": { run: (_, b) => signoffs.GET(req(`/api/admin/policies/${b.policy.id}/signoffs`), ctx({ id: b.policy.id })) },
@@ -447,6 +455,7 @@ const ROWS: Record<string, Row> = {
   "api/sso/start:GET": { na: PUBLIC },
   "api/subtitles:POST": { run: (_, b) => subtitles.POST(req("/api/subtitles", { method: "POST", body: JSON.stringify({ lessonId: b.mod.lessons[0].id, target: "es" }) })) },
   "api/super/demo-requests:GET": { run: () => demoRequests.GET(req("/api/super/demo-requests")) },
+  "api/super/seats:GET": { run: () => seats.GET(req("/api/super/seats")) },
   "api/t/[token]/open:GET": { na: "public simulation token: the open pixel of that token's own recipient, by design" },
   "api/tutor:POST": { run: (_, b) => tutor.POST(req("/api/tutor", { method: "POST", body: JSON.stringify({ slug: b.mod.slug, lessonKey: "lesson-1", question: "Why is this unsafe?", locale: "en" }) })) },
   "app/(focus)/learn/[slug]/[lessonId]/actions.loadCaptionsAction": {

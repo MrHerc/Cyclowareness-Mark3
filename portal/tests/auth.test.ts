@@ -156,7 +156,7 @@ describe("tenant defaults: defaultSettings", () => {
 
   it("has the documented shape and defaults", () => {
     const s = defaultSettings();
-    expect(Object.keys(s).sort()).toEqual(["attestationText", "certificate", "defaultLocale", "email", "identity", "integrations", "learning", "locales", "notifications", "protection", "security", "timeZone"]);
+    expect(Object.keys(s).sort()).toEqual(["attestationText", "certificate", "defaultLocale", "email", "identity", "integrations", "learning", "locales", "notifications", "protection", "retention", "security", "timeZone"]);
     expect(s.timeZone).toBe("Asia/Baku");
     expect(s.protection).toEqual({ contentProtection: true, watermark: true });
     expect(s.learning).toEqual({ timeLimits: true, refresher: true, riskThreshold: 67, dailyGoalXp: 50 });

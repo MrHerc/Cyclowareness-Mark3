@@ -872,7 +872,8 @@ async function main() {
 
   /* ───────── risk scores and the 30-day trend ───────── */
   await recomputeRisk(db, tenantId);
-  // Per-person history: 30 days drifting towards today's score, ending exactly on it.
+  // Per-person history: 30 days along the organisation's curve below (the risk story and the trend chart must agree), ending exactly on today's score.
+  const RISK_FALL = 9;
   const scores = await db.select({ id: t.users.id, score: t.users.riskScore }).from(t.users).where(sql`${t.users.tenantId} = ${tenantId} and ${t.users.status} = 'active'`);
   for (const u of scores) {
     const drift = Math.round((rnd() - 0.5) * 24);
@@ -880,7 +881,7 @@ async function main() {
       Array.from({ length: 31 }, (_, i) => {
         const d = 30 - i;
         const wobble = d === 0 ? 0 : Math.round((rnd() - 0.5) * 4);
-        return { tenantId, userId: u.id, day: dayKey(new Date(NOW.getTime() - d * DAY)), score: Math.max(0, Math.min(100, u.score + Math.round((drift * d) / 30) + wobble)) };
+        return { tenantId, userId: u.id, day: dayKey(new Date(NOW.getTime() - d * DAY)), score: Math.max(0, Math.min(100, u.score + Math.round(RISK_FALL * (d / 30) ** 2 + (drift * d) / 30) + wobble)) };
       }),
     );
   }
@@ -890,7 +891,7 @@ async function main() {
     .set({ streakFreezes: sql`greatest(${t.users.streakFreezes}, 1)` })
     .where(sql`${t.users.id} in ${[learner.id, byEmailKey("head").id, content.id, analyst.id]}`);
   const k = await tenantKpis(db, tenantId);
-  const start = { risk: k.avgRisk + 9, completion: Math.max(5, k.completion - 38), report: Math.min(95, k.reportRate + 6), click: Math.min(60, k.clickRate + 10) };
+  const start = { risk: k.avgRisk + RISK_FALL, completion: Math.max(5, k.completion - 38), report: Math.min(95, k.reportRate + 6), click: Math.min(60, k.clickRate + 10) };
   for (let d = 30; d >= 0; d--) {
     const f = (30 - d) / 30;
     const ease = 1 - Math.pow(1 - f, 2);

@@ -47,6 +47,47 @@ All notable changes to this project are recorded here. The format follows
   without a migration. The checks job reports coverage with a 60 % line floor; a Docker build job
   and an e2e job were added. (`.github/workflows/ci.yml`)
 - **Live drill endpoint documented.** `GET` and `POST /api/admin/drill/{id}` in `docs/API.md`.
+- **Support access needs the organisation's consent.** Settings → Security lets an organisation
+  administrator allow Safarov Industries support for 72 hours and revoke it (audit
+  `support.access_granted` / `support.access_revoked`); the operator console shows the state per
+  organisation. Without an open window the operator cannot create a link for an administrator.
+  (`portal/src/server/actions/settings.ts`, `portal/src/server/actions/platform.ts`, test: `tests/step-up.test.ts`)
+- **Per-organisation data retention.** Settings → Protection → Data retention sets audit and learning
+  retention in months (0 to 120, 0 keeps everything and is the default). The daily clean-up deletes that
+  organisation's older audit entries, answers and closed behaviour risks within its time budget and
+  records each purge as `retention.purged`; lesson progress, XP, attestations, certificates and open
+  risks are never deleted. `docs/OPERATIONS.md` has a retention and residency section.
+  (`portal/src/server/jobs.ts`, tests: `tests/jobs-ops.test.ts`, `tests/retention-settings.test.ts`)
+- **Simulation sender on a proven look-alike domain.** Settings → Email → Simulation sender: after the
+  organisation publishes its domain-proof TXT record on a look-alike domain and checks it, simulation
+  mail (only) can go out from an address on that domain. `docs/SIMULATION-DELIVERY.md` covers SPF, DKIM,
+  DMARC and allow-listing in Microsoft 365 and Google Workspace.
+  (`portal/src/server/mail.ts`, test: `tests/simulation-sender.test.ts`)
+- **SCORM 1.2 export.** Studio → "Export for an LMS" downloads a module as a SCORM 1.2 zip (manifest,
+  launcher, an offline player and the lessons in one language) through
+  `GET /api/admin/modules/{id}/scorm`, rate limited and audited as `module.exported`. The package
+  reports status, score (mastery 80) and session time to the LMS and nothing back to the portal.
+  (`portal/src/server/scorm/`, `portal/src/scorm/`, `portal/scripts/build-scorm-player.ts`, tests:
+  `tests/scorm-export.test.ts`, `tests/scorm-api.test.ts`, `tests/scorm-player.test.ts`,
+  `tests/scorm-player-cache.test.ts`)
+- **Leadership risk story.** The Leadership page opens with four to six sentences built from the
+  organisation's data (risk trend, most exposed department and its weakest category, the campaign that
+  moved most, the top training, certificates this quarter) and a recommended assignment; the same
+  sentences are the first section of the compliance pack, titled with the date of printing. Template
+  text in ten languages, no AI. (`portal/src/server/queries/risk-story.ts`, test: `tests/risk-story.test.ts`)
+- **Operator usage metrics and seat export.** `/super/metrics` shows per-organisation aggregates (active,
+  invited, weekly and monthly active people, lessons, modules, campaign funnel, server-verified
+  certificates); `GET /api/super/seats` returns a seat CSV per organisation for the month, for platform
+  operators only, audited as `seats.exported`. (`portal/src/server/queries/platform-metrics.ts`, test:
+  `tests/platform-metrics.test.ts`)
+- **Customer and English engineering documents.** `docs/ADMIN-GUIDE.md`, `docs/LEARNER-QUICKSTART.md`,
+  `docs/SECURITY-WHITEPAPER.md`, an English index at the top of `docs/build/DECISIONS.md` and
+  `docs/build/OPEN-QUESTIONS.en.md`. The whitepaper was written before step-up, key rotation and
+  retention settings were merged and still lists them as not provided.
+- **Cross-organisation test suite.** `portal/scripts/inventory-surface.ts` lists every exported server
+  action and API route method with its guard (`portal/tests/fixtures/surface.json`), and
+  `tests/cross-tenant.test.ts` calls each one with another organisation's ids and with a lower role and
+  checks that the other organisation's rows stay unchanged; an entry point without a row fails the suite.
 
 ### Changed
 
@@ -98,6 +139,22 @@ All notable changes to this project are recorded here. The format follows
   `.claude/launch.json` holds only the repository-relative `portal` entry.
 - **The admin guide no longer opens by itself on the live drill page**, and number count-ups and tour
   scrolling follow the Calm motion setting. (test: `tests/motion.test.ts`)
+- **Database migration `portal/drizzle/0004_wave_b.sql` (additive).** Index `answers_tenant_at_idx` on
+  `answers (tenant_id, at)` and the partial unique index `tenants_domain_verified_idx` on
+  `tenants (domain)` where `domain_verified_at` is set. A database in which two organisations already
+  share a verified domain must be cleaned up before it migrates. Support access and retention live in
+  the `settings` JSON column (no table change).
+- **Simulation clicks are counted by a beacon, not by the page render.** `/t` and `/q` only look the
+  token up; the browser sends one click beacon and then shows the fake sign-in, and a submit counts only
+  after a recorded click. A browser without JavaScript is not counted and gets a link to the lesson.
+  (`portal/src/components/site/teachable.tsx`, test: `tests/simulation-tracking.test.ts`)
+- **Base images are pinned by digest** (`node:24-trixie-slim` in the Dockerfile, `postgres:16-alpine` in
+  both compose files); Dependabot proposes the digest updates.
+- **Scheduled report emails say what the link opens**: the report as CSV or XLSX after sign-in, with
+  the print-ready version on the console's Reports page (ten languages).
+- **The operator overview's people count leaves out platform operator accounts**, the same count the
+  seat export uses.
+- **The Azerbaijani quick-start block was removed from `portal/README.md`**; its English equivalents remain.
 
 ### Fixed
 
@@ -122,6 +179,8 @@ All notable changes to this project are recorded here. The format follows
   (test: `tests/time-zone.test.ts`)
 - **CSV imports over 1 MB failed with an error page** after the Server Action limit was lowered; files
   over 900 KB are now refused with a message. (test: `tests/people-import.test.ts`)
+- **Mail scanners and link prefetches recorded simulation clicks** because opening the page counted;
+  known scanner user agents are now refused at the click beacon. (test: `tests/simulation-tracking.test.ts`)
 
 ### Security
 
@@ -142,6 +201,31 @@ All notable changes to this project are recorded here. The format follows
 - **No secret in compose files**: the demo compose file requires its database password, `APP_SECRET`
   and seed password from the environment.
 - **Every GitHub Action is pinned to a commit SHA** and checkout no longer keeps credentials.
+- **Account-takeover actions ask for the administrator's own password.** Resetting someone's two-step
+  verification, creating a password-reset link, changing a role and the operator's administrator link
+  require the actor's password again (10 attempts per actor per 15 minutes, every refusal audited as
+  `security.step_up_failed` with the target). The affected person gets an in-app notice and an email,
+  even when suspended, and when the target is an administrator the other administrators are notified.
+  (`portal/src/server/auth/step-up.ts`, `portal/src/server/services/notify.ts`, test: `tests/step-up.test.ts`)
+- **Invite links only for accounts that were never activated.** An invite link could be created for an
+  active account and used to set its password without any re-authentication; the server now refuses it,
+  and an invite token for an active account is treated as expired.
+  (tests: `tests/step-up.test.ts`, `tests/auth-security.test.ts`)
+- **`APP_SECRET` can be rotated.** Stored secrets carry the id of the key that sealed them; the new
+  optional `APP_SECRET_PREVIOUS` keeps the old key readable while `npx tsx scripts/rotate-secret.ts`
+  re-encrypts SSO, LDAP, SMTP and webhook secrets and TOTP keys. The new optional
+  `APP_DOMAIN_PROOF_SECRET` fixes the key of the domain-proof TXT values (default `APP_SECRET`; set it
+  once, before the first rotation). Backup codes issued before a rotation stop working once
+  `APP_SECRET_PREVIOUS` is removed. Runbook: `docs/OPERATIONS.md`, "Rotating APP_SECRET".
+  (`portal/src/server/crypto.ts`, `portal/src/server/services/secret-rotation.ts`,
+  `portal/.env.example`, tests: `tests/crypto.test.ts`, `tests/auth-security.test.ts`)
+- **A domain can be verified by one organisation only**; a second organisation gets "domain taken".
+  (test: `tests/crypto.test.ts`)
+- **AI Sel's cached answers are kept per organisation**, so an answer given in one organisation is never
+  served to another. (`portal/src/server/tutor.ts`, test: `tests/tutor-cache.test.ts`)
+- **Lesson slugs and keys over 100 characters are refused** before any query, and **the sign-off CSV
+  shows IP addresses only to roles with audit access**.
+  (tests: `tests/learning-actions.test.ts`, `tests/signoffs-route.test.ts`)
 
 ## Phase 0 - CI, tests and ten fixes (merged 2026-11-05, unreleased)
 

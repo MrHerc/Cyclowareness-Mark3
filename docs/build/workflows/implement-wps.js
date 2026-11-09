@@ -34,7 +34,7 @@ HARD RULES
 - Do NOT edit docs/build/DECISIONS.md, docs/build/PROGRESS.md or docs/build/OPEN-QUESTIONS.md (many packages would conflict there): put the ADR text, the progress line and any open question for the owner in your result's "summary"/"left_open" fields; the orchestrator writes them. Other docs (README, docs/*.md, the skill references) you may edit when the brief says so.
 - The verified gap register is at docs/build/REGISTER-2026-11-05.md: read the entries your brief names (evidence, verified smallest fix, files, risks) before you start.
 - Every new branch of logic gets a test in portal/tests (vitest). Run, from portal/: "npm run typecheck", "npx eslint src tests scripts --max-warnings=0", and "npx vitest run <the test files you touched or added>" (the full suite is run by the orchestrator after the merge). All three must pass before you finish.
-- Commit on your worktree's branch when done (git add the files you changed; one or a few commits; message in English; end the message with "Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"). Do not commit node_modules or .next.
+- Commit on your worktree's branch when done (git add the files you changed; one or a few commits; message in English; end the message with "Co-Authored-By: Claude <noreply@anthropic.com>"). Do not commit node_modules or .next.
 - Your final text is machine-read: return the structured output only.`
 
 const IMPL_SCHEMA = { type: 'object', properties: {
@@ -52,7 +52,7 @@ const FIX_SCHEMA = { type: 'object', properties: { fixed: { type: 'array', items
 // A package may name its own reviewers ({ key, model: 'mythos'|'opus', prompt }); otherwise the two default lenses apply.
 const LENSES = (wp) => Array.isArray(wp.lenses) && wp.lenses.length ? wp.lenses : wp.security
   ? [
-    { key: 'security', model: 'mythos', prompt: 'Lens: attacker. Try to break what was built: bypass the check, forge the evidence, reach another tenant, replay, race two requests, exceed a limit, inject through every input, abuse the migration or the default. Every finding must have file:line and a concrete attack.' },
+    { key: 'security', model: 'mythos', prompt: 'Lens: security controls (defensive review). For every entry point and data path this package adds or touches, check that the control is present, complete and tested: authentication and role check, tenant scoping of every query, input validation, rate limits and quotas, idempotence and transactions under repeated or concurrent requests, integrity of evidence and audit() entries, safe defaults, additive migrations. Every finding must name file:line, the control that is missing or incomplete, and the regression test that would prove the fix.' },
     { key: 'correctness', model: 'opus', prompt: 'Lens: correctness and completeness against the brief. Does every acceptance item hold? Edge cases, error paths, transactions, i18n (all ten locales, key parity, ICU), RTL, hydration, tests that actually assert the behaviour.' },
   ]
   : [
