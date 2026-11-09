@@ -28,4 +28,11 @@ describe("svgLogoProblem", () => {
     expect(svgLogoProblem(wrap('<rect x="1"onclick="alert(1)"/>'))).toBe("handler");
     expect(svgLogoProblem(wrap("<foreignObject><div/></foreignObject>"))).toBe("script");
   });
+
+  it("refuses SMIL animation, which can retarget href to an entity-encoded javascript: URL", () => {
+    expect(svgLogoProblem(wrap('<a><set attributeName="href" to="javascript&#58;alert(1)"/><text>x</text></a>'))).toBe("script");
+    expect(svgLogoProblem(wrap('<a><animate attributeName="href" values="&#106;avascript:alert(1)"/><text>x</text></a>'))).toBe("script");
+    expect(svgLogoProblem(wrap('<rect><animateTransform attributeName="transform" type="rotate" to="360"/></rect>'))).toBe("script");
+    expect(svgLogoProblem(wrap('<rect><animateMotion path="M0 0h1"/></rect>'))).toBe("script");
+  });
 });
