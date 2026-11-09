@@ -2,10 +2,11 @@ import { notFound } from "next/navigation";
 import { and, desc, eq, gte, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { ArrowDownRight, ArrowUpRight, Printer, Sparkles } from "lucide-react";
-import { hasFeature, requirePermission } from "@/server/auth/viewer";
+import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { overviewData } from "@/server/queries/admin";
 import { peopleById } from "@/server/queries/secops";
+import { riskStory, storySentences } from "@/server/queries/risk-story";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { ProgressBar } from "@/components/ui/progress";
@@ -13,6 +14,7 @@ import { AreaChart } from "@/components/ui/charts";
 import { PageHeader } from "@/components/ui/layout";
 import { ScrollRegion } from "@/components/ui/scroll-region";
 import { PrintButton } from "@/components/admin/print-toolbar";
+import { AssignDialog } from "@/components/admin/assign-dialog";
 import { riskBand } from "@/lib/domain/risk";
 import { dayAt, requestNow } from "@/lib/time";
 import { cn } from "@/lib/cn";
@@ -29,12 +31,13 @@ export default async function LeadershipPage() {
   const v = await requirePermission("leadership.read");
   if (!hasFeature(v, "leadership")) notFound();
   const locale = await getLocale();
-  const [tr, tn, tc, format] = await Promise.all([getTranslations("secops.leadership"), getTranslations("admin.nav"), getTranslations("common"), getFormatter()]);
+  const [tr, tn, tc, ts, format] = await Promise.all([getTranslations("secops.leadership"), getTranslations("admin.nav"), getTranslations("common"), getTranslations("admin.riskStory"), getFormatter()]);
   const d = await overviewData(v, locale, null);
   const since30 = new Date(requestNow().getTime() - 30 * DAY);
   const tid = v.tenant.id;
 
-  const [incOpened, incResolved, loopsClosed, risks, versions, activeUsers] = await Promise.all([
+  const [story, incOpened, incResolved, loopsClosed, risks, versions, activeUsers] = await Promise.all([
+    riskStory(v, locale),
     db().select({ n: sql<number>`count(*)` }).from(t.incidents).where(and(eq(t.incidents.tenantId, tid), gte(t.incidents.createdAt, since30))),
     db().select({ n: sql<number>`count(*)` }).from(t.incidents).where(and(eq(t.incidents.tenantId, tid), gte(t.incidents.resolvedAt, since30))),
     db().select({ n: sql<number>`count(*)`, trained: sql<number>`coalesce(sum(${t.loops.trainedCount}), 0)` }).from(t.loops).where(and(eq(t.loops.tenantId, tid), gte(t.loops.closedAt, since30))),
@@ -58,6 +61,16 @@ export default async function LeadershipPage() {
   const needed = latestIds.length * Number(activeUsers[0]?.n ?? 0);
   const policyCoverage = needed ? Math.min(100, Math.round((Number(signed?.n ?? 0) / needed) * 100)) : 0;
   const people = await peopleById(tid, risks.map((r) => r.userId));
+  const sentences = await storySentences(story, locale);
+  const recommended = !story.empty && story.weakest?.module && allowed(v, "assignments.write") ? { module: story.weakest.module, department: story.weakest } : null;
+  const storyTiles = story.empty
+    ? []
+    : [
+        { label: ts("tiles.risk"), value: format.number(story.trend.to) },
+        { label: ts("tiles.change", { since: story.trend.since }), value: format.number(story.trend.to - story.trend.from, { signDisplay: "exceptZero" }) },
+        { label: ts("tiles.certified"), value: tc("units.percent", { value: format.number(story.certified.share) }) },
+        ...(story.weakest ? [{ label: ts("tiles.weakest"), value: format.number(story.weakest.risk), note: story.weakest.name }] : []),
+      ];
 
   const k = d.kpis;
   const delta = k.avgRiskDelta ?? 0;
@@ -71,6 +84,42 @@ export default async function LeadershipPage() {
   return (
     <div className="grid grid-cols-1 gap-6 print:gap-4">
       <PageHeader title={tn("leadership")} subtitle={tr("subtitle")} icon={<Sparkles />} actions={<PrintButton label={tr("print")} icon={<Printer />} />} />
+
+      <Card>
+        <CardHeader title={ts("title")} description={ts("subtitle")} />
+        <CardBody className="grid gap-4 pt-0">
+          <div className="grid max-w-prose gap-2 text-body-sm text-pretty">
+            {sentences.map((s, i) => (
+              <p key={i}>{s}</p>
+            ))}
+          </div>
+          {recommended ? (
+            <div className="print:hidden">
+              <AssignDialog
+                modules={[{ id: recommended.module.id, title: recommended.module.title, meta: "" }]}
+                paths={[]}
+                departments={[{ id: recommended.department.id, name: recommended.department.name }]}
+                people={[]}
+                preset={{ target: "module", targetId: recommended.module.id, departmentId: recommended.department.id }}
+                label={ts("assign")}
+              />
+            </div>
+          ) : null}
+          {storyTiles.length ? (
+            <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              {storyTiles.map((x) => (
+                <div key={x.label} className="grid content-start gap-1 rounded-lg bg-sunken p-3">
+                  <dt className="text-tab text-ink-muted break-words hyphens-auto">{x.label}</dt>
+                  <dd className="text-title-sm font-bold tabular-nums">
+                    <bdi>{x.value}</bdi>
+                  </dd>
+                  {"note" in x ? <dd className="text-tab text-ink-subtle break-words hyphens-auto">{x.note}</dd> : null}
+                </div>
+              ))}
+            </dl>
+          ) : null}
+        </CardBody>
+      </Card>
 
       <div className={cn("rounded-2xl p-6 print:border print:border-line", headline === "good" ? "bg-safe-50" : headline === "bad" ? "bg-risk-50" : "bg-warn-50")}>
         <p className={cn("text-title font-semibold text-balance", headline === "good" ? "text-safe-700" : headline === "bad" ? "text-risk-700" : "text-warn-700")}>{tr(`headline.${headline}`)}</p>

@@ -4,7 +4,7 @@ import { db, t } from "@/server/db";
 import { notFound } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
-import { buildReport, parseReportFilters, scopedPeople } from "@/server/reports/build";
+import { buildReport, buildRiskStory, parseReportFilters, scopedPeople } from "@/server/reports/build";
 import { audit } from "@/server/services/audit";
 import { DocHeader, ReportSection } from "@/components/admin/report-document";
 import { PrintToolbar } from "@/components/admin/print-toolbar";
@@ -28,6 +28,7 @@ export default async function CompliancePack({ searchParams }: PageProps<"/print
   const str = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : undefined);
   // Every section, the period header and the audit entry use the filters the reports apply; a period they
   // would ignore (2026-13-01, a start after the end) is refused, never shown to auditors as that period.
+  // The risk story alone is the state on the day of printing; its title says so.
   const { filters, rejected } = parseReportFilters({ from: str("from"), to: str("to"), d: str("d") });
   if (rejected) {
     return (
@@ -38,7 +39,8 @@ export default async function CompliancePack({ searchParams }: PageProps<"/print
       </main>
     );
   }
-  const [completion, confirmations, simulations, risk] = await Promise.all([
+  const [story, completion, confirmations, simulations, risk] = await Promise.all([
+    buildRiskStory(v, filters, locale),
     buildReport(v, "completion", filters, locale),
     buildReport(v, "confirmations", filters, locale),
     buildReport(v, "simulations", filters, locale),
@@ -79,6 +81,7 @@ export default async function CompliancePack({ searchParams }: PageProps<"/print
       <PrintToolbar label={tr("print")} />
       <main className="mx-auto max-w-5xl px-8 py-8 print:max-w-none print:p-0">
         <DocHeader org={v.tenant.name} title={tr("compliance.title")} sub={`${period} · ${tr("generatedAt", { date: format.dateTime(new Date(), { dateStyle: "long", timeStyle: "short" }) })}`} logo={v.tenant.branding.logoUrl} />
+        <ReportSection title={story.title} headers={story.headers} rows={story.rows} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />
         <ReportSection title={tr("compliance.settings")} headers={[tr("compliance.settingCol"), tr("compliance.valueCol")]} rows={settingRows} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />
         <ReportSection title={tr("compliance.training")} headers={completion.headers} rows={completion.rows} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />
         <ReportSection title={tr("compliance.confirmations")} headers={confirmations.headers} rows={confirmations.rows} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />

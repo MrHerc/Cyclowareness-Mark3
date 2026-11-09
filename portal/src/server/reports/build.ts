@@ -4,12 +4,13 @@ import { getTranslations } from "next-intl/server";
 import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { departmentClosure, resolveAssignments } from "../services/assignments";
-import { scopeDepartmentIds } from "../queries/admin";
+import { narrowToDepartment, scopeDepartmentIds } from "../queries/admin";
+import { riskStory, storySentences } from "../queries/risk-story";
 import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { riskBand } from "../../lib/domain/risk";
 import { levelFor } from "../../lib/domain/gamification";
 import { LOCALE_NAMES, pick, type Locale } from "../../i18n/config";
-import { dayRange, todayIn } from "../../lib/time";
+import { dayRange, requestNow, todayIn } from "../../lib/time";
 import { isUuid } from "../../lib/ids";
 import type { ReportKind } from "../db/schema";
 
@@ -44,12 +45,7 @@ export async function scopedPeople(v: Viewer, f: ReportFilters) {
   const scope = await scopeDepartmentIds(v);
   const departments = await db().select().from(t.departments).where(eq(t.departments.tenantId, v.tenant.id));
   const closure = departmentClosure(departments);
-  let dept: Set<string> | null = scope;
-  if (f.departmentId) {
-    // A department filter that no longer exists (deleted or merged) or lies outside the viewer's scope
-    // matches nobody; it must never widen the report to the whole organisation.
-    dept = closure.has(f.departmentId) && (!scope || scope.has(f.departmentId)) ? closure.get(f.departmentId)! : new Set<string>();
-  }
+  const dept = f.departmentId ? narrowToDepartment(scope, closure, f.departmentId) : scope;
   const users = await db()
     .select()
     .from(t.users)
@@ -57,6 +53,17 @@ export async function scopedPeople(v: Viewer, f: ReportFilters) {
     .orderBy(asc(t.users.name));
   const deptName = new Map(departments.map((d) => [d.id, d.name]));
   return { users: users.filter((u) => !dept || (u.departmentId && dept.has(u.departmentId))), deptName };
+}
+
+/**
+ * The leadership risk story as a one-column section of the compliance pack, for the people the pack covers.
+ * The story is always today's (the last three weeks, this quarter), never the pack's period, so its title
+ * carries the date it describes and a pack printed for an earlier period cannot pass it off as that period's.
+ */
+export async function buildRiskStory(v: Viewer, f: ReportFilters, locale: string): Promise<ReportTable> {
+  const tr = await getTranslations({ locale, namespace: "admin.riskStory" });
+  const sentences = await storySentences(await riskStory(v, locale, f.departmentId), locale);
+  return { title: tr("titleAsOf", { date: requestNow() }), headers: [tr("finding")], rows: sentences.map((s) => [s]) };
 }
 
 export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters, locale: string): Promise<ReportTable> {
