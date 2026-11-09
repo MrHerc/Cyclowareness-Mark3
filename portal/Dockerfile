@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1
 # Production image, built from the portal folder:  docker build -t portal .
 # Stages: deps (npm ci) -> builder (next build) -> runner (standalone server, non-root).
-FROM node:24-trixie-slim AS base
+# Pinned by the multi-arch index digest (amd64 and arm64); Dependabot proposes the digest bump weekly.
+FROM node:24-trixie-slim@sha256:0820eaa85e07d0490446dd01d14707e17e6108a36988cf374899cd057eb3812d AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 

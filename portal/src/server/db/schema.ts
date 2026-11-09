@@ -109,6 +109,10 @@ export type TenantSettings = {
     replyTo?: string;
     helpdesk?: string;
     testedAt?: string;
+    /** From address of phishing simulations only (a look-alike address); saved only on `simulationDomain`. */
+    simulationFromAddress?: string;
+    /** Look-alike domain on which the organisation's TXT proof record was found (verifySimulationDomainAction). */
+    simulationDomain?: string;
   };
   integrations: {
     webhookUrl?: string;

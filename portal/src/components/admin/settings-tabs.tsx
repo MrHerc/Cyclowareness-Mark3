@@ -53,6 +53,7 @@ import {
   setLogoAction,
   testEmailAction,
   verifyDomainAction,
+  verifySimulationDomainAction,
 } from "@/server/actions/settings";
 import type { TemplateKind, TenantSettings } from "@/server/db/schema";
 import { DESTINATION_PORTS, SYSLOG_DEFAULT_PORT } from "@/lib/destination-ports";
@@ -655,6 +656,7 @@ export function IdentityTab({
 
 export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: EmailView; viewerEmail: string; outbox: { id: string; to: string; subject: string; status: string; createdAt: string; error: string | null; resendable: boolean; cancelled: boolean }[]; failedCount: number }) {
   const t = useTranslations("settings.email");
+  const tb = useTranslations("settings.branding");
   const tc = useTranslations("common");
   const { pending, save } = useSave();
   const [resending, startResend] = useTransition();
@@ -663,9 +665,26 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
       const res = await resendFailedMailAction(id);
       toast(res.ok ? t("resent", { count: res.count }) : t("resendFailed"), res.ok ? "success" : "error");
     });
-  const [s, setS] = useState({ host: email.host ?? "", port: email.port ?? 587, secure: email.secure ?? false, user: email.user ?? "", password: "", fromName: email.fromName ?? "", fromAddress: email.fromAddress ?? "", replyTo: email.replyTo ?? "", helpdesk: email.helpdesk ?? "", enabled: email.enabled });
+  const [s, setS] = useState({ host: email.host ?? "", port: email.port ?? 587, secure: email.secure ?? false, user: email.user ?? "", password: "", fromName: email.fromName ?? "", fromAddress: email.fromAddress ?? "", replyTo: email.replyTo ?? "", helpdesk: email.helpdesk ?? "", simulationFromAddress: email.simulationFromAddress ?? "", enabled: email.enabled });
   const [to, setTo] = useState(viewerEmail);
   const [testing, startTest] = useTransition();
+  // Look-alike domain of the simulation sender: proven with the same TXT record as the organisation's domain (Branding).
+  const [simDomain, setSimDomain] = useState(email.simulationDomain ?? "");
+  const [record, setRecord] = useState("");
+  const [checking, startCheck] = useTransition();
+  useEffect(() => {
+    domainProofRecordAction().then(
+      (r) => setRecord(r.record),
+      () => setRecord(""),
+    );
+  }, []);
+  const checkSimulationDomain = () =>
+    startCheck(async () => {
+      const res = await verifySimulationDomainAction(s.simulationFromAddress);
+      if (!res.ok) return toast(res.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.invalidField", { field: t("simulationFrom") }), "error");
+      if (res.found && res.domain) setSimDomain(res.domain);
+      toast(res.found ? tb("checkOk") : tb("checkMissing"), res.found ? "success" : "error");
+    });
   // The stored password is not kept for a different host or port (saveEmailAction); 587 is the default port.
   const passwordReenter = email.hasPassword && !s.password && endpointKey(email.host, email.port ?? 587) !== endpointKey(s.host, s.port || 587);
   return (
@@ -715,6 +734,34 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
           </CardBody>
         </Card>
         <Card>
+          <CardHeader title={t("simulationTitle")} description={t("simulationBody")} />
+          <CardBody className="grid gap-4">
+            {simDomain ? (
+              <Notice tone="safe" icon={<ShieldCheck />}>
+                {t("simulationProven", { domain: simDomain })}
+              </Notice>
+            ) : (
+              <Notice tone="warn">{t("simulationNotProven")}</Notice>
+            )}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={t("simulationFrom")} htmlFor="e-sf" hint={t("simulationFromHint")}>
+                <Input id="e-sf" type="email" dir="ltr" value={s.simulationFromAddress} onChange={(e) => setS({ ...s, simulationFromAddress: e.target.value })} placeholder="accounts@ofis-techizat.example" autoComplete="off" spellCheck={false} />
+              </Field>
+              <Field label={tb("txtRecord")} htmlFor="e-txt" hint={tb("txtHint")}>
+                <div className="flex gap-2">
+                  <Input id="e-txt" value={record} readOnly className="font-mono text-caption" />
+                  <Button variant="secondary" size="icon" aria-label={tc("copy")} disabled={!record} onClick={() => navigator.clipboard.writeText(record).then(() => toast(tc("copied")))}>
+                    <Copy />
+                  </Button>
+                </div>
+              </Field>
+            </div>
+            <Button variant="secondary" className="w-fit" disabled={checking || !s.simulationFromAddress.includes("@")} onClick={checkSimulationDomain}>
+              {tb("check")}
+            </Button>
+          </CardBody>
+        </Card>
+        <Card>
           <CardHeader title={t("helpdeskTitle")} />
           <CardBody>
             <Field label={t("helpdesk")} htmlFor="e-hd">
@@ -728,7 +775,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
             save(async () => {
               const res = await saveEmailAction({ ...s, password: s.password || undefined, port: s.port || undefined });
               return res.error === "secretRequired" ? { ...res, message: t("passwordReenter") } : res;
-            }, { host: "e-host", port: "e-port", user: "e-user", password: "e-pw", fromName: "e-fn", fromAddress: "e-fa", replyTo: "e-rt", helpdesk: "e-hd" })}
+            }, { host: "e-host", port: "e-port", user: "e-user", password: "e-pw", fromName: "e-fn", fromAddress: "e-fa", replyTo: "e-rt", helpdesk: "e-hd", simulationFromAddress: "e-sf" })}
         />
         <Card>
           <CardHeader

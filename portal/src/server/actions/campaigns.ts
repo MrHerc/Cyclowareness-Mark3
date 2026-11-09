@@ -7,7 +7,8 @@ import { db, t } from "../db";
 import { actionViewer } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
 import { audit } from "../services/audit";
-import { launchCampaign, recordSubmit, setCampaignStatus, type LaunchBlock } from "../services/campaigns";
+import { launchCampaign, recordClick, recordSubmit, setCampaignStatus, type LaunchBlock } from "../services/campaigns";
+import { isLikelyScanner } from "../tracking";
 import { TEMPLATE_BY_KEY, templateOnPlan } from "../../lib/campaigns/templates";
 
 const draftSchema = z.object({
@@ -90,8 +91,20 @@ export async function setCampaignStatusAction(id: string, status: "cancelled" | 
   return { ok: true };
 }
 
+/**
+ * The click beacon of the simulation page (/t and /q), sent once the page runs in a browser: a
+ * mail scanner that merely fetches the page records nothing. Recorded once per recipient.
+ * shortcut: `via` is the browser's word (a /t link may be beaconed as "qr"), which only mislabels that
+ * one recipient's event name; a route-side action would be just as callable, so the token itself would
+ * have to carry the channel to close it.
+ */
+export async function simulationClickAction(token: string, via: "link" | "qr"): Promise<void> {
+  if (!/^[a-z2-7]{10,40}$/.test(token) || (via !== "link" && via !== "qr") || (await isLikelyScanner())) return;
+  await recordClick(db(), token, via);
+}
+
 /** Fake sign-in on the simulation page: only the fact is recorded, never what was typed. */
 export async function simulationSubmitAction(token: string): Promise<void> {
-  if (!/^[a-z2-7]{10,40}$/.test(token)) return;
+  if (!/^[a-z2-7]{10,40}$/.test(token) || (await isLikelyScanner())) return;
   await recordSubmit(db(), token);
 }

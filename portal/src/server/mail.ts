@@ -18,7 +18,8 @@ import { TEMPLATE_BY_KEY, templateText } from "../lib/campaigns/templates";
  * Outgoing email. Everything goes through the outbox table first (delivery log + retries).
  * Without a mail server the message is kept with status "logged" so admins can see it.
  * `fromName` replaces the organisation's display name for this one message (phishing
- * simulations show the template's sender); the address is always the organisation's own.
+ * simulations show the template's sender); the address is the organisation's own, or for
+ * simulations the proven look-alike address from Settings → Email when there is one.
  */
 export type Mail = { to: string; subject: string; text: string; html?: string; kind: string; fromName?: string; /** Language of the message (the `lang` of the HTML and the default button label). */ lang: string };
 
@@ -64,7 +65,7 @@ export function renderEmailHtml(text: string, opts: { brand?: string; footer?: s
   return `<!doctype html><html lang="${escapeHtml(lang)}" dir="${dir}"><body style="margin:0;background:#f7f6fb;font-family:Segoe UI,Arial,sans-serif;color:#16123a"><div dir="${dir}" style="max-width:560px;margin:0 auto;padding:32px 20px${align}"><div style="background:#fff;border:1px solid #e7e5f0;border-radius:20px;padding:28px">${body}</div>${opts.footer ? `<p style="font-size:12px;color:#6b6788;margin:16px 8px">${escapeHtml(opts.footer)}</p>` : ""}</div></body></html>`;
 }
 
-type Transport = { transporter: Transporter; address: string; name: string; replyTo?: string };
+type Transport = { transporter: Transporter; address: string; /** From address of simulations (Settings → Email, proven domain). */ simulationAddress?: string; name: string; replyTo?: string };
 
 /**
  * Why an organisation's mail cannot go out: "not_configured" keeps the message as logged (no mail
@@ -129,7 +130,7 @@ async function transportFor(db: DB, tenantId: string | null, emailOverride?: Ten
     auth: e.user ? { user: e.user, pass: decryptSecret(e.passwordEnc) ?? "" } : undefined,
     ...SMTP_TIMEOUTS,
   });
-  return { transporter, address, name: e.fromName || tenant.branding.senderName || tenant.name, replyTo: e.replyTo };
+  return { transporter, address, simulationAddress: e.simulationFromAddress, name: e.fromName || tenant.branding.senderName || tenant.name, replyTo: e.replyTo };
 }
 
 function fromHeader(transport: Transport, fromName?: string): string {
@@ -245,7 +246,8 @@ async function deliverRow(db: DB, id: string, opts: { fromName?: string; transpo
   if (transport === "unresolvable") return recordFailure(db, m, transport, true);
   try {
     const fromName = opts.fromName ?? sim.senderName;
-    await transport.transporter.sendMail({ from: fromHeader(transport, fromName), replyTo: transport.replyTo, to: m.to, subject: m.subject, text: m.text, html: m.html });
+    const address = (m.kind === "simulation" && transport.simulationAddress) || transport.address;
+    await transport.transporter.sendMail({ from: fromHeader({ ...transport, address }, fromName), replyTo: transport.replyTo, to: m.to, subject: m.subject, text: m.text, html: m.html });
     // Delivered: the stored copy (the delivery log) no longer needs the live invitation or reset link.
     await db
       .update(t.outbox)

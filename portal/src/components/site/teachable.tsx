@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, ChevronRight, Lock, ShieldAlert } from "lucide-react";
-import { simulationSubmitAction } from "@/server/actions/campaigns";
+import { simulationClickAction, simulationSubmitAction } from "@/server/actions/campaigns";
 import { Mascot } from "@/components/mascot/mascot";
 import { buttonClass } from "@/components/ui/button";
 
 /**
- * Teachable moment after a simulated phishing click: for credential-harvest templates a
- * look-alike sign-in form comes first. Its inputs have no names, so nothing typed ever leaves
- * the browser; only the fact that the form was submitted is recorded.
+ * Teachable moment after a simulated phishing click. The click is counted by a beacon sent on
+ * mount, so a mail scanner that only fetches the page records nothing. For credential-harvest
+ * templates a look-alike sign-in form comes first (once the beacon is through). Its inputs have
+ * no names, so nothing typed ever leaves the browser; only the fact that the form was submitted is recorded.
  */
 export function TeachableMoment({
   token,
@@ -33,9 +34,28 @@ export function TeachableMoment({
   qr: boolean;
 }) {
   const t = useTranslations("site.teach");
-  const [stage, setStage] = useState<"login" | "teach">(harvest && !alreadySubmitted ? "login" : "teach");
+  const [stage, setStage] = useState<"beacon" | "login" | "teach">(harvest && !alreadySubmitted ? "beacon" : "teach");
   const [submitted, setSubmitted] = useState(alreadySubmitted);
   const [pending, start] = useTransition();
+  useEffect(() => {
+    // The fake sign-in waits for the beacon either way: a failed request must not hide the lesson.
+    simulationClickAction(token, qr ? "qr" : "link")
+      .catch(() => undefined)
+      .finally(() => setStage((s) => (s === "beacon" ? "login" : s)));
+  }, [token, qr]);
+
+  if (stage === "beacon") {
+    return (
+      <div aria-busy="true" className="min-h-dvh bg-[#f3f2f1]">
+        {/* Without JavaScript the beacon never runs: the lesson is still one click away (the click itself is not counted). */}
+        <noscript>
+          <p className="p-6 text-body text-[#1b1b1b]">
+            {t("title")} <Link href={`/learn/${moduleSlug}`} className="underline">{t("learnCta")}</Link>
+          </p>
+        </noscript>
+      </div>
+    );
+  }
 
   if (stage === "login") {
     return (

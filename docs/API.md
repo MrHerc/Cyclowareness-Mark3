@@ -356,8 +356,8 @@ These pages need no session. Tokens are random base32 strings, and the pages are
 
 **`/t/{token}` and `/q/{token}`.**
 
-- **Recorded click.** The first visit records a click or scan, opens a risk for the recipient and emits the webhook event `phishing.clicked` or `qr.scanned`.
-- **Mail scanners.** Requests that look like mail security scanners or prefetches are shown the page without recording anything.
+- **Recorded click.** Rendering the page records nothing. Once the page runs in a browser it sends a beacon (a server action with the token and `link` or `qr`); the first beacon records the click or scan, opens a risk for the recipient and emits the webhook event `phishing.clicked` or `qr.scanned`. Later beacons change nothing.
+- **Mail scanners.** A gateway, sandbox or link preview that only fetches the page therefore never counts, whatever user agent it uses; a beacon from a request whose user agent names a known scanner or that is a browser prefetch is refused as well. Allow-listing the simulations in Microsoft 365 and Google Workspace, and what detonation sandboxes still count: [SIMULATION-DELIVERY.md](SIMULATION-DELIVERY.md).
 - **Teachable moment.** The page shows the message's red flags in the recipient's language, with a link to the related lesson.
 - **Fake sign-in.** For credential-harvest templates a look-alike sign-in form comes first. Its inputs have no names, so nothing typed is sent; only the fact of submission is recorded.
 

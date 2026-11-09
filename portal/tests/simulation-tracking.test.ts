@@ -13,7 +13,12 @@ vi.mock("../src/server/services/risk", () => ({ recomputeRisk: vi.fn() }));
 vi.mock("../src/server/mail", () => ({ queueEmail: vi.fn() }));
 vi.mock("../src/server/sms", () => ({ sendSms: vi.fn(), smsAvailable: () => false }));
 vi.mock("../src/server/env", () => ({ env: {}, appUrl: () => "http://localhost:3000" }));
-vi.mock("next/headers", () => ({ headers: async () => new Headers({ "user-agent": "Mozilla/5.0 (Windows NT 10.0) Chrome/130" }) }));
+vi.mock("next/cache", () => ({ refresh: vi.fn() }));
+vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => null }));
+const BROWSER = "Mozilla/5.0 (Windows NT 10.0) Chrome/130";
+// The user agent of the request under test: a browser, or a mail security scanner.
+const request = vi.hoisted(() => ({ ua: "Mozilla/5.0 (Windows NT 10.0) Chrome/130" }));
+vi.mock("next/headers", () => ({ headers: async () => new Headers({ "user-agent": request.ua }) }));
 
 const pglite = new PGlite();
 const db = drizzle(pglite, { schema: t }) as unknown as DB;
@@ -22,6 +27,8 @@ vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src
 const { recordClick, recordOpen, recordSubmit } = await import("../src/server/services/campaigns");
 const { attestModule, completeLesson, issueCertificate, randomToken } = await import("../src/server/services/progress");
 const { trackingView } = await import("../src/server/tracking");
+const { simulationClickAction, simulationSubmitAction } = await import("../src/server/actions/campaigns");
+const { emitEvent } = await import("../src/server/services/events");
 
 let tenantId = "";
 let userId = "";
@@ -84,7 +91,7 @@ describe("cancelled simulation campaign", () => {
   it("records nothing and skips the fake sign-in once cancelled", async () => {
     const { recipient: r, token } = await recipient("cancelled");
     await recordOpen(db, token);
-    const view = await trackingView(token, "link");
+    const view = await trackingView(token);
     expect(view?.harvest).toBe(false);
     await recordSubmit(db, token);
     const row = await recipientRow(r.id);
@@ -96,7 +103,66 @@ describe("cancelled simulation campaign", () => {
 
   it("still shows the fake sign-in of a running harvest campaign", async () => {
     const { token } = await recipient("running");
-    expect((await trackingView(token, "link"))?.harvest).toBe(true);
+    expect((await trackingView(token))?.harvest).toBe(true);
+  });
+});
+
+describe("click beacon", () => {
+  beforeEach(async () => {
+    await db.delete(t.behaviorRisks);
+    request.ua = BROWSER;
+    vi.mocked(emitEvent).mockClear();
+  });
+
+  it("counts nothing when the page is fetched, once when the beacon arrives", async () => {
+    const { recipient: r, token } = await recipient("running");
+    // A mail scanner with a browser user agent renders the page: no click.
+    expect((await trackingView(token))?.harvest).toBe(true);
+    expect((await recipientRow(r.id)).clickedAt).toBeNull();
+    expect(await openRisks()).toHaveLength(0);
+    await simulationClickAction(token, "link");
+    expect((await recipientRow(r.id)).clickedAt).not.toBeNull();
+    expect(await openRisks()).toHaveLength(1);
+    // The beacon of a second visit (or a reloaded page) changes nothing.
+    await simulationClickAction(token, "link");
+    expect(await openRisks()).toHaveLength(1);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(db, tenantId, "phishing.clicked", expect.objectContaining({ userId }));
+  });
+
+  it("refuses a known scanner and a bad token, and counts a QR landing as a scan", async () => {
+    const { recipient: r, token } = await recipient("running");
+    request.ua = "Mozilla/5.0 (Windows NT 10.0) Proofpoint URL Defense";
+    await simulationClickAction(token, "qr");
+    expect((await recipientRow(r.id)).clickedAt).toBeNull();
+    request.ua = BROWSER;
+    await simulationClickAction(token.toUpperCase(), "qr");
+    expect((await recipientRow(r.id)).clickedAt).toBeNull();
+    await simulationClickAction(token, "qr");
+    expect((await recipientRow(r.id)).clickedAt).not.toBeNull();
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(db, tenantId, "qr.scanned", expect.objectContaining({ userId }));
+  });
+
+  it("never shows the fake sign-in to a known scanner, and records nothing", async () => {
+    const { recipient: r, token } = await recipient("running");
+    request.ua = "Mozilla/5.0 (Windows NT 10.0) Proofpoint URL Defense";
+    expect((await trackingView(token))?.harvest).toBe(false);
+    expect((await recipientRow(r.id)).clickedAt).toBeNull();
+  });
+
+  it("counts a submitted fake sign-in only after a click, never from a scanner", async () => {
+    const { recipient: r, token } = await recipient("running");
+    // No click yet (the beacon failed or was refused): the form's submit is not a risk.
+    await simulationSubmitAction(token);
+    expect((await recipientRow(r.id)).submittedAt).toBeNull();
+    await simulationClickAction(token, "link");
+    request.ua = "Mozilla/5.0 (Windows NT 10.0) Proofpoint URL Defense";
+    await simulationSubmitAction(token);
+    expect((await recipientRow(r.id)).submittedAt).toBeNull();
+    request.ua = BROWSER;
+    await simulationSubmitAction(token);
+    expect((await recipientRow(r.id)).submittedAt).not.toBeNull();
+    expect(vi.mocked(emitEvent)).toHaveBeenCalledWith(db, tenantId, "simulation.risky", expect.objectContaining({ userId, stage: "submitted" }));
   });
 });
 
