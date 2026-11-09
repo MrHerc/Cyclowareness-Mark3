@@ -1,7 +1,9 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { eq } from "drizzle-orm";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { runJobs } from "../src/server/jobs";
-import { addTenant, DB_SETUP_TIMEOUT, testDb } from "./helpers/db";
+import { defaultSettings } from "../src/lib/tenant-defaults";
+import { addModule, addTenant, addUser, DB_SETUP_TIMEOUT, testDb } from "./helpers/db";
 
 const { db, ready } = testDb();
 const DAY = 86_400_000;
@@ -36,5 +38,73 @@ describe("job runner tick", () => {
     await runJobs(db, now);
     expect((await db.select({ name: t.demoRequests.name }).from(t.demoRequests)).map((r) => r.name)).toEqual(["recent"]);
     expect((await db.select({ id: t.tutorCache.id }).from(t.tutorCache)).map((r) => r.id)).toEqual(["recent"]);
+  }, 60_000);
+
+  it("applies each organisation's retention to its own rows only and never deletes evidence", async () => {
+    const now = new Date("2026-11-07T10:00:00Z");
+    const old = new Date(now.getTime() - 400 * DAY);
+    const recent = new Date(now.getTime() - 10 * DAY);
+    const mod = await addModule(db, { lessons: 1 });
+    const org = async (retention: t.TenantSettings["retention"]) => {
+      const tenant = await addTenant(db, { settings: { ...defaultSettings("en"), retention } });
+      const user = await addUser(db, tenant.id);
+      await db.insert(t.auditLog).values([
+        { tenantId: tenant.id, action: "old", at: old },
+        { tenantId: tenant.id, action: "recent", at: recent },
+      ]);
+      const answer = { tenantId: tenant.id, userId: user.id, lessonId: mod.lessons[0].id, sceneId: "q1", correct: true, firstTry: true };
+      await db.insert(t.answers).values([
+        { ...answer, sceneId: "old", at: old },
+        { ...answer, sceneId: "recent", at: recent },
+      ]);
+      const risk = { tenantId: tenant.id, userId: user.id, kind: "phishing_click" as const, severity: "high" as const, createdAt: old };
+      await db.insert(t.behaviorRisks).values([
+        { ...risk, title: "closed long ago", status: "closed", closedAt: old },
+        { ...risk, title: "closed lately", status: "closed", closedAt: recent },
+        { ...risk, title: "still open" },
+      ]);
+      await db.insert(t.lessonProgress).values({ userId: user.id, lessonId: mod.lessons[0].id, completedAt: old });
+      const rows = async () => ({
+        audit: (await db.select({ a: t.auditLog.action }).from(t.auditLog).where(eq(t.auditLog.tenantId, tenant.id))).map((r) => r.a).filter((a) => a === "old" || a === "recent").sort(),
+        answers: (await db.select({ s: t.answers.sceneId }).from(t.answers).where(eq(t.answers.tenantId, tenant.id))).map((r) => r.s).sort(),
+        risks: (await db.select({ title: t.behaviorRisks.title }).from(t.behaviorRisks).where(eq(t.behaviorRisks.tenantId, tenant.id))).map((r) => r.title).sort(),
+        progress: (await db.select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, user.id))).length,
+      });
+      return rows;
+    };
+    const everything = { audit: ["old", "recent"], answers: ["old", "recent"], risks: ["closed lately", "closed long ago", "still open"], progress: 1 };
+    const auditOnly = await org({ auditMonths: 1, learningMonths: 0 });
+    const learningOnly = await org({ auditMonths: 0, learningMonths: 12 });
+    const keeps = await org({ auditMonths: 0, learningMonths: 0 });
+    globalThis.__jobsCleanupDay = undefined;
+    await runJobs(db, now);
+    expect(await auditOnly()).toEqual({ ...everything, audit: ["recent"] });
+    expect(await learningOnly()).toEqual({ ...everything, answers: ["recent"], risks: ["closed lately", "still open"] });
+    expect(await keeps()).toEqual(everything);
+    const purges = await db.select({ tenantId: t.auditLog.tenantId, meta: t.auditLog.meta }).from(t.auditLog).where(eq(t.auditLog.action, "retention.purged"));
+    expect(purges).toHaveLength(2);
+    expect(purges.map((p) => p.meta)).toEqual(
+      expect.arrayContaining([
+        { auditEntries: 1, answers: 0, risks: 0, auditBefore: "2026-10-07T10:00:00.000Z" },
+        { auditEntries: 0, answers: 1, risks: 1, learningBefore: "2025-11-07T10:00:00.000Z" },
+      ]),
+    );
+  }, 60_000);
+
+  it("stops at the time budget, keeps the organisation's rows and leaves the day to the next tick", async () => {
+    const now = new Date("2026-11-08T10:00:00Z");
+    const tenant = await addTenant(db, { settings: { ...defaultSettings("en"), retention: { auditMonths: 1, learningMonths: 0 } } });
+    await db.insert(t.auditLog).values({ tenantId: tenant.id, action: "old", at: new Date(now.getTime() - 400 * DAY) });
+    // Every clock read lands past the 30-second budget set at the start of the clean-up.
+    let clock = Date.now();
+    const spy = vi.spyOn(Date, "now").mockImplementation(() => (clock += 31_000));
+    globalThis.__jobsCleanupDay = undefined;
+    try {
+      await runJobs(db, now);
+    } finally {
+      spy.mockRestore();
+    }
+    expect(globalThis.__jobsCleanupDay).toBeUndefined();
+    expect((await db.select({ a: t.auditLog.action }).from(t.auditLog).where(eq(t.auditLog.tenantId, tenant.id))).map((r) => r.a)).toContain("old");
   }, 60_000);
 });

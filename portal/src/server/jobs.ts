@@ -368,7 +368,7 @@ async function deleteInBatches(db: DB, table: PgTable, key: PgColumn, where: Ret
  * expired sessions and sign-in links, watermark codes of ended sessions after 90 days, delivered or
  * finished mail and integration deliveries after 90 days, read notifications after 400 days
  * (the reminder history needs a year), cached tutor answers after a year, and demo requests after
- * 24 months (the privacy policy's promise).
+ * 24 months (the privacy policy's promise); then what each organisation set under Settings → Protection.
  */
 async function cleanup(db: DB, now: Date): Promise<number> {
   const day = dayKey(now);
@@ -394,6 +394,35 @@ async function cleanup(db: DB, now: Date): Promise<number> {
   total += await deleteInBatches(db, t.notifications, t.notifications.id, and(isNotNull(t.notifications.readAt), lt(t.notifications.createdAt, ago(400 * DAY))), deadline);
   total += await deleteInBatches(db, t.tutorCache, t.tutorCache.id, and(lt(t.tutorCache.createdAt, ago(365 * DAY))), deadline);
   total += await deleteInBatches(db, t.demoRequests, t.demoRequests.id, and(lt(t.demoRequests.createdAt, ago(730 * DAY))), deadline);
+  // Each organisation's own retention, 0 = keep forever. Lesson progress, XP, attestations and
+  // certificates are compliance evidence and are never deleted; open risks are still being remediated.
+  const monthsAgo = (months: number) => {
+    const d = new Date(now);
+    d.setUTCMonth(d.getUTCMonth() - months);
+    return d;
+  };
+  for (const org of await db.select({ id: t.tenants.id, settings: t.tenants.settings }).from(t.tenants)) {
+    if (Date.now() > deadline) break;
+    const { auditMonths, learningMonths } = withDefaults(org.settings).retention;
+    const purged = { auditEntries: 0, answers: 0, risks: 0 };
+    if (auditMonths > 0) purged.auditEntries = await deleteInBatches(db, t.auditLog, t.auditLog.id, and(eq(t.auditLog.tenantId, org.id), lt(t.auditLog.at, monthsAgo(auditMonths))), deadline);
+    if (learningMonths > 0) {
+      purged.answers = await deleteInBatches(db, t.answers, t.answers.id, and(eq(t.answers.tenantId, org.id), lt(t.answers.at, monthsAgo(learningMonths))), deadline);
+      purged.risks = await deleteInBatches(db, t.behaviorRisks, t.behaviorRisks.id, and(eq(t.behaviorRisks.tenantId, org.id), lt(t.behaviorRisks.closedAt, monthsAgo(learningMonths))), deadline);
+    }
+    const count = purged.auditEntries + purged.answers + purged.risks;
+    total += count;
+    // A purge leaves its own entry, so a gap in the organisation's history is explained rather than suspect.
+    if (count > 0) {
+      await audit(db, {
+        tenantId: org.id,
+        actorId: null,
+        action: "retention.purged",
+        at: now,
+        meta: { ...purged, ...(auditMonths > 0 ? { auditBefore: monthsAgo(auditMonths).toISOString() } : {}), ...(learningMonths > 0 ? { learningBefore: monthsAgo(learningMonths).toISOString() } : {}) },
+      });
+    }
+  }
   // Done for today only when everything fit in the time budget; otherwise the next tick continues.
   if (Date.now() <= deadline) globalThis.__jobsCleanupDay = day;
   return total;

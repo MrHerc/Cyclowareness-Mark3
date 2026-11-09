@@ -47,6 +47,7 @@ import {
   saveLearningAction,
   saveNotificationsAction,
   saveProtectionAction,
+  saveRetentionAction,
   saveTimeZoneAction,
   resendFailedMailAction,
   sendTestEventAction,
@@ -1400,12 +1401,14 @@ function enhanceWatermark(file: File, done: (dataUrl: string) => void) {
   image.src = url;
 }
 
-export function ProtectionTab({ protection }: { protection: TenantSettings["protection"] }) {
+export function ProtectionTab({ protection, retention }: { protection: TenantSettings["protection"]; retention: TenantSettings["retention"] }) {
   const t = useTranslations("settings.protection");
   const tc = useTranslations("common");
   const format = useClientFormat();
   const { pending, save } = useSave();
+  const kept = useSave();
   const [s, setS] = useState({ ...protection, androidScreenBlock: protection.androidScreenBlock ?? false });
+  const [r, setR] = useState(retention);
   const [img, setImg] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [result, setResult] = useState<string | null>(null);
@@ -1496,6 +1499,18 @@ export function ProtectionTab({ protection }: { protection: TenantSettings["prot
           </div>
         </CardBody>
       </Card>
+      <Card>
+        <CardHeader title={t("retention")} description={t("retentionBody")} />
+        <CardBody className="grid gap-5 sm:grid-cols-2">
+          <Field label={t("auditMonths")} htmlFor="p-audit-months" hint={t("monthsHint")}>
+            <Input id="p-audit-months" type="number" min={0} max={120} value={r.auditMonths} onChange={(e) => setR({ ...r, auditMonths: Number(e.target.value) })} className="max-w-40" />
+          </Field>
+          <Field label={t("learningMonths")} htmlFor="p-learning-months" hint={t("monthsHint")}>
+            <Input id="p-learning-months" type="number" min={0} max={120} value={r.learningMonths} onChange={(e) => setR({ ...r, learningMonths: Number(e.target.value) })} className="max-w-40" />
+          </Field>
+        </CardBody>
+      </Card>
+      <SaveBar pending={kept.pending} onSave={() => kept.save(() => saveRetentionAction(r), { auditMonths: "p-audit-months", learningMonths: "p-learning-months" })} />
     </div>
   );
 }
