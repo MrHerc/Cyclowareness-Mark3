@@ -4,7 +4,7 @@ import { and, eq, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { db, t } from "@/server/db";
 import { appUrl, env } from "@/server/env";
-import { getSession } from "@/server/auth/viewer";
+import { getViewer, twoFactorGap } from "@/server/auth/viewer";
 import { isPrivileged } from "@/server/auth/permissions";
 import { emailDomain } from "@/server/auth/sso-routing";
 import { createSession, setSessionCookie } from "@/server/auth/session";
@@ -92,8 +92,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
   }
 
   if (state.test) {
-    const v = await getSession();
-    if (v && v.tenant.id === tenant.id) await audit(db(), { tenantId: tenant.id, actorId: v.user.id, action: "sso.tested", ip, meta: email ? { ok: true, email } : { ok: false, reason } });
+    const v = await getViewer();
+    if (v && v.tenant.id === tenant.id && !twoFactorGap(v)) await audit(db(), { tenantId: tenant.id, actorId: v.user.id, action: "sso.tested", ip, meta: email ? { ok: true, email } : { ok: false, reason } });
     redirect(`/admin/settings?tab=identity&ssoTest=${email ? "ok" : "failed"}`);
   }
 

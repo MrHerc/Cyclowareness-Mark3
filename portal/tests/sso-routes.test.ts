@@ -7,19 +7,32 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { DB } from "../src/server/db/client";
 import { defaultSettings } from "../src/lib/tenant-defaults";
+import { twoFactorRequired } from "../src/server/auth/permissions";
 
 // The single sign-on routes against a real (in-memory) database; the provider round trip is stubbed.
+type Session = { tenant: { slug: string; settings?: { identity: { requireAdmin2fa: boolean } } }; user?: { totpEnabled: boolean; role: t.Role }; twoFactorVerified?: boolean };
 const h = vi.hoisted(() => ({
   db: undefined as unknown,
   session: null as unknown,
   claims: {} as Record<string, unknown>,
   cookie: undefined as string | undefined,
   audits: [] as { action: string; meta?: Record<string, unknown> }[],
+  limit: vi.fn(async (key: string, max: number, windowMs: number) => (void [key, max, windowMs], { ok: true, retryAfterMs: 0 })),
 }));
 vi.mock("../src/server/db", async () => ({ db: () => h.db, t: await import("../src/server/db/schema") }));
 vi.mock("../src/server/env", () => ({ env: { TRUST_PROXY: 0, isProd: false, secret: "test-only-secret-0123456789-abcdefghij-0123456789" }, appUrl: () => "http://localhost:3000" }));
 vi.mock("../src/server/request", async (original) => ({ ...(await original<typeof import("../src/server/request")>()), clientIp: async () => null, userAgent: async () => null }));
-vi.mock("../src/server/auth/viewer", () => ({ getSession: async () => h.session, allowed: () => true }));
+vi.mock("../src/server/rate-limit", () => ({ rateLimit: h.limit }));
+// getViewer and twoFactorGap apply the real rules (viewer.ts, permissions.ts) to the test's session object.
+vi.mock("../src/server/auth/viewer", () => ({
+  getSession: async () => h.session,
+  getViewer: async () => {
+    const s = h.session as Session | null;
+    return s && !(s.user?.totpEnabled && !s.twoFactorVerified) ? s : null;
+  },
+  allowed: () => true,
+  twoFactorGap: (v: Session) => twoFactorRequired(v.user?.role ?? "learner", v.tenant.settings?.identity.requireAdmin2fa ?? false) && !v.user?.totpEnabled,
+}));
 vi.mock("../src/server/services/audit", () => ({ audit: async (_db: unknown, entry: { action: string; meta?: Record<string, unknown> }) => void h.audits.push(entry) }));
 vi.mock("../src/server/auth/oidc", async (original) => ({
   ...(await original<typeof import("../src/server/auth/oidc")>()),
@@ -70,18 +83,56 @@ beforeAll(async () => {
 beforeEach(() => {
   h.session = null;
   h.audits.length = 0;
+  h.limit.mockClear();
 });
+
+const startUrl = (query: string) => `http://localhost:3000/api/sso/start?${query}`;
+const PROVIDER = /^https:\/\/idp\.sso\.test\/auth\?/;
 
 describe("SSO start", () => {
   it("refuses an organisation whose domain proof is missing, unless an administrator tests the settings", async () => {
-    expect(await redirectOf(start.GET(new Request("http://localhost:3000/api/sso/start?tenant=unproven")))).toBe("/sign-in?error=sso");
+    expect(await redirectOf(start.GET(new Request(startUrl("tenant=unproven"))))).toBe("/sign-in?error=sso");
     h.session = { tenant: { slug: "unproven" } };
-    expect(await redirectOf(start.GET(new Request("http://localhost:3000/api/sso/start?tenant=unproven&test=1")))).toMatch(/^https:\/\/idp\.sso\.test\/auth\?/);
-    expect(await redirectOf(start.GET(new Request("http://localhost:3000/api/sso/start?tenant=proven")))).toMatch(/^https:\/\/idp\.sso\.test\/auth\?/);
+    expect(await redirectOf(start.GET(new Request(startUrl("tenant=unproven&test=1"))))).toMatch(PROVIDER);
+    expect(await redirectOf(start.GET(new Request(startUrl("tenant=proven"))))).toMatch(PROVIDER);
+  });
+
+  it("lets only an administrator past two-step verification (and set up for it when the organisation requires it) test the settings", async () => {
+    const admin = (o: Partial<Session>): Session => ({ tenant: { slug: "proven", settings: { identity: { requireAdmin2fa: false } } }, user: { totpEnabled: true, role: "tenant_admin" }, twoFactorVerified: true, ...o });
+    h.session = admin({ twoFactorVerified: false });
+    expect(await redirectOf(start.GET(new Request(startUrl("tenant=proven&test=1"))))).toBe("/sign-in");
+    h.session = admin({ tenant: { slug: "proven", settings: { identity: { requireAdmin2fa: true } } }, user: { totpEnabled: false, role: "tenant_admin" } });
+    expect(await redirectOf(start.GET(new Request(startUrl("tenant=proven&test=1"))))).toBe("/sign-in");
+    h.session = admin({});
+    expect(await redirectOf(start.GET(new Request(startUrl("tenant=proven&test=1"))))).toMatch(PROVIDER);
+  });
+
+  it("opens a per-organisation bucket only for an organisation that exists", async () => {
+    for (let i = 0; i < 10; i++) await redirectOf(start.GET(new Request(startUrl(`tenant=made-up-${i}`))));
+    expect(h.limit.mock.calls.filter(([key]) => key.startsWith("sso-start:t:"))).toEqual([]);
+    expect(await redirectOf(start.GET(new Request(startUrl("tenant=proven"))))).toMatch(PROVIDER);
+    expect(h.limit).toHaveBeenCalledWith("sso-start:t:proven", 600, 60_000);
+    h.limit.mockResolvedValueOnce({ ok: false, retryAfterMs: 60_000 });
+    const res = (await start.GET(new Request(startUrl("tenant=proven")))) as Response;
+    expect(res.status).toBe(429);
   });
 });
 
 describe("SSO callback", () => {
+  it("records the settings test only for an administrator past two-step verification", async () => {
+    const testRun = async () => {
+      h.claims = { iss: ISSUER, email_verified: true, sub: "t-1", email: "admin@proven.test" };
+      h.cookie = sealState({ state: "s1", nonce: "n1", verifier: "v1", tenant: "proven", test: true, at: Date.now() });
+      return redirectOf(callback.GET(new Request("http://localhost:3000/api/sso/callback/proven?code=c&state=s1"), { params: Promise.resolve({ tenant: "proven" }) }));
+    };
+    h.session = { tenant: { id: proven, slug: "proven" }, user: { id: "u-admin", totpEnabled: true, role: "tenant_admin" }, twoFactorVerified: false };
+    expect(await testRun()).toBe("/admin/settings?tab=identity&ssoTest=ok");
+    expect(h.audits.filter((a) => a.action === "sso.tested")).toEqual([]);
+    h.session = { tenant: { id: proven, slug: "proven" }, user: { id: "u-admin", totpEnabled: true, role: "tenant_admin" }, twoFactorVerified: true };
+    expect(await testRun()).toBe("/admin/settings?tab=identity&ssoTest=ok");
+    expect(h.audits.filter((a) => a.action === "sso.tested")).toHaveLength(1);
+  });
+
   it("refuses an unproven domain before any account is looked up or created", async () => {
     expect(await signIn("unproven", { sub: "u-1", email: "new@unproven.test" })).toBe("/sign-in?error=sso");
     expect(lastRefusal()).toBe("domain_unproven");

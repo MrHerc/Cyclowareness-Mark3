@@ -38,7 +38,8 @@ export async function generateTrainingAction(input: TrainingInput): Promise<Trai
   const p = requestSchema.safeParse(input);
   if (!p.success) return { ok: false, error: "invalid" };
   if (!aiEnabled()) return { ok: false, error: "offline" };
-  if (!(await rateLimit(`ai-training:${v.user.id}`, 10, 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
+  // Per person an hour, and per organisation a day: the model budget is the operator's.
+  if (!(await rateLimit(`ai-training:${v.user.id}`, 10, 60 * 60_000)).ok || !(await rateLimit(`ai-training-day:t:${v.tenant.id}`, 50, 24 * 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
   try {
     // The reviewer writes its findings in the Studio user's interface language, not the training's.
     const { draft, verification } = await generateVerified(anthropicTrainingModel(await getLocale()), p.data);

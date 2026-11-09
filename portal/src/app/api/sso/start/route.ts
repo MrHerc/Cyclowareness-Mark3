@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db, t } from "@/server/db";
 import { appUrl, env } from "@/server/env";
-import { allowed, getSession } from "@/server/auth/viewer";
+import { allowed, getViewer, twoFactorGap } from "@/server/auth/viewer";
 import { SSO_STATE_COOKIE, codeChallenge, discover, randomValue, sealState } from "@/server/auth/oidc";
 import { TENANT_SLUG_RE } from "@/server/services/tenants";
 import { rateLimit } from "@/server/rate-limit";
@@ -22,9 +22,10 @@ export async function GET(request: Request) {
   const test = url.searchParams.get("test") === "1";
   const failed = test ? "/admin/settings?tab=identity&ssoTest=failed" : "/sign-in?error=sso";
 
-  // Anonymous, and each start reads the database and can mean a request to the provider: limited per client and per organisation.
+  // Anonymous, and each start reads the database and can mean a request to the provider: limited per client here and per
+  // organisation once it is known (a bucket per made-up slug would let a flood write a row per request).
   const ip = await clientIp();
-  if ((ip && !(await rateLimit(`sso-start:${ipRateKey(ip)}`, 60, 60_000)).ok) || (TENANT_SLUG_RE.test(slug) && !(await rateLimit(`sso-start:t:${slug}`, 600, 60_000)).ok)) {
+  if (ip && !(await rateLimit(`sso-start:${ipRateKey(ip)}`, 60, 60_000)).ok) {
     return new Response("Too many requests", { status: 429, headers: { "retry-after": "60" } });
   }
 
@@ -33,9 +34,13 @@ export async function GET(request: Request) {
     ? await db().select({ slug: t.tenants.slug, plan: t.tenants.plan, features: t.tenants.features, settings: t.tenants.settings, domainVerifiedAt: t.tenants.domainVerifiedAt }).from(t.tenants).where(eq(t.tenants.slug, slug))
     : [];
   const tenant = row ? { ...row, settings: withDefaults(row.settings) } : undefined;
+  if (tenant && !(await rateLimit(`sso-start:t:${tenant.slug}`, 600, 60_000)).ok) {
+    return new Response("Too many requests", { status: 429, headers: { "retry-after": "60" } });
+  }
   if (test) {
-    const v = await getSession();
-    if (!v || !tenant || v.tenant.slug !== tenant.slug || !allowed(v, "settings.write")) redirect("/sign-in");
+    // An administrator past two-step verification (and set up for it when the organisation requires it), as every admin route.
+    const v = await getViewer();
+    if (!v || !tenant || v.tenant.slug !== tenant.slug || !allowed(v, "settings.write") || twoFactorGap(v)) redirect("/sign-in");
   }
   const sso = tenant?.settings.identity.sso;
   if (!tenant || !sso || sso.protocol !== "oidc" || !sso.issuer || !sso.clientId) redirect(failed);
