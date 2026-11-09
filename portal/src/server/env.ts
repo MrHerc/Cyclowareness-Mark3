@@ -18,6 +18,10 @@ const schema = z
     ALLOW_HTTP_APP_URL: flag("0"),
     /** 32+ random bytes, used for encrypting stored secrets and signing tokens. */
     APP_SECRET: z.preprocess(blank, z.string().min(32).optional()),
+    /** The APP_SECRET before a rotation: stored secrets still open with it until scripts/rotate-secret.ts has re-encrypted them (docs/OPERATIONS.md). */
+    APP_SECRET_PREVIOUS: z.preprocess(blank, z.string().min(32).optional()),
+    /** Key of every organisation's domain-proof TXT value. Defaults to APP_SECRET: set it once and never rotate it, or every published record changes. */
+    APP_DOMAIN_PROOF_SECRET: z.preprocess(blank, z.string().min(32).optional()),
     DATABASE_URL: z.preprocess(blank, z.string().optional()),
     /** node-postgres pool size. The job runner holds one connection for its lock while the tick uses others, so at least 2. */
     DATABASE_POOL_MAX: z.preprocess(blank, z.coerce.number().int().min(2).max(100).default(10)),
@@ -121,6 +125,8 @@ export const env = {
   isProd: data.NODE_ENV === "production",
   /** Fixed development secret so local data stays readable between restarts. Never used in production. */
   secret: data.APP_SECRET ?? "dev-only-secret-change-me-dev-only-secret-change-me",
+  previousSecret: data.APP_SECRET_PREVIOUS,
+  domainProofSecret: data.APP_DOMAIN_PROOF_SECRET ?? data.APP_SECRET ?? "dev-only-secret-change-me-dev-only-secret-change-me",
   showOtp: data.NODE_ENV !== "production" && data.DEV_SHOW_OTP === "1",
 };
 

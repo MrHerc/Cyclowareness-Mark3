@@ -240,7 +240,7 @@ export function TenantControls({
               onClick={() =>
                 start(async () => {
                   const res = await verifyTenantDomainAction(tenantId, host, force);
-                  if (!res.ok) return toast(tc("errors.invalid"), "error");
+                  if (!res.ok) return toast(res.error === "domainTaken" ? t("domainTaken") : tc("errors.invalid"), "error");
                   if (!res.verified) return toast(t("notFound"), "error");
                   toast(t("verified"));
                   setMode(null);

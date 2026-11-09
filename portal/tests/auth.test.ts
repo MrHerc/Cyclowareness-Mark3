@@ -416,33 +416,34 @@ describe("crypto", () => {
       }
     });
 
-    it("emits a versioned iv:tag:data envelope with a fresh IV every time", () => {
+    it("emits a versioned kid:iv:tag:data envelope with a fresh IV every time", () => {
       const a = encryptSecret("same");
       const b = encryptSecret("same");
       expect(a).not.toBe(b);
       const parts = a.split(":");
-      expect(parts).toHaveLength(4);
-      expect(parts[0]).toBe("v1");
-      expect(Buffer.from(parts[1], "base64url")).toHaveLength(12);
-      expect(Buffer.from(parts[2], "base64url")).toHaveLength(16);
+      expect(parts).toHaveLength(5);
+      expect(parts[0]).toBe("v2");
+      expect(parts[1]).toMatch(/^[0-9a-f]{8}$/);
+      expect(Buffer.from(parts[2], "base64url")).toHaveLength(12);
+      expect(Buffer.from(parts[3], "base64url")).toHaveLength(16);
       expect(a).not.toContain("same");
     });
 
     it("returns null for a tampered ciphertext, tag or IV", () => {
       const sealed = encryptSecret("webhook-signing-secret");
+      expect(decryptSecret(tamper(sealed, 4))).toBeNull();
       expect(decryptSecret(tamper(sealed, 3))).toBeNull();
       expect(decryptSecret(tamper(sealed, 2))).toBeNull();
-      expect(decryptSecret(tamper(sealed, 1))).toBeNull();
       const forged = ["v1", randomBytes(12).toString("base64url"), randomBytes(16).toString("base64url"), randomBytes(24).toString("base64url")].join(":");
       expect(decryptSecret(forged)).toBeNull();
     });
 
     it("returns null for a wrong version or a malformed value", () => {
       const sealed = encryptSecret("totp-key");
-      expect(decryptSecret(sealed.replace(/^v1/, "v2"))).toBeNull();
-      expect(decryptSecret(sealed.replace(/^v1/, "v0"))).toBeNull();
-      expect(decryptSecret(sealed.split(":").slice(0, 3).join(":"))).toBeNull();
-      expect(decryptSecret("v1::" + sealed.split(":")[2] + ":" + sealed.split(":")[3])).toBeNull();
+      expect(decryptSecret(sealed.replace(/^v2/, "v3"))).toBeNull();
+      expect(decryptSecret(sealed.replace(/^v2/, "v0"))).toBeNull();
+      expect(decryptSecret(sealed.split(":").slice(0, 4).join(":"))).toBeNull();
+      expect(decryptSecret("v2:" + sealed.split(":")[1] + "::" + sealed.split(":")[3] + ":" + sealed.split(":")[4])).toBeNull();
       expect(decryptSecret("not-a-ciphertext")).toBeNull();
       expect(decryptSecret("")).toBeNull();
       expect(decryptSecret(null)).toBeNull();
@@ -455,7 +456,7 @@ describe("crypto", () => {
       expect(decryptSecret(encryptSecret(""))).toBe("");
     });
 
-    it("makes stored secrets unreadable after APP_SECRET rotates", () => {
+    it("makes stored secrets unreadable after APP_SECRET changes without APP_SECRET_PREVIOUS", () => {
       const sealed = encryptSecret("ldap-bind-password");
       try {
         vi.stubEnv("APP_SECRET", "rotated-test-only-app-secret-9876543210-zyxwvutsrq");

@@ -56,14 +56,19 @@ export function newBackupCodes(): { codes: string[]; hashes: string[] } {
     const s = [...bytes].map((b) => alphabet[b % alphabet.length]).join("");
     return `${s.slice(0, 5)}-${s.slice(5)}`;
   });
-  return { codes, hashes: codes.map(hashBackupCode) };
+  return { codes, hashes: codes.map((code) => hashBackupCode(code)) };
 }
 
 const normalised = (code: string) => code.trim().toLowerCase().replace(/\s/g, "");
 
 /** An HMAC keyed from APP_SECRET (like the stored TOTP keys), so a copy of the database alone cannot be searched offline. */
-export function hashBackupCode(code: string): string {
-  return hmac(`backup:${normalised(code)}`, sha256Hex(`backup-codes:${env.secret}`));
+export function hashBackupCode(code: string, secret = env.secret): string {
+  return hmac(`backup:${normalised(code)}`, sha256Hex(`backup-codes:${secret}`));
+}
+
+/** Every form a stored code may have: the current key, the previous key during an APP_SECRET rotation, and the legacy hash. */
+export function backupCodeHashes(code: string): string[] {
+  return [hashBackupCode(code), ...(env.previousSecret ? [hashBackupCode(code, env.previousSecret)] : []), legacyBackupHash(code)];
 }
 
 /** How codes made before the keyed hash were stored (plain SHA-256); they stay valid until used or replaced. */

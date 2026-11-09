@@ -175,7 +175,7 @@ export function BrandingTab({
     startCheck(async () => {
       const res = await verifyDomainAction(proofDomain);
       if (!res.ok) {
-        toast(res.error === "rateLimited" ? tc("errors.rateLimited") : t("checkInvalid"), "error");
+        toast(res.error === "rateLimited" ? tc("errors.rateLimited") : res.error === "domainTaken" ? t("domainTaken") : t("checkInvalid"), "error");
         return;
       }
       if (res.verified && res.verifiedOn) {

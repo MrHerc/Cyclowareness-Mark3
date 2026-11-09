@@ -20,12 +20,10 @@ const h = vi.hoisted(() => ({
   mails: [] as string[],
   sms: [] as string[],
   session: null as unknown,
+  env: { TRUST_PROXY: 1, showOtp: false, isProd: false, secret: "test-only-secret-0123456789-abcdefghij-0123456789", previousSecret: undefined as string | undefined, BOOTSTRAP_OPERATOR_EMAIL: "op@platform.test" },
 }));
 vi.mock("../src/server/db", async () => ({ db: () => h.db, dbHandle: () => ({ driver: "pglite", db: h.db }), t: await import("../src/server/db/schema") }));
-vi.mock("../src/server/env", () => ({
-  env: { TRUST_PROXY: 1, showOtp: false, isProd: false, secret: "test-only-secret-0123456789-abcdefghij-0123456789", BOOTSTRAP_OPERATOR_EMAIL: "op@platform.test" },
-  appUrl: () => "http://localhost:3000",
-}));
+vi.mock("../src/server/env", () => ({ env: h.env, appUrl: () => "http://localhost:3000" }));
 vi.mock("../src/server/request", async (original) => ({ ...(await original<typeof import("../src/server/request")>()), clientIp: async () => h.ip, userAgent: async () => null }));
 vi.mock("../src/server/auth/password", () => ({ hashPassword: async () => "hash", verifyPassword: async (_: string | null, pw: string) => pw === "right password", passwordProblem: () => null }));
 vi.mock("../src/server/auth/viewer", () => ({ getSession: async () => h.session, actionViewer: async () => h.session }));
@@ -112,6 +110,24 @@ describe("second factor under a parallel burst", () => {
     expect(await outcome(auth.verifySecondFactorAction(undefined, form({ mode: "backup", code: "old23-codes" })))).toBe("invalidBackupCode");
     const [left] = await db().select({ codes: t.users.totpRecovery }).from(t.users).where(eq(t.users.id, u.id));
     expect(left.codes).toEqual([]);
+  });
+
+  it("takes a backup code hashed with the previous key once, and only while APP_SECRET_PREVIOUS is set", async () => {
+    const PREVIOUS = "previous-test-only-secret-9876543210-zyxwvutsrq";
+    const second = hashBackupCode("mnopq-rstuv", PREVIOUS);
+    const u = await person({ email: "rotated@acme.test", totpEnabled: true, totpRecovery: [hashBackupCode("abcde-fghjk", PREVIOUS), second] });
+    h.session = { user: { id: u.id }, sessionId: "pending" };
+    const spend = (code: string) => outcome(auth.verifySecondFactorAction(undefined, form({ mode: "backup", code })));
+    h.env.previousSecret = PREVIOUS;
+    try {
+      expect(await spend("abcde-fghjk")).toBe("signed-in");
+      expect(await spend("abcde-fghjk")).toBe("invalidBackupCode");
+    } finally {
+      h.env.previousSecret = undefined;
+    }
+    expect(await spend("mnopq-rstuv")).toBe("invalidBackupCode");
+    const [left] = await db().select({ codes: t.users.totpRecovery }).from(t.users).where(eq(t.users.id, u.id));
+    expect(left.codes).toEqual([second]);
   });
 });
 

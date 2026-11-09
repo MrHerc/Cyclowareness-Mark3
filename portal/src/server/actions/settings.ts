@@ -7,9 +7,10 @@ import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { db, t } from "../db";
 import { actionViewer, hasFeature, type Viewer } from "../auth/viewer";
-import { domainProofFound, domainProofRecord, normaliseHost } from "../auth/domain-proof";
+import { domainProofFound, domainProofRecord, domainProofRecords, normaliseHost } from "../auth/domain-proof";
 import { audit, type AuditAction } from "../services/audit";
 import { encryptSecret, sha256Hex } from "../crypto";
+import { isUniqueViolation } from "../db/errors";
 import { env } from "../env";
 import { resendableMail, sendTestEmail } from "../mail";
 import { destinationProblem } from "../net-guard";
@@ -108,7 +109,7 @@ export async function setLogoAction(dataUrl: string | null): Promise<{ ok: boole
 /** The TXT value this organisation publishes to prove its domain (Branding → Domain proof). */
 export async function domainProofRecordAction(): Promise<{ record: string }> {
   const v = await actionViewer("settings.write");
-  return { record: domainProofRecord(v.tenant.id, env.secret) };
+  return { record: domainProofRecord(v.tenant.id, env.domainProofSecret) };
 }
 
 /**
@@ -118,16 +119,16 @@ export async function domainProofRecordAction(): Promise<{ record: string }> {
  * re-check has failed for a week (or for good, when the operator forced the proof).
  * `kept` tells the form that the current proof is still in place.
  */
-export async function verifyDomainAction(domain: string): Promise<{ ok: boolean; verified: boolean; found: boolean; kept: boolean; verifiedOn?: string; error?: "rateLimited" }> {
+export async function verifyDomainAction(domain: string): Promise<{ ok: boolean; verified: boolean; found: boolean; kept: boolean; verifiedOn?: string; error?: "rateLimited" | "domainTaken" }> {
   const v = await actionViewer("settings.write");
   const host = normaliseHost(domain);
   if (!host) return { ok: false, verified: false, found: false, kept: false };
   // Two DNS lookups per check: a few an hour per organisation.
   if (!(await rateLimit(`domain-check:${v.tenant.id}`, 20, 60 * 60_000)).ok) return { ok: false, verified: false, found: false, kept: false, error: "rateLimited" };
-  const found = await domainProofFound(host, domainProofRecord(v.tenant.id, env.secret));
+  const found = await domainProofFound(host, domainProofRecords(v.tenant.id));
   const now = new Date();
   // The DNS lookup is done; the row is read and written under a lock so a concurrent settings save is not lost.
-  const { proven, adopted } = await db().transaction(async (tx) => {
+  const outcome = await db().transaction(async (tx) => {
     const [row] = await tx
       .select({ domain: t.tenants.domain, settings: t.tenants.settings, domainVerifiedAt: t.tenants.domainVerifiedAt })
       .from(t.tenants)
@@ -150,7 +151,16 @@ export async function verifyDomainAction(domain: string): Promise<{ ok: boolean;
       .set(found ? { domain: host, domainVerifiedAt: now, settings } : { settings })
       .where(eq(t.tenants.id, v.tenant.id));
     return { proven, adopted: true };
+  }).catch((error: unknown) => {
+    // Another organisation holds the proof for this domain (tenants_domain_verified_idx).
+    if (isUniqueViolation(error, "tenants_domain_verified_idx")) return "taken" as const;
+    throw error;
   });
+  if (outcome === "taken") {
+    await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "domain.rechecked", ip: await clientIp(), meta: { domain: host, found, taken: true } });
+    return { ok: false, verified: false, found, kept: false, error: "domainTaken" };
+  }
+  const { proven, adopted } = outcome;
   if (!adopted) {
     await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "domain.rechecked", ip: await clientIp(), meta: { domain: host, found } });
     return { ok: true, verified: false, found: false, kept: proven };

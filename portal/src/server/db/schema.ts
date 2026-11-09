@@ -137,7 +137,7 @@ export const tenants = pgTable("tenants", {
   domain: text("domain"),
   domainVerifiedAt: ts("domain_verified_at"),
   createdAt: createdAt(),
-});
+}, (t) => [uniqueIndex("tenants_domain_verified_idx").on(t.domain).where(sql`domain_verified_at is not null`)]);
 
 export const departments = pgTable(
   "departments",
