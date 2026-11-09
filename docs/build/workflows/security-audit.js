@@ -23,6 +23,9 @@ async function retrying(prompt, opts) {
   return null
 }
 
+// Workflow worktrees are cut from the last pushed commit, not from args.base: every reader must move first.
+const PIN = `FIRST STEP, before you read any file: the worktree you were given was cut from an OLDER commit, not from the code under audit. From the worktree root run "git checkout --detach ${args.base}" and then "git rev-parse HEAD": it must print ${args.base}. If it does not, stop and say so in notes instead of auditing. Read, cite and test only that commit; anything you saw before the checkout is stale.`
+
 const CONTEXT = `PROJECT: Cyclowareness (vendor Safarov Industries), a multi-tenant security-awareness platform sold to banks and governments. Repository "${REPO}"; the app is portal/ (Next.js 16 App Router, React 19, TypeScript strict, Server Actions under portal/src/server/actions, route handlers under portal/src/app/api, Drizzle, PGlite in tests). The security review of 2026-10-27 (docs/SECURITY_REVIEW.md, ADR-033), the verified gap register (docs/build/REGISTER-2026-11-05.md, the S-, SEC-, I-, L- ids) and waves A and B of the closure run (docs/build/PROGRESS.md cycles 12-13, ADR-035 onward) describe the controls that are supposed to exist. This is a defensive audit of the owner's own code at commit ${args.base}: the question for every control is "is it present, complete and tested", not "how would one break in".
 RULES: your worktree is a read-only copy for the Audit and Verify phases: read any file, run "npm run typecheck", "npx vitest run <file>" and throwaway test cases you write under portal/tests (never commit them, delete them before you finish), never start or stop servers, never run db:*/demo/setup/content:sync scripts, never touch the main checkout "${REPO}", never edit docs/audit/. Give your worktree dependencies first: from the worktree root run powershell -NoProfile -Command "New-Item -ItemType Junction -Path 'portal\\node_modules' -Target '${REPO.replace(/\//g, '\\\\')}\\portal\\node_modules'" (skip if portal/node_modules exists). Your final text is machine-read: return the structured output only.`
 
@@ -61,6 +64,8 @@ const RECHECK_SCHEMA = { type: 'object', properties: { verdicts: { type: 'array'
 phase('Audit')
 const audits = await parallel(AREAS.map((a) => () => retrying(`${CONTEXT}
 
+${PIN}
+
 AREA: ${a.key}. ${a.scope}
 Work through the whole area systematically (list the files first, then every control in each file). For each control decide: present and complete (put it in controls_verified with file:line), incomplete, or missing. A finding needs the code path (file:line) that proves the gap and, where a throwaway vitest can show it cheaply, the test and its result. Severity by consequence for a bank or government customer: critical = data of another organisation readable or writable, authentication bypass, server-side request to internal networks, arbitrary code; high = account takeover path, forged compliance evidence, stored script injection, significant data exposure; medium/low/info otherwise. Do not report style issues or theoretical concerns without a code path; put those in notes.`,
   { label: `audit:${a.key}`, phase: 'Audit', schema: FINDINGS_SCHEMA, model: MYTHOS, isolation: 'worktree', effort: 'high' })))
@@ -77,6 +82,8 @@ log(`Audit: ${raw.length} raw findings, ${findings.length} after dedup; ${audits
 phase('Verify')
 const verified = await parallel(findings.map((f, i) => () =>
   parallel([0, 1].map((k) => () => retrying(`${CONTEXT}
+
+${PIN}
 
 You VERIFY one reported finding independently (verifier ${k + 1} of 2). Read the code path yourself; run a throwaway test if that settles it. Confirm only if the control is demonstrably missing or incomplete at the cited place in the current code; reject if the control exists elsewhere on the same path, if the register or an ADR records the behaviour as intended, or if the report rests on an assumption the code does not support. Default to rejected when uncertain. Also give the severity you would assign.
 FINDING:
@@ -104,7 +111,7 @@ ${JSON.stringify(fs.map(({ votes, ...rest }) => rest), null, 1)}`, { label: `fix
 phase('Recheck')
 const rechecks = await parallel(fixes.filter((x) => x.fix).map((x, i) => () => retrying(`${CONTEXT}
 
-You RE-CHECK a fix independently. The fix lives in the worktree "${x.fix.worktree}" on branch ${x.fix.branch} (commits ${x.fix.commits.join(', ')}); run "git log -p --stat -${Math.max(1, x.fix.commits.length)}" there and read the surrounding code; run its tests. For each finding below decide whether the control now holds completely (closed) or a gap remains (not closed: say exactly where). List any new gap the fix introduced. Do not edit anything.
+You RE-CHECK a fix independently. The directory you start in does NOT contain the fix: work only inside the fixer's worktree (cd there first; "git rev-parse --abbrev-ref HEAD" must print ${x.fix.branch} and "git merge-base --is-ancestor ${args.base} HEAD" must hold; if either fails, say so in notes and mark every finding not closed). The fix lives in the worktree "${x.fix.worktree}" on branch ${x.fix.branch} (commits ${x.fix.commits.join(', ')}); run "git log -p --stat -${Math.max(1, x.fix.commits.length)}" there and read the surrounding code; run its tests. For each finding below decide whether the control now holds completely (closed) or a gap remains (not closed: say exactly where). List any new gap the fix introduced. Do not edit anything.
 FINDINGS: ${JSON.stringify(x.findings.map(({ votes, ...rest }) => rest), null, 1)}
 FIXER'S SUMMARY: ${x.fix.summary}
 NOT FIXED BY THE FIXER: ${x.fix.not_fixed.join(' | ') || 'nothing'}`, { label: `recheck:${i}`, phase: 'Recheck', schema: RECHECK_SCHEMA, model: MYTHOS, effort: 'high' })
