@@ -17,6 +17,7 @@ vi.mock("next-intl/server", () => ({ getLocale: async () => "en", getTranslation
 vi.mock("../src/server/auth/viewer", () => ({
   actionViewer: async () => viewers.shift()!,
   allowed: (v: V, p: Permission) => can(v.user.role, p) && (!PERMISSION_FEATURE[p] || v.tenant.features.has(PERMISSION_FEATURE[p]!)),
+  privileged: (v: V, p: Permission) => can(v.user.role, p) && (!PERMISSION_FEATURE[p] || v.tenant.features.has(PERMISSION_FEATURE[p]!)),
   hasFeature: (v: V, f: string) => v.tenant.features.has(f),
 }));
 

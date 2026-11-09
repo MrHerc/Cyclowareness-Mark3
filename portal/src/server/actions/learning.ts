@@ -6,7 +6,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
 import { isUniqueViolation } from "../db/errors";
-import { actionViewer, allowed, type Viewer } from "../auth/viewer";
+import { actionViewer, privileged, type Viewer } from "../auth/viewer";
 import { rateLimit } from "../rate-limit";
 import { queueEmail, renderEmailHtml } from "../mail";
 import { appUrl } from "../env";
@@ -29,7 +29,7 @@ async function moduleBySlug(v: Viewer, slug: string) {
       and(
         eq(t.modules.slug, slug),
         or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)),
-        allowed(v, "studio.write") ? undefined : eq(t.modules.status, "published"),
+        privileged(v, "studio.write") ? undefined : eq(t.modules.status, "published"),
       ),
     );
   return rows.find((r) => r.tenantId) ?? rows[0] ?? null;

@@ -126,10 +126,11 @@ describe("unlinking single sign-on", () => {
     const { audit } = await import("../src/server/services/audit");
     actor = { id: ids.admin, role: "tenant_admin" };
     const [u] = await db.insert(t.users).values({ tenantId, email: "sso@platform.test", name: "Sso", ssoSubject: "https://idp.test sub-1" }).returning();
-    expect(await people.unlinkSsoAction(u.id)).toEqual({ ok: true });
+    expect(await people.unlinkSsoAction(u.id)).toEqual({ ok: false, error: "wrongPassword" });
+    expect(await people.unlinkSsoAction(u.id, PW)).toEqual({ ok: true });
     expect((await db.select({ s: t.users.ssoSubject }).from(t.users).where(eq(t.users.id, u.id)))[0].s).toBeNull();
     expect(audit).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ action: "sso.unlinked", targetId: u.id }));
     // Nothing to unlink: no entry, no success.
-    expect(await people.unlinkSsoAction(u.id)).toEqual({ ok: false });
+    expect(await people.unlinkSsoAction(u.id, PW)).toEqual({ ok: false });
   });
 });

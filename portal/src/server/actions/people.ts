@@ -215,10 +215,10 @@ const updateSchema = z.object({
   locale: z.enum(LOCALES),
 });
 
-/** `error` and `fields` as for adding a person, so the dialog marks the rejected input. */
-export type UpdatePersonResult = { ok: boolean; error?: "invalid" | "invalidPhone" | "phoneTaken" | "cannotAdd" | "rateLimited"; fields?: string[] };
+/** `error` and `fields` as for adding a person, so the dialog marks the rejected input; `wrongPassword` and `rateLimited` also come from the step-up a new number takes. */
+export type UpdatePersonResult = { ok: boolean; error?: "invalid" | "invalidPhone" | "phoneTaken" | "cannotAdd" | "rateLimited" | "wrongPassword"; fields?: string[] };
 
-export async function updatePersonAction(userId: string, input: z.input<typeof updateSchema>): Promise<UpdatePersonResult> {
+export async function updatePersonAction(userId: string, input: z.input<typeof updateSchema>, password?: string): Promise<UpdatePersonResult> {
   const v = await actionViewer("people.write");
   const u = await target(v, userId);
   if (!u) return { ok: false, error: "invalid" };
@@ -227,8 +227,15 @@ export async function updatePersonAction(userId: string, input: z.input<typeof u
     const fields = [...new Set(p.error.issues.map((i) => String(i.path[0] ?? "")).filter(Boolean))];
     return { ok: false, error: fields.length === 1 && fields[0] === "phone" ? "invalidPhone" : "invalid", fields };
   }
+  // A number signs its holder in by SMS code, so giving a live account a new one is a takeover path like a reset link:
+  // the actor's own password, and the person is told (removing a number opens nothing).
+  const newPhone = !!p.data.phone && p.data.phone !== u.phone;
+  if (newPhone) {
+    const refused = await stepUp(v, password, "person.phone_changed", u.id);
+    if (refused) return { ok: false, error: refused };
+  }
   // A new number is looked up across organisations, like an addition: it counts against the same per-administrator limit.
-  if (p.data.phone && p.data.phone !== u.phone && !(await rateLimit(`people-add:${v.user.id}`, 60, 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
+  if (newPhone && !(await rateLimit(`people-add:${v.user.id}`, 60, 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
   const holder = p.data.phone ? await phoneHolder(p.data.phone, u.id) : null;
   if (holder) return { ok: false, error: takenBy(holder, v, "phoneTaken"), fields: ["phone"] };
   try {
@@ -238,7 +245,8 @@ export async function updatePersonAction(userId: string, input: z.input<typeof u
     if (isUniqueViolation(error, "users_phone_active_idx")) return { ok: false, error: "phoneTaken", fields: ["phone"] };
     throw error;
   }
-  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.changed", targetType: "user", targetId: u.id });
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.changed", targetType: "user", targetId: u.id, ip: await clientIp(), meta: newPhone ? { phoneChanged: true } : undefined });
+  if (newPhone) await notifyTakeover(db(), v.tenant.id, v.user, u, "phoneChanged");
   refresh();
   return { ok: true };
 }
@@ -276,9 +284,14 @@ export async function resetTwoFactorAction(userId: string, password?: string): P
   return { ok: true };
 }
 
-/** Clears the provider identity bound at the first SSO sign-in (sso_subject); the next sign-in binds the account anew (a person re-created at the identity provider). */
-export async function unlinkSsoAction(userId: string): Promise<{ ok: boolean }> {
+/**
+ * Clears the provider identity bound at the first SSO sign-in (sso_subject); the next sign-in binds the account anew (a person
+ * re-created at the identity provider). Whoever then asserts the email at the provider gets the account, so it takes the step-up.
+ */
+export async function unlinkSsoAction(userId: string, password?: string): Promise<{ ok: boolean; error?: StepUpError }> {
   const v = await actionViewer("people.write");
+  const refused = await stepUp(v, password, "sso.unlinked", userId);
+  if (refused) return { ok: false, error: refused };
   const u = await target(v, userId);
   if (!u?.ssoSubject) return { ok: false };
   await db().update(t.users).set({ ssoSubject: null }).where(eq(t.users.id, u.id));
@@ -619,7 +632,8 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
               tenantId: v.tenant.id,
               name: r.name,
               email: r.email,
-              role: r.role === "tenant_admin" && v.user.role !== "tenant_admin" ? "learner" : r.role,
+              // Same rule as addPersonAction: administrators are granted by an administrator or the platform operator.
+              role: r.role === "tenant_admin" && v.user.role !== "tenant_admin" && v.user.role !== "super_admin" ? "learner" : r.role,
               status: "invited",
               departmentId: r.department ? deptByName.get(departmentKey(r.department)) ?? null : null,
               jobTitle: r.jobTitle || null,

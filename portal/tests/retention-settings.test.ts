@@ -28,9 +28,14 @@ describe("saveRetentionAction", () => {
     expect(await saveRetentionAction({ auditMonths: 121, learningMonths: 0 })).toEqual({ ok: false, field: "auditMonths" });
     expect(await saveRetentionAction({ auditMonths: 0, learningMonths: -1 })).toEqual({ ok: false, field: "learningMonths" });
     expect(await saveRetentionAction({ auditMonths: 1.5, learningMonths: 0 })).toEqual({ ok: false, field: "auditMonths" });
+    // The audit log is the trace of the administrators' own actions: never purged before a year.
+    expect(await saveRetentionAction({ auditMonths: 1, learningMonths: 0 })).toEqual({ ok: false, field: "auditMonths" });
+    expect(await saveRetentionAction({ auditMonths: 11, learningMonths: 1 })).toEqual({ ok: false, field: "auditMonths" });
     expect(await stored(tenant.id)).toEqual({ auditMonths: 0, learningMonths: 0 });
     expect(audit).not.toHaveBeenCalled();
 
+    expect(await saveRetentionAction({ auditMonths: 12, learningMonths: 1 })).toEqual({ ok: true });
+    expect(await stored(tenant.id)).toEqual({ auditMonths: 12, learningMonths: 1 });
     expect(await saveRetentionAction({ auditMonths: 24, learningMonths: 120 })).toEqual({ ok: true });
     expect(await stored(tenant.id)).toEqual({ auditMonths: 24, learningMonths: 120 });
     expect(await stored(other.id)).toEqual({ auditMonths: 0, learningMonths: 0 });

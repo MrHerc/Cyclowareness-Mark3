@@ -7,7 +7,7 @@ import { unstable_rethrow } from "next/navigation";
 import { z } from "zod";
 import { db, t } from "../db";
 import { logFailure } from "../db/errors";
-import { actionViewer, allowed } from "../auth/viewer";
+import { actionViewer, privileged } from "../auth/viewer";
 import { submitThreatReport } from "../services/threats";
 import { analyzeUpload, type SandboxState } from "../sandbox/upload";
 import { audit } from "../services/audit";
@@ -72,7 +72,7 @@ export async function escalateAnalysisAction(id: string): Promise<{ ok: boolean 
     .select()
     .from(t.sandboxAnalyses)
     .where(and(eq(t.sandboxAnalyses.id, id), eq(t.sandboxAnalyses.tenantId, v.tenant.id)));
-  if (!a || (a.submittedBy !== v.user.id && !allowed(v, "secops.read"))) return { ok: false };
+  if (!a || (a.submittedBy !== v.user.id && !privileged(v, "secops.read"))) return { ok: false };
   // One report per analysis (SB numbers are unique per organisation): sending it again only reaches the same report.
   const subject = `SB-${a.number}: ${a.objectName}`.slice(0, 300);
   const [sent] = await db()

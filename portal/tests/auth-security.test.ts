@@ -37,6 +37,7 @@ vi.mock("next/server", () => ({ after: (fn: () => unknown) => void h.later.push(
 vi.mock("next/cache", () => ({ refresh: () => undefined }));
 
 const auth = await import("../src/server/actions/auth");
+const { rateLimit } = await import("../src/server/rate-limit");
 const { hashBackupCode, legacyBackupHash, newTotpKey } = await import("../src/server/auth/totp");
 const { renewedExpiry, shouldRenew, SESSION_MAX_DAYS } = await import("../src/server/auth/session");
 const db = () => h.db as DB;
@@ -187,6 +188,21 @@ describe("phone codes", () => {
     expect(await ask("192.0.2.1")).toBe("rateLimited");
     expect(await ask("192.0.2.3")).toBe("ok");
     expect(await ask("192.0.2.3")).toBe("rateLimited");
+  });
+
+  it("caps the codes texted per organisation and hour, without telling the requester", async () => {
+    // SMS_PER_TENANT_HOUR (auth.ts) is 500; the counter is shared with the action, so the first 498 are taken here.
+    const [{ id: orgId }] = await db().insert(t.tenants).values({ slug: "pumped", name: "Pumped", plan: "professional", branding: { primary: "#4f46e5", accent: "#ff7a1a" }, settings: defaultSettings("en") }).returning();
+    for (let i = 0; i < 498; i++) await rateLimit(`sms-tenant:${orgId}`, 500, 60 * 60_000);
+    const numbers = ["+994501110011", "+994501110012", "+994501110013"];
+    for (const phone of numbers) await db().insert(t.users).values({ tenantId: orgId, name: "Pumped Person", email: `${phone}@pumped.test`, passwordHash: "hash", locale: "en", phone });
+    // Without a trusted proxy every client is one: five codes per number are allowed, so only the organisation's cap stops this.
+    h.ip = null;
+    const answers = [];
+    for (const phone of numbers) for (let i = 0; i < 2; i++) answers.push(await auth.requestPhoneCodeAction(undefined, form({ phone })));
+    expect(answers.map((a) => a?.step)).toEqual(Array(6).fill("code"));
+    await runLater();
+    expect(h.sms).toEqual(["+994501110011", "+994501110011"]);
   });
 });
 

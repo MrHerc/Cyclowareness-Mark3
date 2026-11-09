@@ -23,6 +23,8 @@ vi.mock("../src/server/services/assignments", () => ({}));
 vi.mock("../src/server/queries/admin", () => ({}));
 vi.mock("../src/server/auth/links", () => ({}));
 vi.mock("../src/server/auth/session", () => ({}));
+// A new number takes the actor's password (tests/step-up.test.ts); here only the import and the limits are under test.
+vi.mock("../src/server/auth/step-up", () => ({ stepUp: async () => null }));
 vi.mock("../src/server/request", () => ({ clientIp: async () => "127.0.0.1" }));
 
 const pglite = new PGlite();
@@ -30,9 +32,10 @@ const db = drizzle(pglite, { schema: t }) as unknown as DB;
 vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src/server/db/schema") }));
 
 let tenantId = "";
+let actorRole: Role = "tenant_admin";
 vi.mock("../src/server/auth/viewer", () => ({
   actionViewer: async () => ({
-    user: { id: "00000000-0000-4000-8000-000000000001", role: "tenant_admin" },
+    user: { id: "00000000-0000-4000-8000-000000000001", role: actorRole },
     tenant: { id: tenantId, features: new Set(), settings: { defaultLocale: "en", email: { enabled: false } } },
   }),
 }));
@@ -137,6 +140,16 @@ describe("CSV import roles", () => {
     const users = await db.select({ email: t.users.email, role: t.users.role }).from(t.users).where(eq(t.users.tenantId, tenantId));
     const roleOf = new Map(users.map((u) => [u.email, u.role]));
     for (const p of people) expect(roleOf.get(p.email), `${p.email} (${p.written})`).toBe(p.role);
+  });
+
+  it("lets the platform operator import administrators, as the add dialog does", async () => {
+    actorRole = "super_admin";
+    try {
+      expect(await importPeopleAction(["name,email,role", "Op Admin,op-admin@acme.test,admin"].join("\n"), true)).toMatchObject({ ok: true, imported: 1 });
+    } finally {
+      actorRole = "tenant_admin";
+    }
+    expect((await db.select({ role: t.users.role }).from(t.users).where(eq(t.users.email, "op-admin@acme.test")))[0].role).toBe("tenant_admin");
   });
 });
 

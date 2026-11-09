@@ -5,7 +5,7 @@ import { refresh } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
-import { actionViewer, allowed, hasFeature } from "../auth/viewer";
+import { actionViewer, hasFeature, privileged } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
 import { insertNumbered } from "../services/threats";
 import { audit } from "../services/audit";
@@ -99,7 +99,7 @@ export async function replyTicketAction(ticketId: string, body: string): Promise
   const text = body.trim().slice(0, 5000);
   if (text.length < 1 || !hasFeature(v, "support") || !isUuid(ticketId)) return { ok: false };
   const [ticket] = await db().select().from(t.supportTickets).where(and(eq(t.supportTickets.id, ticketId), eq(t.supportTickets.tenantId, v.tenant.id)));
-  const staff = allowed(v, "support.manage");
+  const staff = privileged(v, "support.manage");
   if (!ticket || (ticket.userId !== v.user.id && !staff)) return { ok: false };
   // Requesters only: the support desk answers many tickets an hour.
   if (!staff && !(await rateLimit(`ticket-reply:${v.user.id}`, 30, 60 * 60_000)).ok) return { ok: false };

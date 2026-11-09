@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { runJobs } from "../src/server/jobs";
@@ -51,6 +51,9 @@ describe("job runner tick", () => {
       await db.insert(t.auditLog).values([
         { tenantId: tenant.id, action: "old", at: old },
         { tenantId: tenant.id, action: "recent", at: recent },
+        // The entries that explain a gap in the history outlive the retention they describe.
+        { tenantId: tenant.id, action: "settings.retention", at: old, meta: retention },
+        { tenantId: tenant.id, action: "retention.purged", at: old, meta: { seeded: true } },
       ]);
       const answer = { tenantId: tenant.id, userId: user.id, lessonId: mod.lessons[0].id, sceneId: "q1", correct: true, firstTry: true };
       await db.insert(t.answers).values([
@@ -65,27 +68,30 @@ describe("job runner tick", () => {
       ]);
       await db.insert(t.lessonProgress).values({ userId: user.id, lessonId: mod.lessons[0].id, completedAt: old });
       const rows = async () => ({
-        audit: (await db.select({ a: t.auditLog.action }).from(t.auditLog).where(eq(t.auditLog.tenantId, tenant.id))).map((r) => r.a).filter((a) => a === "old" || a === "recent").sort(),
+        audit: (await db.select({ a: t.auditLog.action, at: t.auditLog.at }).from(t.auditLog).where(eq(t.auditLog.tenantId, tenant.id))).filter((r) => r.at.getTime() !== now.getTime()).map((r) => r.a).sort(),
         answers: (await db.select({ s: t.answers.sceneId }).from(t.answers).where(eq(t.answers.tenantId, tenant.id))).map((r) => r.s).sort(),
         risks: (await db.select({ title: t.behaviorRisks.title }).from(t.behaviorRisks).where(eq(t.behaviorRisks.tenantId, tenant.id))).map((r) => r.title).sort(),
         progress: (await db.select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, user.id))).length,
       });
       return rows;
     };
-    const everything = { audit: ["old", "recent"], answers: ["old", "recent"], risks: ["closed lately", "closed long ago", "still open"], progress: 1 };
-    const auditOnly = await org({ auditMonths: 1, learningMonths: 0 });
+    const everything = { audit: ["old", "recent", "retention.purged", "settings.retention"], answers: ["old", "recent"], risks: ["closed lately", "closed long ago", "still open"], progress: 1 };
+    const auditOnly = await org({ auditMonths: 12, learningMonths: 0 });
     const learningOnly = await org({ auditMonths: 0, learningMonths: 12 });
     const keeps = await org({ auditMonths: 0, learningMonths: 0 });
     globalThis.__jobsCleanupDay = undefined;
     await runJobs(db, now);
-    expect(await auditOnly()).toEqual({ ...everything, audit: ["recent"] });
+    expect(await auditOnly()).toEqual({ ...everything, audit: ["recent", "retention.purged", "settings.retention"] });
     expect(await learningOnly()).toEqual({ ...everything, answers: ["recent"], risks: ["closed lately", "still open"] });
     expect(await keeps()).toEqual(everything);
-    const purges = await db.select({ tenantId: t.auditLog.tenantId, meta: t.auditLog.meta }).from(t.auditLog).where(eq(t.auditLog.action, "retention.purged"));
+    const purges = await db
+      .select({ tenantId: t.auditLog.tenantId, meta: t.auditLog.meta })
+      .from(t.auditLog)
+      .where(and(eq(t.auditLog.action, "retention.purged"), eq(t.auditLog.at, now)));
     expect(purges).toHaveLength(2);
     expect(purges.map((p) => p.meta)).toEqual(
       expect.arrayContaining([
-        { auditEntries: 1, answers: 0, risks: 0, auditBefore: "2026-10-07T10:00:00.000Z" },
+        { auditEntries: 1, answers: 0, risks: 0, auditBefore: "2025-11-07T10:00:00.000Z" },
         { auditEntries: 0, answers: 1, risks: 1, learningBefore: "2025-11-07T10:00:00.000Z" },
       ]),
     );

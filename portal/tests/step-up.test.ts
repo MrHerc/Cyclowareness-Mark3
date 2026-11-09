@@ -153,6 +153,71 @@ describe("step-up before account-takeover actions", () => {
     expect(await people.changeRoleAction(learner.id, "tenant_admin", PW)).toEqual({ ok: true });
     expect((await notices(peer.id)).length).toBe(before + 1);
   });
+
+  it("asks for the password to give a person a new phone number (it signs them in by SMS), not to rename them", async () => {
+    as(admin2);
+    const edit = { name: "Kamran Learner", jobTitle: "", locale: "en" as const };
+    expect(await people.updatePersonAction(learner.id, { ...edit, phone: "+994501234567" })).toEqual({ ok: false, error: "wrongPassword" });
+    expect(await people.updatePersonAction(learner.id, { ...edit, phone: "+994501234567" }, "not-it")).toEqual({ ok: false, error: "wrongPassword" });
+    expect((await row(learner.id)).phone).toBeNull();
+    expect((await audits(org.id, "security.step_up_failed")).filter((a) => a.meta?.action === "person.phone_changed").map((a) => a.targetId)).toEqual([learner.id, learner.id]);
+    // A rename, or keeping the number, is an ordinary edit.
+    expect(await people.updatePersonAction(learner.id, { ...edit, name: "Kamran L.", phone: "" })).toEqual({ ok: true });
+    const noticesBefore = (await notices(learner.id)).length;
+    expect(await people.updatePersonAction(learner.id, { ...edit, phone: "+994 50 123 45 67" }, PW)).toEqual({ ok: true });
+    expect((await row(learner.id)).phone).toBe("+994501234567");
+    expect((await notices(learner.id)).slice(noticesBefore)).toMatchObject([{ kind: "phoneChanged", href: "/profile" }]);
+    expect(sent.at(-1)).toMatchObject({ to: learner.email, subject: "The phone number of your account changed" });
+    expect(await people.updatePersonAction(learner.id, { ...edit, phone: "+994501234567" })).toEqual({ ok: true });
+    expect((await notices(learner.id)).length).toBe(noticesBefore + 1);
+    // Making someone an administrator is a peer action: the other administrators hear of it.
+    const peerBefore = (await notices(peer.id)).length;
+    expect(await people.updatePersonAction(targetAdmin.id, { name: targetAdmin.name, locale: "en", phone: "+994507654321" }, PW)).toEqual({ ok: true });
+    expect((await notices(peer.id)).length).toBe(peerBefore + 1);
+    expect((await notices(peer.id)).at(-1)?.title).toContain(targetAdmin.name);
+  });
+
+  it("asks for the password to unlink a person's single sign-on identity, which the next sign-in binds anew", async () => {
+    as(peer);
+    await db.update(t.users).set({ ssoSubject: "https://idp.test sub-1" }).where(eq(t.users.id, learner.id));
+    expect(await people.unlinkSsoAction(learner.id, "not-it")).toEqual({ ok: false, error: "wrongPassword" });
+    expect((await row(learner.id)).ssoSubject).toBe("https://idp.test sub-1");
+    expect((await audits(org.id, "security.step_up_failed")).filter((a) => a.meta?.action === "sso.unlinked")).toHaveLength(1);
+    expect(await people.unlinkSsoAction(learner.id, PW)).toEqual({ ok: true });
+    expect((await row(learner.id)).ssoSubject).toBeNull();
+    expect(await audits(org.id, "sso.unlinked")).toHaveLength(1);
+  });
+});
+
+describe("step-up before re-pointing the organisation's sign-in", () => {
+  const identity = (sso: Partial<{ issuer: string; clientId: string; emailClaim: string; autoCreate: boolean }> = {}, rest: Partial<{ ssoEnabled: boolean; requireAdmin2fa: boolean; maxDevices: number | null }> = {}) => ({
+    requireAdmin2fa: true,
+    maxDevices: null as number | null,
+    ssoEnabled: false,
+    ...rest,
+    sso: { protocol: "oidc" as const, issuer: "", clientId: "", emailClaim: "email", autoCreate: true, ...sso },
+    ldap: { departmentSource: "attribute" as const, syncManagers: true, syncLanguage: false, schedule: "off" as const, passwordSignIn: false, matchByEmail: true },
+  });
+  const storedIssuer = async () => (await db.select({ s: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, org.id)))[0].s.identity?.sso?.issuer;
+
+  it("saves the device limit without a password, but needs it for the issuer, the email claim, auto-create, the switch and dropping the 2FA rule", async () => {
+    // targetAdmin has not acted yet: the step-up allows 10 tries per actor and the others have used theirs.
+    as(targetAdmin);
+    expect(await settings.saveIdentityAction(identity({}, { maxDevices: 3 }))).toEqual({ ok: true });
+    expect(await settings.saveIdentityAction(identity({ issuer: "https://idp.attacker.test", clientId: "portal" }))).toEqual({ ok: false, error: "wrongPassword" });
+    expect(await settings.saveIdentityAction(identity({ issuer: "https://idp.attacker.test", clientId: "portal" }), "not-it")).toEqual({ ok: false, error: "wrongPassword" });
+    expect(await storedIssuer()).toBeFalsy();
+    expect((await audits(org.id, "security.step_up_failed")).filter((a) => a.meta?.action === "settings.identity")).toHaveLength(2);
+    for (const input of [identity({ emailClaim: "upn" }), identity({ autoCreate: false }), identity({ issuer: "https://idp.acme.test", clientId: "portal" }, { ssoEnabled: true }), identity({}, { requireAdmin2fa: false })]) {
+      expect(await settings.saveIdentityAction(input)).toEqual({ ok: false, error: "wrongPassword" });
+    }
+    expect(await settings.saveIdentityAction(identity({ issuer: "https://idp.acme.test", clientId: "portal" }), PW)).toEqual({ ok: true });
+    expect(await storedIssuer()).toBe("https://idp.acme.test");
+    const [saved] = (await audits(org.id, "settings.identity")).filter((a) => a.meta?.issuerChanged);
+    expect(saved.meta).toMatchObject({ issuerChanged: true, issuerBefore: null, issuerAfter: "https://idp.acme.test" });
+    // The same values again change nothing, so no password is asked.
+    expect(await settings.saveIdentityAction(identity({ issuer: "https://idp.acme.test", clientId: "portal" }))).toEqual({ ok: true });
+  });
 });
 
 describe("the operator's support link", () => {

@@ -52,6 +52,7 @@ vi.mock("../src/server/auth/viewer", () => ({
   getViewer: async () => viewer,
   getSession: async () => viewer,
   allowed,
+  privileged: allowed,
   hasFeature: (v: Viewer, f: string) => v.tenant.features.has(f as never),
   twoFactorGap: () => false,
 }));
