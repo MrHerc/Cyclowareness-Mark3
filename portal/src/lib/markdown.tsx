@@ -20,7 +20,8 @@ function inline(text: string, key: string): ReactNode[] {
   const out: ReactNode[] = [];
   // A link's text and address stop at the next "[", where the next link could start: otherwise every
   // unclosed "[" re-scans to the end of the paragraph (quadratic on a policy full of "[").
-  const re = /(\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^[\]]+)\]\((https?:\/\/[^\s)[]+|\/[^\s)[]*)\))/g;
+  // A path must not start with "//" or "/\" (browsers read both as another host, as safePath does).
+  const re = /(\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^[\]]+)\]\((https?:\/\/[^\s)[]+|\/(?![/\\])[^\s)[]*)\))/g;
   let last = 0;
   let m: RegExpExecArray | null;
   let i = 0;

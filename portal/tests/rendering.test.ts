@@ -115,6 +115,12 @@ describe("Markdown", () => {
     expect(md("[x](mailto:a@b.c)")).not.toContain("<a ");
   });
 
+  it("does not link protocol-relative destinations that look like paths", () => {
+    expect(md("[a](//evil.example/x)")).not.toContain("<a ");
+    expect(md("[a](/\\evil.example/x)")).not.toContain("<a ");
+    expect(md("[a](/learn)")).toContain('href="/learn"');
+  });
+
   it("renders pipe tables with a thead and a tbody", () => {
     const html = md("| Name | Role |\n|---|---|\n| Ada | Admin |\n| Bob | User |");
     expect(html).toContain("<table");
