@@ -271,8 +271,15 @@ async function deliverRow(db: DB, id: string, opts: { fromName?: string; transpo
       .where(eq(t.outbox.id, id));
     return { status: "sent", stop: false };
   } catch (error) {
-    // The raw server answer goes to the log; the outbox keeps a code the console can translate.
-    log.error(`[mail] delivery of ${m.id} failed`, { tenantId: m.tenantId ?? undefined, error: String((error as Error)?.message ?? error).slice(0, 500) });
+    // The server answer goes to the log with its addresses redacted (a rejection names the recipient); the outbox keeps a code the console can translate.
+    log.error(`[mail] delivery of ${m.id} failed`, {
+      tenantId: m.tenantId ?? undefined,
+      error: String((error as Error)?.message ?? error)
+        .replace(/[^\s<>@:;,"']+@[^\s<>@:;,"']+/g, "<address>")
+        .slice(0, 500),
+      code: (error as { code?: string })?.code,
+      responseCode: (error as { responseCode?: number })?.responseCode,
+    });
     return recordFailure(db, m, classifySmtpError(error), stopsServer(error));
   }
 }

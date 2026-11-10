@@ -124,7 +124,7 @@ export async function overviewData(v: Viewer, locale: string, departmentFilter: 
       .where(and(eq(t.riskSnapshots.tenantId, v.tenant.id), gte(t.riskSnapshots.day, dayPlus(-31, v.tenant.settings.timeZone, now))))
       .orderBy(asc(t.riskSnapshots.day)),
     // Unscoped: the whole organisation, without a list of people; the rows are read per person below.
-    resolveAssignments(db(), v.tenant.id, deptScope ? ids : undefined),
+    resolveAssignments(db(), v.tenant.id, deptScope ? inScope : undefined),
     departmentLeague(db(), v.tenant.id),
     ids.length
       ? db()

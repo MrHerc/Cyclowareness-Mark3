@@ -63,6 +63,9 @@ export async function closeLoop(db: DB, p: { tenantId: string; loopId: string; a
 
 /* ───────── targeted training ───────── */
 
+/** People per statement: 1,000 behaviour risks bind 8,000 parameters, far below PostgreSQL's 65,535 per statement. */
+const TARGET_CHUNK = 1_000;
+
 /**
  * Gives specific people one module because of a real event (incident, approved material).
  * It shows up under "My open risks" with a due date and closes when they finish the module.
@@ -90,33 +93,35 @@ export async function targetTraining(
   if (!p.userIds.length) return [];
   const [mod] = await db.select({ slug: t.modules.slug, title: t.modules.title }).from(t.modules).where(eq(t.modules.id, p.moduleId));
   if (!mod) return [];
-  const people = await db
-    .select({ id: t.users.id, locale: t.users.locale })
-    .from(t.users)
-    .where(and(eq(t.users.tenantId, p.tenantId), inArray(t.users.id, p.userIds), eq(t.users.status, "active")));
+  const people: { id: string; locale: string }[] = [];
+  const completed: { userId: string }[] = [];
+  for (let i = 0; i < p.userIds.length; i += TARGET_CHUNK) {
+    const ids = p.userIds.slice(i, i + TARGET_CHUNK);
+    people.push(...(await db.select({ id: t.users.id, locale: t.users.locale }).from(t.users).where(and(eq(t.users.tenantId, p.tenantId), inArray(t.users.id, ids), eq(t.users.status, "active")))));
+    completed.push(...(await db.select({ userId: t.moduleProgress.userId }).from(t.moduleProgress).where(and(eq(t.moduleProgress.moduleId, p.moduleId), inArray(t.moduleProgress.userId, ids), eq(t.moduleProgress.status, "completed")))));
+  }
   if (!people.length) return [];
   const existing = await db
     .select({ userId: t.behaviorRisks.userId })
     .from(t.behaviorRisks)
     .where(and(eq(t.behaviorRisks.tenantId, p.tenantId), eq(t.behaviorRisks.sourceRef, p.sourceRef), eq(t.behaviorRisks.status, "open")));
-  const completed = await db
-    .select({ userId: t.moduleProgress.userId })
-    .from(t.moduleProgress)
-    .where(and(eq(t.moduleProgress.moduleId, p.moduleId), inArray(t.moduleProgress.userId, people.map((u) => u.id)), eq(t.moduleProgress.status, "completed")));
   const skip = new Set([...existing, ...completed].map((e) => e.userId));
-  const targetPeople = people.filter((u) => !skip.has(u.id));
-  const targets = targetPeople.map((u) => u.id);
+  const targets = people.filter((u) => !skip.has(u.id)).map((u) => u.id);
   if (!targets.length) return [];
   const due = p.dueDate ?? dayPlus(7, await tenantTimeZone(db, p.tenantId));
   const titleFor = (locale: string) => (typeof p.title === "function" ? p.title(locale) : p.title);
   // A title written by the system is stored in every UI language; one typed by a person (incident, material) as it is.
   const stored = typeof p.title === "function" ? encodeRiskTitle(Object.fromEntries(LOCALES.map((l) => [l, titleFor(l)]))) : p.title.slice(0, 300);
-  await db.insert(t.behaviorRisks).values(targetPeople.map((u) => ({ tenantId: p.tenantId, userId: u.id, kind: p.kind, severity: p.severity, title: stored, sourceRef: p.sourceRef, moduleId: p.moduleId, dueDate: due })));
   // Module title and reason in each person's own language.
   const moduleTitle = (locale: string) => pick(mod.title, locale);
   const note = p.note;
-  await notifyUsers(db, p.tenantId, targets, "assignment", { module: moduleTitle, dueDate: due, link: `/learn/${mod.slug}`, reason: titleFor }, { title: note?.title ?? moduleTitle, body: note ? note.body.slice(0, 280) : titleFor, href: `/learn/${mod.slug}` }, { defer: true });
-  await recomputeRisk(db, p.tenantId, targets);
+  // The notification and the rescoring bind one parameter per person too, so they go chunk by chunk with the insert.
+  for (let i = 0; i < targets.length; i += TARGET_CHUNK) {
+    const chunk = targets.slice(i, i + TARGET_CHUNK);
+    await db.insert(t.behaviorRisks).values(chunk.map((userId) => ({ tenantId: p.tenantId, userId, kind: p.kind, severity: p.severity, title: stored, sourceRef: p.sourceRef, moduleId: p.moduleId, dueDate: due })));
+    await notifyUsers(db, p.tenantId, chunk, "assignment", { module: moduleTitle, dueDate: due, link: `/learn/${mod.slug}`, reason: titleFor }, { title: note?.title ?? moduleTitle, body: note ? note.body.slice(0, 280) : titleFor, href: `/learn/${mod.slug}` }, { defer: true });
+    await recomputeRisk(db, p.tenantId, chunk);
+  }
   return targets;
 }
 

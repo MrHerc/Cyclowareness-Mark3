@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { featuresFor, reportAddress, withDefaults } from "../src/lib/tenant-defaults";
@@ -46,6 +46,15 @@ vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => ai.viewe
 vi.mock("../src/server/request", () => ({ clientIp: async () => null }));
 vi.mock("next/cache", () => ({ refresh: vi.fn() }));
 vi.mock("next-intl/server", () => ({ getLocale: async () => "en", getTranslations: async () => (key: string) => key }));
+// Unchanged behaviour; the spies show how many people each call binds.
+vi.mock("../src/server/services/notify", async (original) => {
+  const m = await original<typeof import("../src/server/services/notify")>();
+  return { ...m, notifyUsers: vi.fn(m.notifyUsers) };
+});
+vi.mock("../src/server/services/risk", async (original) => {
+  const m = await original<typeof import("../src/server/services/risk")>();
+  return { ...m, recomputeRisk: vi.fn(m.recomputeRisk) };
+});
 
 const { db, ready } = testDb();
 const { submitThreatReport, insertNumbered } = await import("../src/server/services/threats");
@@ -55,6 +64,8 @@ const inbound = await import("../src/app/api/inbound/[tenant]/route");
 const { rateLimit } = await import("../src/server/rate-limit");
 const { sha256Hex } = await import("../src/server/crypto");
 const { randomToken } = await import("../src/server/services/progress");
+const { notifyUsers } = await import("../src/server/services/notify");
+const { recomputeRisk } = await import("../src/server/services/risk");
 const { saveStudioLessonAction, setModuleStatusAction, updateStudioLessonAction } = await import("../src/server/actions/secops");
 
 beforeAll(ready, DB_SETUP_TIMEOUT);
@@ -355,6 +366,25 @@ describe("targetTraining", () => {
     expect(await targetTraining(db, { ...base, userIds: [], moduleId: (await addModule(db)).id })).toEqual([]);
     expect(await targetTraining(db, { ...base, userIds: [person.id], moduleId: "00000000-0000-4000-8000-000000000000" })).toEqual([]);
   });
+
+  it("targets 8,200 people, more than one INSERT of behaviour risks can bind (8 each, 65,535 at most)", async () => {
+    const tenant = await addTenant(db);
+    const mod = await addModule(db);
+    const people = await db.execute<{ id: string }>(sql`insert into users (tenant_id, email, name, locale) select ${tenant.id}, 'target' || g || '@test.example', 'Target ' || g, 'en' from generate_series(1, 8200) g returning id`);
+    const userIds = people.rows.map((r) => r.id);
+    vi.mocked(notifyUsers).mockClear();
+    vi.mocked(recomputeRisk).mockClear();
+    const targets = await targetTraining(db, { tenantId: tenant.id, userIds, moduleId: mod.id, severity: "medium", kind: "path", title: "Refresher", sourceRef: "REFRESH-2026-11" });
+    expect(targets).toHaveLength(8_200);
+    const [risks] = await db.select({ n: count() }).from(t.behaviorRisks).where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.sourceRef, "REFRESH-2026-11")));
+    expect(risks.n).toBe(8_200);
+    // Notifying and rescoring bind one parameter per person as well, so past 65,535 targets they must go in chunks too.
+    for (const spy of [vi.mocked(notifyUsers), vi.mocked(recomputeRisk)]) {
+      const sizes = spy.mock.calls.map((c) => (c[2] as string[]).length);
+      expect(sizes.reduce((a, b) => a + b, 0)).toBe(8_200);
+      expect(Math.max(...sizes)).toBeLessThanOrEqual(1_000);
+    }
+  }, 300_000);
 });
 
 describe("moduleScores", () => {

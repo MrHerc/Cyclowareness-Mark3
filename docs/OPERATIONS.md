@@ -119,10 +119,20 @@ lost, so make them on the build machine before every release image. Details: `po
 - **Nightly dump.** From the `portal` folder: `sh scripts/backup.sh` writes
   `backups/portal-<UTC time>.dump` (`pg_dump -Fc`) and deletes dumps older than `BACKUP_KEEP_DAYS`
   (14). Cron: `15 2 * * * cd /srv/portal && mkdir -p backups && sh scripts/backup.sh >> backups/backup.log 2>&1`.
+  The script runs with `umask 077` and sets the folder to `700`, so only the account that runs it can
+  read the dumps (every organisation's personal data).
+- **Encrypted dumps (recommended for banks and government).** Install [age](https://age-encryption.org)
+  on the host, make a key pair once on another machine (`age-keygen -o backup-identity.txt`) and set
+  `BACKUP_AGE_RECIPIENT=<its public key, age1…>` in the cron line's environment. The script then writes
+  `backups/portal-<UTC time>.dump.age`, encrypted on its way to disk, so neither the host's disk nor the
+  off-host storage holds a plaintext dump. Keep `backup-identity.txt` in
+  `<password manager / sealed escrow>` next to `APP_SECRET`, never on this host or with the dumps.
 - **Off-host copy.** Copy `backups/` every day to `<storage account at another provider>`. Keep
   `APP_SECRET` (from `.env`) in `<password manager / sealed escrow>`, apart from the dumps: a dump is
   useless without it, and it must not travel with them.
-- **Restore.** `sh scripts/restore.sh backups/<file>.dump`: asks for confirmation, stops `app` and
+- **Restore.** `sh scripts/restore.sh backups/<file>.dump` (an encrypted dump:
+  `BACKUP_AGE_IDENTITY=<path to backup-identity.txt> sh scripts/restore.sh backups/<file>.dump.age`,
+  which decrypts it with age; a wrong identity stops before anything changes): asks for confirmation, stops `app` and
   `worker`, empties the database and loads the dump in one transaction (a failed restore changes
   nothing; tables from migrations newer than the dump are dropped, so the next start re-applies them)
   and starts `app`. `.env` must hold the `APP_SECRET` that was in use when the dump was made.
@@ -189,15 +199,31 @@ per run; whatever is left is picked up by the next tick).
   requests from the public site after 24 months.
 - **Per-organisation retention.** Settings → Protection → Data retention, two values in months
   (0 to 120, 0 = keep forever, the default). *Audit log* deletes that organisation's audit entries
-  older than the value. *Answers and closed risks* deletes its lesson answers and the behaviour risks
-  closed longer ago than the value; open risks stay. Every change is in the audit log as
-  `settings.retention`. Deleting answers lowers the figures of the module-quality report for that
-  period. The risk score reads risky answers of the last 90 days and first-try accuracy of the last
-  180 days, so a value under 6 months shortens those windows and changes that organisation's risk
-  scores. Each run that deletes something writes one `retention.purged` entry to that organisation's
-  audit log with the counts and cutoff dates, so the gap in its history is explained.
+  older than the value. *Learning and simulation results* deletes, older than the value:
+  - lesson answers;
+  - behaviour risks closed before the cutoff (open risks stay);
+  - the per-person results (sent, opened, clicked, submitted, reported) of campaigns that are completed
+    or cancelled and ended before the cutoff, with their teachable-moment loops. The campaigns themselves
+    stay, but no totals are stored: their figures (sent, opened, clicked, reported) on the campaign list,
+    the campaign page and in reports count the results that remain, so such a campaign shows none;
+  - closed teachable-moment loops assigned before the cutoff;
+  - the daily per-person risk scores (the person page sparkline and the leadership risk story);
+  - the forwarded mail text and link of threat reports that were converted or dismissed (the report
+    itself stays, so its TR number and the reporter's sharp-eye badge stay; reports still new or
+    triaged keep their text);
+  - sandbox analyses, except each organisation's highest-numbered one, so an SB number is never reused.
+
+  Every change is in the audit log as `settings.retention`. Deleting answers lowers the figures of the
+  module-quality report for that period. The risk score reads simulation results and risky answers of
+  the last 90 days and first-try accuracy of the last 180 days, so a value under 6 months shortens
+  those windows and changes that organisation's risk scores; campaign reports and the person page lose
+  the deleted results too. Each run that deletes something writes one `retention.purged` entry to that
+  organisation's audit log with the counts per kind and the cutoff dates, so the gap in its history is
+  explained.
 - **Never deleted by the job.** Lesson progress, XP events, attestations and certificates: they are
-  the organisation's compliance evidence and feed XP and league totals.
+  the organisation's compliance evidence and feed XP and league totals. Lab attempts stay too: a
+  learning path's lab counts as passed, and the lab-explorer badge is earned, from them. Open
+  behaviour risks, open threat reports and campaigns that are still running stay as well.
 - **Backups.** Deleted rows stay in the nightly dumps until those age out (`BACKUP_KEEP_DAYS`, 14,
   plus the off-host copy's own retention). Say so when a customer asks how long deleted data lasts.
 - **Residency.** Where the data lives is a hosting decision, not a setting: the hosted portal keeps
