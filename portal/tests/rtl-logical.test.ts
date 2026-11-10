@@ -156,4 +156,10 @@ describe("direction of text in another language, and mirrored icons", () => {
     );
     expect(offenders).toEqual([]);
   }, 60_000);
+
+  it("lays out the mini-lab's page-language label in the page's direction inside English scenario text", () => {
+    const source = fs.readFileSync(path.join(process.cwd(), "src/components/lab/labs/mini-lab.tsx"), "utf8");
+    const label = htmlTags(source).find((tag) => source.includes(`${tag}{says}`));
+    expect(label).toContain("{...langAttrs(locale)}");
+  });
 });

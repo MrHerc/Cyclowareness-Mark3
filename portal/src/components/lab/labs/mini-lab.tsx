@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AppWindow, CheckCircle2, ChevronRight, FileText, Globe, Mail, MessageSquare, PhoneIncoming, ShieldAlert } from "lucide-react";
 import type { LabArtifact, LabDecision, LabScenario } from "@/lib/content/lab-scenario";
 import { Button } from "@/components/ui/button";
@@ -327,6 +327,8 @@ function Feedback({ ok, verdictId, explainId, risk, explain, lang, action, onAct
 
 /** A text message, a call or a window, shown in the decision card itself. */
 function InlineArtifact({ a, says }: { a: LabArtifact; says: string }) {
+  // The wrapper carries the scenario's language; this label is in the page's.
+  const locale = useLocale();
   if (a.kind === "sms")
     return (
       <div className="mt-3 rounded-lg bg-sunken p-3.5">
@@ -354,7 +356,7 @@ function InlineArtifact({ a, says }: { a: LabArtifact; says: string }) {
             {a.number}
           </span>
         </p>
-        <p className="mt-2 text-tab font-semibold text-ink-subtle">{says}</p>
+        <p {...langAttrs(locale)} className="mt-2 text-tab font-semibold text-ink-subtle">{says}</p>
         {a.body.map((p) => (
           <p key={p} className="mt-1 border-s-2 border-line-strong ps-3 text-body-sm italic">
             {p}

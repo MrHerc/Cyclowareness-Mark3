@@ -47,7 +47,7 @@ beforeAll(async () => {
   plainTenantId = plain.id;
   const [mod] = await db
     .insert(t.modules)
-    .values({ slug: "phishing-email", category: "email", audiences: ["all"], title: { en: "Phishing email", az: "FiÅŸinq mÉ™ktubu" }, subtitle: { en: "" }, minutes: 6, xp: 40, difficulty: "Easy" })
+    .values({ slug: "phishing-email", category: "email", audiences: ["all"], title: { en: "Phishing email", az: "Fişinq məktubu" }, subtitle: { en: "" }, minutes: 6, xp: 40, difficulty: "Easy" })
     .returning();
   await db.insert(t.lessons).values([
     { moduleId: mod.id, key: "phishing-email-1", title: { en: "One" }, minutes: 3, position: 1 },
