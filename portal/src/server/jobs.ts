@@ -28,7 +28,7 @@ import { dayKey } from "../lib/domain/gamification";
 import { featuresFor, withDefaults } from "../lib/tenant-defaults";
 import { dayPlus, todayIn, zonedTime } from "../lib/time";
 import { zonedParts } from "../lib/baku-clock";
-import { LOCALES, isLocale, pick, type Locale } from "../i18n/config";
+import { LOCALES, isLocale, pick } from "../i18n/config";
 import { messagesFor } from "../i18n/translator";
 
 /**
@@ -654,18 +654,11 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
 
 /* ───────── automatic refresher ───────── */
 
-const REFRESHER_TITLE: Record<string, string> = {
-  az: "Aylıq təkrar təlim",
-  en: "Monthly follow-up training",
-  ru: "Ежемесячное повторное обучение",
-  tr: "Aylık tekrar eğitimi",
-  ro: "Instruire lunară de reîmprospătare",
-  ka: "ყოველთვიური განმეორებითი ტრენინგი",
-  uk: "Щомісячне повторне навчання",
-  de: "Monatliche Auffrischungsschulung",
-  fr: "Remise à niveau mensuelle",
-  ar: "تدريب تنشيطي شهري",
-} satisfies Record<Locale, string>;
+/** The refresher task's title (admin.jobs.refresherTitle) in every interface language. */
+async function refresherTitles() {
+  const byLocale = new Map(await Promise.all(LOCALES.map(async (l) => [l, createTranslator({ ...(await messagesFor(l)), namespace: "admin.jobs" })("refresherTitle")] as const)));
+  return (locale: string) => byLocale.get(isLocale(locale) ? locale : "en")!;
+}
 
 /**
  * People at or above the risk threshold get one follow-up training task a month (no penalty, no XP loss):
@@ -709,6 +702,7 @@ async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number
     byModule.set(moduleId, [...(byModule.get(moduleId) ?? []), r.id]);
   }
   let count = 0;
+  const title = await refresherTitles();
   for (const [moduleId, userIds] of byModule) {
     const got = await targetTraining(db, {
       tenantId: tenant.id,
@@ -716,7 +710,7 @@ async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number
       moduleId,
       severity: "medium",
       kind: "path",
-      title: (locale) => REFRESHER_TITLE[locale] ?? REFRESHER_TITLE.en,
+      title,
       sourceRef: ref,
       dueDate: dayPlus(14, tenant.settings.timeZone, now),
     });

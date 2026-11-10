@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { runJobs } from "../src/server/jobs";
 import { defaultSettings } from "../src/lib/tenant-defaults";
+import { riskTitles } from "../src/lib/risk-title";
 import { addModule, addTenant, addUser, DB_SETUP_TIMEOUT, testDb } from "./helpers/db";
 
 const { db, ready } = testDb();
@@ -112,5 +113,21 @@ describe("job runner tick", () => {
     }
     expect(globalThis.__jobsCleanupDay).toBeUndefined();
     expect((await db.select({ a: t.auditLog.action }).from(t.auditLog).where(eq(t.auditLog.tenantId, tenant.id))).map((r) => r.a)).toContain("old");
+  }, 60_000);
+});
+
+describe("monthly refresher", () => {
+  it("titles the follow-up training from the message files, in every interface language", async () => {
+    const now = new Date("2026-11-09T10:00:00Z");
+    // The daily snapshot recomputes the score first: a threshold of 1 makes this learner due for one.
+    const settings = defaultSettings("en");
+    const tenant = await addTenant(db, { settings: { ...settings, learning: { ...settings.learning, riskThreshold: 1 } } });
+    const user = await addUser(db, tenant.id);
+    await addModule(db, { slug: "phishing-email", tenantId: tenant.id, status: "published", lessons: 1 });
+    await runJobs(db, now);
+    const [risk] = await db.select({ title: t.behaviorRisks.title }).from(t.behaviorRisks).where(and(eq(t.behaviorRisks.userId, user.id), eq(t.behaviorRisks.sourceRef, "REFRESH-2026-11")));
+    const titles = riskTitles(risk.title);
+    expect(titles).toMatchObject({ az: "Aylıq təkrar təlim", en: "Monthly follow-up training", ar: "تدريب تنشيطي شهري" });
+    expect(Object.keys(titles ?? {})).toHaveLength(10);
   }, 60_000);
 });

@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useClientFormat, useOrgTimeZone } from "@/lib/client-format";
 import { Building2, Calendar, Check, Clock, Globe, Mail, MessageSquare, Usb } from "lucide-react";
 import { saveCampaignAction } from "@/server/actions/campaigns";
@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
 import { Pill } from "@/components/ui/pill";
 import { toast } from "@/components/ui/toast";
-import { TemplatePreview } from "@/components/admin/template-preview";
-import { TEMPLATES, templateText, type Channel } from "@/lib/campaigns/templates";
+import type { CampaignTemplate, Channel } from "@/lib/campaigns/templates";
 import { cn } from "@/lib/cn";
 import { fromZonedParts, zonedParts } from "@/lib/baku-clock";
 
@@ -21,14 +20,31 @@ const CHANNELS: { key: Channel; icon: typeof Mail }[] = [
   { key: "usb", icon: Usb },
 ];
 
-/** A draft or scheduled campaign reopened for editing; the wizard starts on the review step. */
-export type WizardInitial = { id: string; name: string; templateKey: string; channel: Channel; audience: "all" | "department"; departmentId: string | null; scheduledAt: string | null };
+/** A template as the wizard sees it, named in the viewer's language: the texts stay on the server (wizard-page.tsx). */
+export type WizardTemplate = { key: string; name: string; channel: Channel; difficulty: CampaignTemplate["difficulty"] };
+/** Previews rendered on the server by template-preview.tsx, by template key. */
+export type WizardPreviews = Record<string, { compact: ReactNode; full: ReactNode }>;
 
-export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { departments: { id: string; name: string; people: number }[]; smsVoice: boolean; qrTrap: boolean; initial?: WizardInitial }) {
+/** A draft or scheduled campaign reopened for editing; the wizard starts on the review step. */
+export type WizardInitial = { id: string; name: string; templateKey: string; template: WizardTemplate | null; channel: Channel; audience: "all" | "department"; departmentId: string | null; scheduledAt: string | null };
+
+export function CampaignWizard({
+  departments,
+  smsVoice,
+  templates: offered,
+  previews,
+  initial,
+}: {
+  departments: { id: string; name: string; people: number }[];
+  smsVoice: boolean;
+  /** The templates this organisation may send. */
+  templates: WizardTemplate[];
+  previews: WizardPreviews;
+  initial?: WizardInitial;
+}) {
   const t = useTranslations("admin.campaigns");
   const tw = useTranslations("admin.campaigns.wizard");
   const tc = useTranslations("common");
-  const locale = useLocale();
   const format = useClientFormat();
   const whenLabel = (d: Date) => format.dateTime(d, { day: "numeric", month: "numeric", year: "numeric", timeStyle: "short" });
   const router = useRouter();
@@ -46,11 +62,8 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
   const [now, setNow] = useState(0);
   const [name, setName] = useState(initial?.name ?? "");
   const [pending, start] = useTransition();
-  // QR traps only on a plan with the qr_trap feature (the server refuses them otherwise).
-  // Voice templates stay defined but are not offered: no telephony adapter places calls (launchBlocker refuses them).
-  const offered = useMemo(() => TEMPLATES.filter((x) => x.channel !== "voice" && (qrTrap || !x.qr)), [qrTrap]);
   const templates = useMemo(() => offered.filter((x) => x.channel === channel), [offered, channel]);
-  const tpl = TEMPLATES.find((x) => x.key === templateKey) ?? null;
+  const tpl = offered.find((x) => x.key === templateKey) ?? (initial?.template?.key === templateKey ? initial.template : null);
   const dept = departments.find((d) => d.id === departmentId);
   const scheduledAt = when === "date" && date ? fromZonedParts(date, time || "10:00", timeZone) : null;
 
@@ -59,7 +72,7 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
 
   const chips = [
     channel ? { step: 1, label: t("channelLabel"), value: t(`channel.${channel}`) } : null,
-    tpl ? { step: 2, label: t("template"), value: templateText(tpl.name, locale) } : null,
+    tpl ? { step: 2, label: t("template"), value: tpl.name } : null,
     audience ? { step: 3, label: t("audience"), value: audience === "all" ? t("wholeOrg") : (dept?.name ?? "") } : null,
     when ? { step: 4, label: t("sendTime"), value: when === "later" ? tw("notYet") : scheduledAt ? whenLabel(scheduledAt) : "" } : null,
   ].filter(Boolean) as { step: number; label: string; value: string }[];
@@ -110,10 +123,10 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
               <button key={x.key} type="button" className={card(templateKey === x.key)} onClick={() => setTemplateKey(x.key)}>
                 <span className="grid min-w-0 flex-1 gap-2">
                   <span className="flex items-center justify-between gap-2">
-                    <span className="text-body-sm font-semibold">{templateText(x.name, locale)}</span>
+                    <span className="text-body-sm font-semibold">{x.name}</span>
                     <Pill tone={x.difficulty === "Easy" ? "safe" : x.difficulty === "Medium" ? "warn" : "risk"}>{t("difficulty", { level: tc(`difficulty.${x.difficulty}`) })}</Pill>
                   </span>
-                  <TemplatePreview tpl={x} locale={locale} compact />
+                  {previews[x.key].compact}
                 </span>
               </button>
             ))}
@@ -189,12 +202,12 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
         <section className="grid gap-4">
           <h2 className="text-title font-bold">{tw("q5")}</h2>
           <Field label={tw("name")} htmlFor="w-name" hint={tw("nameHint")}>
-            <Input id="w-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={160} className="max-w-lg" placeholder={templateText(tpl.name, locale)} />
+            <Input id="w-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={160} className="max-w-lg" placeholder={tpl.name} />
           </Field>
           <dl className="grid gap-2 rounded-xl border border-line bg-surface p-4 text-body-sm">
             {[
               [t("channelLabel"), t(`channel.${tpl.channel}`), 1],
-              [t("template"), templateText(tpl.name, locale), 2],
+              [t("template"), tpl.name, 2],
               [t("audience"), audience === "all" ? t("wholeOrg") : (dept?.name ?? ""), 3],
               [t("sendTime"), when === "later" ? tw("notYet") : scheduledAt ? whenLabel(scheduledAt) : "", 4],
             ].map(([k, val, s]) => (
@@ -209,7 +222,7 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
               </div>
             ))}
           </dl>
-          <TemplatePreview tpl={tpl} locale={locale} />
+          {previews[tpl.key].full}
           <p className="text-caption text-ink-muted">{when === "date" ? tw("scheduledNote") : tw("draftNote")}</p>
         </section>
       ) : null}
@@ -229,7 +242,7 @@ export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { dep
               start(async () => {
                 const res = await saveCampaignAction({
                   id: initial?.id,
-                  name: name.trim() || templateText(tpl!.name, locale),
+                  name: name.trim() || tpl!.name,
                   templateKey: tpl!.key,
                   audience: audience ?? "all",
                   departmentId: audience === "department" ? departmentId : null,

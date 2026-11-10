@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { rateLimitOnPglite } from "./helpers/db";
 
 // The refusal paths must not touch the database or mail; these stubs record any use.
 const insert = vi.fn();
@@ -12,7 +13,7 @@ vi.mock("../src/server/mail", () => ({ queueEmail: (...args: unknown[]) => queue
 vi.mock("../src/server/env", () => ({ env: { SALES_EMAIL: "sales@example.com" } }));
 
 const { requestDemoAction } = await import("../src/server/actions/site");
-const { rateLimit: realRateLimit } = await vi.importActual<typeof import("../src/server/rate-limit")>("../src/server/rate-limit");
+const { rateLimit: realRateLimit } = await rateLimitOnPglite(await vi.importActual<typeof import("../src/server/rate-limit")>("../src/server/rate-limit"));
 
 const form = (values: Record<string, string>) => {
   const f = new FormData();

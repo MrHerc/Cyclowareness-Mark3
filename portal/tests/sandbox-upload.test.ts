@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // The sandbox upload route: the only path that takes a 10 MB body, with the same gates as the Server Action.
 vi.mock("../src/server/db", () => ({ db: () => ({}), t: new Proxy({}, { get: () => ({}) }) }));
+vi.mock("../src/server/rate-limit", async (original) => (await import("./helpers/db")).rateLimitOnPglite(await original()));
 vi.mock("../src/server/services/audit", () => ({ audit: vi.fn() }));
 vi.mock("../src/server/services/events", () => ({ emitEvent: vi.fn() }));
 vi.mock("../src/server/services/threats", () => ({ insertNumbered: async () => ({ number: 7, row: { id: "00000000-0000-4000-8000-0000000000aa" } }) }));

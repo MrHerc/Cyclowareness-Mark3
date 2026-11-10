@@ -5,6 +5,7 @@ const down = () => {
   throw new Error("database unavailable");
 };
 vi.mock("../src/server/db", () => ({ db: () => ({ select: down, insert: down, update: down, delete: down, transaction: down }), t: new Proxy({}, { get: () => ({}) }) }));
+vi.mock("../src/server/rate-limit", async (original) => (await import("./helpers/db")).rateLimitOnPglite(await original()));
 vi.mock("../src/server/env", () => ({ env: { TRUST_PROXY: 0, isProd: false, secret: "test-only-secret-0123456789-abcdefghij-0123456789" }, appUrl: () => "http://localhost:3000" }));
 const TENANT = "00000000-0000-4000-8000-0000000000aa";
 vi.mock("../src/server/auth/viewer", () => ({

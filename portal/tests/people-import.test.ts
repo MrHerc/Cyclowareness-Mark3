@@ -162,10 +162,12 @@ describe("Add person", () => {
 
   it("answers a database failure with a notice the dialog can show, instead of throwing", async () => {
     vi.spyOn(console, "error").mockImplementationOnce(() => {});
-    vi.spyOn(db, "insert").mockImplementationOnce((() => ({
-      values: () => ({ returning: () => Promise.reject(Object.assign(new Error("terminating connection"), { code: "57P01" })) }),
-    })) as never);
+    // Only the person's insert fails; the rate limiter's counter (same database) still works.
+    const insert = db.insert.bind(db);
+    const spy = vi.spyOn(db, "insert").mockImplementation(((table: unknown) =>
+      table === t.users ? { values: () => ({ returning: () => Promise.reject(Object.assign(new Error("terminating connection"), { code: "57P01" })) }) } : insert(table as never)) as never);
     expect(await addPersonAction(undefined, form("tural@acme.test"))).toEqual({ error: "generic" });
+    spy.mockRestore();
     // The unique indexes still answer with their own messages.
     expect(await addPersonAction(undefined, form("tural@acme.test"))).toEqual({ ok: true, name: "Tural Hasanov" });
     expect(await addPersonAction(undefined, form("tural@acme.test"))).toEqual({ error: "emailTaken" });
