@@ -1,0 +1,164 @@
+{
+  "formatVersion": 1,
+  "module": "extortion-emails",
+  "title": "Extortion emails in practice",
+  "intro": "\"I hacked your camera\" emails are a bluff. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "sextortion",
+      "title": "Your password: Gunes2019. You have 48 hours",
+      "prompt": "What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Anonymous",
+          "address": "anonim.7781@mail-relay.example.net"
+        },
+        "subject": "Your password: Gunes2019. You have 48 hours",
+        "time": "08:47",
+        "body": [
+          "I got into your device and recorded private videos with your camera.",
+          "If you do not want the videos published, send bitcoin worth 1,500 AZN to: bc1q000000000000000000000000000000demo",
+          "You have 48 hours to pay."
+        ]
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report phishing"
+        },
+        {
+          "id": "reply",
+          "label": "Reply: show me proof"
+        }
+      ],
+      "safe": "report",
+      "explain": "The security team can remove the same email from other colleagues' mailboxes too.",
+      "risk": "account"
+    },
+    {
+      "id": "toast",
+      "title": "IshPocht: Your password: Gunes2019. You have 48 hours",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "IshPocht: Your password: Gunes2019. You have 48 hours",
+        "body": [
+          "I have videos recorded with your camera. Send bitcoin or everyone will see them."
+        ]
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report"
+        },
+        {
+          "id": "reply",
+          "label": "Reply: show me proof"
+        },
+        {
+          "id": "pay",
+          "label": "Copy the bitcoin address and pay"
+        }
+      ],
+      "safe": "report",
+      "explain": "Reporting without paying or replying is the best first step.",
+      "risk": "money"
+    },
+    {
+      "id": "house-photo",
+      "title": "Do you see the photo of your house?",
+      "prompt": "What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "The Watcher",
+          "address": "watcher.0042@anon-post.example.net"
+        },
+        "subject": "Do you see the photo of your house?",
+        "time": "09:05",
+        "body": [
+          "This is your house. I know your address and your password.",
+          "Send 1,500 AZN in bitcoin, or the videos will be published."
+        ],
+        "attachment": {
+          "name": "ev_unvan.jpg",
+          "size": "212 KB"
+        }
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report phishing"
+        },
+        {
+          "id": "open",
+          "label": "Open photo"
+        },
+        {
+          "id": "promise",
+          "label": "Reply: I will pay"
+        }
+      ],
+      "safe": "report",
+      "explain": "The house photo comes from a public map, so this is a mass bluff too.",
+      "risk": "money"
+    },
+    {
+      "id": "proof",
+      "title": "Subut_video.zip",
+      "prompt": "A reply came: supposedly proof. What do you do with this file?",
+      "artifact": {
+        "kind": "file",
+        "name": "Subut_video.zip",
+        "size": "1.2 MB",
+        "text": "Source: Anonymous: reply email"
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open"
+        },
+        {
+          "id": "delete",
+          "label": "Delete"
+        }
+      ],
+      "safe": "delete",
+      "explain": "Do not open the file, and report the email to the security team.",
+      "risk": "malware"
+    },
+    {
+      "id": "security-notice",
+      "title": "Warning: extortion emails",
+      "prompt": "What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "IT Security",
+          "address": "security@idare.example"
+        },
+        "subject": "Warning: extortion emails",
+        "time": "09:20",
+        "body": [
+          "Today some colleagues received extortion emails showing an old password.",
+          "Do not pay and do not reply. Send the email with the Report button.",
+          "If you still use that password, change it."
+        ]
+      },
+      "options": [
+        {
+          "id": "safe",
+          "label": "Mark as safe"
+        },
+        {
+          "id": "report",
+          "label": "Report phishing"
+        }
+      ],
+      "safe": "safe",
+      "explain": "This email asks for nothing, it only repeats the right rules.",
+      "risk": "account"
+    }
+  ]
+}

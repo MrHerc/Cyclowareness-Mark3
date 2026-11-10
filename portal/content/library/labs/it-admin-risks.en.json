@@ -1,0 +1,114 @@
+{
+  "formatVersion": 1,
+  "module": "it-admin-risks",
+  "title": "Admin Risks in practice",
+  "intro": "More privilege, more responsibility. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "keys-issued",
+      "title": "Security keys for admin accounts",
+      "prompt": "Is this a safe practice?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Security team",
+          "address": "security@idare.example"
+        },
+        "subject": "Security keys for admin accounts",
+        "time": "15:00",
+        "body": [
+          "From Monday, admin panel sign-in requires a physical key. Collect yours in person from room 305."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "No link, nothing to download or type, the key is handed over in person. This change makes you safer.",
+      "risk": "credentials"
+    },
+    {
+      "id": "ticket-password",
+      "title": "Message from Ticket 4821",
+      "prompt": "Is this a safe practice?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Ticket 4821",
+        "time": "10:24",
+        "body": [
+          "I put the server password in the comments so the next shift can see it."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Many people see tickets and they stay in the archive. Rotate the password and move it to the vault.",
+      "risk": "credentials"
+    },
+    {
+      "id": "env-in-repo",
+      "title": "git.idare.example",
+      "prompt": "Is this a safe practice?",
+      "artifact": {
+        "kind": "web",
+        "title": "git.idare.example",
+        "url": "https://git.idare.example/infra/deploy/-/blob/main/.env",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "The .env file was committed to the repository. Keys stay in history, so deleting the file is not enough. Rotate them now.",
+      "risk": "account"
+    },
+    {
+      "id": "shared-admin",
+      "title": "Message from Kamran (network)",
+      "prompt": "Is this a safe practice?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Kamran (network)",
+        "time": "10:24",
+        "body": [
+          "I am off on holiday, here is my admin password, use it if needed."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "With a shared admin account no one can tell who did what. The stand-in should get temporary rights on their own account.",
+      "risk": "credentials"
+    }
+  ]
+}

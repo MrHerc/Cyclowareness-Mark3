@@ -1,0 +1,136 @@
+{
+  "formatVersion": 1,
+  "module": "work-phone-mdm",
+  "title": "Work phone in practice",
+  "intro": "Keep your work phone managed and safe. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "enroll",
+      "title": "İşCihaz: Finish enrolment",
+      "prompt": "Technical support installed this app themselves. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "İşCihaz: Finish enrolment",
+        "body": [
+          "Technical support has prepared your device. Finish enrolment to get work mail."
+        ]
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open notification"
+        },
+        {
+          "id": "later",
+          "label": "Later"
+        }
+      ],
+      "safe": "open",
+      "explain": "Enrolling through your organisation's own app is the safest way.",
+      "risk": "device"
+    },
+    {
+      "id": "code",
+      "title": "Call from Technical support",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "Technical support",
+        "number": "+994 12 000 45 17",
+        "body": [
+          "Hello, this is technical support. To lock your phone we sent you an SMS code. Please read it out."
+        ]
+      },
+      "options": [
+        {
+          "id": "share",
+          "label": "Read out the code"
+        },
+        {
+          "id": "verify",
+          "label": "I will call the official number myself"
+        }
+      ],
+      "safe": "verify",
+      "explain": "Checking on the official number exposes a fake call at once.",
+      "risk": "credentials"
+    },
+    {
+      "id": "profile-sms",
+      "title": "Message from IT-Support",
+      "prompt": "Check the sender and the link address. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "IT-Support",
+        "time": "11:42",
+        "body": [
+          "Dear colleague, your MDM profile expires today. Install the new profile so your phone is not blocked: iscihaz-profil.example.net/new"
+        ]
+      },
+      "options": [
+        {
+          "id": "click",
+          "label": "Open link"
+        },
+        {
+          "id": "report",
+          "label": "Report"
+        }
+      ],
+      "safe": "report",
+      "explain": "Your report lets technical support warn everyone else too.",
+      "risk": "account"
+    },
+    {
+      "id": "map-location",
+      "title": "YolXəritə asks for access",
+      "prompt": "Is this request safe on a work phone, or a threat?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "YolXəritə asks for access",
+        "body": [
+          "Location: only while the app is open"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "A map needs location, and only while it is open. The permission fits the job.",
+      "risk": "credentials"
+    },
+    {
+      "id": "game-sms",
+      "title": "Super Oyunlar asks for access",
+      "prompt": "Is this request safe on a work phone, or a threat?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Super Oyunlar asks for access",
+        "body": [
+          "Read SMS messages",
+          "Contacts"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A game needs neither SMS nor contacts. SMS access lets it read your sign-in codes.",
+      "risk": "credentials"
+    }
+  ]
+}

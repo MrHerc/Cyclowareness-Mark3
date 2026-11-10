@@ -74,7 +74,8 @@ export function LabPanel({
         </ul>
       </section>
 
-      <section aria-labelledby="lab-rules">
+      {/* A mini-lab has neither rules nor hints. */}
+      <section aria-labelledby="lab-rules" hidden={!rules.length}>
         <h3 id="lab-rules" className="text-caption font-bold tracking-wide text-ink-muted uppercase">
           {t("rules")}
         </h3>
@@ -89,7 +90,7 @@ export function LabPanel({
         </ul>
       </section>
 
-      <section aria-labelledby="lab-hints">
+      <section aria-labelledby="lab-hints" hidden={!hintsTotal}>
         <h3 id="lab-hints" className="text-caption font-bold tracking-wide text-ink-muted uppercase">
           {t("hints")}
         </h3>

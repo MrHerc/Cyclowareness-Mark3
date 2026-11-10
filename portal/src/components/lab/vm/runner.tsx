@@ -7,7 +7,7 @@ import { completeVmLabAction, type VmLabResult } from "@/server/lab/vm-action";
 import { cn } from "@/lib/cn";
 import { HINT_COST, scoreRun, startRun, step, type LabDef, type LabEvent, type LabRun } from "../model/labs";
 import { initialWm, wmReducer, type WmAction, type WmState } from "../model/wm";
-import { Debrief, type DebriefTexts } from "./debrief";
+import { Debrief, type DebriefBack, type DebriefTexts } from "./debrief";
 import { formatElapsed, useMedia, useSeconds, useStill } from "./hooks";
 import { LabPanel } from "./panel";
 import { VmShell, type VmApp } from "./vm-shell";
@@ -21,8 +21,9 @@ type Toast = { id: number; text: string; tone: "ok" | "risk" };
  * Runs one virtual-machine lab: boots the machine (after hydration, so nothing time- or screen-dependent
  * renders on the server), keeps the event log, the window manager, the timer and the hints, finishes when
  * the lab's goal is met or the learner ends it, and sends the log to the server for the stored result.
+ * `stage` is shown above the machine (a mini-lab's decision card); `back` is the debrief's way out.
  */
-export function LabRunner<S>({ def, texts, host, apps, notes, onAgain }: { def: LabDef<S>; texts: LabTexts; host: string; apps: (ctx: LabCtx<S>) => VmApp[]; notes?: (s: S) => string[]; onAgain: () => void }) {
+export function LabRunner<S>({ def, texts, host, apps, notes, stage, back, onAgain }: { def: LabDef<S>; texts: LabTexts; host: string; apps: (ctx: LabCtx<S>) => VmApp[]; notes?: (s: S) => string[]; stage?: (ctx: LabCtx<S>) => React.ReactNode; back?: DebriefBack; onAgain: () => void }) {
   const t = useTranslations("learner.lab.vm");
   const still = useStill();
   const phone = useMedia("(max-width: 639.98px)");
@@ -88,7 +89,7 @@ export function LabRunner<S>({ def, texts, host, apps, notes, onAgain }: { def: 
     const score = scoreRun(def, run);
     return (
       <div ref={top} tabIndex={-1} className="scroll-mt-24 outline-none">
-        <Debrief def={def} score={score} hints={run.hints} texts={texts} notes={notes?.(run.s) ?? []} result={result} pending={pending} elapsed={formatElapsed(elapsedSec)} onAgain={onAgain} />
+        <Debrief def={def} score={score} hints={run.hints} texts={texts} notes={notes?.(run.s) ?? []} result={result} pending={pending} elapsed={formatElapsed(elapsedSec)} back={back} onAgain={onAgain} />
       </div>
     );
   }
@@ -127,14 +128,17 @@ export function LabRunner<S>({ def, texts, host, apps, notes, onAgain }: { def: 
   const done = achieved.length;
   return (
     <div className={cn("grid grid-cols-1 gap-5", !phone && "lg:grid-cols-[minmax(0,1fr)_16rem] xl:grid-cols-[minmax(0,1fr)_17rem] 2xl:grid-cols-[minmax(0,1fr)_19rem]")}>
-      <div className="relative min-w-0">
-        <VmShell apps={apps({ run, send, wm, act })} wm={wm} act={act} panel={panel} phone={phone} host={host} label={t("screen")} tasksBadge={`${done}/${def.objectives.length}`} />
-        {seen.toast ? (
-          <div key={seen.toast.id} aria-hidden className={cn("pointer-events-none absolute top-6 left-1/2 z-[60] flex max-w-[calc(100%-2rem)] -translate-x-1/2 animate-rise items-center gap-2 rounded-pill px-4 py-2 text-caption font-semibold shadow-overlay", seen.toast.tone === "ok" ? "bg-safe-600 text-white" : "bg-risk-600 text-white", phone && "top-auto bottom-20")}>
-            {seen.toast.tone === "ok" ? <CheckCircle2 className="size-4.5 shrink-0" /> : <ShieldAlert className="size-4.5 shrink-0" />}
-            <span className="truncate">{seen.toast.text}</span>
-          </div>
-        ) : null}
+      <div className="grid min-w-0 gap-4">
+        {stage?.({ run, send, wm, act })}
+        <div className="relative min-w-0">
+          <VmShell apps={apps({ run, send, wm, act })} wm={wm} act={act} panel={panel} phone={phone} host={host} label={t("screen")} tasksBadge={`${done}/${def.objectives.length}`} />
+          {seen.toast ? (
+            <div key={seen.toast.id} aria-hidden className={cn("pointer-events-none absolute top-6 left-1/2 z-[60] flex max-w-[calc(100%-2rem)] -translate-x-1/2 animate-rise items-center gap-2 rounded-pill px-4 py-2 text-caption font-semibold shadow-overlay", seen.toast.tone === "ok" ? "bg-safe-600 text-white" : "bg-risk-600 text-white", phone && "top-auto bottom-20")}>
+              {seen.toast.tone === "ok" ? <CheckCircle2 className="size-4.5 shrink-0" /> : <ShieldAlert className="size-4.5 shrink-0" />}
+              <span className="truncate">{seen.toast.text}</span>
+            </div>
+          ) : null}
+        </div>
       </div>
       {phone ? null : panel}
     </div>

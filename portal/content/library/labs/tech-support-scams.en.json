@@ -1,0 +1,139 @@
+{
+  "formatVersion": 1,
+  "module": "tech-support-scams",
+  "title": "Fake Tech Support in practice",
+  "intro": "A scary screen, a helpful call: both are fake. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "popup-appears",
+      "title": "Threat detected",
+      "prompt": "A red warning just opened. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Threat detected",
+        "body": [
+          "There is malware on your computer. Call support now: +994 12 000 70 05"
+        ]
+      },
+      "options": [
+        {
+          "id": "close",
+          "label": "Close the window"
+        },
+        {
+          "id": "call",
+          "label": "Call the number shown"
+        },
+        {
+          "id": "scan",
+          "label": "Press the Scan button"
+        }
+      ],
+      "safe": "close",
+      "explain": "Simply closing a window like this is the right answer.",
+      "risk": "account"
+    },
+    {
+      "id": "ask-code",
+      "title": "Call from SahilBank security",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "SahilBank security",
+        "number": "+994 12 000 54 30",
+        "body": [
+          "A code just arrived on your phone to confirm. Please read that code to me."
+        ]
+      },
+      "options": [
+        {
+          "id": "refuse",
+          "label": "I do not read the code"
+        },
+        {
+          "id": "read",
+          "label": "I read the code"
+        }
+      ],
+      "safe": "refuse",
+      "explain": "The code that arrives is the key to your account, never tell it to anyone.",
+      "risk": "credentials"
+    },
+    {
+      "id": "fullscreen-lock",
+      "title": "Screen locked",
+      "prompt": "Now the screen is full and it is making a sound. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Screen locked",
+        "body": [
+          "Do not turn off the computer. If you close this without support, your data will be lost."
+        ]
+      },
+      "options": [
+        {
+          "id": "force-quit",
+          "label": "Force quit the browser"
+        },
+        {
+          "id": "call",
+          "label": "Call support"
+        }
+      ],
+      "safe": "force-quit",
+      "explain": "When you force the browser to close, this fake screen disappears too.",
+      "risk": "device"
+    },
+    {
+      "id": "install",
+      "title": "Call from SahilBank security",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "SahilBank security",
+        "number": "+994 12 000 54 30",
+        "body": [
+          "So I can help you, please install the UzaqMasa app and let me connect."
+        ]
+      },
+      "options": [
+        {
+          "id": "refuse",
+          "label": "I do not install the app"
+        },
+        {
+          "id": "install",
+          "label": "Install the app"
+        }
+      ],
+      "safe": "refuse",
+      "explain": "You never install a remote access app because a caller asks you to.",
+      "risk": "malware"
+    },
+    {
+      "id": "real-update",
+      "title": "Browser ready to update",
+      "prompt": "This is the browser's own quiet notice. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Browser ready to update",
+        "body": [
+          "Restart the browser to apply the changes."
+        ]
+      },
+      "options": [
+        {
+          "id": "update",
+          "label": "Update"
+        },
+        {
+          "id": "call",
+          "label": "Call support just in case"
+        }
+      ],
+      "safe": "update",
+      "explain": "A real update is calm, gives no number and does not rush you.",
+      "risk": "account"
+    }
+  ]
+}

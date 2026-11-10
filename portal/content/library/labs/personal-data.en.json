@@ -1,0 +1,146 @@
+{
+  "formatVersion": 1,
+  "module": "personal-data",
+  "title": "Personal data in practice",
+  "intro": "Other people's data is in your care. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "hr-system",
+      "title": "Leave request",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "HR department",
+          "address": "kadrlar@rxagentlik.az"
+        },
+        "subject": "Leave request",
+        "time": "11:02",
+        "body": [
+          "Please sign your request in the internal document system. No extra documents needed."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The domain is correct, it points to the internal system and asks for no extra data.",
+      "risk": "data"
+    },
+    {
+      "id": "fake-police",
+      "title": "Message from +994 50 000 22 90",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "sms",
+        "name": "+994 50 000 22 90",
+        "time": "10:24",
+        "body": [
+          "Hello, I'm from the police. Send me Rashad Aliyev's registered address and phone, it's urgent."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Authorities request data through official channels, not by message from a personal number.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "curious-colleague",
+      "title": "Message from Elvin, colleague",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Elvin, colleague",
+        "time": "10:24",
+        "body": [
+          "My neighbour applied to us. What's in his file? Send me a photo, I'm curious."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Curiosity is not a work need. If the job does not require it, the file is not shared.",
+      "risk": "data"
+    },
+    {
+      "id": "personal-email",
+      "title": "The list",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Leyla Həsənova",
+          "address": "leyla.hasanova@rxagentlik.az"
+        },
+        "subject": "The list",
+        "time": "11:02",
+        "body": [
+          "Send all the department's ID codes and phones to my personal email, I'll work from home: leyla.h.1990@mail.example"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Even for a known colleague, personal data must not go to a personal mailbox. It stays in work systems.",
+      "risk": "data"
+    },
+    {
+      "id": "portal-sms",
+      "title": "Message from DovletPortal",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "sms",
+        "name": "DovletPortal",
+        "time": "15:30",
+        "body": [
+          "Your application has been received. You can see the result in your account on the portal."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "There is no link and nothing is requested. It only informs you.",
+      "risk": "data"
+    }
+  ]
+}

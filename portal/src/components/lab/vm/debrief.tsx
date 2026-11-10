@@ -8,10 +8,12 @@ import { Ring } from "@/components/ui/progress";
 import type { VmLabResult } from "@/server/lab/vm-action";
 import { HINT_COST, type LabDef, type LabScore } from "../model/labs";
 
+/** Where the debrief's second button leads: the lab list by default, a mini-lab's module page. */
+export type DebriefBack = { href: string; label: string };
 export type DebriefTexts = { title: string; objective: (id: string) => string; why: (id: string) => string; rule: (id: string) => string; ruleWhy: (id: string) => string };
 
 /** After the lab: the score, what was found and missed and why it matters, the risky actions, the hints. */
-export function Debrief<S>({ def, score, hints, texts, notes, result, pending, elapsed, onAgain }: { def: LabDef<S>; score: LabScore; hints: number; texts: DebriefTexts; notes: string[]; result: VmLabResult | null; pending: boolean; elapsed: string; onAgain: () => void }) {
+export function Debrief<S>({ def, score, hints, texts, notes, result, pending, elapsed, back, onAgain }: { def: LabDef<S>; score: LabScore; hints: number; texts: DebriefTexts; notes: string[]; result: VmLabResult | null; pending: boolean; elapsed: string; back?: DebriefBack; onAgain: () => void }) {
   const t = useTranslations("learner.lab.vm.debrief");
   const tl = useTranslations("learner.lab");
   const found = def.objectives.filter((o) => score.achieved.includes(o.id));
@@ -103,7 +105,8 @@ export function Debrief<S>({ def, score, hints, texts, notes, result, pending, e
             <p className="mt-3 rounded-lg bg-safe-50 p-3.5 text-caption text-safe-700">{t("nothingMissed")}</p>
           )}
         </section>
-        <section aria-labelledby="db-risky" className="md:col-span-2">
+        {/* A lab without rules (a mini-lab) has no risky actions to list. */}
+        <section aria-labelledby="db-risky" className="md:col-span-2" hidden={!def.rules.length}>
           <h3 id="db-risky" className="flex items-center gap-2 text-body font-bold text-risk-700">
             <ShieldAlert className="size-5" aria-hidden />
             {t("risky")}
@@ -143,7 +146,7 @@ export function Debrief<S>({ def, score, hints, texts, notes, result, pending, e
         <Button variant="secondary" icon={<RotateCcw />} onClick={onAgain}>
           {t("again")}
         </Button>
-        <ButtonLink href="/lab">{tl("backToLab")}</ButtonLink>
+        <ButtonLink href={back?.href ?? "/lab"}>{back?.label ?? tl("backToLab")}</ButtonLink>
       </div>
     </Card>
   );

@@ -1,4 +1,5 @@
 import { LAB_XP } from "@/lib/domain/gamification";
+import type { LabArtifact, LabScenario } from "@/lib/content/lab-scenario";
 import { BEACON_IP, BEACON_PID, BEACON_STARTUP, workstation } from "./machines";
 import { exec, initialShell, type ShellState } from "./shell";
 
@@ -18,7 +19,8 @@ export type Objective = { id: string; points: number; secret?: boolean };
 export type Rule = { id: string; penalty: number };
 
 export type LabDef<S> = {
-  id: VmLabId;
+  /** A VmLabId, or a module's mini-lab id (miniLabId). */
+  id: string;
   primary: AppId;
   objectives: readonly Objective[];
   rules: readonly Rule[];
@@ -164,6 +166,44 @@ export const signinLab: LabDef<SigninState> = {
   broken: (s) => [s.typedPassword && "noPassword", s.submitted && "noSubmit"].filter((v): v is string => !!v),
   done: (s) => s.closed && !s.tabOpen && s.reported,
 };
+
+/* ---------------- Mini-labs: a module's decisions (content/library/labs) ---------------- */
+
+/** A mini-lab's id in lab_attempts and for completeVmLabAction: "mini:<module slug>". */
+export const miniLabId = (slug: string) => `mini:${slug}`;
+export const miniLabSlug = (lab: string) => (lab.startsWith("mini:") ? lab.slice(5) : null);
+
+/** The app that shows an artifact; texts, calls and windows are shown in the decision card itself. */
+export const ARTIFACT_APP: Record<LabArtifact["kind"], AppId> = { email: "mail", web: "browser", file: "files", sms: "mail", call: "mail", dialog: "mail" };
+
+export type MiniState = { answers: Record<string, string> };
+
+/**
+ * One objective per decision, reached when its safe option is chosen; the 100 points are shared out evenly. The
+ * learner's event is ["choose", "<decision id>:<option id>"], and only the first answer to a decision counts.
+ */
+export function miniLabDef(sc: LabScenario): LabDef<MiniState> {
+  const n = sc.decisions.length;
+  const base = Math.floor(LAB_MAX / n);
+  return {
+    id: miniLabId(sc.module),
+    primary: ARTIFACT_APP[sc.decisions[0].artifact.kind],
+    objectives: sc.decisions.map((d, i) => ({ id: d.id, points: base + (i < LAB_MAX - base * n ? 1 : 0) })),
+    rules: [],
+    hints: 0,
+    init: () => ({ answers: {} }),
+    apply: (s, [type, arg]) => {
+      if (type !== "choose" || !arg) return s;
+      const [id, option] = arg.split(":");
+      const d = sc.decisions.find((x) => x.id === id);
+      if (!d || Object.hasOwn(s.answers, d.id) || !d.options.some((o) => o.id === option)) return s;
+      return { answers: { ...s.answers, [d.id]: option } };
+    },
+    achieved: (s) => sc.decisions.filter((d) => s.answers[d.id] === d.safe).map((d) => d.id),
+    broken: () => [],
+    done: (s) => sc.decisions.every((d) => Object.hasOwn(s.answers, d.id)),
+  };
+}
 
 /* ---------------- Runs, scoring and the catalog ---------------- */
 

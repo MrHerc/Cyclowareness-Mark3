@@ -1,0 +1,164 @@
+{
+  "formatVersion": 1,
+  "module": "vendor-email-compromise",
+  "title": "Vendor email fraud in practice",
+  "intro": "New bank details? Call first. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "invoice-normal",
+      "title": "September invoice",
+      "prompt": "What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "OfisTechizat LLC",
+          "address": "satis@ofistechizat.example"
+        },
+        "subject": "September invoice",
+        "time": "09:15",
+        "body": [
+          "Hello, the September invoice is attached.",
+          "Payment as usual to the account in our contract. Regards, Sabina Karimova"
+        ],
+        "attachment": {
+          "name": "Invoice_2026_09.pdf",
+          "size": "180 KB"
+        }
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open attachment"
+        },
+        {
+          "id": "report",
+          "label": "Report phishing"
+        }
+      ],
+      "safe": "open",
+      "explain": "Known address, an expected PDF invoice and the account does not change. This is normal mail.",
+      "risk": "money"
+    },
+    {
+      "id": "thread-genuine",
+      "title": "RE: Contract 47/2026",
+      "prompt": "What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Elchin Babayev",
+          "address": "layihe@kur-tikinti.example"
+        },
+        "subject": "RE: Contract 47/2026",
+        "time": "10:05",
+        "body": [
+          "Hi. We took your comments into account, the revised draft is attached.",
+          "Call me if you have questions. Elchin"
+        ],
+        "attachment": {
+          "name": "Contract_47_revised.pdf",
+          "size": "340 KB"
+        }
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open attachment"
+        },
+        {
+          "id": "report",
+          "label": "Report phishing"
+        }
+      ],
+      "safe": "open",
+      "explain": "An expected PDF, the usual tone, no pressure. This is normal work mail.",
+      "risk": "account"
+    },
+    {
+      "id": "bank-change-fake",
+      "title": "Our bank details have changed",
+      "prompt": "Look at the sender's domain. What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "OfisTechizat LLC Accounts",
+          "address": "muhasibat@ofistechizat-az.example.net"
+        },
+        "subject": "Our bank details have changed",
+        "time": "10:42",
+        "body": [
+          "Dear partner,",
+          "Due to an audit we have moved our account to UlduzBank.",
+          "Please pay the September invoice (14,860 manat) to the new account: AZ00ULDZ00000000400520007731",
+          "Payment is due today by 16:00, the old account is being closed.",
+          "For questions call only this number: +994 50 000 72 19"
+        ]
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report phishing"
+        },
+        {
+          "id": "confirm",
+          "label": "Reply: we accept the new account"
+        },
+        {
+          "id": "ask",
+          "label": "Reply: is this true?"
+        }
+      ],
+      "safe": "report",
+      "explain": "Look-alike domain, new account and a deadline. No button? Forward it to IT security.",
+      "risk": "money"
+    },
+    {
+      "id": "pdf-expected",
+      "title": "Contract_47_revised.pdf",
+      "prompt": "Safe or threat?",
+      "artifact": {
+        "kind": "file",
+        "name": "Contract_47_revised.pdf",
+        "size": "340 KB",
+        "text": "Source: Elchin Babayev, expected reply"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "An expected document, a normal format and a known sender. Fine to open.",
+      "risk": "money"
+    },
+    {
+      "id": "zip-pass",
+      "title": "Payment_order.zip",
+      "prompt": "Safe or threat?",
+      "artifact": {
+        "kind": "file",
+        "name": "Payment_order.zip",
+        "size": "1,1 MB",
+        "text": "Source: layihe@kur-tikinti.example, password: 4417"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A password protected archive hides from antivirus. Call the sender and ask.",
+      "risk": "money"
+    }
+  ]
+}

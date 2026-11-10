@@ -1,0 +1,148 @@
+{
+  "formatVersion": 1,
+  "module": "fake-official-accounts",
+  "title": "Fake official accounts in practice",
+  "intro": "Check the source before you trust or share. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "aid-channel",
+      "title": "Message from Ministry of Social Services | Official",
+      "prompt": "The channel name looks official. But where does the link go?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Ministry of Social Services | Official",
+        "time": "10:24",
+        "body": [
+          "Dear citizen! Every family is granted a one-off state payment of 300 AZN.",
+          "To receive it, enter your card details today: sxn-yardim.example.net/qeydiyyat"
+        ]
+      },
+      "options": [
+        {
+          "id": "click",
+          "label": "Open link"
+        },
+        {
+          "id": "report",
+          "label": "Report channel"
+        },
+        {
+          "id": "share",
+          "label": "Send to family group"
+        }
+      ],
+      "safe": "report",
+      "explain": "The address is not the ministry's site, and a report gets the channel closed faster.",
+      "risk": "money"
+    },
+    {
+      "id": "salary-card",
+      "title": "Message from Department group",
+      "prompt": "A colleague posted it, but no source is given. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Department group",
+        "time": "10:24",
+        "body": [
+          "Forwarded. Urgent! From tomorrow civil servants' salary cards are being replaced. Update your details so the old card is not blocked: maas-kart-yeni.example.net"
+        ]
+      },
+      "options": [
+        {
+          "id": "click",
+          "label": "Open link"
+        },
+        {
+          "id": "verify",
+          "label": "Ask accounting"
+        },
+        {
+          "id": "share",
+          "label": "Send to family group"
+        }
+      ],
+      "safe": "verify",
+      "explain": "Check an internal decision with an internal source, on a number you know.",
+      "risk": "money"
+    },
+    {
+      "id": "boss-new-number",
+      "title": "Message from Head of Office (new number)",
+      "prompt": "A familiar title, but a number you do not know. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Head of Office (new number)",
+        "time": "10:24",
+        "body": [
+          "Hello. This is my new number. I'm in a meeting and can't call.",
+          "Send me a copy of this morning's official letter here, urgently."
+        ]
+      },
+      "options": [
+        {
+          "id": "send",
+          "label": "Send the letter"
+        },
+        {
+          "id": "verify",
+          "label": "Call the manager's known number"
+        },
+        {
+          "id": "ask",
+          "label": "Who is this?"
+        }
+      ],
+      "safe": "verify",
+      "explain": "Always check a new number through a channel you already know.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "official-list",
+      "title": "sxn.example",
+      "prompt": "Official or fake?",
+      "artifact": {
+        "kind": "web",
+        "title": "sxn.example",
+        "url": "https://sxn.example/elaqe/sosial-sebekeler",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "This is the ministry's own site. Take the list of official accounts from a page like this.",
+      "risk": "money"
+    },
+    {
+      "id": "extra-word",
+      "title": "kontakto.example",
+      "prompt": "Official or fake?",
+      "artifact": {
+        "kind": "web",
+        "title": "kontakto.example",
+        "url": "https://kontakto.example/sxn.resmi.official",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "The extra word at the end is a typical sign of a fake. The official address is sxn.resmi.",
+      "risk": "impersonation"
+    }
+  ]
+}

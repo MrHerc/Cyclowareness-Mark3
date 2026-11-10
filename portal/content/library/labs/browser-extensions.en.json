@@ -1,0 +1,136 @@
+{
+  "formatVersion": 1,
+  "module": "browser-extensions",
+  "title": "Risky browser extensions in practice",
+  "intro": "A useful extension can turn into a spy. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "copy-store",
+      "title": "xezri-elaveler.example.info",
+      "prompt": "The first page in the search looks like the store. What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "xezri-elaveler.example.info",
+        "url": "https://xezri-elaveler.example.info/mezenne-pro",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "install",
+          "label": "Download the extension"
+        },
+        {
+          "id": "check",
+          "label": "Check the address"
+        }
+      ],
+      "safe": "check",
+      "explain": "This domain is not the store's own address. Open the store from the browser menu.",
+      "risk": "malware"
+    },
+    {
+      "id": "ad-tab",
+      "title": "endirim-kupon.example.info",
+      "prompt": "The browser opened a new tab by itself. What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "endirim-kupon.example.info",
+        "url": "https://endirim-kupon.example.info/hediyye",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "claim",
+          "label": "Claim the prize"
+        },
+        {
+          "id": "close",
+          "label": "Close the tab"
+        }
+      ],
+      "safe": "close",
+      "explain": "Tabs that open by themselves are often the work of a harmful extension, so let us find the cause.",
+      "risk": "money"
+    },
+    {
+      "id": "perms",
+      "title": "Məzənnə Pro asks for access",
+      "prompt": "Does showing exchange rates need these permissions?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Məzənnə Pro asks for access",
+        "body": [
+          "Show currency exchange rates",
+          "Read and change all your data on all websites",
+          "See your tabs and browsing history"
+        ]
+      },
+      "options": [
+        {
+          "id": "allow",
+          "label": "Add extension"
+        },
+        {
+          "id": "deny",
+          "label": "Decline"
+        }
+      ],
+      "safe": "deny",
+      "explain": "If the permission does not fit the job, do not install it.",
+      "risk": "malware"
+    },
+    {
+      "id": "screenshot",
+      "title": "Ekran Şəkli asks for access",
+      "prompt": "Would you install this extension or decline it?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Ekran Şəkli asks for access",
+        "body": [
+          "See only the open page when you press the button",
+          "Save images to the Downloads folder"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The permissions fit the job and only work when you press the button. An extension like this adds no real risk.",
+      "risk": "malware"
+    },
+    {
+      "id": "free-vpn",
+      "title": "Pulsuz VPN Sürət asks for access",
+      "prompt": "Would you install this extension or decline it?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Pulsuz VPN Sürət asks for access",
+        "body": [
+          "Read and change all your data on all websites",
+          "Read your browsing history",
+          "Manage your proxy settings"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A free VPN extension sees all your traffic and often earns its money from your data. For work, use only the VPN your office provides.",
+      "risk": "malware"
+    }
+  ]
+}

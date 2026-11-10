@@ -1,0 +1,147 @@
+{
+  "formatVersion": 1,
+  "module": "insider-threat",
+  "title": "Insider threat in practice",
+  "intro": "Mistake or intent: use the right channel. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "personal-mail",
+      "title": "List for the report",
+      "prompt": "What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Nigar Əliyeva",
+          "address": "nigar.aliyeva@idare.example"
+        },
+        "subject": "List for the report",
+        "time": "09:20",
+        "body": [
+          "Hi, I will work from home tonight.",
+          "Please send the staff list (ID numbers, phones) to my personal mail: nigar.84@poctam.example"
+        ]
+      },
+      "options": [
+        {
+          "id": "forward",
+          "label": "Send the list to her personal mail"
+        },
+        {
+          "id": "reply",
+          "label": "Reply: I cannot send it to personal mail"
+        }
+      ],
+      "safe": "reply",
+      "explain": "Working from home goes through approved tools, such as work mail over the VPN.",
+      "risk": "data"
+    },
+    {
+      "id": "ask-password",
+      "title": "Message from Tural Həsənov",
+      "prompt": "What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Tural Həsənov",
+        "time": "10:24",
+        "body": [
+          "Hi, they closed my access by mistake.",
+          "Give me your password, I will take the project folders from the archive and return it tomorrow."
+        ]
+      },
+      "options": [
+        {
+          "id": "give",
+          "label": "Send the password"
+        },
+        {
+          "id": "refuse",
+          "label": "I cannot give my password, contact IT support"
+        }
+      ],
+      "safe": "refuse",
+      "explain": "If access was closed, only IT and the manager can sort it out.",
+      "risk": "credentials"
+    },
+    {
+      "id": "shadow-it",
+      "title": "FaylDaşı: free file transfer",
+      "prompt": "The file was too big for email, so you found a free site. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "FaylDaşı: free file transfer",
+        "body": [
+          "Layihe_smeta.xlsx (2.4 GB) uploaded.",
+          "Anyone with the link can download the file."
+        ]
+      },
+      "options": [
+        {
+          "id": "share",
+          "label": "Copy the link and send it to the partner"
+        },
+        {
+          "id": "cancel",
+          "label": "Cancel and ask IT for the approved way"
+        }
+      ],
+      "safe": "cancel",
+      "explain": "IT support will show you the approved way to send a large file safely.",
+      "risk": "data"
+    },
+    {
+      "id": "portal-share",
+      "title": "Estimate shared",
+      "prompt": "Safe or risk?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Leyla Rzayeva",
+          "address": "leyla.rzayeva@idare.example"
+        },
+        "subject": "Estimate shared",
+        "time": "10:05",
+        "body": [
+          "I shared the file on the internal portal with our department only."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "An approved internal place and limited access. This is the right way to share.",
+      "risk": "data"
+    },
+    {
+      "id": "badge-photo",
+      "title": "Kontakto: Your post is live",
+      "prompt": "Safe or risk?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Kontakto: Your post is live",
+        "body": [
+          "\"My first day!\" The photo shows your badge and an internal system on screen."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A badge and a work screen give attackers what they need to fake a card and pick targets.",
+      "risk": "money"
+    }
+  ]
+}

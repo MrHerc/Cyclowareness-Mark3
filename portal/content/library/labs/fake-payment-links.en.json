@@ -1,0 +1,144 @@
+{
+  "formatVersion": 1,
+  "module": "fake-payment-links",
+  "title": "Fake payment links in practice",
+  "intro": "Fine, parcel, benefit: link by text? Stop. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "redeliver-sms",
+      "title": "Message from +994 51 000 83 17",
+      "prompt": "A familiar courier name and a small amount. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "+994 51 000 83 17",
+        "time": "10:47",
+        "body": [
+          "TezKuryer: our courier could not find you. Pay 0.90 AZN for a new delivery: tezkuryer-catdirilma.example.net/odenis"
+        ]
+      },
+      "options": [
+        {
+          "id": "open-link",
+          "label": "Open the link"
+        },
+        {
+          "id": "report",
+          "label": "Report as spam"
+        }
+      ],
+      "safe": "report",
+      "explain": "Report the text, then check the parcel in the official app.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "fake-fine-page",
+      "title": "e-xidmet-cerime.example.net",
+      "prompt": "Look at the address bar. What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "e-xidmet-cerime.example.net",
+        "url": "https://e-xidmet-cerime.example.net/odenis",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "pay",
+          "label": "Pay with the discount"
+        },
+        {
+          "id": "close",
+          "label": "Close the tab"
+        }
+      ],
+      "safe": "close",
+      "explain": "This is not the portal's own domain. Now open the portal yourself.",
+      "risk": "money"
+    },
+    {
+      "id": "bank-code",
+      "title": "Message from SahilBank",
+      "prompt": "Your bank sent a code. Look at the amount. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "SahilBank",
+        "time": "10:49",
+        "body": [
+          "Code: 518204. Payment 412.00 AZN, TZK GLOBAL PAY. Never share this code."
+        ]
+      },
+      "options": [
+        {
+          "id": "type-code",
+          "label": "Type the code on the site"
+        },
+        {
+          "id": "call-bank",
+          "label": "Call the bank on the card's number"
+        }
+      ],
+      "safe": "call-bank",
+      "explain": "The amount next to the code is far higher than the page said, so have the card blocked now.",
+      "risk": "credentials"
+    },
+    {
+      "id": "real-fines",
+      "title": "e-xidmet.example",
+      "prompt": "Is this page genuine or fake?",
+      "artifact": {
+        "kind": "web",
+        "title": "e-Xidmət Portalı",
+        "url": "https://e-xidmet.example/cerimeler",
+        "body": [],
+        "fields": [
+          "Personal ID code",
+          "Password"
+        ],
+        "button": "Sign in"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "This is the portal's own domain and you opened it yourself. This is where to check fines.",
+      "risk": "money"
+    },
+    {
+      "id": "fake-discount",
+      "title": "e-xidmet-endirim.example.net",
+      "prompt": "Is this page genuine or fake?",
+      "artifact": {
+        "kind": "web",
+        "title": "e-Xidmət Portalı",
+        "url": "https://e-xidmet-endirim.example.net/cerime",
+        "body": [],
+        "fields": [
+          "Card number",
+          "Expiry date",
+          "CVV",
+          "SMS code"
+        ],
+        "button": "Pay with 50% off"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "The domain is different and the page wants everything at once: card, code and SMS code. It is a theft form.",
+      "risk": "money"
+    }
+  ]
+}

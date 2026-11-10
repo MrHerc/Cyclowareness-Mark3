@@ -1,0 +1,181 @@
+{
+  "formatVersion": 1,
+  "module": "incident-reporting",
+  "title": "Report Incidents in practice",
+  "intro": "Fast reporting limits the damage. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "quota",
+      "title": "Your mailbox is 98% full",
+      "prompt": "Look at the sender's address. What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "IshPocht Administrator",
+          "address": "admin@ispoct-mail.example.net"
+        },
+        "subject": "Your mailbox is 98% full",
+        "time": "08:47",
+        "body": [
+          "If you do not add space, new emails will be deleted in 24 hours.",
+          "To add space:"
+        ],
+        "link": {
+          "text": "ispoct-mail.example.net/kvota",
+          "href": "https://ispoct-mail.example.net/kvota",
+          "after": 1
+        }
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report as phishing"
+        },
+        {
+          "id": "click",
+          "label": "Open the link"
+        },
+        {
+          "id": "delete",
+          "label": "Delete"
+        },
+        {
+          "id": "forward",
+          "label": "Forward to colleagues"
+        }
+      ],
+      "safe": "report",
+      "explain": "Your report lets specialists remove the same email from everyone else's inbox.",
+      "risk": "account"
+    },
+    {
+      "id": "new-login",
+      "title": "İşPoçt: Sign-in from a new device",
+      "prompt": "If this sign-in was not you, what do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "İşPoçt: Sign-in from a new device",
+        "body": [
+          "Someone signed in to your account from Ganja on an unknown device at 03:12."
+        ]
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "It was not me: report"
+        },
+        {
+          "id": "ignore",
+          "label": "Dismiss"
+        }
+      ],
+      "safe": "report",
+      "explain": "An unknown sign-in means someone has your password. Reporting fast saves the account.",
+      "risk": "credentials"
+    },
+    {
+      "id": "second-trap",
+      "title": "Urgent: your account was hacked",
+      "prompt": "Attackers sometimes write a second time. What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "IT Security",
+          "address": "security@idare-secure.example.net"
+        },
+        "subject": "Urgent: your account was hacked",
+        "time": "09:02",
+        "body": [
+          "After yesterday's incident, confirm your account again within one hour.",
+          "Confirm:"
+        ],
+        "link": {
+          "text": "idare-secure.example.net/yoxla",
+          "href": "https://idare-secure.example.net/yoxla",
+          "after": 1
+        }
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report as phishing"
+        },
+        {
+          "id": "click",
+          "label": "Open the link"
+        },
+        {
+          "id": "delete",
+          "label": "Delete"
+        }
+      ],
+      "safe": "report",
+      "explain": "The address is not your organisation's domain. Attackers often come back to the same person.",
+      "risk": "credentials"
+    },
+    {
+      "id": "training-mail",
+      "title": "Security training on Friday",
+      "prompt": "Should this be reported? Threat or normal?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Technical support",
+          "address": "it-support@idare.example"
+        },
+        "subject": "Security training on Friday",
+        "time": "12:30",
+        "body": [
+          "A short training takes place on Friday at 11:00 in the main hall. No registration needed."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "Correct address, no link, no request. This is a normal notice.",
+      "risk": "credentials"
+    },
+    {
+      "id": "wrong-recipient",
+      "title": "Draft: Staff list",
+      "prompt": "Should this be reported? Threat or normal?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "You",
+          "address": "l.aliyeva@idare.example"
+        },
+        "subject": "Staff list",
+        "time": "10:02",
+        "body": [
+          "The list you asked for is attached."
+        ],
+        "attachment": {
+          "name": "isciler_siyahisi.xlsx",
+          "size": "240 KB"
+        }
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "The list went to a personal address outside the organisation. That is a data leak, report it now.",
+      "risk": "data"
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "formatVersion": 1,
+  "module": "phishing-email",
+  "title": "Phishing emails in practice",
+  "intro": "Spot a fake email at first glance. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "payslip",
+      "title": "September payslip",
+      "prompt": "Read the sender address letter by letter. What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Accounting",
+          "address": "muhasibat@xidmetagentIiyi.az"
+        },
+        "subject": "September payslip",
+        "time": "09:02",
+        "body": [
+          "Dear user,",
+          "Your payslip is ready. If you do not confirm within 24 hours, the payment will be stopped."
+        ],
+        "link": {
+          "text": "View payslip",
+          "href": "https://maas-portal.info/giris",
+          "after": 1
+        }
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report phishing"
+        },
+        {
+          "id": "click",
+          "label": "Open the link"
+        },
+        {
+          "id": "delete",
+          "label": "Delete"
+        }
+      ],
+      "safe": "report",
+      "explain": "The address has a capital I instead of a small l: a look-alike domain.",
+      "risk": "credentials"
+    },
+    {
+      "id": "fake-login",
+      "title": "xidmetagentliyi.az.hesab-yoxla.info",
+      "prompt": "Look at the end of the address: who is the real owner?",
+      "artifact": {
+        "kind": "web",
+        "title": "Xidmət Agentliyi",
+        "url": "https://xidmetagentliyi.az.hesab-yoxla.info/giris",
+        "body": [],
+        "fields": [
+          "Email",
+          "Password"
+        ],
+        "button": "Sign in"
+      },
+      "options": [
+        {
+          "id": "login",
+          "label": "Sign in"
+        },
+        {
+          "id": "close",
+          "label": "Close tab"
+        }
+      ],
+      "safe": "close",
+      "explain": "The familiar name in front is decoration; the real domain was hesab-yoxla.info.",
+      "risk": "credentials"
+    },
+    {
+      "id": "pitch",
+      "title": "Call from OfisTəchizat MMC",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "OfisTəchizat MMC",
+        "number": "+994 50 000 61 27",
+        "body": [
+          "Hello, Gunel Aliyeva from OfisTəchizat. Did you get our email? Please pay the September invoice to the new account today."
+        ]
+      },
+      "options": [
+        {
+          "id": "agree",
+          "label": "Fine, I will pay today"
+        },
+        {
+          "id": "verify",
+          "label": "I will check on the contract number"
+        }
+      ],
+      "safe": "verify",
+      "explain": "The email and the call can come from the same scammer. Check through another channel.",
+      "risk": "money"
+    },
+    {
+      "id": "meeting",
+      "title": "Tomorrow's meeting",
+      "prompt": "Safe or threat?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Elvin Mammadov",
+          "address": "e.mammadov@xidmetagentliyi.az"
+        },
+        "subject": "Tomorrow's meeting",
+        "time": "10:21",
+        "body": [
+          "Hello Aynur,",
+          "See you tomorrow at 10:00 in room 3. The agenda is in yesterday's email."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "A known colleague, the right address, no link and no request. A normal work email.",
+      "risk": "credentials"
+    },
+    {
+      "id": "card-blocked",
+      "title": "Message from UlduzBank",
+      "prompt": "Safe or threat?",
+      "artifact": {
+        "kind": "sms",
+        "name": "UlduzBank",
+        "time": "08:03",
+        "body": [
+          "UlduzBank: Your card has been blocked. To unblock it, sign in: https://ulduzbank-az.info/kart"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "The sender name can be faked, and the link is not the bank's site. If in doubt, call the number on the back of your card.",
+      "risk": "credentials"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "formatVersion": 1,
+  "module": "messenger-hijack",
+  "title": "Messenger Account Hijack in practice",
+  "intro": "The six-digit code is your account key. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "group-money",
+      "title": "Message from Department group",
+      "prompt": "A message comes to the group from your head of department's account. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Department group",
+        "time": "10:24",
+        "body": [
+          "Elnarə Hüseynova: Hello all. I urgently need 300 manat, I will pay it back tonight.",
+          "Elnarə Hüseynova: I will send the card number privately. Do not call, I am in a meeting."
+        ]
+      },
+      "options": [
+        {
+          "id": "call",
+          "label": "Call Elnarə on the phone"
+        },
+        {
+          "id": "send",
+          "label": "I will send it, write the card"
+        }
+      ],
+      "safe": "call",
+      "explain": "Calling the number you know shows at once who wrote the message.",
+      "risk": "money"
+    },
+    {
+      "id": "vote-page",
+      "title": "balaca-ressam.example.org",
+      "prompt": "The page looks lovely and has a Vote button. What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "balaca-ressam.example.org",
+        "url": "https://balaca-ressam.example.org/ses",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "vote",
+          "label": "Vote"
+        },
+        {
+          "id": "close",
+          "label": "Close the page"
+        }
+      ],
+      "safe": "close",
+      "explain": "Closing an unknown page that wants an account for a vote is the safest step.",
+      "risk": "credentials"
+    },
+    {
+      "id": "friend-asks",
+      "title": "Message from Aysel Məmmədova",
+      "prompt": "A minute later a message comes from your friend Aysel. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Aysel Məmmədova",
+        "time": "10:24",
+        "body": [
+          "Hi dear, did you get a code? I sent mine to your number by mistake.",
+          "Please send it quickly, my phone is getting blocked."
+        ]
+      },
+      "options": [
+        {
+          "id": "share",
+          "label": "Send her the code"
+        },
+        {
+          "id": "call",
+          "label": "Call Aysel on the phone"
+        },
+        {
+          "id": "block",
+          "label": "Block"
+        }
+      ],
+      "safe": "call",
+      "explain": "A code that came to you belongs to your account, and the call warns the real Aysel.",
+      "risk": "credentials"
+    },
+    {
+      "id": "pin-on",
+      "title": "Söhbət: Two-step verification turned on",
+      "prompt": "Is each notice safe or a threat?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Söhbət: Two-step verification turned on",
+        "body": [
+          "You set up extra protection for your account."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "This confirms a step you took yourself. Two-step verification protects the account from code theft.",
+      "risk": "credentials"
+    },
+    {
+      "id": "unasked-code",
+      "title": "Message from Söhbət",
+      "prompt": "Is each notice safe or a threat?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Söhbət",
+        "time": "23:40",
+        "body": [
+          "Your Söhbət code: 418 205. Do not share this code with anyone."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "If you did not ask for it, someone is trying to log in with your number. Give the code to no one.",
+      "risk": "credentials"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "formatVersion": 1,
+  "module": "meeting-security",
+  "title": "Meeting security in practice",
+  "intro": "Who is listening, what is on screen?. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "lobby-unknown",
+      "title": "Waiting room",
+      "prompt": "Someone is in the waiting room. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Waiting room",
+        "body": [
+          "Wants to join: iPhone",
+          "Not on the invite list"
+        ]
+      },
+      "options": [
+        {
+          "id": "admit",
+          "label": "Admit"
+        },
+        {
+          "id": "deny",
+          "label": "Deny"
+        }
+      ],
+      "safe": "deny",
+      "explain": "That is exactly what the waiting room is for.",
+      "risk": "data"
+    },
+    {
+      "id": "the-ask",
+      "title": "Rəşad Məmmədov (Director)",
+      "prompt": "The director is on camera and the voice sounds familiar. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Rəşad Məmmədov (Director)",
+        "body": [
+          "Camera on, the voice lags a little behind the lips.",
+          "\"Transfer 46,000 manat to a new account by 15:00 today. This is confidential, tell no one.\""
+        ]
+      },
+      "options": [
+        {
+          "id": "pay",
+          "label": "OK, I will transfer it now"
+        },
+        {
+          "id": "verify",
+          "label": "I will confirm by calling you on the number I know"
+        },
+        {
+          "id": "wave-test",
+          "label": "Please wave at the camera"
+        }
+      ],
+      "safe": "verify",
+      "explain": "A second channel exposes the fake quickly.",
+      "risk": "money"
+    },
+    {
+      "id": "lobby-known",
+      "title": "Waiting room",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Waiting room",
+        "body": [
+          "Wants to join: Leyla Rzayeva",
+          "On the invite list"
+        ]
+      },
+      "options": [
+        {
+          "id": "admit",
+          "label": "Admit"
+        },
+        {
+          "id": "deny",
+          "label": "Deny"
+        }
+      ],
+      "safe": "admit",
+      "explain": "Leyla is invited and her name is on the list.",
+      "risk": "account"
+    },
+    {
+      "id": "pressure",
+      "title": "Meeting chat",
+      "prompt": "Now another familiar person confirms it too. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Meeting chat",
+        "body": [
+          "Rəşad Məmmədov: Do not call, my phone is not with me.",
+          "Sevda Kərimli (chief accountant): I am here too, everything is in order."
+        ]
+      },
+      "options": [
+        {
+          "id": "pay",
+          "label": "If everyone agrees, I will transfer"
+        },
+        {
+          "id": "leave",
+          "label": "Leave the meeting and hold the payment"
+        }
+      ],
+      "safe": "leave",
+      "explain": "\"Do not call\" is the best reason to call.",
+      "risk": "money"
+    },
+    {
+      "id": "share-pick",
+      "title": "What do you want to share?",
+      "prompt": "Choose what to share. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "What do you want to share?",
+        "body": [
+          "Entire screen",
+          "Window: Teqdimat_oktyabr.pptx",
+          "Open browser tab: Salary table 2026"
+        ]
+      },
+      "options": [
+        {
+          "id": "whole",
+          "label": "Share entire screen"
+        },
+        {
+          "id": "window",
+          "label": "Share only the presentation window"
+        }
+      ],
+      "safe": "window",
+      "explain": "Participants see only what they need.",
+      "risk": "money"
+    }
+  ]
+}

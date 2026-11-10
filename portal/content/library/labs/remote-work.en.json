@@ -1,0 +1,117 @@
+{
+  "formatVersion": 1,
+  "module": "remote-work",
+  "title": "Remote work in practice",
+  "intro": "Your office needs protection at home too. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "vpn-update",
+      "title": "New VPN app version",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "IT Support",
+          "address": "it@rxagentlik.az"
+        },
+        "subject": "New VPN app version",
+        "time": "08:30",
+        "body": [
+          "The update will install on your work computer automatically. Do not download anything."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The domain is correct and you are not asked to download anything.",
+      "risk": "credentials"
+    },
+    {
+      "id": "default-router",
+      "title": "192.168.1.1",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "web",
+        "title": "HomeRouter",
+        "url": "http://192.168.1.1",
+        "body": [],
+        "fields": [
+          "Username: admin",
+          "Password: admin"
+        ],
+        "button": "Sign in"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Factory passwords are public knowledge. Change the router password now.",
+      "risk": "credentials"
+    },
+    {
+      "id": "share-password",
+      "title": "Message from Tural, colleague",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Tural, colleague",
+        "time": "10:24",
+        "body": [
+          "I can't get into the system from home. Tell me your password, just for a minute."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A password is never shared, not even with a colleague. Suggest he contacts tech support.",
+      "risk": "credentials"
+    },
+    {
+      "id": "free-vpn",
+      "title": "super-free-vpn.top",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "web",
+        "title": "super-free-vpn.top",
+        "url": "https://super-free-vpn.top/download",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "An unknown free VPN can read your traffic. Use only the organisation's VPN for work.",
+      "risk": "account"
+    }
+  ]
+}

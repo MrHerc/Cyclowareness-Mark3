@@ -1,0 +1,85 @@
+{
+  "formatVersion": 1,
+  "module": "usb-media",
+  "title": "USB drives and chargers in practice",
+  "intro": "A found flash drive is no gift. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "assistant-sms",
+      "title": "Message from +994 51 000 77 63",
+      "prompt": "A flash drive is lying on your desk. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "+994 51 000 77 63",
+        "time": "09:48",
+        "body": [
+          "Hello, I'm Nigar, the director's new assistant.",
+          "We left a flash drive on your desk, it's the director's presentation.",
+          "Please plug it in and open the file now, the meeting starts in 10 minutes. Don't tell anyone yet."
+        ]
+      },
+      "options": [
+        { "id": "plug-in", "label": "Plug it in and open the file" },
+        { "id": "check", "label": "Call the director's office on the number I know" },
+        { "id": "reply", "label": "Reply and ask which file to open" }
+      ],
+      "safe": "check",
+      "explain": "An unknown number, the director's name, time pressure and secrecy. Check through a channel you already know.",
+      "risk": "malware"
+    },
+    {
+      "id": "car-park-drive",
+      "title": "Salaries_2026_confidential.xlsx",
+      "prompt": "This drive was lying in the car park. What do you do with this file?",
+      "artifact": {
+        "kind": "file",
+        "name": "Salaries_2026_confidential.xlsx",
+        "size": "48 KB",
+        "text": "Source: USB drive found in the car park"
+      },
+      "options": [
+        { "id": "open", "label": "Plug it into my work computer and open it" },
+        { "id": "home", "label": "Check it on my home computer" },
+        { "id": "security", "label": "Take the drive to the security team" }
+      ],
+      "safe": "security",
+      "explain": "Plugging it in can be enough: some devices pretend to be a keyboard and type commands by themselves.",
+      "risk": "malware"
+    },
+    {
+      "id": "colleague-offer",
+      "title": "Message from Kamal (colleague)",
+      "prompt": "A colleague offers to look at the drive for you. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Kamal (colleague)",
+        "time": "09:55",
+        "body": ["Give it to me, I'll look. I have antivirus on my computer."]
+      },
+      "options": [
+        { "id": "hand-over", "label": "Hand it over, the antivirus will protect him" },
+        { "id": "refuse", "label": "Politely refuse and hand it in" }
+      ],
+      "safe": "refuse",
+      "explain": "Antivirus does not stop a device that types commands. Security checks drives on a computer isolated from the network.",
+      "risk": "malware"
+    },
+    {
+      "id": "trust-device",
+      "title": "Trust this computer?",
+      "prompt": "Your phone is charging from a cable a stranger lent you at the airport. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Trust this computer?",
+        "body": ["Your settings and data will be accessible from this computer when connected."]
+      },
+      "options": [
+        { "id": "trust", "label": "Trust" },
+        { "id": "decline", "label": "Don't trust, and unplug the cable" }
+      ],
+      "safe": "decline",
+      "explain": "A charging cable should never ask for trust. Charge with your own adapter from a wall socket or your own power bank.",
+      "risk": "device"
+    }
+  ]
+}

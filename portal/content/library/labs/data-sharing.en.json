@@ -1,0 +1,142 @@
+{
+  "formatVersion": 1,
+  "module": "data-sharing",
+  "title": "Sharing data safely in practice",
+  "intro": "Before sending: what, to whom, how. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "phone-book",
+      "title": "Message from Nigar (former colleague)",
+      "prompt": "What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Nigar (former colleague)",
+        "time": "10:24",
+        "body": [
+          "Hi! I need it at my new job: could you send me the internal phone book?"
+        ]
+      },
+      "options": [
+        {
+          "id": "keep",
+          "label": "It is internal, I cannot send it"
+        },
+        {
+          "id": "share",
+          "label": "I send the file"
+        }
+      ],
+      "safe": "keep",
+      "explain": "Internal documents are for staff only, and a former colleague is now an outsider.",
+      "risk": "data"
+    },
+    {
+      "id": "file-page",
+      "title": "disk.rxagentlik.az",
+      "prompt": "How do you share the file?",
+      "artifact": {
+        "kind": "web",
+        "title": "disk.rxagentlik.az",
+        "url": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "share",
+          "label": "Share"
+        },
+        {
+          "id": "personal",
+          "label": "Move to my personal cloud"
+        }
+      ],
+      "safe": "share",
+      "explain": "The file stays on the work drive. Now look at the sharing settings.",
+      "risk": "data"
+    },
+    {
+      "id": "autocomplete",
+      "title": "Draft: List of applications",
+      "prompt": "Read the recipient's domain to the end. What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "You",
+          "address": "aynur.mammadova@rxagentlik.az"
+        },
+        "subject": "List of applications",
+        "time": "11:38",
+        "body": [
+          "Leyla, the list you asked for is attached."
+        ],
+        "attachment": {
+          "name": "Muracietler_2026.xlsx",
+          "size": "310 KB"
+        }
+      },
+      "options": [
+        {
+          "id": "fix",
+          "label": "Check and fix the recipient"
+        },
+        {
+          "id": "send",
+          "label": "Send"
+        }
+      ],
+      "safe": "fix",
+      "explain": "The name matched but the domain did not. The work address ends in rxagentlik.az.",
+      "risk": "data"
+    },
+    {
+      "id": "named-week",
+      "title": "Sharing setting",
+      "prompt": "Is this sharing setting safe?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Sharing setting",
+        "body": [
+          "Project report: 2 people, view, 7 days"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "Narrow access, view only and an end date. The right setting.",
+      "risk": "data"
+    },
+    {
+      "id": "anyone-forever",
+      "title": "Sharing setting",
+      "prompt": "Is this sharing setting safe?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Sharing setting",
+        "body": [
+          "Salary table: anyone with the link, edit, no end date"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A confidential file open to anyone with no end date. Once the link spreads, there is no undo.",
+      "risk": "money"
+    }
+  ]
+}

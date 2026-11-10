@@ -1,0 +1,134 @@
+{
+  "formatVersion": 1,
+  "module": "fake-captcha-commands",
+  "title": "Fake CAPTCHA in practice",
+  "intro": "No real check asks you to type commands. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "clickfix",
+      "title": "Confirm you are human",
+      "prompt": "The page tells you to press keys and paste. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Confirm you are human",
+        "body": [
+          "To continue, press the keys shown and paste the text."
+        ]
+      },
+      "options": [
+        {
+          "id": "close",
+          "label": "Close the page"
+        },
+        {
+          "id": "do",
+          "label": "Follow the steps"
+        }
+      ],
+      "safe": "close",
+      "explain": "A check that asks you to type a command is fake, so closing it is the right step.",
+      "risk": "malware"
+    },
+    {
+      "id": "run-box",
+      "title": "Run",
+      "prompt": "The Run box is open, and it holds an unknown text the site copied. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Run",
+        "body": [
+          "The text the site copied has been pasted into the box:",
+          "[unknown text copied by the site]"
+        ]
+      },
+      "options": [
+        {
+          "id": "cancel",
+          "label": "Cancel and close"
+        },
+        {
+          "id": "run",
+          "label": "Run it with OK"
+        }
+      ],
+      "safe": "cancel",
+      "explain": "Cancelling stops the text from running, then tell tech support what happened.",
+      "risk": "malware"
+    },
+    {
+      "id": "real-captcha",
+      "title": "Select the pictures",
+      "prompt": "This is an ordinary picture check. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Select the pictures",
+        "body": [
+          "To show you are not a robot, select the pictures with traffic lights."
+        ]
+      },
+      "options": [
+        {
+          "id": "complete",
+          "label": "Select the pictures and confirm"
+        },
+        {
+          "id": "report",
+          "label": "Report as an attack"
+        }
+      ],
+      "safe": "complete",
+      "explain": "This is what a real check looks like: pick pictures or tick a box.",
+      "risk": "malware"
+    },
+    {
+      "id": "image-captcha",
+      "title": "Tick the box",
+      "prompt": "Is each check real or a trap?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Tick the box",
+        "body": [
+          "Tick the I am not a robot box and continue."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "This is an ordinary check. Ticking a box or picking pictures is safe.",
+      "risk": "malware"
+    },
+    {
+      "id": "keystroke-captcha",
+      "title": "Complete the check",
+      "prompt": "Is each check real or a trap?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Complete the check",
+        "body": [
+          "Press the keys that open a window and paste the text."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A check that asks you to type a command is fake. Close the page.",
+      "risk": "malware"
+    }
+  ]
+}

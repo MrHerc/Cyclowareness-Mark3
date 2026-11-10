@@ -1,0 +1,149 @@
+{
+  "formatVersion": 1,
+  "module": "fake-login-windows",
+  "title": "Fake login windows in practice",
+  "intro": "Looks real, but trapped inside the page. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "popup",
+      "title": "IshPocht: sign in",
+      "prompt": "The window shows the right address. But that proves nothing yet. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "IshPocht: sign in",
+        "body": [
+          "https://poct.idare.example/giris",
+          "Sign in with your work email to view the document.",
+          "Email: aysel.quliyeva@idare.example"
+        ]
+      },
+      "options": [
+        {
+          "id": "drag",
+          "label": "Drag the window outside the browser"
+        },
+        {
+          "id": "type-pass",
+          "label": "Type the password and sign in"
+        }
+      ],
+      "safe": "drag",
+      "explain": "The right test. Let us see whether the window can leave the browser.",
+      "risk": "credentials"
+    },
+    {
+      "id": "real-share",
+      "title": "Narmin Hasanova shared a file with you",
+      "prompt": "What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "BuludXidmet",
+          "address": "bildiris@buludxidmet.example"
+        },
+        "subject": "Narmin Hasanova shared a file with you",
+        "time": "08:55",
+        "body": [
+          "Narmin Hasanova shared \"Budce_2027.xlsx\" with you.",
+          "Note: the budget table we discussed this morning."
+        ],
+        "link": {
+          "text": "Open file",
+          "href": "https://buludxidmet.example/idare/budce-2027",
+          "after": 1
+        }
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open file"
+        },
+        {
+          "id": "report",
+          "label": "Report phishing"
+        }
+      ],
+      "safe": "open",
+      "explain": "You expected this file, and the link goes to the service's own address. It is fine to open.",
+      "risk": "account"
+    },
+    {
+      "id": "drag-result",
+      "title": "IshPocht: sign in",
+      "prompt": "The window was cut off at the page edge. A real window never does that. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "IshPocht: sign in",
+        "body": [
+          "The window reached the edge of the page and was cut off.",
+          "It did not leave the browser."
+        ]
+      },
+      "options": [
+        {
+          "id": "close-it",
+          "label": "Close the window and the tab"
+        },
+        {
+          "id": "type-anyway",
+          "label": "Sign in anyway"
+        }
+      ],
+      "safe": "close-it",
+      "explain": "A window that cannot leave the page is fake, so type nothing into it.",
+      "risk": "credentials"
+    },
+    {
+      "id": "moves-out",
+      "title": "IshPocht: sign in",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "IshPocht: sign in",
+        "body": [
+          "You dragged the window aside: it left the browser and moved onto the desktop.",
+          "ParolSeyf offered the password by itself."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The window moves apart from the browser, and the password manager recognises the site. These are signs of a real window.",
+      "risk": "credentials"
+    },
+    {
+      "id": "edge-cut",
+      "title": "IshPocht: sign in",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "IshPocht: sign in",
+        "body": [
+          "You dragged the window aside.",
+          "It reached the edge of the page and was cut off."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A real window leaves the browser and goes anywhere on the screen. If it gets cut off, it is a picture drawn inside the page.",
+      "risk": "credentials"
+    }
+  ]
+}

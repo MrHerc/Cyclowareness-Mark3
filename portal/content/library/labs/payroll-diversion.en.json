@@ -1,0 +1,152 @@
+{
+  "formatVersion": 1,
+  "module": "payroll-diversion",
+  "title": "Payroll diversion in practice",
+  "intro": "Bank details never change by email. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "fake-colleague",
+      "title": "Updating my salary account",
+      "prompt": "Look at the sender's domain. What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Kamran Aliyev",
+          "address": "k.aliyev@seherxidmetleri-mail.example.net"
+        },
+        "subject": "Updating my salary account",
+        "time": "09:12",
+        "body": [
+          "Hello, I have switched banks.",
+          "Please pay the September salary into this account: AZ00ULDZ00000000000000007731",
+          "I will bring the form later. Kamran Aliyev, Transport Unit"
+        ]
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report phishing"
+        },
+        {
+          "id": "change",
+          "label": "Reply: account updated"
+        }
+      ],
+      "safe": "report",
+      "explain": "The domain is not your office's domain, it has an extra word added.",
+      "risk": "money"
+    },
+    {
+      "id": "search",
+      "title": "axtar.example",
+      "prompt": "What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "axtar.example",
+        "url": "https://axtar.example/?q=kadr+kabineti",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "ad",
+          "label": "Open the ad result"
+        },
+        {
+          "id": "bookmark",
+          "label": "Open Kadr Kabineti from bookmarks"
+        }
+      ],
+      "safe": "bookmark",
+      "explain": "A bookmark always takes you to the real address.",
+      "risk": "account"
+    },
+    {
+      "id": "system-request",
+      "title": "New request: bank detail change, Ayten Huseynova",
+      "prompt": "What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Kadr Kabineti",
+          "address": "noreply@kabinet.seherxidmetleri.example"
+        },
+        "subject": "New request: bank detail change, Ayten Huseynova",
+        "time": "10:05",
+        "body": [
+          "The employee sent this request in Kadr Kabineti, signed in with two-step verification.",
+          "Review the request in the system:"
+        ],
+        "link": {
+          "text": "View request",
+          "href": "https://kabinet.seherxidmetleri.example/sorgular/2187",
+          "after": 1
+        }
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "View request"
+        },
+        {
+          "id": "report",
+          "label": "Report phishing"
+        }
+      ],
+      "safe": "open",
+      "explain": "The address is your office's own domain and the request came from inside the system.",
+      "risk": "account"
+    },
+    {
+      "id": "salary-sms",
+      "title": "Message from SahilBank",
+      "prompt": "Safe or scam?",
+      "artifact": {
+        "kind": "sms",
+        "name": "SahilBank",
+        "time": "09:00",
+        "body": [
+          "Salary of 1,240.00 AZN credited to your card. Balance: 1,386.50 AZN."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "There is no link and it asks for nothing. This is a normal information message.",
+      "risk": "money"
+    },
+    {
+      "id": "boss-gift-cards",
+      "title": "Message from Sabina Aliyeva, manager",
+      "prompt": "Safe or scam?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Sabina Aliyeva, manager",
+        "time": "10:24",
+        "body": [
+          "I am in a meeting and cannot call. Quickly buy five 100 manat BonusMarket cards and send me the codes here. I will pay you back."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A gift card code is like cash and never comes back. Call your manager on a number you know to check.",
+      "risk": "money"
+    }
+  ]
+}

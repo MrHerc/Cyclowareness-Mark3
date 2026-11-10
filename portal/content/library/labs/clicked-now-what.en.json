@@ -1,0 +1,149 @@
+{
+  "formatVersion": 1,
+  "module": "clicked-now-what",
+  "title": "Clicked: now what? in practice",
+  "intro": "Stop the damage in the first 15 minutes. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "retry-trap",
+      "title": "Sign-in failed",
+      "prompt": "The page shows an error. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Sign-in failed",
+        "body": [
+          "Wrong password. Try again or use another password."
+        ]
+      },
+      "options": [
+        {
+          "id": "retry",
+          "label": "Try again"
+        },
+        {
+          "id": "close",
+          "label": "Close"
+        }
+      ],
+      "safe": "close",
+      "explain": "Type nothing more. Close the page and move to the next step.",
+      "risk": "credentials"
+    },
+    {
+      "id": "av-alert",
+      "title": "Threat detected",
+      "prompt": "Your antivirus raises an alert. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Threat detected",
+        "body": [
+          "A malicious macro was found in Akt_imzala.docm. Cleanup did not finish."
+        ]
+      },
+      "options": [
+        {
+          "id": "disconnect",
+          "label": "Turn off Wi-Fi, unplug the cable"
+        },
+        {
+          "id": "keep-working",
+          "label": "Close and keep working"
+        },
+        {
+          "id": "delete",
+          "label": "Delete the file"
+        }
+      ],
+      "safe": "disconnect",
+      "explain": "Off the network, the computer cannot spread the damage or send data out.",
+      "risk": "malware"
+    },
+    {
+      "id": "the-email",
+      "title": "Your mailbox is 98% full",
+      "prompt": "The email is still in your inbox. What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "İşPoçt Admin",
+          "address": "admin@ispoct-mail.example.net"
+        },
+        "subject": "Your mailbox is 98% full",
+        "time": "09:41",
+        "body": [
+          "Increase your storage so mail is not deleted:"
+        ],
+        "link": {
+          "text": "ispoct-mail.example.net/yer",
+          "href": "https://ispoct-mail.example.net/yer",
+          "after": 0
+        }
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report phishing"
+        },
+        {
+          "id": "delete",
+          "label": "Delete it so nobody sees"
+        }
+      ],
+      "safe": "report",
+      "explain": "Your report lets security remove the email from other inboxes too.",
+      "risk": "account"
+    },
+    {
+      "id": "farid",
+      "title": "Message from Fərid",
+      "prompt": "Did your colleague do the right thing?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Fərid",
+        "time": "10:24",
+        "body": [
+          "I opened a strange file. I turned off Wi-Fi and I'm calling security now."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "Disconnect first, then report by phone.",
+      "risk": "account"
+    },
+    {
+      "id": "leyla",
+      "title": "Message from Leyla",
+      "prompt": "Did your colleague do the right thing?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Leyla",
+        "time": "10:24",
+        "body": [
+          "I opened the file, then deleted it. Nobody will know."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Deleting destroys the trail, and hiding gives the attack time.",
+      "risk": "account"
+    }
+  ]
+}

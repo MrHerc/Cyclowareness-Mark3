@@ -1,0 +1,133 @@
+{
+  "formatVersion": 1,
+  "module": "search-ads-lookalikes",
+  "title": "Fake sites in search in practice",
+  "intro": "The first result is not always right. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "results",
+      "title": "tapan.example",
+      "prompt": "At the top is an ad, and below it is the app's own site. What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "tapan.example",
+        "url": "https://tapan.example/axtar?q=gorus+yukle",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "ad",
+          "label": "Sponsored: gorus-app-download.example.net"
+        },
+        {
+          "id": "organic",
+          "label": "gorus.example: official site"
+        }
+      ],
+      "safe": "organic",
+      "explain": "You skipped the ad and opened the app's own site.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "search-ad",
+      "title": "tapan.example",
+      "prompt": "The first search result is an ad. What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "tapan.example",
+        "url": "https://tapan.example/axtar?q=vetendas+portali+arayis",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "ad",
+          "label": "Open the ad"
+        },
+        {
+          "id": "official",
+          "label": "Open the vetendasportal.gov.az result"
+        }
+      ],
+      "safe": "official",
+      "explain": "You skipped the ad and chose the result whose address ends in gov.az.",
+      "risk": "account"
+    },
+    {
+      "id": "fake-site",
+      "title": "gorus-app-download.example.net",
+      "prompt": "The page looks a lot like the real site. Look at the address. What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "gorus-app-download.example.net",
+        "url": "https://gorus-app-download.example.net/yukle",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "download",
+          "label": "Download"
+        },
+        {
+          "id": "leave",
+          "label": "Close the tab"
+        }
+      ],
+      "safe": "leave",
+      "explain": "The address was not the app's own site. Go to the official site yourself.",
+      "risk": "malware"
+    },
+    {
+      "id": "fake-login",
+      "title": "vetendasportal.gov.az-arayis.example",
+      "prompt": "On a phone only the start of the address shows. Read it to the end. What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "Vatandash Portal",
+        "url": "https://vetendasportal.gov.az-arayis.example/giris",
+        "body": [],
+        "fields": [
+          "FIN code",
+          "Password"
+        ],
+        "button": "Sign in"
+      },
+      "options": [
+        {
+          "id": "login",
+          "label": "Sign in"
+        },
+        {
+          "id": "close",
+          "label": "Close the page"
+        }
+      ],
+      "safe": "close",
+      "explain": "The real owner of a site is at the end of the address, and this one did not end in gov.az.",
+      "risk": "credentials"
+    },
+    {
+      "id": "fake-file",
+      "title": "GorusSetup_2026.exe",
+      "prompt": "The file has downloaded. Will you open it?",
+      "artifact": {
+        "kind": "file",
+        "name": "GorusSetup_2026.exe",
+        "size": "84 MB",
+        "text": "Source: gorus-app-download.example.net"
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open"
+        },
+        {
+          "id": "delete",
+          "label": "Delete"
+        }
+      ],
+      "safe": "delete",
+      "explain": "Delete the file, tell technical support, and get the app from the official site.",
+      "risk": "credentials"
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "formatVersion": 1,
+  "module": "e-signature-misuse",
+  "title": "E-signature in practice",
+  "intro": "Your PIN and your signature are yours alone. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "expire",
+      "title": "Call from MöhürID Support",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "MöhürID Support",
+        "number": "+994 12 000 77 40",
+        "body": [
+          "Hello, this is MöhürID support. Your mobile signature certificate, excuse me, expires today and will be blocked unless you renew it."
+        ]
+      },
+      "options": [
+        {
+          "id": "comply",
+          "label": "How do I renew it?"
+        },
+        {
+          "id": "verify",
+          "label": "I will call the official number myself"
+        }
+      ],
+      "safe": "verify",
+      "explain": "Find the service's number on its official website yourself.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "unexpected",
+      "title": "MöhürID: Signature request",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "MöhürID: Signature request",
+        "body": [
+          "Document: Etibarname_avtomobil.pdf. Service: Bulud Notariat"
+        ]
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open and sign"
+        },
+        {
+          "id": "deny",
+          "label": "Reject"
+        }
+      ],
+      "safe": "deny",
+      "explain": "A request you did not start means someone is trying to use your name.",
+      "risk": "account"
+    },
+    {
+      "id": "sms-code",
+      "title": "Call from MöhürID Support",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "MöhürID Support",
+        "number": "+994 12 000 77 40",
+        "body": [
+          "You will get an SMS for the renewal. Read me the code and I will enter it in the system for you."
+        ]
+      },
+      "options": [
+        {
+          "id": "share",
+          "label": "I read out the code"
+        },
+        {
+          "id": "keep",
+          "label": "I do not share codes with anyone"
+        }
+      ],
+      "safe": "keep",
+      "explain": "Real support never asks for a code.",
+      "risk": "credentials"
+    },
+    {
+      "id": "own-code",
+      "title": "Message from MohurID",
+      "prompt": "Is this message safe or dangerous?",
+      "artifact": {
+        "kind": "sms",
+        "name": "MohurID",
+        "time": "09:10",
+        "body": [
+          "Confirmation code: 482913. Do not share this code. If you did not send this request, reject it."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "A normal message when you sign in yourself. No link, and it reminds you to keep the code secret.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "renew-link",
+      "title": "Message from MohurID",
+      "prompt": "Is this message safe or dangerous?",
+      "artifact": {
+        "kind": "sms",
+        "name": "MohurID",
+        "time": "09:42",
+        "body": [
+          "Your certificate is blocked. Restore it here: mohurid-yenile.test"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "The link does not go to the service's official website. Open the official site yourself to check.",
+      "risk": "impersonation"
+    }
+  ]
+}

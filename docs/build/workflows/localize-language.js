@@ -1,6 +1,6 @@
 export const meta = {
   name: 'localize-language',
-  description: 'Localise the whole portal into one new language: UI messages, legal texts, policies, landing (ar) and all 106 lessons, each translated then independently edited, then terminology consistency passes',
+  description: 'Localise the whole portal into one new language: UI messages, legal texts, policies, landing (ar), all 106 lessons and the 53 mini-labs, each translated then independently edited, then terminology consistency passes. args.only = "labs" translates only the mini-labs (content/library/labs) into an existing language',
   phases: [
     { title: 'Translate', detail: 'translators for UI chunks, legal, policies, landing and lesson batches' },
     { title: 'Edit', detail: 'an independent native editor per item' },
@@ -49,12 +49,20 @@ WHAT A TRANSLATION IS: the same JSON with only learner-facing text translated. T
 - Never edit the .en/.az/.ru files or the i18n files.
 CHECK: run from ${P}: npx tsx scripts/check-lesson-locales.ts <your files> and fix until every file prints ok.`
 
+// The 53 modules, nine mini-labs per batch.
+const LAB_MODULES = [...new Set(BATCHES.flat().map((l) => l.split('/')[0]))]
+const LAB_BATCHES = Array.from({ length: Math.ceil(LAB_MODULES.length / 9) }, (_, i) => LAB_MODULES.slice(i * 9, i * 9 + 9))
+
+const LAB_RULES = `MINI-LABS: JSON files ${P}/content/library/labs/<module>.en.json (schema: ${P}/src/lib/content/lab-scenario.ts): a few decisions built from the module's lessons, each with an artifact (email, sms, call, file, web page, dialog), options, the safe option and a debrief line. Write <module>.${LANG}.json next to each English file. The LESSONS rules above apply in full and the same checker enforces them: only the text under title, intro, prompt, label, explain, name, subject, body, text, size, fields and button is translated; every id, safe, risk, kind, time, address, number, href, url, after, module and formatVersion stays byte-identical and arrays keep their length. The decisions quote the module's lessons: reuse the wording, terms, character names and localised file names of ${P}/content/library/lessons/<module>/*.${LANG}.json, and keep every red flag the decision tests.
+CHECK: run from ${P}: npx tsx scripts/check-lesson-locales.ts <your files> and fix until every file prints ok.`
+
 const DOC_RULES = (what) => `${what}
 - Keep the Markdown structure byte-compatible: the first-line edition comment (<!-- version: …; effective: … -->) unchanged, the same number of ## sections in the same order, every numbered clause (1.1., 1.2. …) with the same number at the start of the line, the same lists and links (translate link text, keep URLs), the same emphasis.
 - Legal register: precise, formal ${NAME} legal language as a ${NAME}-qualified lawyer would write a translation; do not add, drop or soften any obligation, right, deadline, amount, party or definition; keep defined terms consistent; company names, addresses, registry numbers and statute names stay as in the source (add a ${NAME} rendering in parentheses only where a reader needs it).
 - Do not fix or change the content even if you think something is wrong; report it in notes instead.`
 
-const ITEMS = [
+const LAB_ITEMS = LAB_BATCHES.map((b, i) => ({ key: `labs-${i + 1}`, kind: 'labs', modules: b }))
+const ITEMS = args.only === 'labs' ? LAB_ITEMS : [
   { key: 'ui-admin', kind: 'ui', ns: ['admin'] },
   { key: 'ui-learner', kind: 'ui', ns: ['learner', 'player', 'common', 'site', 'auth'] },
   { key: 'ui-ops', kind: 'ui', ns: ['secops', 'security', 'settings'] },
@@ -62,6 +70,7 @@ const ITEMS = [
   { key: 'policies', kind: 'doc', task: DOC_RULES(`POLICIES: translate ${P}/content/policies/acceptable-use.en.md and ${P}/content/policies/passwords.en.md into ${P}/content/policies/acceptable-use.${LANG}.md and ${P}/content/policies/passwords.${LANG}.md (sample company policies employees read and sign off in the portal; see how the az/ru versions mirror the en structure). Policy register: clear, binding workplace-policy language.`) },
   ...(LANG === 'ar' ? [{ key: 'landing', kind: 'landing' }] : []),
   ...BATCHES.map((b, i) => ({ key: `lessons-${i + 1}`, kind: 'lessons', lessons: b })),
+  ...LAB_ITEMS,
 ]
 
 const SCHEMA = { type: 'object', properties: { summary: { type: 'string' }, files: { type: 'array', items: { type: 'string' } }, notes: { type: 'array', items: { type: 'string' } } }, required: ['summary', 'files', 'notes'] }
@@ -69,6 +78,7 @@ const SCHEMA = { type: 'object', properties: { summary: { type: 'string' }, file
 function translatorTask(it) {
   if (it.kind === 'ui') return `${UI_RULES}\n\nYOUR TASK (translator): namespaces ${it.ns.join(', ')}. For each, read the en file fully (and az/ru for context), then write ${P}/messages/${LANG}/<ns>.json. If the file already exists (an interrupted run), complete and fix it instead of starting over. Run the check. Return summary, files, notes (ambiguous strings, terms you chose that are not in the glossary).`
   if (it.kind === 'doc') return `${it.task}\n\nYOUR TASK (translator): write the two files. If one exists already (an interrupted run), complete and fix it. Return summary, files, notes.`
+  if (it.kind === 'labs') return `${LESSON_RULES}\n\n${LAB_RULES}\n\nYOUR TASK (translator): the mini-labs of the modules ${it.modules.join(', ')}. For each: read the English file and the module's ${LANG} lessons, then write the ${LANG} version. If a ${LANG} file already exists (an interrupted run), review and complete it instead of starting over. Return summary, files, notes.`
   if (it.kind === 'landing') return `LANDING PAGE: ${P}/content/landing/en.json is the public marketing site copy (a guided tour of the product). Write ${P}/content/landing/${LANG}.json with exactly the same keys and structure, persuasive, natural marketing ${NAME} for ${args.market} decision makers (CISO, HR, CEO), consistent with the glossary. Read ${P}/content/landing/de.json or fr.json to see how other languages adapted it, and ${P}/tests/landing.test.ts for the rules. CHECK: node -e "const a=require('${P}/content/landing/en.json'),b=require('${P}/content/landing/${LANG}.json');const f=(o,p='')=>Object.entries(o).flatMap(([k,v])=>v&&typeof v==='object'?f(v,p+k+'.'):[p+k]);const x=f(a).sort().join(),y=f(b).sort().join();console.log(x===y?'keys ok':'KEY MISMATCH')"\n\nYOUR TASK (translator): write the file. Return summary, files, notes.`
   return `${LESSON_RULES}\n\nYOUR TASK (translator): lessons (module/lesson): ${it.lessons.join(', ')}. For each: read the English file fully, then write the ${LANG} version. If a ${LANG} file already exists (an interrupted run), review and complete it instead of starting over. Return summary, files, notes (tricky spans, terms, localised file names).`
 }
@@ -78,6 +88,7 @@ function editorTask(it, tr) {
   const common = `YOU ARE THE INDEPENDENT NATIVE EDITOR (a second pair of eyes; you verify, you do not trust the translator). Translator's notes: ${notes}.`
   if (it.kind === 'ui') return `${UI_RULES}\n\n${common} Namespaces ${it.ns.join(', ')}: compare every ${LANG} string with the en (and az/ru) string and fix in place: mistranslations, omissions, strings whose meaning depends on UI context you did not check (grep the key in ${P}/src when unsure), literal or unnatural phrasing, wrong register, inconsistent terms or verbs against the glossary and across files, grammar, spelling, script and typography, plural forms, too-long button labels. Run the check until ok. Return summary (kinds of fixes, roughly how many), files, notes.`
   if (it.kind === 'doc') return `${it.task}\n\n${common} Compare the ${LANG} files clause by clause with the English (and az) source and fix: omissions, changed obligations or meanings, terminology, register, grammar, typography, structure. Return summary, files, notes (anything a lawyer must look at).`
+  if (it.kind === 'labs') return `${LESSON_RULES}\n\n${LAB_RULES}\n\n${common} Mini-labs of the modules ${it.modules.join(', ')}: open each English file, the ${LANG} file and the module's ${LANG} lessons side by side and edit the ${LANG} file in place: mistranslations and omissions, anything that changes which option is safe, wording that differs from the lessons for the same thing, literal or unnatural phrasing, glossary terms, grammar, typography, realism of the messages and pages. Run the checker until every file is ok. Return summary, files, notes.`
   if (it.kind === 'landing') return `${translatorTask(it).split('YOUR TASK')[0]}\n${common} Compare with en.json line by line and polish to native marketing quality; fix meaning, tone, consistency, typography. Run the check. Return summary, files, notes.`
   return `${LESSON_RULES}\n\n${common} Lessons: ${it.lessons.join(', ')}. For every lesson open the English file and the ${LANG} file side by side and edit the ${LANG} file in place (Edit tool for small fixes, Write for a full rewrite): mistranslations and omissions, anything that changes which answer is right, literal or unnatural phrasing, calques, wrong register, inconsistent terms against the glossary, grammar, spelling, script and typography per the style rules, sentences that sound bad when read aloud, spot spans that no longer hold their phrase, realism of the phishing artefacts. Run the checker until every file is ok. Return summary, files, notes (anything still doubtful).`
 }
@@ -90,6 +101,8 @@ const done = results.filter(Boolean)
 log(`${LANG}: ${done.length} of ${ITEMS.length} items edited`)
 const notesOf = (kind) => done.filter((r) => r.kind === kind && r.ed).map((r) => `[${r.key}] ${r.ed.notes.join(' | ')}`).join('\n').slice(0, 5000)
 
+// A labs-only run touches no lesson or UI file, so it needs no consistency pass over them.
+if (args.only === 'labs') return { lang: LANG, items: done.map((r) => ({ key: r.key, summary: r.ed ? r.ed.summary.slice(0, 300) : 'failed' })) }
 const [lessonPass, uiPass] = await parallel([
   () => retrying(`${WORLD}\n\n${LESSON_RULES}\n\nYOU ARE THE CONSISTENCY EDITOR for all ${LANG} lessons. Editors' notes:\n${notesOf('lessons')}\n1) Make sure every English lesson has a ${LANG} file (list ${P}/content/library/lessons/*/*.en.json and compare); translate any missing one. 2) Search all ${LANG} lesson files for terminology variants of the glossary terms and unify them; also unify how each character name and each localised file name is written. 3) Spot-read 10 lessons across different modules end to end for tone and flow and fix what you find. 4) Run from ${P}: npx tsx scripts/check-lesson-locales.ts $(ls content/library/lessons/*/*.${LANG}.json) and fix until all pass. Return summary, files, notes.`,
     { label: `consistency:${LANG}:lessons`, phase: 'Consistency', schema: SCHEMA, model: 'sonnet' }),

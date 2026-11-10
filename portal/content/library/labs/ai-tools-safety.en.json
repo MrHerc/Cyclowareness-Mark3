@@ -1,0 +1,132 @@
+{
+  "formatVersion": 1,
+  "module": "ai-tools-safety",
+  "title": "AI tools safety in practice",
+  "intro": "Use chatbots without leaking information. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "public-upload",
+      "title": "neyrosohbet.example",
+      "prompt": "Whose data is in this file?",
+      "artifact": {
+        "kind": "web",
+        "title": "neyrosohbet.example",
+        "url": "https://neyrosohbet.example/yeni",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "upload",
+          "label": "Upload Vetendas_muracietleri.xlsx"
+        },
+        {
+          "id": "skip",
+          "label": "Do not upload the file"
+        }
+      ],
+      "safe": "skip",
+      "explain": "A file with personal data is never uploaded to a public chatbot.",
+      "risk": "data"
+    },
+    {
+      "id": "pro-page",
+      "title": "neyrosohbet-pro.test",
+      "prompt": "Look at the address bar. What do you do on this page?",
+      "artifact": {
+        "kind": "web",
+        "title": "neyrosohbet-pro.test",
+        "url": "https://neyrosohbet-pro.test",
+        "body": []
+      },
+      "options": [
+        {
+          "id": "install",
+          "label": "Install the extension"
+        },
+        {
+          "id": "close",
+          "label": "Close the tab"
+        }
+      ],
+      "safe": "close",
+      "explain": "A service's \"free Pro\" version is not handed out on a foreign site.",
+      "risk": "malware"
+    },
+    {
+      "id": "history",
+      "title": "Use your chats to train the model?",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Use your chats to train the model?",
+        "body": [
+          "Your chat history will be stored on the service's servers."
+        ]
+      },
+      "options": [
+        {
+          "id": "allow",
+          "label": "Allow"
+        },
+        {
+          "id": "deny",
+          "label": "Decline"
+        }
+      ],
+      "safe": "deny",
+      "explain": "Turning training off helps, but still do not paste official information.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "komekci-notif",
+      "title": "İdarə Köməkçisi: Your summary is ready",
+      "prompt": "Safe or a trap?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "İdarə Köməkçisi: Your summary is ready",
+        "body": [
+          "You can open it on the internal portal."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The institution's approved tool sends an expected notice and asks for no link or code.",
+      "risk": "data"
+    },
+    {
+      "id": "voice-note",
+      "title": "Message from Manager",
+      "prompt": "Safe or a trap?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Manager",
+        "time": "10:24",
+        "body": [
+          "Hi, it's me. Send the confirmation code to this number right away, I will explain later."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A voice can be imitated with AI. Call your manager's known number yourself.",
+      "risk": "credentials"
+    }
+  ]
+}
