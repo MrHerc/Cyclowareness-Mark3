@@ -181,7 +181,6 @@ export function BrandingTab({
   const [proofDomain, setProofDomain] = useState(domain ?? branding.senderDomain ?? "");
   const [proof, setProof] = useState(domain && verifiedOn ? { domain, verifiedOn } : null);
   const [record, setRecord] = useState("");
-  const [checking, startCheck] = useTransition();
   useEffect(() => {
     domainProofRecordAction().then(
       (r) => setRecord(r.record),
@@ -192,13 +191,10 @@ export function BrandingTab({
     if (await writeClipboard(v)) toast(tc("copied"));
     else toast(tc("errors.generic"), "error");
   };
-  const checkDomain = () =>
-    startCheck(async () => {
-      const res = await verifyDomainAction(proofDomain);
-      if (!res.ok) {
-        toast(res.error === "rateLimited" ? tc("errors.rateLimited") : res.error === "domainTaken" ? t("domainTaken") : t("checkInvalid"), "error");
-        return;
-      }
+  const checkDomain = useAction(verifyDomainAction, {
+    // rateLimited falls through to common.errors.
+    errorMap: (res) => (res.error === "domainTaken" ? t("domainTaken") : res.error ? undefined : t("checkInvalid")),
+    onSuccess: (res) => {
       if (res.verified && res.verifiedOn) {
         setProof({ domain: proofDomain.trim().toLowerCase(), verifiedOn: res.verifiedOn });
         toast(t("checkOk"), "success");
@@ -207,7 +203,8 @@ export function BrandingTab({
         if (!res.kept) setProof(null);
         toast(res.kept ? t("checkKept") : t("checkMissing"), "error");
       }
-    });
+    },
+  });
 
   const upload = (f: File) => {
     if (!["image/png", "image/jpeg", "image/svg+xml"].includes(f.type) || f.size > 512 * 1024) return toast(t("logoError"), "error");
@@ -337,7 +334,7 @@ export function BrandingTab({
                 </div>
               </Field>
             </div>
-            <Button variant="secondary" className="w-fit" disabled={checking || !proofDomain.trim()} onClick={checkDomain}>
+            <Button variant="secondary" className="w-fit" disabled={checkDomain.pending || !proofDomain.trim()} onClick={() => checkDomain.run(proofDomain)}>
               {t("check")}
             </Button>
           </CardBody>
@@ -716,32 +713,29 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
   const tb = useTranslations("settings.branding");
   const tc = useTranslations("common");
   const { pending, save } = useSave();
-  const [resending, startResend] = useTransition();
-  const resend = (id?: string) =>
-    startResend(async () => {
-      const res = await resendFailedMailAction(id);
-      toast(res.ok ? t("resent", { count: res.count }) : t("resendFailed"), res.ok ? "success" : "error");
-    });
+  const resend = useAction(resendFailedMailAction, { successToast: (res) => t("resent", { count: res.count }), errorMap: () => t("resendFailed") });
   const [s, setS] = useState({ host: email.host ?? "", port: email.port ?? 587, secure: email.secure ?? false, user: email.user ?? "", password: "", fromName: email.fromName ?? "", fromAddress: email.fromAddress ?? "", replyTo: email.replyTo ?? "", helpdesk: email.helpdesk ?? "", simulationFromAddress: email.simulationFromAddress ?? "", enabled: email.enabled });
   const [to, setTo] = useState(viewerEmail);
-  const [testing, startTest] = useTransition();
+  const testEmail = useAction(testEmailAction, {
+    successToast: t("testOk"),
+    errorMap: (res) => (res.error === "rateLimited" ? undefined : t("testFailed", { error: t(`testErrors.${(res.error ?? "send_failed") as "send_failed"}`) })),
+  });
   // Look-alike domain of the simulation sender: proven with the same TXT record as the organisation's domain (Branding).
   const [simDomain, setSimDomain] = useState(email.simulationDomain ?? "");
   const [record, setRecord] = useState("");
-  const [checking, startCheck] = useTransition();
   useEffect(() => {
     domainProofRecordAction().then(
       (r) => setRecord(r.record),
       () => setRecord(""),
     );
   }, []);
-  const checkSimulationDomain = () =>
-    startCheck(async () => {
-      const res = await verifySimulationDomainAction(s.simulationFromAddress);
-      if (!res.ok) return toast(res.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.invalidField", { field: t("simulationFrom") }), "error");
+  const checkSimulationDomain = useAction(verifySimulationDomainAction, {
+    errorMap: (res) => (res.error ? undefined : tc("errors.invalidField", { field: t("simulationFrom") })),
+    onSuccess: (res) => {
       if (res.found && res.domain) setSimDomain(res.domain);
       toast(res.found ? tb("checkOk") : tb("checkMissing"), res.found ? "success" : "error");
-    });
+    },
+  });
   // The stored password is not kept for a different host or port (saveEmailAction); 587 is the default port.
   const passwordReenter = email.hasPassword && !s.password && endpointKey(email.host, email.port ?? 587) !== endpointKey(s.host, s.port || 587);
   return (
@@ -813,7 +807,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
                 </div>
               </Field>
             </div>
-            <Button variant="secondary" className="w-fit" disabled={checking || !s.simulationFromAddress.includes("@")} onClick={checkSimulationDomain}>
+            <Button variant="secondary" className="w-fit" disabled={checkSimulationDomain.pending || !s.simulationFromAddress.includes("@")} onClick={() => checkSimulationDomain.run(s.simulationFromAddress)}>
               {tb("check")}
             </Button>
           </CardBody>
@@ -841,7 +835,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
             description={t("outboxBody")}
             action={
               failedCount ? (
-                <Button size="sm" variant="secondary" icon={<Send />} disabled={resending} onClick={() => resend()}>
+                <Button size="sm" variant="secondary" icon={<Send />} disabled={resend.pending} onClick={() => resend.run()}>
                   {t("resendAll", { count: failedCount })}
                 </Button>
               ) : undefined
@@ -860,7 +854,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
                     {m.cancelled ? (
                       <span className="text-ink-subtle">{t("campaignCancelled")}</span>
                     ) : m.resendable ? (
-                      <Button size="sm" variant="ghost" disabled={resending} onClick={() => resend(m.id)} title={m.error && t.has(`testErrors.${m.error as "send_failed"}`) ? t(`testErrors.${m.error as "send_failed"}`) : undefined}>
+                      <Button size="sm" variant="ghost" disabled={resend.pending} onClick={() => resend.run(m.id)} title={m.error && t.has(`testErrors.${m.error as "send_failed"}`) ? t(`testErrors.${m.error as "send_failed"}`) : undefined}>
                         {t("resend")}
                       </Button>
                     ) : null}
@@ -884,13 +878,8 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
               <Button
                 className="w-full"
                 icon={<Send />}
-                disabled={!email.host || !to || testing}
-                onClick={() =>
-                  startTest(async () => {
-                    const res = await testEmailAction(to);
-                    toast(res.ok ? t("testOk") : res.error === "rateLimited" ? tc("errors.rateLimited") : t("testFailed", { error: t(`testErrors.${(res.error ?? "send_failed") as "send_failed"}`) }), res.ok ? "success" : "error");
-                  })
-                }
+                disabled={!email.host || !to || testEmail.pending}
+                onClick={() => testEmail.run(to)}
               >
                 {t("sendTest")}
               </Button>
@@ -1486,7 +1475,11 @@ export function ProtectionTab({ protection, retention }: { protection: TenantSet
   const [img, setImg] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [result, setResult] = useState<string | null>(null);
-  const [checking, startCheck] = useTransition();
+  // A code nobody holds is a refusal without an error key: its message comes from errorMap, not the generic failure.
+  const lookup = useAction(lookupWatermarkAction, {
+    onSuccess: (res) => setResult(t("found", { name: res.name ?? "", email: res.email ?? "", date: format.dateTime(new Date(res.at!), { dateStyle: "medium", timeStyle: "short" }) })),
+    errorMap: () => t("notFound"),
+  });
 
   // A picture pasted anywhere on the tab goes straight to the leak check.
   useEffect(() => {
@@ -1559,13 +1552,8 @@ export function ProtectionTab({ protection, retention }: { protection: TenantSet
             </Field>
             <Button
               className="w-fit"
-              disabled={checking || code.replace(/[^A-Z0-9]/g, "").length !== 8}
-              onClick={() =>
-                startCheck(async () => {
-                  const res = await lookupWatermarkAction(code);
-                  setResult(res.ok ? t("found", { name: res.name ?? "", email: res.email ?? "", date: format.dateTime(new Date(res.at!), { dateStyle: "medium", timeStyle: "short" }) }) : t("notFound"));
-                })
-              }
+              disabled={lookup.pending || code.replace(/[^A-Z0-9]/g, "").length !== 8}
+              onClick={() => (setResult(null), lookup.run(code))}
             >
               {t("check")}
             </Button>

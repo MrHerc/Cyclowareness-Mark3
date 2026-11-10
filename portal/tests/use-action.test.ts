@@ -134,11 +134,13 @@ describe("Settings calls that cannot reach the error boundary", () => {
   // sends a failed call (server unreachable) to the error boundary, and the tab's unsaved edits are lost.
   const source = readFileSync(path.join(__dirname, "..", "src", "components", "admin", "settings-tabs.tsx"), "utf8");
 
-  it("runs the token, support-access, secret rotation and test-event calls through useAction", () => {
-    for (const action of ["createApiTokenAction", "revokeApiTokenAction", "grantSupportAccessAction", "revokeSupportAccessAction", "rotateWebhookSecretAction", "rotateInboundSecretAction", "sendTestEventAction"]) {
+  it("runs every call outside a Save through useAction", () => {
+    for (const action of ["createApiTokenAction", "revokeApiTokenAction", "grantSupportAccessAction", "revokeSupportAccessAction", "rotateWebhookSecretAction", "rotateInboundSecretAction", "sendTestEventAction", "verifyDomainAction", "verifySimulationDomainAction", "resendFailedMailAction", "testEmailAction", "lookupWatermarkAction"]) {
       expect(source, action).toContain(`useAction(${action}`);
       expect(source, action).not.toMatch(new RegExp(`await ${action}\\(`));
     }
+    // The only transition left is useSave's own, which settles its calls (below).
+    expect(source.match(/useTransition\(\)/g)).toHaveLength(1);
   });
 
   it("settles every Save through settle()", () => {

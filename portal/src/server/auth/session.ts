@@ -84,16 +84,17 @@ export async function invalidateSession(id: string): Promise<void> {
 }
 
 /**
- * Signs the person out (everywhere but `exceptId`) and revokes the reporting-API tokens they created. Every caller
- * ends sessions for a security reason (a changed or reset password or second factor, signing out other devices,
- * a suspension, a changed role), and a token minted from a stolen session must not outlive that recovery.
- * `reason` goes into each token's api_token.revoked entry.
+ * Signs the person out (everywhere but `exceptId`) and revokes the reporting-API tokens they created, so a token
+ * minted from a stolen session does not outlive the account's recovery (a changed or reset password, an
+ * administrator's 2FA reset, signing out other devices, a suspension). `reason` goes into each token's
+ * api_token.revoked entry; null keeps the tokens where sessions end for no compromise (turning on two-step
+ * verification, a role change: ADR-064, the token follows the role).
  */
-export async function invalidateUserSessions(userId: string, exceptId?: string, reason = "sessions_ended"): Promise<void> {
+export async function invalidateUserSessions(userId: string, exceptId?: string, reason: string | null = "sessions_ended"): Promise<void> {
   await db()
     .delete(t.sessions)
     .where(exceptId ? and(eq(t.sessions.userId, userId), ne(t.sessions.id, exceptId)) : eq(t.sessions.userId, userId));
-  await revokeUserApiTokens(userId, reason);
+  if (reason) await revokeUserApiTokens(userId, reason);
 }
 
 /** Revokes the live (not revoked, not expired) reporting-API tokens the person created, one audit entry per token. */

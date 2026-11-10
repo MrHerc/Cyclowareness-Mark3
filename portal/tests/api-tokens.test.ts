@@ -5,6 +5,8 @@
  */
 import { createFormatter, createTranslator } from "next-intl";
 import { and, eq, isNull } from "drizzle-orm";
+import { generateTOTP } from "@oslojs/otp";
+import { decodeBase32IgnorePadding } from "@oslojs/encoding";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { Viewer } from "../src/server/auth/viewer";
@@ -33,7 +35,8 @@ const PW = "Correct-Horse-Battery-9";
 vi.mock("../src/server/auth/step-up", async (importOriginal) => ({ ...(await importOriginal<object>()), stepUp: async (_v: unknown, password: unknown) => (password === PW ? null : "wrongPassword") }));
 
 const { createApiTokenAction, revokeApiTokenAction } = await import("../src/server/actions/settings");
-const { changePasswordAction, signOutOtherDevicesAction } = await import("../src/server/actions/profile");
+const { changePasswordAction, confirmTotpAction, signOutOtherDevicesAction } = await import("../src/server/actions/profile");
+const { newTotpKey } = await import("../src/server/auth/totp");
 const { setPasswordAction } = await import("../src/server/actions/auth");
 const { resetTwoFactorAction, setStatusAction } = await import("../src/server/actions/people");
 const { hashPassword } = await import("../src/server/auth/password");
@@ -325,5 +328,19 @@ describe("a credential recovery of the creator", () => {
     const revoked = (await audited("api_token.revoked", org.id)).filter((e) => e.targetId === mine.id || e.targetId === expired.id);
     expect(revoked).toMatchObject([{ actorId: null, targetId: mine.id, meta: { name: "creator's", reason } }]);
     expect((await reports.GET(bearer("/api/admin/reports/completion", others.token), ctx("completion"))).status).toBe(200);
+  });
+
+  it("keeps the creator's tokens when they turn on two-step verification, which signs other sessions out without a compromise", async () => {
+    const key = newTotpKey();
+    const creator = await addUser(db, org.id, { role: "tenant_admin", totpSecret: key.encrypted });
+    actor = viewerFor(creator, org);
+    try {
+      const mine = await mint(["reports.read"], "kept on enrolment");
+      expect(await confirmTotpAction(generateTOTP(decodeBase32IgnorePadding(key.base32), 30, 6))).toMatchObject({ ok: true });
+      expect((await reports.GET(bearer("/api/admin/reports/completion", mine.token), ctx("completion"))).status).toBe(200);
+      expect((await audited("api_token.revoked", org.id)).filter((e) => e.targetId === mine.id)).toEqual([]);
+    } finally {
+      actor = viewerFor(admin, tenant);
+    }
   });
 });

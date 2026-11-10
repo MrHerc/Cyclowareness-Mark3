@@ -44,7 +44,7 @@ export async function confirmTotpAction(code: string): Promise<ActionResult<{ co
   await db().update(t.users).set({ totpEnabled: true, totpRecovery: backup.hashes }).where(eq(t.users.id, v.user.id));
   // The current session already proved the second factor; every other one (perhaps someone else's) has to sign in again.
   await db().update(t.sessions).set({ twoFactorVerified: true }).where(eq(t.sessions.id, v.sessionId));
-  await invalidateUserSessions(v.user.id, v.sessionId, "2fa_on");
+  await invalidateUserSessions(v.user.id, v.sessionId, null);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.2fa_on", ip: await clientIp() });
   return { ok: true, codes: backup.codes };
 }
