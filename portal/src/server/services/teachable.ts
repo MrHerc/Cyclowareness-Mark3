@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, isNull, lte, notExists } from "drizzle-orm";
+import { and, eq, gte, inArray, isNull, lte, ne, notExists } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
@@ -124,12 +124,14 @@ export const canResim = (templateKey: string) => {
 
 /** The hourly step: new loops for the last day's clicks, re-simulations that are due, and their results. Returns the loops started. */
 export async function teachableTick(db: DB, tenant: { id: string; settings: TenantSettings }, now: Date): Promise<number> {
-  if (!tenant.settings.learning.teachable) return 0;
+  // Switched off, nothing new starts and no re-simulation is scheduled, but the result of one already sent is still recorded.
+  const on = tenant.settings.learning.teachable;
   const tz = tenant.settings.timeZone;
   let started = 0;
 
-  // 1. Clicks (a submit always follows one) without a loop. A live drill only plays the attack, so it starts none.
-  const clicks = await db
+  // 1. Clicks (a submit always follows one) without a loop. A live drill only plays the attack, so it starts none;
+  // a re-simulation measures the loop it belongs to, so a click in it starts none either (the loop ends there).
+  const clicks = !on ? [] : await db
     .select({ recipientId: t.campaignRecipients.id, userId: t.users.id, locale: t.users.locale, campaignId: t.campaigns.id, templateKey: t.campaigns.templateKey })
     .from(t.campaignRecipients)
     .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
@@ -139,6 +141,7 @@ export async function teachableTick(db: DB, tenant: { id: string; settings: Tena
         eq(t.campaigns.tenantId, tenant.id),
         eq(t.users.tenantId, tenant.id),
         eq(t.users.status, "active"),
+        ne(t.campaigns.audience, "person"),
         gte(t.campaignRecipients.clickedAt, new Date(now.getTime() - DAY)),
         lte(t.campaignRecipients.clickedAt, now),
         notExists(db.select({ id: t.teachableLoops.id }).from(t.teachableLoops).where(eq(t.teachableLoops.sourceRecipientId, t.campaignRecipients.id))),
@@ -148,31 +151,40 @@ export async function teachableTick(db: DB, tenant: { id: string; settings: Tena
   for (const c of clicks) {
     const tpl = TEMPLATE_BY_KEY.get(c.templateKey);
     if (!tpl) continue;
-    const mod = await microModule(db, tenant.id, tpl, [...tenant.settings.locales, c.locale]);
-    const [loop] = await db
-      .insert(t.teachableLoops)
-      .values({ tenantId: tenant.id, userId: c.userId, sourceCampaignId: c.campaignId, sourceRecipientId: c.recipientId, microModuleId: mod.id, assignedAt: now })
-      .onConflictDoNothing()
-      .returning({ id: t.teachableLoops.id });
-    if (!loop) continue;
-    const due = dayPlus(TEACHABLE_DAYS.lesson, tz, now);
-    const [assignment] = await db
-      .insert(t.assignments)
-      .values({ tenantId: tenant.id, moduleId: mod.id, scope: "user", userId: c.userId, dueKind: "fixed", dueDate: due, reason: "teachable" })
-      .returning({ id: t.assignments.id });
-    // The click's risk now asks for this lesson: finishing it closes the risk (progress.ts completeLesson).
-    await db
-      .update(t.behaviorRisks)
-      .set({ moduleId: mod.id, dueDate: due })
-      .where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.userId, c.userId), eq(t.behaviorRisks.sourceRef, c.campaignId), eq(t.behaviorRisks.kind, "phishing_click"), eq(t.behaviorRisks.status, "open")));
-    const link = `/learn/${mod.slug}`;
-    await notifyUsers(db, tenant.id, [c.userId], "assignment", { module: (l) => pick(mod.title, l), dueDate: due, link }, { href: link }, { defer: true });
-    await audit(db, { tenantId: tenant.id, actorId: null, action: "assignment.created", targetType: "assignment", targetId: assignment.id, meta: { teachable: true, campaign: c.campaignId, template: tpl.key } });
-    started++;
+    // One transaction per click: the loop row is the claim later ticks skip, so it never stands without its module, lesson and assignment.
+    const created = await db.transaction(async (tx) => {
+      const mod = await microModule(tx, tenant.id, tpl, [...tenant.settings.locales, c.locale]);
+      const [loop] = await tx
+        .insert(t.teachableLoops)
+        .values({ tenantId: tenant.id, userId: c.userId, sourceCampaignId: c.campaignId, sourceRecipientId: c.recipientId, microModuleId: mod.id, assignedAt: now })
+        .onConflictDoNothing()
+        .returning({ id: t.teachableLoops.id });
+      if (!loop) return false;
+      const due = dayPlus(TEACHABLE_DAYS.lesson, tz, now);
+      const [assignment] = await tx
+        .insert(t.assignments)
+        .values({ tenantId: tenant.id, moduleId: mod.id, scope: "user", userId: c.userId, dueKind: "fixed", dueDate: due, reason: "teachable" })
+        .returning({ id: t.assignments.id });
+      // A person who already took this lesson in an earlier loop takes it again: otherwise the new assignment counts as done at once.
+      await tx
+        .update(t.moduleProgress)
+        .set({ status: "in_progress", completedAt: null })
+        .where(and(eq(t.moduleProgress.userId, c.userId), eq(t.moduleProgress.moduleId, mod.id), eq(t.moduleProgress.status, "completed")));
+      // The click's risk now asks for this lesson: finishing it closes the risk (progress.ts completeLesson).
+      await tx
+        .update(t.behaviorRisks)
+        .set({ moduleId: mod.id, dueDate: due })
+        .where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.userId, c.userId), eq(t.behaviorRisks.sourceRef, c.campaignId), eq(t.behaviorRisks.kind, "phishing_click"), eq(t.behaviorRisks.status, "open")));
+      const link = `/learn/${mod.slug}`;
+      await notifyUsers(tx, tenant.id, [c.userId], "assignment", { module: (l) => pick(mod.title, l), dueDate: due, link }, { href: link }, { defer: true });
+      await audit(tx, { tenantId: tenant.id, actorId: null, action: "assignment.created", targetType: "assignment", targetId: assignment.id, meta: { teachable: true, campaign: c.campaignId, template: tpl.key } });
+      return true;
+    });
+    if (created) started++;
   }
 
   // 2. Re-simulations that are due, only while the organisation can send on that channel (otherwise the loop waits).
-  const waiting = await db
+  const waiting = !on ? [] : await db
     .select({ loop: t.teachableLoops, templateKey: t.campaigns.templateKey, person: t.users.name, active: t.users.status })
     .from(t.teachableLoops)
     .innerJoin(t.campaigns, eq(t.campaigns.id, t.teachableLoops.sourceCampaignId))
@@ -193,12 +205,15 @@ export async function teachableTick(db: DB, tenant: { id: string; settings: Tena
       if (active !== "active" || !next || (await launchBlocker(db, tenant.id, next.channel, 1))) continue;
       const name = tr("campaignName", { template: templateText(next.name, tenant.settings.defaultLocale), person });
       // Scheduled now: the next tick's campaignTick launches it through launchCampaign, the normal sending path.
-      const [campaign] = await db
-        .insert(t.campaigns)
-        .values({ tenantId: tenant.id, name, channel: next.channel, templateKey: next.key, audience: "person", userId: loop.userId, status: "scheduled", scheduledAt: now })
-        .returning({ id: t.campaigns.id });
-      await db.update(t.teachableLoops).set({ resimCampaignId: campaign.id, status: "resim" }).where(eq(t.teachableLoops.id, loop.id));
-      await audit(db, { tenantId: tenant.id, actorId: null, action: "campaign.created", targetType: "campaign", targetId: campaign.id, meta: { name, template: next.key, teachable: true } });
+      // Campaign and loop together, so a failure between them can never leave a second re-simulation to the next tick.
+      await db.transaction(async (tx) => {
+        const [campaign] = await tx
+          .insert(t.campaigns)
+          .values({ tenantId: tenant.id, name, channel: next.channel, templateKey: next.key, audience: "person", userId: loop.userId, status: "scheduled", scheduledAt: now })
+          .returning({ id: t.campaigns.id });
+        await tx.update(t.teachableLoops).set({ resimCampaignId: campaign.id, status: "resim" }).where(eq(t.teachableLoops.id, loop.id));
+        await audit(tx, { tenantId: tenant.id, actorId: null, action: "campaign.created", targetType: "campaign", targetId: campaign.id, meta: { name, template: next.key, teachable: true } });
+      });
     }
   }
 

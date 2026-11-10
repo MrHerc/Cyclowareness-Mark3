@@ -125,12 +125,13 @@ export async function completeLesson(
       target: [t.moduleProgress.userId, t.moduleProgress.moduleId],
       set: { status, percent, lastLessonKey: lesson.key, ...(teachable ? { completedAt: sql`coalesce(${t.moduleProgress.completedAt}, ${at.toISOString()}::timestamptz)` } : {}) },
     });
-  // Every loop waiting for this lesson is done (a person who clicked twice has one per click).
+  // Every loop waiting for this lesson is done (a person who clicked twice has one per click). One whose
+  // re-simulation the 21-day fallback already scheduled keeps its "resim" status but records the lesson too.
   if (teachable) {
     await db
       .update(t.teachableLoops)
-      .set({ completedAt: at, status: "completed" })
-      .where(and(eq(t.teachableLoops.userId, p.userId), eq(t.teachableLoops.microModuleId, lesson.moduleId), eq(t.teachableLoops.status, "assigned")));
+      .set({ completedAt: at, status: sql`case when ${t.teachableLoops.status} = 'assigned' then 'completed' else ${t.teachableLoops.status} end` })
+      .where(and(eq(t.teachableLoops.userId, p.userId), eq(t.teachableLoops.microModuleId, lesson.moduleId), isNull(t.teachableLoops.completedAt), inArray(t.teachableLoops.status, ["assigned", "resim"])));
   }
   // A completed module stays completed when it is replayed, so no attestation follows. A risk
   // linked to it since then (a click in a simulation) asks for the training again: it closes once

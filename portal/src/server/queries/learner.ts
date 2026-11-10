@@ -88,7 +88,8 @@ export async function openTeachable(v: Viewer) {
     .select({ slug: t.modules.slug, title: t.modules.title, assignedAt: t.teachableLoops.assignedAt })
     .from(t.teachableLoops)
     .innerJoin(t.modules, eq(t.modules.id, t.teachableLoops.microModuleId))
-    .where(and(eq(t.teachableLoops.userId, v.user.id), eq(t.teachableLoops.status, "assigned")))
+    // Still to take, also once the 21-day fallback has scheduled the re-simulation.
+    .where(and(eq(t.teachableLoops.userId, v.user.id), isNull(t.teachableLoops.completedAt), inArray(t.teachableLoops.status, ["assigned", "resim"])))
     .orderBy(desc(t.teachableLoops.assignedAt))
     .limit(1);
   return row ? { slug: row.slug, title: row.title, due: dayPlus(TEACHABLE_DAYS.lesson, v.tenant.settings.timeZone, row.assignedAt) } : null;

@@ -70,6 +70,16 @@ const asViewer = (tenant: Awaited<ReturnType<typeof org>>["tenant"], user: typeo
   tenant: { ...tenant, features: featuresFor(tenant.plan, tenant.features) },
 } as unknown as Viewer);
 
+/** Takes the micro-lesson of `slug` through the server-verified path as `user`. */
+async function finish(tenant: Awaited<ReturnType<typeof org>>["tenant"], user: typeof t.users.$inferSelect, slug = "teachable:payslip") {
+  viewer = asViewer(tenant, user);
+  await learning.startLessonAction(slug, "lesson-1");
+  await db.update(t.lessonProgress).set({ startedAt: new Date(Date.now() - 120_000) }).where(and(eq(t.lessonProgress.userId, user.id), isNotNull(t.lessonProgress.startedAt)));
+  // intro, steps, hotspot, check, recap: the last scene is index 4.
+  await learning.reachSceneAction(slug, "lesson-1", 4);
+  return learning.completeLessonAction({ slug, lessonKey: "lesson-1", answers: [{ sceneId: "hotspot", picked: ["s1"] }, { sceneId: "check", picked: ["o2"] }] });
+}
+
 describe("click → micro-lesson", () => {
   it("assigns one micro-lesson within the hour, in the person's language, and replaying the click or the step changes nothing", async () => {
     const { tenant, people } = await org({ personLocale: "ru", people: 2 });
@@ -126,6 +136,38 @@ describe("click → micro-lesson", () => {
     expect(loop.status).toBe("completed");
     expect(loop.completedAt).toBeInstanceOf(Date);
     expect(await db.select().from(t.attestations).where(eq(t.attestations.userId, p.id))).toHaveLength(0);
+  }, 60_000);
+
+  it("refuses the micro-lesson to a person of the organisation it was not assigned to", async () => {
+    const { tenant, people } = await org({ people: 2 });
+    const [p, other] = people;
+    const { token } = await clickable(tenant.id);
+    await recordClick(db, token(p.id), "link");
+    await teachableTick(db, tenant, new Date());
+    expect(await finish(tenant, other)).toMatchObject({ ok: false });
+    expect(await db.select().from(t.moduleProgress).where(eq(t.moduleProgress.userId, other.id))).toHaveLength(0);
+    expect(await db.select().from(t.xpEvents).where(eq(t.xpEvents.userId, other.id))).toHaveLength(0);
+  }, 60_000);
+
+  it("asks again for a lesson taken in an earlier loop, and taking it again closes the new risk", async () => {
+    const { tenant, people } = await org();
+    const [p] = people;
+    const first = await clickable(tenant.id);
+    await recordClick(db, first.token(p.id), "link");
+    await teachableTick(db, tenant, new Date());
+    expect(await finish(tenant, p)).toMatchObject({ ok: true, moduleStatus: "completed" });
+
+    const second = await clickable(tenant.id);
+    await recordClick(db, second.token(p.id), "link");
+    expect(await teachableTick(db, tenant, new Date())).toBe(1);
+    const [mod] = await db.select().from(t.modules).where(and(eq(t.modules.tenantId, tenant.id), eq(t.modules.slug, "teachable:payslip")));
+    const [mp] = await db.select().from(t.moduleProgress).where(and(eq(t.moduleProgress.userId, p.id), eq(t.moduleProgress.moduleId, mod.id)));
+    expect(mp).toMatchObject({ status: "in_progress", completedAt: null });
+    expect((await db.select().from(t.behaviorRisks).where(and(eq(t.behaviorRisks.userId, p.id), eq(t.behaviorRisks.status, "open")))).map((r) => r.sourceRef)).toEqual([second.campaign.id]);
+
+    expect(await finish(tenant, p)).toMatchObject({ ok: true, moduleStatus: "completed" });
+    expect(await db.select().from(t.behaviorRisks).where(and(eq(t.behaviorRisks.userId, p.id), eq(t.behaviorRisks.status, "open")))).toHaveLength(0);
+    expect((await loopsOf(tenant.id)).map((l) => l.status)).toEqual(["completed", "completed"]);
   }, 60_000);
 
   it("never touches another organisation's recipients", async () => {
@@ -203,6 +245,35 @@ describe("re-simulation", () => {
     const resims = await personCampaigns(tenant.id);
     expect(resims).toHaveLength(1);
     expect(resims[0]).toMatchObject({ channel: "sms", templateKey: "prize-sms" });
+  }, 60_000);
+
+  it("after the 21-day fallback: a late lesson is still recorded, a click in the re-simulation starts no loop, and switched off its result is still recorded", async () => {
+    const { tenant, people } = await org();
+    const [p] = people;
+    const { token } = await clickable(tenant.id);
+    await recordClick(db, token(p.id), "link");
+    await teachableTick(db, tenant, new Date());
+    await db.update(t.teachableLoops).set({ assignedAt: new Date(Date.now() - 30 * 86_400_000) }).where(eq(t.teachableLoops.tenantId, tenant.id));
+    await teachableTick(db, tenant, new Date());
+    const [resim] = await personCampaigns(tenant.id);
+    expect((await loopsOf(tenant.id))[0]).toMatchObject({ status: "resim", completedAt: null });
+
+    // The lesson taken after the re-simulation was scheduled.
+    expect(await finish(tenant, p)).toMatchObject({ ok: true, moduleStatus: "completed" });
+    const [late] = await loopsOf(tenant.id);
+    expect(late.status).toBe("resim");
+    expect(late.completedAt).toBeInstanceOf(Date);
+
+    await campaignTick(db);
+    const [r] = await db.select().from(t.campaignRecipients).where(eq(t.campaignRecipients.campaignId, resim.id));
+    await recordClick(db, r.token, "link");
+    expect(await teachableTick(db, tenant, new Date())).toBe(0);
+    expect(await loopsOf(tenant.id)).toHaveLength(1);
+
+    const off = { ...tenant, settings: { ...tenant.settings, learning: { ...tenant.settings.learning, teachable: false } } };
+    expect(await setCampaignStatus(db, tenant.id, resim.id, "completed")).toBe(true);
+    await teachableTick(db, off, new Date());
+    expect((await loopsOf(tenant.id))[0]).toMatchObject({ resimResult: "clicked", status: "closed" });
   }, 60_000);
 
   it("picks the same channel at the next difficulty, staying at Hard and on the plan", () => {
