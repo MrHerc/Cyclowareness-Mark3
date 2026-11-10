@@ -13,11 +13,12 @@ This document lists every interface Cyclowareness exposes to other systems, base
 7. [Syslog and SIEM](#7-syslog-and-siem)
 8. [SMS gateway contract](#8-sms-gateway-contract)
 9. [Single sign-on contract](#9-single-sign-on-contract)
-10. [Rate limits](#rate-limits)
+10. [Inbound report address](#10-inbound-report-address)
+11. [Rate limits](#rate-limits)
 
 ## 1. Scope
 
-**There is no public REST API for machine clients.** Every authenticated endpoint uses the browser session cookie that sign-in sets. There are no API keys, OAuth client credentials or service accounts. A script can call these endpoints only with a valid user session.
+**There is no public REST API for machine clients.** Every authenticated endpoint uses the browser session cookie that sign-in sets, except the inbound report address (section 10), which takes a per-organisation secret from the mail provider. There are no other API keys, OAuth client credentials or service accounts. A script can call these endpoints only with a valid user session.
 
 | Interface | Who uses it | Stable for integration |
 |---|---|---|
@@ -27,6 +28,7 @@ This document lists every interface Cyclowareness exposes to other systems, base
 | Outbound webhooks and syslog | The organisation's SIEM, SOAR or ticketing system | Yes |
 | SMS webhook | The platform's SMS gateway | Yes |
 | OpenID Connect | The organisation's identity provider | Yes |
+| Inbound report address | The organisation's mail provider | Yes |
 
 Server Actions are POST requests that Next.js routes by an internal action id. Do not call them from other systems.
 
@@ -95,6 +97,7 @@ A malformed or `null` Origin is refused with `403`.
 | GET | `/api/admin/drill/{id}` | `campaigns.write`, feature `live_drill` | JSON state of a live drill |
 | POST | `/api/admin/drill/{id}` | `campaigns.write`, feature `live_drill`, same origin | JSON state after applying the due drill events |
 | GET | `/api/super/demo-requests` | `platform.manage` | CSV of demo requests |
+| POST | `/api/inbound/{tenant}` | Organisation's inbound secret, feature `integrations` | `202`; files a threat report (section 10) |
 
 ## 4. Endpoints
 
@@ -549,6 +552,58 @@ Cyclowareness acts as an OpenID Connect relying party (`src/server/auth/oidc.ts`
 
 SAML is not connected; only OpenID Connect works.
 
+## 10. Inbound report address
+
+People report suspicious mail by forwarding it to the organisation's report address (for example `report@bank.az`). The organisation's mail provider receives that mail, parses it and posts each message to Cyclowareness, where it becomes a threat report of the person who forwarded it (`src/app/api/inbound/[tenant]/route.ts`). It needs the plan feature `integrations`.
+
+**Setup** (Settings, Integrations, Report address):
+
+1. Type the report address. The report dialog then tells learners to forward suspicious mail there; leave it empty to hide the hint.
+2. Create the access secret and copy it: only its SHA-256 hash is stored, so it is shown once. Creating a new one stops the old one at once.
+3. In the mail provider, route the report address to the endpoint shown on the card, `{APP_URL}/api/inbound/{tenant slug}`, with the secret as a bearer token. Mailgun routes, Amazon SES receipt rules and Postmark inbound webhooks each send their own format: put a small adapter in front that maps it to the generic JSON below. Only that generic format is built in.
+
+**Request.**
+
+```http
+POST {APP_URL}/api/inbound/{tenant slug}
+Content-Type: application/json
+Authorization: Bearer {inbound secret}
+
+{
+  "from": "Aysel Məmmədova <aysel@bank.az>",
+  "to": "report@bank.az",
+  "subject": "Fwd: Your payslip is ready",
+  "text": "---------- Forwarded message ----------\n…",
+  "html": "<div>…</div>"
+}
+```
+
+| Field | Required | Use |
+|---|---|---|
+| `from` | Yes | The person who forwarded the mail, a bare address or `Name <address>`. Matched without regard to case against the active people of the organisation |
+| `to` | No | Not used; accepted so the provider can send it |
+| `subject` | No | The report's subject. Simulations are also matched by their template subject, `Fwd:` included |
+| `text` | No | The plain-text body. Stored as the report's details, at most 4,000 characters |
+| `html` | No | Searched for a simulation link only; never stored |
+
+**Processing.**
+
+- The first simulation tracking link (`/t/{token}`) in `text`, then `html`, is passed as the report's link, so a forwarded simulation is matched to that exact recipient, counted as reported and the person's risk score is recomputed.
+- The report is filed exactly as from the report form: channel `email`, the daily report bonus, the `threat.reported` audit entry and the `threat.reported` or `simulation.reported` event.
+- A sender who is not an active person of this organisation is ignored: nothing is filed and no XP is given. A person over the report form's own limit is ignored the same way.
+
+**Answers.**
+
+| Status | Meaning |
+|---|---|
+| `202 Accepted` | Filed, or ignored (unknown sender). The two are not told apart, so the endpoint does not reveal who works at the organisation |
+| `400 Bad Request` | The body is not JSON or `from` is missing |
+| `401 Unauthorized` | Missing or wrong secret, unknown organisation, no secret created, or the plan has no `integrations` |
+| `413 Payload Too Large` | Body over 1 MB. Send the parsed text, not the attachments |
+| `429 Too Many Requests` | Over the organisation's limit; `Retry-After: 60`. Providers retry later |
+
+**Trust.** The secret proves the request comes from your mail provider; it cannot prove who wrote the forwarded mail. Let the provider reject mail to the report address that fails SPF, DKIM or DMARC for your own domain, so a forged `From` cannot file a report, or earn XP, in another person's name.
+
 ## Rate limits
 
 Limits are fixed windows counted in the database and shared by every server instance (`src/server/rate-limit.ts`).
@@ -564,5 +619,6 @@ Limits are fixed windows counted in the database and shared by every server inst
 | `GET /api/me/export` | 5 per person per hour |
 | `GET /api/sso/start`, `GET /api/sso/callback/{tenant}` | 60 per client address per minute and 600 per organisation per minute, each |
 | Start a drill (server action) | 20 drills per organisation per hour |
+| `POST /api/inbound/{tenant}` | 120 messages per organisation per minute; each person's reports share the report form's 20 per hour |
 
 Cached tutor answers and cached subtitles still count against the request limits. Client addresses are known only when `TRUST_PROXY` matches the number of reverse proxies in front of the server.

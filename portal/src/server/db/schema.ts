@@ -126,6 +126,10 @@ export type TenantSettings = {
     syslogTransport?: "tls" | "tcp" | "udp";
     syslogFormat?: "cef" | "json";
     syslogEnabled: boolean;
+    /** SHA-256 of the bearer secret the mail provider sends to /api/inbound/<slug>; the secret itself is shown once. */
+    inboundSecretHash?: string;
+    /** The report address learners forward suspicious mail to, as the administrator typed it (shown in the report dialog). */
+    inboundAddress?: string;
   };
   security: {
     /** Until when (ISO) the platform operator may issue a sign-in link for an administrator; null or past: refused. */

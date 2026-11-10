@@ -10,6 +10,7 @@ import { Protection, Watermark } from "@/components/shell/protection";
 import { BrandMark, TenantMark, isVendorLogo } from "@/components/brand";
 import { Avatar } from "@/components/ui/avatar";
 import { ReportButton } from "@/components/learner/report-button";
+import { reportAddress } from "@/lib/tenant-defaults";
 import { Tour } from "@/components/learner/tour";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { dayKey, liveStreak } from "@/lib/domain/gamification";
@@ -64,7 +65,7 @@ export default async function LearnerLayout({ children }: { children: React.Reac
             <TenantMark name={v.tenant.name} logoUrl={v.tenant.branding.logoUrl} className="min-w-0 flex-1" />
           )}
           <LanguageSwitcher locales={v.tenant.settings.locales} className="h-10" />
-          <ReportButton className="pointer-coarse:h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center" />
+          <ReportButton forwardTo={reportAddress(v.tenant)} className="pointer-coarse:h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center" />
           <NotificationsButton
             items={notes.map((n) => ({ id: n.id, title: n.title, body: n.body, href: n.href, createdAt: n.createdAt.toISOString(), read: !!n.readAt }))}
           />

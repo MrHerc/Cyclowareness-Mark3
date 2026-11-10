@@ -33,6 +33,7 @@ import { ProgressBar } from "@/components/ui/progress";
 import { ButtonLink } from "@/components/ui/button";
 import { EmptyState, PageHeader } from "@/components/ui/layout";
 import { ReportButton } from "@/components/learner/report-button";
+import { reportAddress } from "@/lib/tenant-defaults";
 import { Mascot } from "@/components/mascot/mascot";
 import { BandScale, ScoreGauge } from "@/components/learner/security/score-gauge";
 import { riskBand, type RiskBand } from "@/lib/domain/risk";
@@ -232,7 +233,7 @@ export default async function SecurityPage() {
             </ActionCard>
           ) : null}
           <ActionCard tone="risk" icon={<ShieldAlert />} title={tr("report.cta")} meta={tr("report.ctaBody", { xp: REPORT_BONUS_XP })}>
-            <ReportButton variant="full" className="w-full justify-center sm:w-auto sm:justify-self-start" />
+            <ReportButton variant="full" forwardTo={reportAddress(v.tenant)} className="w-full justify-center sm:w-auto sm:justify-self-start" />
           </ActionCard>
           {v.tenant.features.has("sandbox") ? (
             <ActionCard tone="brand" icon={<FlaskConical />} title={tr("sandbox.card")} meta={tr("sandbox.cardBody")}>

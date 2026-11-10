@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { EmptyState, PageHeader } from "@/components/ui/layout";
 import { Pill } from "@/components/ui/pill";
 import { ReportButton } from "@/components/learner/report-button";
+import { reportAddress } from "@/lib/tenant-defaults";
 import { FeedbackForm, NewTicket } from "../help-forms";
 
 export async function generateMetadata() {
@@ -22,7 +23,7 @@ export default async function HelpPage() {
   const faq = tr.raw("faqItems") as { q: string; a: string }[];
   return (
     <div className="grid gap-6">
-      <PageHeader title={tr("title")} subtitle={tr("sub")} icon={<LifeBuoy />} actions={<><ReportButton variant="full" /><NewTicket /></>} />
+      <PageHeader title={tr("title")} subtitle={tr("sub")} icon={<LifeBuoy />} actions={<><ReportButton variant="full" forwardTo={reportAddress(v.tenant)} /><NewTicket /></>} />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <div className="grid content-start gap-6">
           <Card>
