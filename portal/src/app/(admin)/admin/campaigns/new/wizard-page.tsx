@@ -11,6 +11,22 @@ import { TemplatePreview } from "@/components/admin/template-preview";
 import { TEMPLATES, TEMPLATE_BY_KEY, templateText, type CampaignTemplate } from "@/lib/campaigns/templates";
 import { CampaignWizard, type WizardPreviews, type WizardTemplate } from "./wizard";
 
+/**
+ * The templates the wizard offers, with their previews, named in this locale: the ten-language texts stay on the server.
+ * `draft` is the template of a reopened campaign; it keeps its previews even when it is no longer offered (a plan without qr_trap now).
+ */
+export function wizardTemplates(qrTrap: boolean, draft: CampaignTemplate | undefined, locale: string) {
+  const summary = (x: CampaignTemplate): WizardTemplate => ({ key: x.key, name: templateText(x.name, locale), channel: x.channel, difficulty: x.difficulty });
+  // QR traps only on a plan with the qr_trap feature (the server refuses them otherwise).
+  // Voice templates stay defined but are not offered: no telephony adapter places calls (launchBlocker refuses them).
+  const offered = TEMPLATES.filter((x) => x.channel !== "voice" && (qrTrap || !x.qr));
+  const previews: WizardPreviews = {};
+  for (const x of draft && !offered.includes(draft) ? [...offered, draft] : offered) {
+    previews[x.key] = { compact: <TemplatePreview tpl={x} locale={locale} compact />, full: <TemplatePreview tpl={x} locale={locale} /> };
+  }
+  return { offered: offered.map(summary), previews, template: draft ? summary(draft) : null };
+}
+
 /** The campaign wizard page: empty for /admin/campaigns/new, prefilled with a draft or scheduled campaign for /admin/campaigns/edit/[id]. */
 export async function WizardPage({ v, campaign }: { v: Viewer; campaign: typeof t.campaigns.$inferSelect | null }) {
   const tr = await getTranslations("admin.campaigns");
@@ -23,25 +39,15 @@ export async function WizardPage({ v, campaign }: { v: Viewer; campaign: typeof 
       .where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.status, "active"), ne(t.users.role, "super_admin")))
       .groupBy(t.users.departmentId),
   ]);
-  // The templates' ten-language texts stay on the server: the wizard gets their names and previews in this locale.
-  const locale = await getLocale();
-  const qrTrap = v.tenant.features.has("qr_trap");
-  const summary = (x: CampaignTemplate): WizardTemplate => ({ key: x.key, name: templateText(x.name, locale), channel: x.channel, difficulty: x.difficulty });
-  // QR traps only on a plan with the qr_trap feature (the server refuses them otherwise).
-  // Voice templates stay defined but are not offered: no telephony adapter places calls (launchBlocker refuses them).
-  const offered = TEMPLATES.filter((x) => x.channel !== "voice" && (qrTrap || !x.qr));
   const tpl = campaign ? TEMPLATE_BY_KEY.get(campaign.templateKey) : undefined;
-  const previews: WizardPreviews = {};
-  for (const x of tpl && !offered.includes(tpl) ? [...offered, tpl] : offered) {
-    previews[x.key] = { compact: <TemplatePreview tpl={x} locale={locale} compact />, full: <TemplatePreview tpl={x} locale={locale} /> };
-  }
+  const { offered, previews, template } = wizardTemplates(v.tenant.features.has("qr_trap"), tpl, await getLocale());
   const initial = campaign
     ? {
         id: campaign.id,
         name: campaign.name,
         templateKey: campaign.templateKey,
         // A draft's template stays reviewable even when it is no longer offered (a plan without qr_trap now).
-        template: tpl ? summary(tpl) : null,
+        template,
         channel: tpl?.channel ?? (campaign.channel === "qr" ? ("email" as const) : campaign.channel),
         audience: campaign.audience,
         departmentId: campaign.departmentId,
@@ -58,7 +64,7 @@ export async function WizardPage({ v, campaign }: { v: Viewer; campaign: typeof 
       <PageHeader title={campaign ? tr("edit") : tr("new")} back={{ href: "/admin/campaigns", label: tr("allCampaigns") }} />
       <Card>
         <CardBody>
-          <CampaignWizard smsVoice={v.tenant.features.has("sms_voice")} templates={offered.map(summary)} previews={previews} departments={departments.map((d) => ({ id: d.id, name: d.name, people: reach(d.id) }))} initial={initial} />
+          <CampaignWizard smsVoice={v.tenant.features.has("sms_voice")} templates={offered} previews={previews} departments={departments.map((d) => ({ id: d.id, name: d.name, people: reach(d.id) }))} initial={initial} />
         </CardBody>
       </Card>
     </div>
