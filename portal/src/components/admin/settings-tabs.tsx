@@ -813,7 +813,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
           onSave={() =>
             save(async () => {
               const res = await saveEmailAction({ ...s, password: s.password || undefined, port: s.port || undefined });
-              if (res.error === "simulationNotProven") return { ...res, message: t("simulationSaveNotProven", { domain: s.simulationFromAddress.split("@").pop() ?? "" }) };
+              if (res.error === "simulationNotProven") return { ...res, message: t("simulationSaveNotProven", { domain: (s.simulationFromAddress.split("@").pop() ?? "").trim().toLowerCase() }) };
               return res.error === "secretRequired" ? { ...res, message: t("passwordReenter") } : res;
             }, { host: "e-host", port: "e-port", user: "e-user", password: "e-pw", fromName: "e-fn", fromAddress: "e-fa", replyTo: "e-rt", helpdesk: "e-hd", simulationFromAddress: "e-sf" })}
         />

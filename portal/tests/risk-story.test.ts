@@ -97,9 +97,9 @@ describe("riskStory", () => {
 
     const s = await riskStory(as(o.tenant.id, o.admin), "en");
     if (s.empty) throw new Error("expected a story");
-    // Finance and IT average 52 on the first of the eight snapshot days; today's scores of everyone in scope
-    // (with Tiny's 95 and the administrator's 0) average 46, the number the leadership chart header shows.
-    expect(s.trend).toMatchObject({ from: 52, to: 46 });
+    // Finance and IT score 7 more on the first of the eight snapshot days; Tiny's 95 and the administrator's 0 have no
+    // snapshot and count with today's score at both ends: 407 / 8 = 51 then 365 / 8 = 46, the chart header's number.
+    expect(s.trend).toMatchObject({ from: 51, to: 46 });
     expect((await overviewData(as(o.tenant.id, o.admin), "en", null)).kpis.avgRisk).toBe(46);
     expect(s.weakest).toEqual({ id: o.finance.id, name: "Finance", risk: 70, category: "email", inCategory: 2, module: { id: email.id, title: "Phishing basics" } });
     expect(s.campaign).toEqual({ name: "Parcel lure", from: 50, to: 25 });
@@ -109,7 +109,7 @@ describe("riskStory", () => {
     const sentences = await storySentences(s, "en");
     expect(sentences).toHaveLength(6);
     expect(sentences[0]).toBe("Finance is the most exposed department, with an average risk score of 70; its weakest area is “Email”, with 2 open risks.");
-    expect(sentences[1]).toMatch(/^Since .+, the average risk score has fallen by 6 points to 46\.$/);
+    expect(sentences[1]).toMatch(/^Since .+, the average risk score has fallen by 5 points to 46\.$/);
     expect(sentences[5]).toBe("Recommended next step: assign “Phishing basics” to Finance.");
 
     // A department filter narrows the story to that department's people.

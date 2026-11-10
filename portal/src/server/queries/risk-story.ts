@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, count, countDistinct, desc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, asc, count, countDistinct, desc, eq, gte, inArray, isNotNull } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
@@ -20,7 +20,7 @@ export type RiskStory =
   | { empty: true; days: number }
   | {
       empty: false;
-      /** Average risk of the people in scope on the first snapshot day of the window and now. */
+      /** Average risk of today's people in scope on the first snapshot day of the window and now. */
       trend: { since: Date; from: number; to: number };
       weakest: { id: string; name: string; risk: number; category: string | null; inCategory: number; module: { id: string; title: string } | null } | null;
       /** The campaign in the window whose click rate differs most from the campaign launched before it. */
@@ -48,7 +48,7 @@ export async function riskStory(v: Viewer, locale: string, departmentId?: string
   const inScope = activeInScope(tid, dept);
 
   const days = await db()
-    .select({ day: t.userRiskSnapshots.day, avg: sql<number>`avg(${t.userRiskSnapshots.score})` })
+    .select({ day: t.userRiskSnapshots.day })
     .from(t.userRiskSnapshots)
     .where(and(eq(t.userRiskSnapshots.tenantId, tid), gte(t.userRiskSnapshots.day, dayPlus(-WINDOW_DAYS, tz, now)), inArray(t.userRiskSnapshots.userId, inScope)))
     .groupBy(t.userRiskSnapshots.day)
@@ -75,7 +75,11 @@ export async function riskStory(v: Viewer, locale: string, departmentId?: string
   const month = Number(today.slice(5, 7));
   const quarterStart = zonedTime(`${today.slice(0, 4)}-${String(month - ((month - 1) % 3)).padStart(2, "0")}-01`, "00:00:00", tz);
 
-  const [risks, assigned, campaigns, completions, [certified]] = await Promise.all([
+  const [first, risks, assigned, campaigns, completions, [certified]] = await Promise.all([
+    db()
+      .select({ userId: t.userRiskSnapshots.userId, score: t.userRiskSnapshots.score })
+      .from(t.userRiskSnapshots)
+      .where(and(eq(t.userRiskSnapshots.tenantId, tid), eq(t.userRiskSnapshots.day, days[0].day), inArray(t.userRiskSnapshots.userId, inScope))),
     top
       ? db()
           .select({ moduleId: t.behaviorRisks.moduleId, category: t.modules.category, title: t.modules.title, status: t.modules.status, n: count() })
@@ -129,11 +133,16 @@ export async function riskStory(v: Viewer, locale: string, departmentId?: string
     if (change !== 0 && (!campaign || Math.abs(change) > Math.abs(campaign.change))) campaign = { name: sent[i].name, from: rate(sent[i - 1]), to: rate(sent[i]), change };
   }
 
+  // Both ends of the trend average the same people: someone without a first-day snapshot (a new hire) counts with
+  // today's score, so a change in headcount does not move the trend.
+  const firstScore = new Map(first.map((r) => [r.userId, Number(r.score)]));
+  const from = Math.round(people.reduce((s, p) => s + (firstScore.get(p.id) ?? p.riskScore), 0) / people.length);
+
   const certifiedPeople = Number(certified?.n ?? 0);
   return {
     empty: false,
     // Today's scores, not today's snapshot: the same number as the average risk of the page's other cards (overviewData).
-    trend: { since, from: Math.round(Number(days[0].avg)), to: avgOf(people) },
+    trend: { since, from, to: avgOf(people) },
     weakest: top
       ? {
           id: top.id,
