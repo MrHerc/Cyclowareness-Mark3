@@ -35,8 +35,9 @@ export async function saveCampaignAction(input: z.infer<typeof draftSchema>): Pr
   const scheduledAt = p.data.scheduledAt ? new Date(p.data.scheduledAt) : null;
   if (scheduledAt && scheduledAt.getTime() < Date.now() - 60_000) return { ok: false, reason: "past_date" };
   if (p.data.id) {
-    const [c] = await db().select({ id: t.campaigns.id, status: t.campaigns.status }).from(t.campaigns).where(and(eq(t.campaigns.id, p.data.id), eq(t.campaigns.tenantId, v.tenant.id)));
-    if (!c || (c.status !== "draft" && c.status !== "scheduled")) return { ok: false };
+    const [c] = await db().select({ id: t.campaigns.id, status: t.campaigns.status, audience: t.campaigns.audience }).from(t.campaigns).where(and(eq(t.campaigns.id, p.data.id), eq(t.campaigns.tenantId, v.tenant.id)));
+    // A teachable-moment re-simulation stays for its one person: it is launched or cancelled, never edited.
+    if (!c || (c.status !== "draft" && c.status !== "scheduled") || c.audience === "person") return { ok: false };
     await db()
       .update(t.campaigns)
       .set({

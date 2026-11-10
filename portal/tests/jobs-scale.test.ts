@@ -90,7 +90,7 @@ describe("assignment changes", () => {
 });
 
 describe("hourly jobs", () => {
-  const ran = (out: Record<string, number>, tenantId: string) => ["reminders", "managers", "refreshers"].filter((job) => `${job}:${tenantId}` in out);
+  const ran = (out: Record<string, number>, tenantId: string) => ["reminders", "managers", "refreshers", "teachable"].filter((job) => `${job}:${tenantId}` in out);
 
   it("run once an hour per organisation, counted from the start of the tick, even one that overran", async () => {
     const tenant = await addTenant(db);
@@ -99,15 +99,15 @@ describe("hourly jobs", () => {
     let clock = Date.now();
     const spy = vi.spyOn(Date, "now").mockImplementation(() => (clock += 60_000));
     try {
-      expect(ran(await runJobs(db, start), tenant.id)).toEqual(["reminders", "managers", "refreshers"]);
+      expect(ran(await runJobs(db, start), tenant.id)).toEqual(["reminders", "managers", "refreshers", "teachable"]);
     } finally {
       spy.mockRestore();
     }
     const runs = await db.select().from(t.jobRuns).where(eq(t.jobRuns.tenantId, tenant.id));
-    expect(runs.map((r) => r.ranAt)).toEqual([start, start, start]);
+    expect(runs.map((r) => r.ranAt)).toEqual([start, start, start, start]);
 
     expect(ran(await runJobs(db, new Date(start.getTime() + 59 * 60_000)), tenant.id)).toEqual([]);
-    expect(ran(await runJobs(db, new Date(start.getTime() + HOUR)), tenant.id)).toEqual(["reminders", "managers", "refreshers"]);
+    expect(ran(await runJobs(db, new Date(start.getTime() + HOUR)), tenant.id)).toEqual(["reminders", "managers", "refreshers", "teachable"]);
     expect(ran(await runJobs(db, new Date(start.getTime() + HOUR + 60_000)), tenant.id)).toEqual([]);
   }, 120_000);
 
@@ -129,6 +129,6 @@ describe("hourly jobs", () => {
     expect(out[`reports:${tenant.id}`]).not.toBe(-1);
     expect(out.tick).toBe(1);
     expect(await db.select().from(t.jobRuns).where(eq(t.jobRuns.tenantId, tenant.id))).toEqual([]);
-    expect(ran(await runJobs(db, new Date(start.getTime() + 60_000)), tenant.id)).toEqual(["reminders", "managers", "refreshers"]);
+    expect(ran(await runJobs(db, new Date(start.getTime() + 60_000)), tenant.id)).toEqual(["reminders", "managers", "refreshers", "teachable"]);
   }, 120_000);
 });

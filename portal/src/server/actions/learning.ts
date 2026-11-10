@@ -14,7 +14,7 @@ import { attestModule, completeLesson, issueCertificate, reachScene, startLesson
 import { recomputeRisk } from "../services/risk";
 import { emitEvent } from "../services/events";
 import { audit } from "../services/audit";
-import { DEFAULT_ATTESTATION } from "../../lib/tenant-defaults";
+import { DEFAULT_ATTESTATION, TEACHABLE_PREFIX } from "../../lib/tenant-defaults";
 import { pick } from "../../i18n/config";
 import { pickLessonContent } from "../../lib/content/lesson-locale";
 import { minDwellMs, scoreLesson } from "../../lib/content/scoring";
@@ -32,7 +32,17 @@ async function moduleBySlug(v: Viewer, slug: string) {
         privileged(v, "studio.write") ? undefined : eq(t.modules.status, "published"),
       ),
     );
-  return rows.find((r) => r.tenantId) ?? rows[0] ?? null;
+  const mod = rows.find((r) => r.tenantId) ?? rows[0] ?? null;
+  // A teachable-moment lesson (services/teachable.ts) is only for the people one of its loops assigned it to: its slug is guessable.
+  if (mod?.slug.startsWith(TEACHABLE_PREFIX)) {
+    const [loop] = await db()
+      .select({ id: t.teachableLoops.id })
+      .from(t.teachableLoops)
+      .where(and(eq(t.teachableLoops.userId, v.user.id), eq(t.teachableLoops.microModuleId, mod.id)))
+      .limit(1);
+    if (!loop) return null;
+  }
+  return mod;
 }
 
 export async function attestModuleAction(slug: string): Promise<{ ok: boolean; token?: string }> {

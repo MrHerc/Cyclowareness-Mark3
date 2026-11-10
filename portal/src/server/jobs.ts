@@ -24,6 +24,7 @@ import { resolveAssignments } from "./services/assignments";
 import { notifyUsers } from "./services/notify";
 import { recomputeRisk, snapshotTenant } from "./services/risk";
 import { targetTraining } from "./services/secops";
+import { teachableTick } from "./services/teachable";
 import { dayKey } from "../lib/domain/gamification";
 import { MIN_AUDIT_MONTHS, featuresFor, withDefaults } from "../lib/tenant-defaults";
 import { dayPlus, todayIn, zonedTime } from "../lib/time";
@@ -98,6 +99,7 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
     await hourly("reminders", tenant.id, () => reminders(db, tenant, now));
     await hourly("managers", tenant.id, () => managerAlerts(db, tenant, now));
     await hourly("refreshers", tenant.id, () => refreshers(db, tenant, now));
+    await hourly("teachable", tenant.id, () => teachableTick(db, tenant, now));
     await step(`reports:${tenant.id}`, () => scheduledReports(db, tenant, now));
   }
   await step("tick", async () => {

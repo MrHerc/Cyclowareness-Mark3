@@ -57,7 +57,8 @@ export type TenantSettings = {
   /** IANA time zone of the organisation's days, due dates, reports and displayed times (lib/day.ts DEFAULT_TIME_ZONE when never chosen). */
   timeZone: string;
   protection: { contentProtection: boolean; watermark: boolean; androidScreenBlock?: boolean };
-  learning: { timeLimits: boolean; refresher: boolean; riskThreshold: number; dailyGoalXp: number };
+  /** `teachable`: the teachable-moment loop after a simulation click (services/teachable.ts). */
+  learning: { timeLimits: boolean; refresher: boolean; riskThreshold: number; dailyGoalXp: number; teachable: boolean };
   /** Months the daily clean-up keeps audit entries, and answers and closed risks; 0 keeps them forever. */
   retention: { auditMonths: number; learningMonths: number };
   attestationText: Record<string, string>;
@@ -880,8 +881,10 @@ export const campaigns = pgTable(
     name: text("name").notNull(),
     channel: text("channel", { enum: ["email", "sms", "voice", "usb", "qr"] }).notNull(),
     templateKey: text("template_key").notNull(),
-    audience: text("audience", { enum: ["all", "department"] }).notNull(),
+    /** "person": a teachable-moment re-simulation for `userId` only (services/teachable.ts). */
+    audience: text("audience", { enum: ["all", "department", "person"] }).notNull(),
     departmentId: uuid("department_id").references(() => departments.id, { onDelete: "set null" }),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
     status: text("status", { enum: CAMPAIGN_STATUS }).notNull().default("draft"),
     scheduledAt: ts("scheduled_at"),
     launchedAt: ts("launched_at"),
@@ -910,6 +913,37 @@ export const campaignRecipients = pgTable(
     reportedAt: ts("reported_at"),
   },
   (t) => [index("recipients_campaign_idx").on(t.campaignId), index("recipients_user_idx").on(t.userId)],
+);
+
+/**
+ * Teachable-moment loop (services/teachable.ts): a click in a simulation, the 90-second lesson it assigned,
+ * then the one-person re-simulation and its result. One loop per clicked recipient row.
+ */
+export const teachableLoops = pgTable(
+  "teachable_loops",
+  {
+    id: id(),
+    tenantId: tenantRef(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sourceCampaignId: uuid("source_campaign_id")
+      .notNull()
+      .references(() => campaigns.id, { onDelete: "cascade" }),
+    sourceRecipientId: uuid("source_recipient_id")
+      .notNull()
+      .unique()
+      .references(() => campaignRecipients.id, { onDelete: "cascade" }),
+    microModuleId: uuid("micro_module_id")
+      .notNull()
+      .references(() => modules.id, { onDelete: "cascade" }),
+    assignedAt: ts("assigned_at").notNull(),
+    completedAt: ts("completed_at"),
+    resimCampaignId: uuid("resim_campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
+    resimResult: text("resim_result", { enum: ["clicked", "submitted", "reported", "passed"] }),
+    status: text("status", { enum: ["assigned", "completed", "resim", "closed"] }).notNull().default("assigned"),
+  },
+  (t) => [index("teachable_loops_tenant_idx").on(t.tenantId, t.status), index("teachable_loops_user_idx").on(t.userId, t.status)],
 );
 
 /** One planned step of a live drill (src/lib/drill/plan.ts): what one recipient does, and when. */

@@ -12,6 +12,7 @@ import { campaignForPage } from "../../[id]/campaign";
 export const editableCampaignForPage = cache(async (id: string) => {
   await requirePermission("campaigns.write");
   const { v, c } = await campaignForPage(id);
-  if (c.status !== "draft" && c.status !== "scheduled") redirect(`/admin/campaigns/${c.id}`);
+  // A teachable-moment re-simulation is not edited either (saveCampaignAction refuses it).
+  if ((c.status !== "draft" && c.status !== "scheduled") || c.audience === "person") redirect(`/admin/campaigns/${c.id}`);
   return { v, c };
 });

@@ -271,13 +271,21 @@ export const WEBHOOK_EVENTS = [
 /** The audit log is the evidence of the administrators' own actions: when it is purged at all, it is kept at least this long. */
 export const MIN_AUDIT_MONTHS = 12;
 
+/**
+ * Teachable-moment loop (services/teachable.ts): the micro-lesson is due `lesson` days after the click; the
+ * re-simulation follows `resim` days after it is completed, or `fallback` days after it was assigned.
+ */
+export const TEACHABLE_DAYS = { lesson: 7, resim: 14, fallback: 21 } as const;
+/** Slug prefix of the hidden per-organisation micro-lesson module of a simulation template. */
+export const TEACHABLE_PREFIX = "teachable:";
+
 export function defaultSettings(locale = "az"): TenantSettings {
   return {
     defaultLocale: locale,
     locales: [...LOCALES],
     timeZone: DEFAULT_TIME_ZONE,
     protection: { contentProtection: true, watermark: true },
-    learning: { timeLimits: true, refresher: true, riskThreshold: 67, dailyGoalXp: 50 },
+    learning: { timeLimits: true, refresher: true, riskThreshold: 67, dailyGoalXp: 50, teachable: true },
     retention: { auditMonths: 0, learningMonths: 0 },
     attestationText: { ...DEFAULT_ATTESTATION },
     certificate: { publicLink: true },

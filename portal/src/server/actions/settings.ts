@@ -483,7 +483,7 @@ export async function saveCertificateAction(input: z.infer<typeof certSchema>): 
   return { ok: true };
 }
 
-const learningSchema = z.object({ timeLimits: z.boolean(), refresher: z.boolean(), riskThreshold: z.number().int().min(50).max(90), dailyGoalXp: z.number().int().min(10).max(500) });
+const learningSchema = z.object({ timeLimits: z.boolean(), refresher: z.boolean(), riskThreshold: z.number().int().min(50).max(90), dailyGoalXp: z.number().int().min(10).max(500), teachable: z.boolean() });
 
 export async function saveLearningAction(input: z.infer<typeof learningSchema>): Promise<SaveResult> {
   const v = await actionViewer("settings.write");

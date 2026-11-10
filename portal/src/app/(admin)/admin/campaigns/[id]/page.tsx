@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { AlertTriangle, Check, Minus } from "lucide-react";
@@ -5,6 +6,8 @@ import { db, t } from "@/server/db";
 import { avatarSrc } from "@/server/avatar";
 import { allowed } from "@/server/auth/viewer";
 import { campaignAudience, campaignStats } from "@/server/services/campaigns";
+import { canResim, resimAt } from "@/server/services/teachable";
+import { requestNow } from "@/lib/time";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { ScrollRegion } from "@/components/ui/scroll-region";
 import { Funnel } from "@/components/ui/charts";
@@ -26,7 +29,7 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
   const locale = await getLocale();
   const [tr, tc, format] = await Promise.all([getTranslations("admin.campaigns"), getTranslations("common"), getFormatter()]);
   const tpl = TEMPLATE_BY_KEY.get(c.templateKey);
-  const [stats, audience, recipients, dept] = await Promise.all([
+  const [stats, audience, recipients, dept, loops] = await Promise.all([
     campaignStats(db(), [c.id]),
     campaignAudience(db(), c),
     db()
@@ -37,7 +40,27 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
       .where(eq(t.campaignRecipients.campaignId, c.id))
       .orderBy(asc(t.users.name)),
     c.departmentId ? db().select({ name: t.departments.name }).from(t.departments).where(eq(t.departments.id, c.departmentId)) : Promise.resolve([]),
+    db()
+      .select({ loop: t.teachableLoops, name: t.users.name })
+      .from(t.teachableLoops)
+      .innerJoin(t.users, eq(t.users.id, t.teachableLoops.userId))
+      .where(and(eq(t.teachableLoops.tenantId, v.tenant.id), eq(t.teachableLoops.sourceCampaignId, c.id)))
+      .orderBy(asc(t.users.name)),
   ]);
+  const resimIds = loops.flatMap((l) => (l.loop.resimCampaignId ? [l.loop.resimCampaignId] : []));
+  const resims = new Map(
+    (resimIds.length ? await db().select({ id: t.campaigns.id, status: t.campaigns.status, scheduledAt: t.campaigns.scheduledAt, launchedAt: t.campaigns.launchedAt }).from(t.campaigns).where(inArray(t.campaigns.id, resimIds)) : []).map((r) => [r.id, r]),
+  );
+  const day = (d: Date) => format.dateTime(d, { dateStyle: "medium" });
+  const now = requestNow();
+  /** Where a loop's re-simulation stands: sent, scheduled, refused at launch, or not created yet (planned, waiting for a channel, none). */
+  const resimState = (loop: (typeof loops)[number]["loop"]) => {
+    const r = loop.resimCampaignId ? resims.get(loop.resimCampaignId) : undefined;
+    if (r) return r.launchedAt ? tr("loop.sent", { date: day(r.launchedAt) }) : r.status === "scheduled" && r.scheduledAt ? tr("loop.scheduled", { date: day(r.scheduledAt) }) : tr("loop.notSent");
+    if (loop.status === "closed" || !canResim(c.templateKey)) return tr("loop.none");
+    const at = resimAt(loop, v.tenant.settings.timeZone);
+    return now < at ? tr("loop.planned", { date: day(at) }) : tr("loop.waiting");
+  };
   // A campaign that has not started yet shows why its last launch (scheduled or manual) was refused,
   // until it is edited (rescheduled, audience changed) after that.
   const [last] =
@@ -71,7 +94,7 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
       <PageHeader
         title={c.name}
         back={{ href: "/admin/campaigns", label: tr("allCampaigns") }}
-        actions={allowed(v, "campaigns.write") ? <CampaignActions id={c.id} status={c.status} audience={audience.length} channel={c.channel} /> : null}
+        actions={allowed(v, "campaigns.write") ? <CampaignActions id={c.id} status={c.status} audience={audience.length} channel={c.channel} editable={c.audience !== "person"} /> : null}
       />
       {blocked && blockedReason ? (
         <Notice tone="warn" icon={<AlertTriangle />} title={tr("lastLaunchBlocked", { date: format.dateTime(blocked.at, { dateStyle: "medium", timeStyle: "short" }) })}>
@@ -106,7 +129,7 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
             <CardBody className="pt-3">
               <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-body-sm">
                 <dt className="text-ink-muted">{tr("audience")}</dt>
-                <dd className="font-semibold">{c.audience === "all" ? tr("wholeOrg") : (dept[0]?.name ?? "—")}</dd>
+                <dd className="font-semibold">{c.audience === "all" ? tr("wholeOrg") : c.audience === "person" ? tr("loop.person") : (dept[0]?.name ?? "—")}</dd>
                 <dt className="text-ink-muted">{tr("peopleInAudience")}</dt>
                 <dd className="font-semibold">{c.launchedAt ? recipients.length : audience.length}</dd>
                 <dt className="text-ink-muted">{tr("sendTime")}</dt>
@@ -156,6 +179,46 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
                       <td className="px-3 py-2.5 text-center">{mark(r.openedAt, "brand")}</td>
                       <td className="px-3 py-2.5 text-center">{mark(r.clickedAt, "risk")}</td>
                       <td className="px-3 py-2.5 text-center">{mark(r.reportedAt, "safe")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </ScrollRegion>
+          </CardBody>
+        </Card>
+      ) : null}
+      {loops.length ? (
+        <Card className="min-w-0">
+          <CardHeader title={tr("loop.title")} description={tr("loop.sub")} />
+          <CardBody className="pt-3">
+            <ScrollRegion label={tr("loop.title")}>
+              <table className="w-full min-w-[40rem] text-body-sm">
+                <thead className="text-tab text-ink-subtle">
+                  <tr className="border-b border-line">
+                    <th className="py-2.5 pe-3 text-start font-semibold">{tr("col.person")}</th>
+                    <th className="px-3 py-2.5 text-start font-semibold">{tr("loop.lesson")}</th>
+                    <th className="px-3 py-2.5 text-start font-semibold">{tr("loop.resim")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loops.map(({ loop, name }) => (
+                    <tr key={loop.id} className="border-b border-line last:border-0">
+                      <td className="py-2.5 pe-3">{name}</td>
+                      <td className="px-3 py-2.5">
+                        {loop.completedAt ? <Pill tone="safe">{tr("loop.completed", { date: day(loop.completedAt) })}</Pill> : <span className="text-ink-muted">{tr("loop.assigned", { date: day(loop.assignedAt) })}</span>}
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span className="flex flex-wrap items-center gap-2">
+                          {loop.resimCampaignId ? (
+                            <Link href={`/admin/campaigns/${loop.resimCampaignId}`} className="font-semibold text-brand-600 hover:underline">
+                              {resimState(loop)}
+                            </Link>
+                          ) : (
+                            <span className="text-ink-muted">{resimState(loop)}</span>
+                          )}
+                          {loop.resimResult ? <Pill tone={loop.resimResult === "clicked" || loop.resimResult === "submitted" ? "risk" : "safe"}>{tr(`loop.result.${loop.resimResult}`)}</Pill> : null}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

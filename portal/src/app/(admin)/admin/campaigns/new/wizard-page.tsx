@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { and, count, eq, ne } from "drizzle-orm";
 import { db, t } from "@/server/db";
@@ -49,7 +50,8 @@ export async function WizardPage({ v, campaign }: { v: Viewer; campaign: typeof 
         // A draft's template stays reviewable even when it is no longer offered (a plan without qr_trap now).
         template,
         channel: tpl?.channel ?? (campaign.channel === "qr" ? ("email" as const) : campaign.channel),
-        audience: campaign.audience,
+        // Never "person": editableCampaignForPage sends a re-simulation back to its page.
+        audience: campaign.audience === "person" ? notFound() : campaign.audience,
         departmentId: campaign.departmentId,
         // A send time that has passed (a draft from before scheduled launches cleared it) is not offered again.
         scheduledAt: campaign.scheduledAt && campaign.scheduledAt > requestNow() ? campaign.scheduledAt.toISOString() : null,

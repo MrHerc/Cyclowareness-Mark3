@@ -8,7 +8,8 @@ import { Button, ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { useAction } from "@/components/ui/use-action";
 
-export function CampaignActions({ id, status, audience, channel }: { id: string; status: string; audience: number; channel: string }) {
+/** `editable` is false for a teachable-moment re-simulation, which is launched or cancelled but never edited. */
+export function CampaignActions({ id, status, audience, channel, editable = true }: { id: string; status: string; audience: number; channel: string; editable?: boolean }) {
   const t = useTranslations("admin.campaigns");
   const [open, setOpen] = useState(false);
   const complete = useAction(setCampaignStatusAction);
@@ -32,7 +33,7 @@ export function CampaignActions({ id, status, audience, channel }: { id: string;
           {t("launch")}
         </Button>
       ) : null}
-      {status === "draft" || status === "scheduled" ? (
+      {editable && (status === "draft" || status === "scheduled") ? (
         <ButtonLink variant="secondary" icon={<Pencil />} href={`/admin/campaigns/edit/${id}`}>
           {t("edit")}
         </ButtonLink>

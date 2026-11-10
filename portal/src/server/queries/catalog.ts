@@ -6,6 +6,7 @@ import type { Viewer } from "../auth/viewer";
 import { assignedForUser } from "../services/assignments";
 import { pick } from "../../i18n/config";
 import type { Category } from "../../lib/domain/catalog";
+import { TEACHABLE_PREFIX } from "../../lib/tenant-defaults";
 
 export type CatalogModule = {
   id: string;
@@ -68,7 +69,9 @@ export const getCatalog = cache(async (v: Viewer, locale: string, drafts = false
   const lessonsBy = new Map<string, typeof lessons>();
   for (const l of lessons) lessonsBy.set(l.moduleId, [...(lessonsBy.get(l.moduleId) ?? []), l]);
 
-  return [...bySlug.values()].map((m) => {
+  // A teachable-moment lesson is reachable only for the people it was assigned to (services/teachable.ts).
+  const visible = [...bySlug.values()].filter((m) => !m.slug.startsWith(TEACHABLE_PREFIX) || assigned.has(m.id) || progress.has(m.id));
+  return visible.map((m) => {
     const p = progress.get(m.id);
     const a = assigned.get(m.id);
     const ls = (lessonsBy.get(m.id) ?? []).map((l) => ({

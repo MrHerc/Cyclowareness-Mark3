@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { and, desc, eq, ne } from "drizzle-orm";
-import { Building2, CalendarDays, CheckCircle2, ChevronRight, Globe, Mail, Megaphone, MessageSquare, Pencil, Phone, Plus, Usb, Users } from "lucide-react";
+import { Building2, CalendarDays, CheckCircle2, ChevronRight, Globe, Mail, Megaphone, MessageSquare, Pencil, Phone, Plus, Usb, User, Users } from "lucide-react";
 import { db, t } from "@/server/db";
 import { allowed, requirePermission } from "@/server/auth/viewer";
 import { campaignStats } from "@/server/services/campaigns";
@@ -45,7 +45,7 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
   const deptName = new Map(departments.map((d) => [d.id, d.name]));
   const closure = departmentClosure(departments);
   const audienceSize = (c: (typeof campaigns)[number]) =>
-    c.audience === "all" ? users.length : users.filter((u) => u.departmentId && c.departmentId && closure.get(c.departmentId)?.has(u.departmentId)).length;
+    c.audience === "all" ? users.length : c.audience === "person" ? 1 : users.filter((u) => u.departmentId && c.departmentId && closure.get(c.departmentId)?.has(u.departmentId)).length;
   const list = campaigns.filter((c) => status === "all" || c.status === status);
 
   return (
@@ -102,8 +102,8 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
                     </Pill>
                     <p className="mt-1.5 grid gap-0.5 text-tab text-ink-muted">
                       <span className="inline-flex items-center gap-1">
-                        {c.audience === "all" ? <Globe className="size-3.5" /> : <Building2 className="size-3.5" />}
-                        {c.audience === "all" ? tr("wholeOrg") : (deptName.get(c.departmentId ?? "") ?? "—")}
+                        {c.audience === "all" ? <Globe className="size-3.5" /> : c.audience === "person" ? <User className="size-3.5" /> : <Building2 className="size-3.5" />}
+                        {c.audience === "all" ? tr("wholeOrg") : c.audience === "person" ? tr("loop.person") : (deptName.get(c.departmentId ?? "") ?? "—")}
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <CalendarDays className="size-3.5" />
