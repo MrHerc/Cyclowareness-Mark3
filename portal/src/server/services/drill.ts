@@ -387,7 +387,7 @@ export async function drillView(db: DB, run: Run, locale: string, now = new Date
       difficulty: tpl.difficulty,
       harvest: tpl.harvest,
       senderName: templateText(tpl.sender.name, locale),
-      senderAddress: tpl.sender.address,
+      senderAddress: templateText(tpl.sender.address, locale),
       subject: templateText(tpl.subject, locale),
       moduleTitle: mod ? pick(mod.title, locale) : null,
       moduleSlug: tpl.moduleSlug,

@@ -38,7 +38,7 @@ export default async function DrillIndexPage() {
     difficulty: tpl.difficulty,
     harvest: tpl.harvest,
     senderName: templateText(tpl.sender.name, locale),
-    senderAddress: tpl.sender.address,
+    senderAddress: templateText(tpl.sender.address, locale),
     subject: templateText(tpl.subject, locale),
   }));
   // People per department (and its sub-departments), the viewer left out, for the audience line.

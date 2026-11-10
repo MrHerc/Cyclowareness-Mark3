@@ -4,6 +4,8 @@
  */
 import type { Locale } from "../../i18n/config";
 import { encodeRiskTitle } from "../risk-title";
+import type { Brand } from "../content/types";
+import brands from "../../../content/library/brands.json";
 
 export type Channel = "email" | "sms" | "voice" | "usb";
 /** Every interface language: a missing translation is a type error. */
@@ -19,7 +21,8 @@ export type CampaignTemplate = {
   harvest: boolean;
   qr?: boolean;
   name: L10n;
-  sender: { name: L10n; address: string };
+  /** `address` is shown in the previews; a market language has its own (the lessons' address map). */
+  sender: { name: L10n; address: L10n };
   subject: L10n;
   body: L10n;
   cta?: L10n;
@@ -28,7 +31,7 @@ export type CampaignTemplate = {
   redFlags: L10n[];
 };
 
-const OFIS_TECHIZAT: L10n = {
+const OFIS_TECHIZAT: L10n = brand("ofistechizat", {
   az: "OfisTəchizat MMC",
   en: "OfisTechizat LLC",
   ru: "ООО OfisTechizat",
@@ -39,10 +42,18 @@ const OFIS_TECHIZAT: L10n = {
   de: "OfisTəchizat MMC",
   fr: "OfisTəchizat MMC",
   ar: "OfisTechizat LLC",
-};
+});
 const CALL: L10n = { az: "Zəng", en: "Call", ru: "Звонок", tr: "Arama", ro: "Apel", ka: "ზარი", uk: "Дзвінок", de: "Anruf", fr: "Appel", ar: "مكالمة" };
 /** Fictional brands keep their name in every language. */
 const same = (name: string): L10n => ({ az: name, en: name, ru: name, tr: name, ro: name, ka: name, uk: name, de: name, fr: name, ar: name });
+/** A brand of the lesson registry: the market packs' local name where a language has one (brands.json `names`). */
+function brand(id: string, names: L10n): L10n {
+  return { ...names, ...(brands as Record<string, Brand>)[id].names };
+}
+const SURET_KARGO = brand("suretkargo", same("SuretKargo"));
+const ULDUZ_BANK = brand("ulduzbank", same("UlduzBank"));
+/** A national prize brand: the country in its name follows the market. */
+const BONUS: L10n = { ...same("BonusAz"), de: "BonusDE", fr: "BonusFR", ar: "بونص SA" };
 
 export const TEMPLATES: CampaignTemplate[] = [
   {
@@ -65,7 +76,7 @@ export const TEMPLATES: CampaignTemplate[] = [
     },
     sender: {
       name: { az: "Mühasibatlıq", en: "Accounting", ru: "Бухгалтерия", tr: "Muhasebe", ro: "Contabilitate", ka: "ბუღალტერია", uk: "Бухгалтерія", de: "Buchhaltung", fr: "Comptabilité", ar: "إدارة الحسابات" },
-      address: "muhasibat@xidmetagentIiyi.az",
+      address: { ...same("muhasibat@xidmetagentIiyi.az"), de: "buchhaltung@buergerdienst-onIine.de", fr: "comptabilite@guichet-pubIic-local.fr", ar: "accounts@pubIic-services-agency.sa" },
     },
     subject: {
       az: "Sentyabr ayı üzrə maaş vərəqəniz hazırdır",
@@ -150,8 +161,8 @@ export const TEMPLATES: CampaignTemplate[] = [
       ar: "غرامة غير مسددة: إشعار أخير",
     },
     sender: {
-      name: { az: "E-Xidmət Portalı", en: "E-Xidmet Portal", ru: "Портал E-Xidmet", tr: "E-Xidmət Portalı", ro: "Portalul E-Xidmət", ka: "E-Xidmet პორტალი", uk: "Портал E-Xidmet", de: "E-Xidmət-Portal", fr: "Portail E-Xidmət", ar: "بوابة E-Xidmet" },
-      address: "bildiris@e-xidmet-portal.info",
+      name: brand("e-xidmet", { az: "E-Xidmət Portalı", en: "E-Xidmet Portal", ru: "Портал E-Xidmet", tr: "E-Xidmət Portalı", ro: "Portalul E-Xidmət", ka: "E-Xidmet პორტალი", uk: "Портал E-Xidmet", de: "E-Xidmət-Portal", fr: "Portail E-Xidmət", ar: "بوابة E-Xidmet" }),
+      address: { ...same("bildiris@e-xidmet-portal.info"), de: "benachrichtigung@eamt-portal.info", fr: "notification@demarcheplus-portal.info", ar: "notice@khadamati-portal.info" },
     },
     subject: {
       az: "Son xəbərdarlıq: 40 AZN cərimə ödənilməyib",
@@ -161,9 +172,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "Ultima notificare: amenda de 40 AZN nu a fost plătită",
       ka: "ბოლო გაფრთხილება: 40 AZN ჯარიმა გადაუხდელია",
       uk: "Останнє попередження: штраф 40 AZN не сплачено",
-      de: "Letzte Mahnung: Bußgeld über 40 AZN nicht bezahlt",
-      fr: "Dernier avis : amende de 40 AZN impayée",
-      ar: "إشعار أخير: غرامة بقيمة 40 AZN غير مسددة",
+      de: "Letzte Mahnung: Bußgeld über 40 € nicht bezahlt",
+      fr: "Dernier avis : amende de 40 € impayée",
+      ar: "إشعار أخير: غرامة بقيمة 40 ريال غير مسددة",
     },
     body: {
       az: "Hörmətli vətəndaş,\n\nAdınıza 40 AZN məbləğində ödənilməmiş cərimə var. 48 saat ərzində ödənilmədikdə məbləğ iki qat artırılacaq və iş məhkəməyə göndəriləcək.",
@@ -173,9 +184,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "Bună ziua,\n\nVă informăm că pe numele dumneavoastră figurează o amendă neplătită de 40 AZN. Dacă nu este achitată în 48 de ore, suma se va dubla, iar dosarul va fi trimis în instanță.",
       ka: "პატივცემულო მოქალაქე,\n\nთქვენს სახელზე ირიცხება 40 AZN-ის გადაუხდელი ჯარიმა. თუ ის 48 საათში არ გადაიხდება, თანხა გაორმაგდება და საქმე სასამართლოს გადაეცემა.",
       uk: "Доброго дня!\n\nПовідомляємо, що на ваше ім’я обліковується несплачений штраф 40 AZN. Якщо його не буде сплачено протягом 48 годин, сума подвоїться, а справу передадуть до суду.",
-      de: "Sehr geehrte Damen und Herren,\n\nauf Ihren Namen ist ein unbezahltes Bußgeld über 40 AZN offen. Wird es nicht innerhalb von 48 Stunden bezahlt, verdoppelt sich der Betrag und der Fall wird an das Gericht übergeben.",
-      fr: "Madame, Monsieur,\n\nUne amende impayée de 40 AZN est enregistrée à votre nom. Sans paiement sous 48 heures, son montant sera doublé et le dossier sera transmis au tribunal.",
-      ar: "عزيزي المواطن،\n\nتوجد غرامة غير مسددة بقيمة 40 AZN مسجلة باسمك. إذا لم تسددها خلال 48 ساعة، فسيتضاعف المبلغ وستحال القضية إلى المحكمة.",
+      de: "Sehr geehrte Damen und Herren,\n\nauf Ihren Namen ist ein unbezahltes Bußgeld über 40 € offen. Wird es nicht innerhalb von 48 Stunden bezahlt, verdoppelt sich der Betrag und der Fall wird an das Gericht übergeben.",
+      fr: "Madame, Monsieur,\n\nUne amende impayée de 40 € est enregistrée à votre nom. Sans paiement sous 48 heures, son montant sera doublé et le dossier sera transmis au tribunal.",
+      ar: "عزيزي المواطن،\n\nتوجد غرامة غير مسددة بقيمة 40 ريال مسجلة باسمك. إذا لم تسددها خلال 48 ساعة، فسيتضاعف المبلغ وستحال القضية إلى المحكمة.",
     },
     cta: { az: "Cəriməni ödəyin", en: "Pay the fine", ru: "Оплатить штраф", tr: "Cezayı öde", ro: "Plătiți amenda", ka: "ჯარიმის გადახდა", uk: "Сплатити штраф", de: "Bußgeld bezahlen", fr: "Payer l’amende", ar: "سداد الغرامة" },
     redFlags: [
@@ -235,7 +246,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "Facture en retard",
       ar: "فاتورة متأخرة السداد",
     },
-    sender: { name: OFIS_TECHIZAT, address: "hesab@ofistechizat-az.com" },
+    sender: { name: OFIS_TECHIZAT, address: { ...same("hesab@ofistechizat-az.com"), de: "konto@buerobedarf-de.com", fr: "compte@bureaufournitures-fr.com", ar: "account@officesupplies-sa.com" } },
     subject: {
       az: "Faktura №0925 — ödəniş gecikir",
       en: "Invoice #0925 is overdue",
@@ -335,7 +346,7 @@ export const TEMPLATES: CampaignTemplate[] = [
     },
     sender: {
       name: { az: "İT Dəstək", en: "IT Support", ru: "ИТ-поддержка", tr: "BT Destek", ro: "Suport IT", ka: "IT მხარდაჭერა", uk: "ІТ-підтримка", de: "IT-Support", fr: "Support informatique", ar: "الدعم الفني" },
-      address: "it-destek@rxagentlik-support.info",
+      address: { ...same("it-destek@rxagentlik-support.info"), de: "it-hilfe@rx-amt-support.info", fr: "it-assistance@direction-rx-support.info", ar: "it-support@rx-authority-support.info" },
     },
     subject: {
       az: "İki addımlı giriş bu gün bitir — QR kodu skan edin",
@@ -418,7 +429,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "Changement de coordonnées bancaires",
       ar: "تغيير البيانات البنكية",
     },
-    sender: { name: OFIS_TECHIZAT, address: "maliyye@ofistechizat.az.co" },
+    sender: { name: OFIS_TECHIZAT, address: { ...same("maliyye@ofistechizat.az.co"), de: "finanzen@buerobedarf.de.co", fr: "finances@bureaufournitures.fr.co", ar: "finance@officesupplies.sa.co" } },
     subject: {
       az: "Yeni bank rekvizitlərimiz",
       en: "Our new bank details",
@@ -476,9 +487,9 @@ export const TEMPLATES: CampaignTemplate[] = [
         ro: "Domeniul se termină în „.az.co”, nu în „.az”.",
         ka: "დომენი „.az.co“-ით მთავრდება და არა „.az“-ით.",
         uk: "Домен закінчується на «.az.co», а не на «.az».",
-        de: "Die Domain endet auf „.az.co“, nicht auf „.az“.",
-        fr: "Le domaine se termine par « .az.co », et non par « .az ».",
-        ar: "ينتهي النطاق باللاحقة «.az.co» وليس «.az».",
+        de: "Die Domain endet auf „.de.co“, nicht auf „.de“.",
+        fr: "Le domaine se termine par « .fr.co », et non par « .fr ».",
+        ar: "ينتهي النطاق باللاحقة «.sa.co» وليس «.sa».",
       },
     ],
   },
@@ -513,7 +524,7 @@ export const TEMPLATES: CampaignTemplate[] = [
         fr: "Fonds de coopération internationale",
         ar: "صندوق التعاون الدولي",
       },
-      address: "events@intl-coopfund.org",
+      address: same("events@intl-coopfund.org"),
     },
     subject: {
       az: "Dəvət: Bakı Rəqəmsal Forumunda əsas məruzə",
@@ -523,9 +534,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "Invitație: discursul principal la Forumul Digital de la Baku",
       ka: "მოწვევა: ძირითადი მოხსენება ბაქოს ციფრულ ფორუმზე",
       uk: "Запрошення: ключова доповідь на Бакинському цифровому форумі",
-      de: "Einladung: Keynote beim Digitalforum Baku",
-      fr: "Invitation : discours d’ouverture au Forum numérique de Bakou",
-      ar: "دعوة: الكلمة الرئيسية في منتدى باكو الرقمي",
+      de: "Einladung: Keynote beim Digitalforum Berlin",
+      fr: "Invitation : discours d’ouverture au Forum numérique de Paris",
+      ar: "دعوة: الكلمة الرئيسية في منتدى جدة الرقمي",
     },
     body: {
       az: "Hörmətli cənab Həsənov,\n\nSizi forumun açılışında əsas məruzə ilə çıxış etməyə dəvət edirik. Proqram və təşkilati məlumatlar fond portalındadır. Zəhmət olmasa ofis hesabınızla daxil olub iştirakı təsdiqləyin.",
@@ -535,9 +546,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "Stimate domnule Hasanov,\n\nAm fi onorați să susțineți discursul de deschidere al forumului. Programul și detaliile organizatorice se află pe portalul fondului. Vă rugăm să vă conectați cu contul de serviciu pentru a confirma.",
       ka: "პატივცემულო ბატონო ჰასანოვ,\n\nპატივი იქნება ჩვენთვის, თუ ფორუმის გახსნაზე ძირითად მოხსენებას წარმოადგენთ. პროგრამა და ორგანიზაციული დეტალები ფონდის პორტალზეა. მონაწილეობის დასადასტურებლად გთხოვთ, შეხვიდეთ სამსახურებრივი ანგარიშით.",
       uk: "Шановний пане Гасанове!\n\nДля нас буде честю, якщо ви виступите з ключовою доповіддю на відкритті форуму. Програма й організаційні деталі — на порталі фонду. Щоб підтвердити участь, увійдіть, будь ласка, з робочим обліковим записом.",
-      de: "Sehr geehrter Herr Həsənov,\n\nes wäre uns eine Ehre, wenn Sie die Eröffnungs-Keynote des Forums halten. Programm und Ablauf finden Sie im Portal des Fonds. Bitte melden Sie sich zur Bestätigung mit Ihrem Dienstkonto an.",
-      fr: "Monsieur Hasanov,\n\nNous serions honorés que vous prononciez le discours d’ouverture du forum. Le programme et les informations pratiques se trouvent sur le portail du fonds. Merci de vous connecter avec votre compte professionnel pour confirmer votre participation.",
-      ar: "السيد حسنوف المحترم،\n\nيشرفنا أن تلقي الكلمة الافتتاحية في المنتدى. البرنامج والتفاصيل التنظيمية متاحة على بوابة الصندوق. يرجى تسجيل الدخول بحساب العمل لتأكيد مشاركتك.",
+      de: "Sehr geehrter Herr Becker,\n\nes wäre uns eine Ehre, wenn Sie die Eröffnungs-Keynote des Forums halten. Programm und Ablauf finden Sie im Portal des Fonds. Bitte melden Sie sich zur Bestätigung mit Ihrem Dienstkonto an.",
+      fr: "Monsieur Durand,\n\nNous serions honorés que vous prononciez le discours d’ouverture du forum. Le programme et les informations pratiques se trouvent sur le portail du fonds. Merci de vous connecter avec votre compte professionnel pour confirmer votre participation.",
+      ar: "السيد العتيبي المحترم،\n\nيشرفنا أن تلقي الكلمة الافتتاحية في المنتدى. البرنامج والتفاصيل التنظيمية متاحة على بوابة الصندوق. يرجى تسجيل الدخول بحساب العمل لتأكيد مشاركتك.",
     },
     cta: { az: "Proqrama baxın", en: "View the programme", ru: "Открыть программу", tr: "Programı görüntüle", ro: "Vizualizați programul", ka: "პროგრამის ნახვა", uk: "Відкрити програму", de: "Programm ansehen", fr: "Voir le programme", ar: "عرض البرنامج" },
     redFlags: [
@@ -597,7 +608,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "SMS de livraison de colis",
       ar: "رسالة نصية عن توصيل طرد",
     },
-    sender: { name: same("SuretKargo"), address: "SuretKargo" },
+    sender: { name: SURET_KARGO, address: SURET_KARGO },
     subject: { az: "Bağlama", en: "Parcel", ru: "Посылка", tr: "Kargo", ro: "Colet", ka: "ამანათი", uk: "Посилка", de: "Paket", fr: "Colis", ar: "طرد" },
     body: {
       az: "SuretKargo: Bağlamanız ünvan natamam olduğu üçün saxlanılıb. 1.20 AZN ödəyib çatdırılmanı yenidən planlaşdırın:",
@@ -607,9 +618,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "SuretKargo: Coletul dumneavoastră este reținut deoarece adresa este incompletă. Plătiți 1,20 AZN pentru a reprograma livrarea:",
       ka: "SuretKargo: თქვენი ამანათი შეჩერებულია, რადგან მისამართი არასრულია. მიწოდების ხელახლა დასაგეგმად გადაიხადეთ 1,20 AZN:",
       uk: "SuretKargo: Вашу посилку затримано через неповну адресу. Сплатіть 1,20 AZN, щоб перенести доставку:",
-      de: "SuretKargo: Ihr Paket wird zurückgehalten, weil die Adresse unvollständig ist. Zahlen Sie 1,20 AZN, um die Zustellung neu zu planen:",
-      fr: "SuretKargo : votre colis est en attente car l’adresse est incomplète. Payez 1,20 AZN pour reprogrammer la livraison :",
-      ar: "SuretKargo: طردك معلق لأن العنوان غير مكتمل. ادفع 1.20 AZN لإعادة جدولة التوصيل:",
+      de: `${SURET_KARGO.de}: Ihr Paket wird zurückgehalten, weil die Adresse unvollständig ist. Zahlen Sie 1,20 €, um die Zustellung neu zu planen:`,
+      fr: `${SURET_KARGO.fr} : votre colis est en attente car l’adresse est incomplète. Payez 1,20 € pour reprogrammer la livraison :`,
+      ar: `${SURET_KARGO.ar}: طردك معلق لأن العنوان غير مكتمل. ادفع 1.20 ريال لإعادة جدولة التوصيل:`,
     },
     redFlags: [
       {
@@ -668,7 +679,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "SMS annonçant un gain",
       ar: "رسالة نصية عن الفوز بجائزة",
     },
-    sender: { name: same("BonusAz"), address: "BonusAz" },
+    sender: { name: BONUS, address: BONUS },
     subject: { az: "Uduş", en: "Prize", ru: "Выигрыш", tr: "Ödül", ro: "Premiu", ka: "პრიზი", uk: "Виграш", de: "Gewinn", fr: "Gain", ar: "جائزة" },
     body: {
       az: "Təbriklər! Nömrəniz smartfon uduşu qazandı. Çatdırılma üçün 4.99 AZN ödəyin, təklif bu gün bitir:",
@@ -678,9 +689,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "Felicitări! Numărul dumneavoastră a câștigat un smartphone. Plătiți 4,99 AZN pentru livrare, oferta expiră astăzi:",
       ka: "გილოცავთ! თქვენმა ნომერმა სმარტფონი მოიგო. მიწოდებისთვის გადაიხადეთ 4,99 AZN, შეთავაზება დღეს მთავრდება:",
       uk: "Вітаємо! Ваш номер виграв смартфон. Сплатіть 4,99 AZN за доставку, пропозиція діє лише сьогодні:",
-      de: "Herzlichen Glückwunsch! Ihre Nummer hat ein Smartphone gewonnen. Zahlen Sie 4,99 AZN für den Versand, das Angebot endet heute:",
-      fr: "Félicitations ! Votre numéro a gagné un smartphone. Payez 4,99 AZN de frais de livraison, l’offre se termine aujourd’hui :",
-      ar: "تهانينا! فاز رقمك بهاتف ذكي. ادفع 4.99 AZN رسوم التوصيل، العرض ينتهي اليوم:",
+      de: "Herzlichen Glückwunsch! Ihre Nummer hat ein Smartphone gewonnen. Zahlen Sie 4,99 € für den Versand, das Angebot endet heute:",
+      fr: "Félicitations ! Votre numéro a gagné un smartphone. Payez 4,99 € de frais de livraison, l’offre se termine aujourd’hui :",
+      ar: "تهانينا! فاز رقمك بهاتف ذكي. ادفع 4.99 ريال رسوم التوصيل، العرض ينتهي اليوم:",
     },
     redFlags: [
       {
@@ -739,7 +750,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "SMS d’alerte bancaire",
       ar: "رسالة تنبيه من البنك",
     },
-    sender: { name: same("UlduzBank"), address: "UlduzBank" },
+    sender: { name: ULDUZ_BANK, address: ULDUZ_BANK },
     subject: { az: "Kart bloku", en: "Card block", ru: "Блокировка карты", tr: "Kart blokesi", ro: "Card blocat", ka: "ბარათის დაბლოკვა", uk: "Блокування картки", de: "Kartensperre", fr: "Carte bloquée", ar: "إيقاف البطاقة" },
     body: {
       az: "UlduzBank: Kartınızda şübhəli əməliyyat aşkarlandı və kart müvəqqəti bloklandı. Bloku açmaq üçün məlumatlarınızı təsdiqləyin:",
@@ -749,9 +760,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "UlduzBank: Am detectat o tranzacție suspectă, iar cardul dumneavoastră a fost blocat temporar. Confirmați-vă datele pentru a-l debloca:",
       ka: "UlduzBank: თქვენს ბარათზე საეჭვო ოპერაცია დაფიქსირდა და ბარათი დროებით დაიბლოკა. განსაბლოკად დაადასტურეთ თქვენი მონაცემები:",
       uk: "UlduzBank: Виявлено підозрілу операцію, вашу картку тимчасово заблоковано. Підтвердьте свої дані, щоб розблокувати її:",
-      de: "UlduzBank: Wir haben eine verdächtige Transaktion festgestellt und Ihre Karte vorübergehend gesperrt. Bestätigen Sie Ihre Daten, um sie zu entsperren:",
-      fr: "UlduzBank : une opération suspecte a été détectée et votre carte est temporairement bloquée. Confirmez vos informations pour la débloquer :",
-      ar: "UlduzBank: تم رصد عملية مشبوهة وإيقاف بطاقتك مؤقتًا. أكد بياناتك لإعادة تفعيلها:",
+      de: `${ULDUZ_BANK.de}: Wir haben eine verdächtige Transaktion festgestellt und Ihre Karte vorübergehend gesperrt. Bestätigen Sie Ihre Daten, um sie zu entsperren:`,
+      fr: `${ULDUZ_BANK.fr} : une opération suspecte a été détectée et votre carte est temporairement bloquée. Confirmez vos informations pour la débloquer :`,
+      ar: `${ULDUZ_BANK.ar}: تم رصد عملية مشبوهة وإيقاف بطاقتك مؤقتًا. أكد بياناتك لإعادة تفعيلها:`,
     },
     redFlags: [
       {
@@ -812,7 +823,7 @@ export const TEMPLATES: CampaignTemplate[] = [
     },
     sender: {
       name: { az: "«İT Dəstək»", en: "“IT Support”", ru: "«ИТ-поддержка»", tr: "“BT Destek”", ro: "„Suport IT”", ka: "„IT მხარდაჭერა“", uk: "«ІТ-підтримка»", de: "„IT-Support“", fr: "« Support informatique »", ar: "«الدعم الفني»" },
-      address: "+994 12 000 33 44",
+      address: { ...same("+994 12 000 33 44"), de: "+49 30 000 33 44", fr: "+33 1 00 00 33 44", ar: "+966 11 000 3344" },
     },
     subject: CALL,
     body: {
@@ -874,7 +885,7 @@ export const TEMPLATES: CampaignTemplate[] = [
     },
     sender: {
       name: { az: "Kamran Babayev", en: "Kamran Babayev", ru: "Камран Бабаев", tr: "Kamran Babayev", ro: "Kamran Babayev", ka: "ქამრან ბაბაევი", uk: "Камран Бабаєв", de: "Kamran Babayev", fr: "Kamran Babayev", ar: "كامران باباييف" },
-      address: "+994 50 000 77 12",
+      address: { ...same("+994 50 000 77 12"), de: "+49 151 000 77 12", fr: "+33 6 00 00 77 12", ar: "+966 55 000 7712" },
     },
     subject: CALL,
     body: {
@@ -959,7 +970,7 @@ export const TEMPLATES: CampaignTemplate[] = [
         fr: "Le nouvel assistant du directeur",
         ar: "المساعد الجديد للمدير",
       },
-      address: "+994 55 000 41 90",
+      address: { ...same("+994 55 000 41 90"), de: "+49 151 000 41 90", fr: "+33 6 00 00 41 90", ar: "+966 55 000 4190" },
     },
     subject: same("USB"),
     body: {

@@ -49,7 +49,7 @@ export const TRANSLATABLE = new Set([
 export const APP_IDENTIFIERS = new Set(["whatsapp", "telegram", "generic", "chat"]);
 
 /** Values that are addresses or identifiers and must never be translated, even under a translatable key. */
-const LOOKS_LIKE_ADDRESS = /^(https?:\/\/|www\.)|^[^\s@]+@[^\s@]+$|^[a-z0-9-]+(\.[a-z0-9-]+)+$/i;
+export const LOOKS_LIKE_ADDRESS = /^(https?:\/\/|www\.)|^[^\s@]+@[^\s@]+$|^[a-z0-9-]+(\.[a-z0-9-]+)+$/i;
 
 const URL_TOKEN = /(?:https?:\/\/|www\.)[^\s<>"'«»“”‘’]+/giu;
 // Also either half of an address split across spans ("r.mammadli@", "@idare.example").

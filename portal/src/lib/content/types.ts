@@ -150,6 +150,8 @@ export type Brand = {
   monogram?: string;
   fake?: boolean;
   imitates?: string;
+  /** The market packs' local analogue per language (content/market), written by scripts/apply-market.ts. */
+  names?: Partial<Record<string, string>>;
 };
 
 export type ModuleFile = {
