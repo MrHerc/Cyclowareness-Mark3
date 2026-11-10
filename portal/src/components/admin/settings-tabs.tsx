@@ -510,7 +510,7 @@ export function IdentityTab({
       matchByEmail: identity.ldap?.matchByEmail ?? true,
     },
   });
-  const [initial] = useState(s);
+  const [initial, setInitial] = useState(s);
   const sso = s.sso;
   const ldap = s.ldap;
   const trustChanged =
@@ -668,7 +668,12 @@ export function IdentityTab({
               const refused = stepUpError(res.error);
               setPwError(refused);
               if (refused) setPwAsked(true);
-              if (res.ok) setPassword("");
+              // What was just saved is the new baseline, so the password is not asked again until trust changes once more.
+              if (res.ok) {
+                setPassword("");
+                setPwAsked(false);
+                setInitial(s);
+              }
               return refused ? { ...res, field: "password", message: refused } : res.error === "secretRequired" ? { ...res, message: t("secretReenter") } : res;
             },
             {
