@@ -100,7 +100,11 @@ describe("riskStory", () => {
     // Finance and IT score 7 more on the first of the eight snapshot days; Tiny's 95 and the administrator's 0 have no
     // snapshot and count with today's score at both ends: 407 / 8 = 51 then 365 / 8 = 46, the chart header's number.
     expect(s.trend).toMatchObject({ from: 51, to: 46 });
-    expect((await overviewData(as(o.tenant.id, o.admin), "en", null)).kpis.avgRisk).toBe(46);
+    // Today's organisation snapshot was written before a recompute: the chart's last point still shows the header's number.
+    await db.insert(t.riskSnapshots).values({ tenantId: o.tenant.id, day: dayPlus(0, tz), avgRisk: 47, completion: 0, reportRate: 0, clickRate: 0 });
+    const live = await overviewData(as(o.tenant.id, o.admin), "en", null);
+    expect(live.kpis.avgRisk).toBe(46);
+    expect(live.charts.at(-1)).toMatchObject({ avgRisk: 46 });
     expect(s.weakest).toEqual({ id: o.finance.id, name: "Finance", risk: 70, category: "email", inCategory: 2, module: { id: email.id, title: "Phishing basics" } });
     expect(s.campaign).toEqual({ name: "Parcel lure", from: 50, to: 25 });
     expect(s.training).toEqual({ title: "Phishing basics", people: 2 });

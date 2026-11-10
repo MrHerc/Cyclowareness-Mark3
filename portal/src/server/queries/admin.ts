@@ -177,6 +177,7 @@ export async function overviewData(v: Viewer, locale: string, departmentFilter: 
   const reportRate = sent ? Math.round((Number(sims[0].reported) / sent) * 100) : 0;
   const active7 = people.filter((p) => p.lastActiveAt && p.lastActiveAt.getTime() > now.getTime() - 7 * DAY).length;
   const first = snapshots[0];
+  const today = dayPlus(0, v.tenant.settings.timeZone, now);
 
   const bands = { low: 0, medium: 0, high: 0 };
   for (const p of people) bands[riskBand(p.riskScore)]++;
@@ -218,7 +219,8 @@ export async function overviewData(v: Viewer, locale: string, departmentFilter: 
       reportRate,
       reportFrom: first && !scoped ? first.reportRate : null,
     },
-    charts: snapshots.map((s) => ({ day: s.day, avgRisk: s.avgRisk, completion: s.completion, reportRate: s.reportRate })),
+    // Today's snapshot is written once a day; its point shows the live average the header names, so a recompute since cannot split them.
+    charts: snapshots.map((s) => ({ day: s.day, avgRisk: !scoped && s.day === today ? avgRisk : s.avgRisk, completion: s.completion, reportRate: s.reportRate })),
     league,
     bands,
     highest: [...people].sort((a, b) => b.riskScore - a.riskScore).slice(0, 5),
