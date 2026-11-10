@@ -373,6 +373,9 @@ describe("inbound report address (/api/inbound/[tenant])", () => {
     const [{ settings }] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenant.id));
     expect(reportAddress({ features: new Set(["integrations"]), settings: withDefaults(settings) })).toBe("report@bank.example");
     expect(reportAddress({ features: new Set(), settings: withDefaults(settings) })).toBeUndefined();
+    // An address typed before the secret exists is not shown: the endpoint would refuse every forwarded mail.
+    const noSecret = withDefaults(settings);
+    expect(reportAddress({ features: new Set(["integrations"]), settings: { ...noSecret, integrations: { ...noSecret.integrations, inboundSecretHash: undefined } } })).toBeUndefined();
 
     const reporter = await addUser(db, tenant.id, { email: `aysel${++tok}@bank.example`, riskScore: 99 });
     const { recipient } = await simulation(tenant.id, reporter.id);
@@ -431,11 +434,41 @@ describe("inbound report address (/api/inbound/[tenant])", () => {
   it("refuses a flood per organisation", async () => {
     const { tenant, auth } = await inboundOrg();
     const person = await addUser(db, tenant.id);
-    // The route's window: 120 messages per organisation and minute.
-    for (let i = 0; i < 120; i++) await rateLimit(`inbound:${tenant.id}`, 120, 60_000);
-    const res = await post(tenant.slug, { from: person.email, subject: "Invoice", text: "Pay now" }, auth);
-    expect(res.status).toBe(429);
-    expect(res.headers.get("retry-after")).toBe("60");
+    // Pinned clock: a minute boundary between filling the window and the post would open a fresh one.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-10T10:00:30Z"));
+    try {
+      // The route's window: 120 messages per organisation and minute.
+      for (let i = 0; i < 120; i++) await rateLimit(`inbound:${tenant.id}`, 120, 60_000);
+      const res = await post(tenant.slug, { from: person.email, subject: "Invoice", text: "Pay now" }, auth);
+      expect(res.status).toBe(429);
+      expect(res.headers.get("retry-after")).toBe("60");
+    } finally {
+      vi.useRealTimers();
+    }
     expect(await reports(tenant.id)).toEqual([]);
+  });
+
+  it("answers quickly for a forwarded mail with a large embedded image and refuses a declared oversize body unread", async () => {
+    const { tenant, auth } = await inboundOrg();
+    const person = await addUser(db, tenant.id);
+    // A base64 data URI is a long run with "/" and no spaces: the tracking-link search must stay linear on it.
+    const image = Array.from({ length: 600_000 }, (_, i) => "AB/c+9xY"[i % 8]).join("");
+    const started = Date.now();
+    const res = await post(tenant.slug, { from: person.email, subject: "Fwd: Invoice", text: "Pay now", html: `<img src="data:image/png;base64,${image}">` }, auth);
+    expect(res.status).toBe(202);
+    expect(Date.now() - started).toBeLessThan(2000);
+    const [report] = await reports(tenant.id);
+    expect(report).toMatchObject({ reporterId: person.id, url: null });
+
+    const big = inbound.POST(
+      new Request(`https://portal.example/api/inbound/${tenant.slug}`, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: auth, "content-length": "2000000" },
+        body: "{}",
+      }),
+      { params: Promise.resolve({ tenant: tenant.slug }) },
+    );
+    expect((await big).status).toBe(413);
   });
 });

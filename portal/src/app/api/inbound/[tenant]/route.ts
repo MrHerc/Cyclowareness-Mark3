@@ -20,8 +20,11 @@ const messageSchema = z.object({
 
 /** Messages per organisation and minute: a reporting wave after a real attack fits, a mail loop does not (the provider retries a 429). */
 const PER_MINUTE = 120;
-/** The first tracking link of our own simulations, so the report is matched to that exact recipient (threats.ts). */
-const TRACKING_LINK = /[^\s"'<>]*\/t\/[a-z2-7]{10,40}/;
+/**
+ * The first tracking link of our own simulations, so the report is matched to that exact recipient (threats.ts).
+ * Anchored on the scheme with bounded segments: an unbounded prefix backtracks quadratically on a long base64 image.
+ */
+const TRACKING_LINK = /https?:\/\/[^\s"'<>/]{1,253}\/(?:[^\s"'<>/]{1,200}\/){0,5}?t\/[a-z2-7]{10,40}/;
 const MAX_BODY = 1_000_000;
 
 /** Same answer for a filed report and an ignored sender, so the endpoint never tells who works here. */
@@ -47,6 +50,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ ten
   }
   if (!(await rateLimit(`inbound:${row.id}`, PER_MINUTE, 60_000)).ok) return new Response("Too many requests", { status: 429, headers: { "retry-after": "60" } });
 
+  // Refuse a declared oversize body before buffering it; the length check after reading is the backstop.
+  if (Number(request.headers.get("content-length")) > MAX_BODY) return new Response("Payload too large", { status: 413 });
   const raw = await request.text();
   if (raw.length > MAX_BODY) return new Response("Payload too large", { status: 413 });
   let body: unknown;

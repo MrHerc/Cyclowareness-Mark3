@@ -558,7 +558,7 @@ People report suspicious mail by forwarding it to the organisation's report addr
 
 **Setup** (Settings, Integrations, Report address):
 
-1. Type the report address. The report dialog then tells learners to forward suspicious mail there; leave it empty to hide the hint.
+1. Type the report address. Once the secret exists, the report dialog tells learners to forward suspicious mail there; leave it empty to hide the hint.
 2. Create the access secret and copy it: only its SHA-256 hash is stored, so it is shown once. Creating a new one stops the old one at once.
 3. In the mail provider, route the report address to the endpoint shown on the card, `{APP_URL}/api/inbound/{tenant slug}`, with the secret as a bearer token. Mailgun routes, Amazon SES receipt rules and Postmark inbound webhooks each send their own format: put a small adapter in front that maps it to the generic JSON below. Only that generic format is built in.
 
@@ -588,7 +588,7 @@ Authorization: Bearer {inbound secret}
 
 **Processing.**
 
-- The first simulation tracking link (`/t/{token}`) in `text`, then `html`, is passed as the report's link, so a forwarded simulation is matched to that exact recipient, counted as reported and the person's risk score is recomputed.
+- The first simulation tracking link (`https://{host}/…/t/{token}`) in `text`, then `html`, is passed as the report's link, so a forwarded simulation is matched to that exact recipient, counted as reported and the person's risk score is recomputed.
 - The report is filed exactly as from the report form: channel `email`, the daily report bonus, the `threat.reported` audit entry and the `threat.reported` or `simulation.reported` event.
 - A sender who is not an active person of this organisation is ignored: nothing is filed and no XP is given. A person over the report form's own limit is ignored the same way.
 
@@ -599,7 +599,7 @@ Authorization: Bearer {inbound secret}
 | `202 Accepted` | Filed, or ignored (unknown sender). The two are not told apart, so the endpoint does not reveal who works at the organisation |
 | `400 Bad Request` | The body is not JSON or `from` is missing |
 | `401 Unauthorized` | Missing or wrong secret, unknown organisation, no secret created, or the plan has no `integrations` |
-| `413 Payload Too Large` | Body over 1 MB. Send the parsed text, not the attachments |
+| `413 Payload Too Large` | Body (or its declared `Content-Length`) over 1 MB. Send the parsed text, not the attachments |
 | `429 Too Many Requests` | Over the organisation's limit; `Retry-After: 60`. Providers retry later |
 
 **Trust.** The secret proves the request comes from your mail provider; it cannot prove who wrote the forwarded mail. Let the provider reject mail to the report address that fails SPF, DKIM or DMARC for your own domain, so a forged `From` cannot file a report, or earn XP, in another person's name.
