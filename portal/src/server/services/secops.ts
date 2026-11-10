@@ -112,13 +112,16 @@ export async function targetTraining(
   const titleFor = (locale: string) => (typeof p.title === "function" ? p.title(locale) : p.title);
   // A title written by the system is stored in every UI language; one typed by a person (incident, material) as it is.
   const stored = typeof p.title === "function" ? encodeRiskTitle(Object.fromEntries(LOCALES.map((l) => [l, titleFor(l)]))) : p.title.slice(0, 300);
-  for (let i = 0; i < targets.length; i += TARGET_CHUNK)
-    await db.insert(t.behaviorRisks).values(targets.slice(i, i + TARGET_CHUNK).map((userId) => ({ tenantId: p.tenantId, userId, kind: p.kind, severity: p.severity, title: stored, sourceRef: p.sourceRef, moduleId: p.moduleId, dueDate: due })));
   // Module title and reason in each person's own language.
   const moduleTitle = (locale: string) => pick(mod.title, locale);
   const note = p.note;
-  await notifyUsers(db, p.tenantId, targets, "assignment", { module: moduleTitle, dueDate: due, link: `/learn/${mod.slug}`, reason: titleFor }, { title: note?.title ?? moduleTitle, body: note ? note.body.slice(0, 280) : titleFor, href: `/learn/${mod.slug}` }, { defer: true });
-  await recomputeRisk(db, p.tenantId, targets);
+  // The notification and the rescoring bind one parameter per person too, so they go chunk by chunk with the insert.
+  for (let i = 0; i < targets.length; i += TARGET_CHUNK) {
+    const chunk = targets.slice(i, i + TARGET_CHUNK);
+    await db.insert(t.behaviorRisks).values(chunk.map((userId) => ({ tenantId: p.tenantId, userId, kind: p.kind, severity: p.severity, title: stored, sourceRef: p.sourceRef, moduleId: p.moduleId, dueDate: due })));
+    await notifyUsers(db, p.tenantId, chunk, "assignment", { module: moduleTitle, dueDate: due, link: `/learn/${mod.slug}`, reason: titleFor }, { title: note?.title ?? moduleTitle, body: note ? note.body.slice(0, 280) : titleFor, href: `/learn/${mod.slug}` }, { defer: true });
+    await recomputeRisk(db, p.tenantId, chunk);
+  }
   return targets;
 }
 

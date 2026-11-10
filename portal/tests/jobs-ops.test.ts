@@ -18,7 +18,7 @@ beforeAll(async () => {
 const demo = (name: string, createdAt: Date) => ({ name, email: `${name}@test.example`, organisation: "Org", country: "AZ", employees: "50-200", locale: "en", consentVersion: "2026-01-01", createdAt });
 const answer = (id: string, createdAt: Date) => ({ id, tenantId, lessonId: crypto.randomUUID(), question: "q", answer: "a", model: "m", createdAt });
 /** The counts of a `retention.purged` entry when nothing of a kind was deleted. */
-const NOTHING_PURGED = { auditEntries: 0, answers: 0, risks: 0, recipients: 0, loops: 0, riskSnapshots: 0, threatReports: 0, sandboxAnalyses: 0, labAttempts: 0 };
+const NOTHING_PURGED = { auditEntries: 0, answers: 0, risks: 0, recipients: 0, loops: 0, riskSnapshots: 0, reportTexts: 0, sandboxAnalyses: 0 };
 
 describe("job runner tick", () => {
   it("records its heartbeat at the end of every tick", async () => {
@@ -100,7 +100,7 @@ describe("job runner tick", () => {
     );
   }, 60_000);
 
-  it("deletes each organisation's old simulation results, loops, risk history, handled reports, analyses and lab runs, and only its own", async () => {
+  it("deletes each organisation's old simulation results, loops, risk history, analyses and handled reports' mail text, and only its own", async () => {
     const now = new Date("2026-11-10T10:00:00Z");
     const old = new Date(now.getTime() - 400 * DAY);
     const recent = new Date(now.getTime() - 10 * DAY);
@@ -111,7 +111,7 @@ describe("job runner tick", () => {
       const settings = defaultSettings("en");
       const tenant = await addTenant(db, { settings: { ...settings, learning: { ...settings.learning, teachable: false }, retention: { auditMonths: 0, learningMonths } } });
       const user = await addUser(db, tenant.id);
-      const campaign =async (name: string, status: (typeof t.CAMPAIGN_STATUS)[number], at: Date) =>
+      const campaign = async (name: string, status: (typeof t.CAMPAIGN_STATUS)[number], at: Date) =>
         (await db.insert(t.campaigns).values({ tenantId: tenant.id, name, channel: "email", templateKey: "payslip", audience: "all", status, createdAt: at, completedAt: status === "completed" ? at : null }).returning())[0];
       const recipient = async (c: { id: string }, sentAt: Date) =>
         (await db.insert(t.campaignRecipients).values({ campaignId: c.id, userId: user.id, token: crypto.randomUUID(), sentAt, clickedAt: sentAt }).returning())[0];
@@ -134,16 +134,17 @@ describe("job runner tick", () => {
         { tenantId: tenant.id, userId: user.id, day: day(old), score: 80 },
         { tenantId: tenant.id, userId: user.id, day: day(recent), score: 40 },
       ]);
-      const report = { tenantId: tenant.id, reporterId: user.id, channel: "email" as const, subject: "Invoice", details: "Forwarded text naming a third party" };
+      const report = { tenantId: tenant.id, reporterId: user.id, channel: "email" as const, subject: "Invoice", details: "Forwarded text naming a third party", url: "https://x.example/a" };
       await db.insert(t.threatReports).values([
         { ...report, number: 1, status: "converted", createdAt: old },
         { ...report, number: 2, status: "triaged", createdAt: old },
         { ...report, number: 3, status: "dismissed", createdAt: recent },
       ]);
       const analysis = { tenantId: tenant.id, kind: "url" as const, objectName: "https://x.example", verdict: "clean" as const, score: 0, findings: [], iocs: [], mitre: [] };
+      // Both old: the highest-numbered one stays, so its SB number is never handed out again.
       await db.insert(t.sandboxAnalyses).values([
         { ...analysis, number: 1, createdAt: old },
-        { ...analysis, number: 2, createdAt: recent },
+        { ...analysis, number: 2, createdAt: old },
       ]);
       await db.insert(t.labAttempts).values([
         { tenantId: tenant.id, userId: user.id, exercise: "old", score: 5, max: 10, xp: 20, at: old },
@@ -156,9 +157,9 @@ describe("job runner tick", () => {
         loops: (await db.select({ c: t.teachableLoops.sourceCampaignId }).from(t.teachableLoops).where(eq(t.teachableLoops.tenantId, tenant.id))).map((r) => (r.c === ended.id ? "ended" : r.c === running.id ? "running" : "lately")).sort(),
         // The tick's own daily snapshot (today) is left out.
         snapshots: (await db.select({ s: t.userRiskSnapshots.score }).from(t.userRiskSnapshots).where(and(eq(t.userRiskSnapshots.tenantId, tenant.id), lt(t.userRiskSnapshots.day, day(now))))).map((r) => r.s),
-        reports: (await db.select({ n: t.threatReports.number }).from(t.threatReports).where(eq(t.threatReports.tenantId, tenant.id))).map((r) => r.n).sort(),
+        reports: (await db.select({ n: t.threatReports.number, details: t.threatReports.details, url: t.threatReports.url }).from(t.threatReports).where(eq(t.threatReports.tenantId, tenant.id))).map((r) => `${r.n}:${r.details && r.url ? "text" : r.details || r.url ? "partial" : "none"}`).sort(),
         analyses: (await db.select({ n: t.sandboxAnalyses.number }).from(t.sandboxAnalyses).where(eq(t.sandboxAnalyses.tenantId, tenant.id))).map((r) => r.n),
-        labs: (await db.select({ e: t.labAttempts.exercise }).from(t.labAttempts).where(eq(t.labAttempts.tenantId, tenant.id))).map((r) => r.e),
+        labs: (await db.select({ e: t.labAttempts.exercise }).from(t.labAttempts).where(eq(t.labAttempts.tenantId, tenant.id))).map((r) => r.e).sort(),
         xp: (await db.select().from(t.xpEvents).where(eq(t.xpEvents.tenantId, tenant.id))).length,
       });
     };
@@ -167,7 +168,7 @@ describe("job runner tick", () => {
       campaigns: 4,
       loops: ["ended", "lately", "running"],
       snapshots: [80, 40],
-      reports: [1, 2, 3],
+      reports: ["1:text", "2:text", "3:text"],
       analyses: [1, 2],
       labs: ["old", "recent"],
       xp: 1,
@@ -177,13 +178,14 @@ describe("job runner tick", () => {
     const keeps = await org(0);
     globalThis.__jobsCleanupDay = undefined;
     await runJobs(db, now);
-    // Old results of finished campaigns go (with their loop); a running campaign's results, closed loops of the last year, open reports and the XP stay.
-    const purged = { recipients: ["ended lately", "still running"], campaigns: 4, loops: ["lately"], snapshots: [40], reports: [2, 3], analyses: [2], labs: ["recent"], xp: 1 };
+    // Old results of finished campaigns go (with their loop); a running campaign's results, closed loops of the last year and the XP stay.
+    // An old handled report keeps its row (badge, TR number) without the mail text; open ones keep theirs. Lab attempts are learner progress and stay.
+    const purged = { recipients: ["ended lately", "still running"], campaigns: 4, loops: ["lately"], snapshots: [40], reports: ["1:none", "2:text", "3:text"], analyses: [2], labs: ["old", "recent"], xp: 1 };
     expect(await first()).toEqual(purged);
     expect(await second()).toEqual(purged);
     expect(await keeps()).toEqual(everything);
     const entries = await db.select({ meta: t.auditLog.meta }).from(t.auditLog).where(and(eq(t.auditLog.action, "retention.purged"), eq(t.auditLog.at, now)));
-    const counts = { ...NOTHING_PURGED, recipients: 2, loops: 1, riskSnapshots: 1, threatReports: 1, sandboxAnalyses: 1, labAttempts: 1, learningBefore: "2025-11-10T10:00:00.000Z" };
+    const counts = { ...NOTHING_PURGED, recipients: 2, loops: 1, riskSnapshots: 1, reportTexts: 1, sandboxAnalyses: 1, learningBefore: "2025-11-10T10:00:00.000Z" };
     expect(entries.map((e) => e.meta)).toEqual([counts, counts]);
   }, 60_000);
 

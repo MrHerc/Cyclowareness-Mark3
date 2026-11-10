@@ -432,7 +432,7 @@ async function cleanup(db: DB, now: Date): Promise<number> {
     const { auditMonths: stored, learningMonths } = withDefaults(org.settings).retention;
     // The same floor as the settings form: a value of 1 to 11 stored before the floor existed cannot purge recent history.
     const auditMonths = stored > 0 ? Math.max(stored, MIN_AUDIT_MONTHS) : 0;
-    const purged = { auditEntries: 0, answers: 0, risks: 0, recipients: 0, loops: 0, riskSnapshots: 0, threatReports: 0, sandboxAnalyses: 0, labAttempts: 0 };
+    const purged = { auditEntries: 0, answers: 0, risks: 0, recipients: 0, loops: 0, riskSnapshots: 0, reportTexts: 0, sandboxAnalyses: 0 };
     // The entries that explain the gaps (the retention setting and earlier purges) are never purged themselves.
     if (auditMonths > 0)
       purged.auditEntries = await deleteInBatches(
@@ -455,11 +455,22 @@ async function cleanup(db: DB, now: Date): Promise<number> {
         .where(and(eq(t.campaigns.tenantId, org.id), inArray(t.campaigns.status, ["completed", "cancelled"]), lt(sql`coalesce(${t.campaigns.completedAt}, ${t.campaigns.createdAt})`, cut)));
       purged.recipients = await deleteInBatches(db, t.campaignRecipients, t.campaignRecipients.id, and(inArray(t.campaignRecipients.campaignId, ended), or(isNull(t.campaignRecipients.sentAt), lt(t.campaignRecipients.sentAt, cut))), deadline);
       purged.riskSnapshots = await deleteInBatches(db, t.userRiskSnapshots, t.userRiskSnapshots.id, and(eq(t.userRiskSnapshots.tenantId, org.id), lt(t.userRiskSnapshots.day, cut.toISOString().slice(0, 10))), deadline);
-      // Reported mail can quote third parties; reports still being handled stay.
-      purged.threatReports = await deleteInBatches(db, t.threatReports, t.threatReports.id, and(eq(t.threatReports.tenantId, org.id), inArray(t.threatReports.status, ["converted", "dismissed"]), lt(t.threatReports.createdAt, cut)), deadline);
-      purged.sandboxAnalyses = await deleteInBatches(db, t.sandboxAnalyses, t.sandboxAnalyses.id, and(eq(t.sandboxAnalyses.tenantId, org.id), lt(t.sandboxAnalyses.createdAt, cut)), deadline);
-      // The XP a lab earned is an xp_events row, which stays.
-      purged.labAttempts = await deleteInBatches(db, t.labAttempts, t.labAttempts.id, and(eq(t.labAttempts.tenantId, org.id), lt(t.labAttempts.at, cut)), deadline);
+      // Reported mail can quote third parties, so a handled report loses its text and link; the row stays, because the
+      // reporter's count earns the sharp-eye badge and its TR number is quoted in audit entries and loops.
+      for (;;) {
+        const ids = db
+          .select({ id: t.threatReports.id })
+          .from(t.threatReports)
+          .where(and(eq(t.threatReports.tenantId, org.id), inArray(t.threatReports.status, ["converted", "dismissed"]), lt(t.threatReports.createdAt, cut), or(isNotNull(t.threatReports.details), isNotNull(t.threatReports.url))))
+          .limit(CLEANUP_BATCH);
+        const done = await db.update(t.threatReports).set({ details: null, url: null }).where(inArray(t.threatReports.id, ids)).returning({ id: t.threatReports.id });
+        purged.reportTexts += done.length;
+        if (done.length < CLEANUP_BATCH || Date.now() > deadline) break;
+      }
+      // The highest-numbered analysis stays, so the next one never reuses an SB number that audit entries and incidents quote.
+      const lastSb = sql`(select max(${t.sandboxAnalyses.number}) from ${t.sandboxAnalyses} where ${t.sandboxAnalyses.tenantId} = ${org.id})`;
+      purged.sandboxAnalyses = await deleteInBatches(db, t.sandboxAnalyses, t.sandboxAnalyses.id, and(eq(t.sandboxAnalyses.tenantId, org.id), lt(t.sandboxAnalyses.createdAt, cut), lt(t.sandboxAnalyses.number, lastSb)), deadline);
+      // Lab attempts stay: a path's lab counts as passed, and the lab-explorer badge is earned, from them (learner progress).
     }
     const count = Object.values(purged).reduce((a, b) => a + b, 0);
     total += count;

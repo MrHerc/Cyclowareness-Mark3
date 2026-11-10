@@ -203,15 +203,15 @@ per run; whatever is left is picked up by the next tick).
   - lesson answers;
   - behaviour risks closed before the cutoff (open risks stay);
   - the per-person results (sent, opened, clicked, submitted, reported) of campaigns that are completed
-    or cancelled and ended before the cutoff, with their teachable-moment loops; the campaigns
-    themselves and their totals stay;
+    or cancelled and ended before the cutoff, with their teachable-moment loops. The campaigns themselves
+    stay, but no totals are stored: their figures (sent, opened, clicked, reported) on the campaign list,
+    the campaign page and in reports count the results that remain, so such a campaign shows none;
   - closed teachable-moment loops assigned before the cutoff;
   - the daily per-person risk scores (the person page sparkline and the leadership risk story);
-  - threat reports that were converted or dismissed (reports still new or triaged stay), including the
-    forwarded mail text;
-  - sandbox analyses;
-  - lab attempts (the XP they earned is an XP event and stays; the lab's best result and the lab
-    explorer badge only count attempts that remain).
+  - the forwarded mail text and link of threat reports that were converted or dismissed (the report
+    itself stays, so its TR number and the reporter's sharp-eye badge stay; reports still new or
+    triaged keep their text);
+  - sandbox analyses, except each organisation's highest-numbered one, so an SB number is never reused.
 
   Every change is in the audit log as `settings.retention`. Deleting answers lowers the figures of the
   module-quality report for that period. The risk score reads simulation results and risky answers of
@@ -221,8 +221,9 @@ per run; whatever is left is picked up by the next tick).
   organisation's audit log with the counts per kind and the cutoff dates, so the gap in its history is
   explained.
 - **Never deleted by the job.** Lesson progress, XP events, attestations and certificates: they are
-  the organisation's compliance evidence and feed XP and league totals. Open behaviour risks, open
-  threat reports and campaigns that are still running stay as well.
+  the organisation's compliance evidence and feed XP and league totals. Lab attempts stay too: a
+  learning path's lab counts as passed, and the lab-explorer badge is earned, from them. Open
+  behaviour risks, open threat reports and campaigns that are still running stay as well.
 - **Backups.** Deleted rows stay in the nightly dumps until those age out (`BACKUP_KEEP_DAYS`, 14,
   plus the off-host copy's own retention). Say so when a customer asks how long deleted data lasts.
 - **Residency.** Where the data lives is a hosting decision, not a setting: the hosted portal keeps
