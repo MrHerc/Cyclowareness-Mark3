@@ -666,6 +666,15 @@ Clips (when `clips` has `speechText(text)` and the text is in the hook's languag
 applies to the playing clip at once (an utterance keeps the values it started with), and `onWord(i)`
 follows the playback position frame by frame (`wordAt(clip.words, currentTime)`); `ended` gives
 `onWord(words.length)` then `onEnd`; `pause`/`resume` map to the element; `stop()` detaches the clip.
+`clipFor(clips, clean, textLang, clipsLang)` decides the order: the clip when the manifest has the text in
+the hook's language, else Web Speech (unchanged contract). Also exported and pinned by
+`tests/narrator-audio.test.ts`: `nextClipUrl(clips, clean)` (the manifest lists texts in reading order;
+after `play()` the next line's clip is fetched once into the HTTP cache, never a second `Audio`),
+`armAudioUnlock(window, element)` (while the lesson has clips, the first `pointerup`/`touchend`/
+`mousedown`/`keydown`, in the capture phase, plays `SILENT_CLIP` on the shared element and pauses it, so
+iOS lets later clips start without a tap; skipped when a clip already plays) and `volumeIsFixed(el)`
+(`VolumeControl` hides its slider where `volume` cannot be set, i.e. iOS; the mute button stays). With
+clips, the options dialog shows `player.syntheticVoice` under the volume.
 Everything below is the Web Speech path that every text without a clip takes.
 
 Behaviour: `speak` first calls `stop()` (bumps a token so stale callbacks are ignored, clears timers and
@@ -1415,8 +1424,24 @@ in `player.artifact.*` (all ten locales), and, if the simulation should open som
 
 ### 6.6 Generate the natural narration (pre-generated TTS)
 
-Built on 2026-10-27 (ADR-028); no clip has been generated yet, because the ElevenLabs key and the voice of
-each language are still open (OPEN-QUESTIONS #2). Until then every text is read by Web Speech.
+Built on 2026-10-27 (ADR-028), made provider-agnostic on 2026-11-10 (docs/build/NARRATION-RESEARCH.md).
+English clips are generated with Piper (`en_US-ljspeech-high`, public domain) and their manifests are
+committed in `content/narration/en/` (the MP3s are git-ignored and made on the build machine);
+Azerbaijani and Russian wait for an Azure Speech key and the owner's voice choice (OPEN-QUESTIONS #2); the
+other seven languages are read by Web Speech until one command generates them.
+
+Providers (`scripts/narration/`, `--provider piper|azure|elevenlabs`, each returning audio plus
+`ClipWord[]`): `piper.ts` (a Python worker, `piper_worker.py`, loads the voice once with alignments;
+`piperWords` maps espeak's word groups to `wordsOf` words, whole text or per sentence, else estimates within
+the sentence's exact start and end; voices must be listed with their SHA-256 in `PIPER_VOICES`), `azure.ts`
+(batch synthesis REST API 2024-04-01 on an S0 resource: SSML job, poll, zip with `.wav` and `.word.json`,
+`boundaryAlignment` → `wordTimings`), `elevenlabs.ts` (the original with-timestamps call), `provider.ts`
+(`estimateWords`, `sentencesOf`, `fetchRetry`, `Fatal`). The generator encodes every clip with ffmpeg
+(`ffmpeg-static` devDependency): MP3 mono 24 kHz 48 kbps, loudnorm −16 LUFS. The clip key's `model` is the
+provider (`piper`, `azure`, `eleven_v3`) and its `voice` the provider's voice name.
+Tests: `tests/narration-providers.test.ts` (estimator, Piper mapping, keys, Azure against a fake HTTP server),
+`tests/narration-manifests.test.ts` (every committed en manifest covers every spoken text with one
+forward-moving timing per word).
 
 The pieces:
 - `src/lib/tts/text.ts`: `speechText`, `wordsOf`, `wordOffsets`, shared by the player, the generator and
@@ -1447,24 +1472,29 @@ The pieces:
 
 Steps:
 
-1. Put `ELEVENLABS_API_KEY` and the voices in `portal/.env.local` only (never the compose `.env`, whose
-   `env_file` would hand the key to the container): `ELEVENLABS_VOICE_ID` for every language and
-   `ELEVENLABS_VOICE_{XX}` per language (`AZ`, `KA`, `AR`…). A voice id is letters and digits only. No
-   voice is built in: ElevenLabs retires its default voices on 2026-12-31, and a native speaker of each
-   language should choose from the Voice Library.
-2. Estimate: `npx tsx --env-file=.env.local scripts/generate-narration.ts --dry-run` (no key needed). On
-   2026-11-04: 37,724 clips and 4.01 million characters for the ten languages, about 321 USD at
-   0.08 USD per 1,000 characters (26 to 38 USD per language; de and fr are the longest, ar the shortest).
-3. Sample: `--locales az --only phishing-email/spot-the-phish`, then open that lesson with sound on and
-   listen with the native speaker (pronunciation of names, pace, the karaoke timing). A name read wrongly
-   is fixed in the lesson's `spoken` text, not in the visible text.
-4. Generate: `--locales az,ru,… --concurrency 4` (1 to 16). Clips already on disk are reused, so a rerun
-   pays only for new or changed text; failed clips are listed and retried on the next run.
+1. Choose the provider per language. Keys and voices go in `portal/.env.local` only (never the compose
+   `.env`, whose `env_file` would hand the key to the container). Piper: `py -3.12 -m pip install --user
+   "piper-tts[alignment]"`, `py -3.12 -m piper.download_voices <voice> --data-dir .voices`, and a new voice
+   added to `PIPER_VOICES` with its SHA-256 after checking its MODEL_CARD licence (NARRATION-RESEARCH §1.3:
+   no commercial Piper voice for az, tr, ka; ru/ro carry the lessac-lineage risk). Azure:
+   `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` (S0), optional `AZURE_VOICE_{XX}`. ElevenLabs:
+   `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` / `ELEVENLABS_VOICE_{XX}` (letters and digits).
+2. Estimate: `npm run narration -- --lang az,ru --provider azure --dry-run` (no key needed): az 375,722 and
+   ru 397,969 characters on 2026-11-10, about 6 USD each on Azure S0.
+3. Sample: `--lang az --provider azure --only phishing-email/spot-the-phish`, then open that lesson with
+   sound on and listen with the native speaker (pronunciation of names, pace, the karaoke timing). A name
+   read wrongly is fixed in the lesson's `spoken` text, not in the visible text.
+4. Generate: `npm run narration -- --lang en --provider piper` (1 to 16 `--concurrency`; one Piper worker
+   per voice reads the queue in order). Clips already on disk are reused, so a rerun pays only for new or
+   changed text; failed clips are listed and retried on the next run. Commit the manifests in
+   `content/narration/<lang>/` and add the language to `NARRATED` in `tests/narration-manifests.test.ts`.
 5. To remake a clip whose text did not change (a bad take), raise `TTS_REVISION` and rerun: every clip then
    gets a new name and seed, so this costs a full run of the languages generated. A new voice for a
    language regenerates that language's clips.
-6. Ship: `public/generated/tts/` and `content/narration/` must be in the image, so run the generator
-   before `docker build`. In development new manifests are picked up without a restart.
+6. Ship: the clips (`public/generated/tts/`, git-ignored) must be in the image, so run the generator on
+   the build machine before `docker build` (the Dockerfile and CI do not generate them); without them the
+   committed manifests are ignored and Web Speech reads. In development new manifests are picked up
+   without a restart.
 7. Check in the player: a lesson with clips reads in the clip's voice whatever the browser has (no
    `VoiceNotice`), speed and volume change the playing clip at once, and texts without a clip (a changed
    sentence, an interface hint in another language) still go to Web Speech.

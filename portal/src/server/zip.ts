@@ -1,4 +1,4 @@
-import { crc32, deflateRawSync } from "node:zlib";
+import { crc32, deflateRawSync, inflateRawSync } from "node:zlib";
 
 /** Minimal, dependency-free zip writer (deflate, UTF-8 names): the .xlsx reports and the SCORM packages. */
 export function zip(files: { name: string; data: Buffer }[]): Buffer {
@@ -41,4 +41,26 @@ export function zip(files: { name: string; data: Buffer }[]): Buffer {
   end.writeUInt32LE(cd.length, 12);
   end.writeUInt32LE(offset, 16);
   return Buffer.concat([...locals, cd, end]);
+}
+
+/** Reads a zip's stored or deflated files by name (the Azure batch-synthesis result in scripts/narration). */
+export function unzip(buf: Buffer): Map<string, Buffer> {
+  const files = new Map<string, Buffer>();
+  const eocd = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  if (eocd < 0 || eocd + 22 > buf.length) throw new Error("not a zip file");
+  let p = buf.readUInt32LE(eocd + 16);
+  for (let n = buf.readUInt16LE(eocd + 10); n > 0; n--) {
+    if (p + 46 > buf.length || buf.readUInt32LE(p) !== 0x02014b50) throw new Error("damaged zip directory");
+    const method = buf.readUInt16LE(p + 10);
+    const compSize = buf.readUInt32LE(p + 20);
+    const nameLen = buf.readUInt16LE(p + 28);
+    const local = buf.readUInt32LE(p + 42);
+    const name = buf.subarray(p + 46, p + 46 + nameLen).toString("utf8");
+    if (method !== 0 && method !== 8) throw new Error(`unsupported compression in ${name}`);
+    const start = local + 30 + buf.readUInt16LE(local + 26) + buf.readUInt16LE(local + 28);
+    const data = buf.subarray(start, start + compSize);
+    files.set(name, method === 8 ? inflateRawSync(data) : data);
+    p += 46 + nameLen + buf.readUInt16LE(p + 30) + buf.readUInt16LE(p + 32);
+  }
+  return files;
 }
