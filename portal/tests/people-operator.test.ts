@@ -119,6 +119,31 @@ describe("deleting a person", () => {
     expect(meta.get(ids.admin)).toEqual({ email: "admin@platform.test", role: "tenant_admin" });
     expect((await row(ids.learner)).email).toBe(`deleted+${ids.learner}@invalid.local`);
   });
+
+  it("removes their name from the free text of their re-simulations: campaign, click risk and creation entry", async () => {
+    actor = { id: ids.admin, role: "tenant_admin" };
+    const [jane] = await db.insert(t.users).values({ tenantId, email: "jane@platform.test", name: "Jane Clicker" }).returning();
+    const old = "Overdue invoice: re-simulation for Jane Clicker";
+    const [resim, other] = await db
+      .insert(t.campaigns)
+      .values([
+        { tenantId, name: old, channel: "email", templateKey: "invoice", audience: "person", userId: jane.id, status: "completed" },
+        { tenantId, name: "Jane Clicker's team drill", channel: "email", templateKey: "invoice", audience: "all", status: "completed" },
+      ])
+      .returning();
+    await db.insert(t.behaviorRisks).values({ tenantId, userId: jane.id, kind: "phishing_click", severity: "medium", title: `You opened the link in the “${old}” phishing simulation.`, sourceRef: resim.id });
+    await db.insert(t.auditLog).values({ tenantId, actorId: null, action: "campaign.created", targetType: "campaign", targetId: resim.id, meta: { name: old, template: "invoice", teachable: true } });
+
+    expect(await people.deletePersonAction(jane.id)).toEqual({ ok: true });
+
+    const names = await db.select({ id: t.campaigns.id, name: t.campaigns.name }).from(t.campaigns).where(eq(t.campaigns.tenantId, tenantId));
+    expect(names.find((c) => c.id === resim.id)?.name).toBe("Overdue invoice: re-simulation for —");
+    expect(names.find((c) => c.id === other.id)?.name).toBe("Jane Clicker's team drill");
+    const [risk] = await db.select({ title: t.behaviorRisks.title }).from(t.behaviorRisks).where(eq(t.behaviorRisks.userId, jane.id));
+    expect(risk.title).not.toContain("Jane Clicker");
+    const [entry] = await db.select({ meta: t.auditLog.meta }).from(t.auditLog).where(eq(t.auditLog.targetId, resim.id));
+    expect(entry.meta).toEqual({ template: "invoice", teachable: true });
+  });
 });
 
 describe("unlinking single sign-on", () => {

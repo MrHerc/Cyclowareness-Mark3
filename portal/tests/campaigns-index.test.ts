@@ -20,6 +20,7 @@ vi.mock("next-intl/server", () => ({
 vi.mock("../src/server/auth/viewer", () => ({ requirePermission: async () => viewer, allowed: () => true }));
 
 const { default: CampaignsPage } = await import("../src/app/(admin)/admin/campaigns/(index)/page");
+const { default: CampaignPage } = await import("../src/app/(admin)/admin/campaigns/[id]/page");
 
 beforeAll(ready, DB_SETUP_TIMEOUT);
 
@@ -49,5 +50,21 @@ describe("/admin/campaigns", () => {
     expect(html).toContain("1 campaign");
     expect(html).toContain("2 of 3 recipients reported the simulation");
     expect(html).toContain("Across 2 campaigns with results");
+  }, 60_000);
+});
+
+describe("/admin/campaigns/[id]", () => {
+  it("names the person of a re-simulation refused because they left, though its name never holds them", async () => {
+    const tenant = await addTenant(db, { plan: "enterprise_hrm" });
+    const admin = await addUser(db, tenant.id, { role: "tenant_admin" });
+    const gone = await addUser(db, tenant.id, { name: "Leyla Gone", status: "suspended" });
+    viewer = { sessionId: "s", twoFactorVerified: true, user: admin, tenant: { ...tenant, settings: withDefaults(tenant.settings), features: featuresFor(tenant.plan, tenant.features) } } as unknown as Viewer;
+    const [resim] = await db
+      .insert(t.campaigns)
+      .values({ tenantId: tenant.id, name: "Overdue invoice: re-simulation", channel: "email", templateKey: "invoice", audience: "person", userId: gone.id, status: "cancelled" })
+      .returning();
+    const page = (await CampaignPage({ params: Promise.resolve({ id: resim.id }) } as never)) as ReactNode;
+    const html = renderToStaticMarkup(createElement(NextIntlClientProvider, (await messagesFor("en")) as ComponentProps<typeof NextIntlClientProvider>, page));
+    expect(html).toContain("Leyla Gone");
   }, 60_000);
 });
