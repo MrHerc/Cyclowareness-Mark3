@@ -14,6 +14,7 @@ import { log } from "../log";
 import type { z } from "zod";
 import { lessonFileSchema, lessonIntegrityErrors } from "../../lib/content/validate";
 import { localeParityErrors } from "../../lib/content/locale-parity";
+import { parityEnglish } from "../../lib/content/market-files";
 import type { ModuleFile } from "../../lib/content/types";
 import { CATEGORY_FROM_LABEL } from "../../lib/domain/catalog";
 import { LOCALES, type Locale } from "../../i18n/config";
@@ -65,7 +66,10 @@ export function readLibrary() {
 
 type CheckedLesson = z.infer<typeof lessonFileSchema>;
 
-/** Schema and integrity rules for every file; a translation must also keep its English original's structure. */
+/**
+ * Schema and integrity rules for every file; a translation must also keep its English original's
+ * structure (`english`, through its market's address map for a language with a market pack).
+ */
 function checkedLesson(raw: unknown, label: string, english?: unknown): CheckedLesson {
   const parsed = lessonFileSchema.safeParse(raw);
   if (!parsed.success) throw new Error(`${label}: ${parsed.error.message}`);
@@ -97,7 +101,7 @@ export function readLibraryLesson(slug: string, id: string): { en: CheckedLesson
   const translations: Partial<Record<TranslationLocale, CheckedLesson>> = {};
   for (const locale of LESSON_TRANSLATIONS) {
     const label = `${key}.${locale}`;
-    if (fs.existsSync(file(locale))) translations[locale] = checkedLesson(read(locale, label), label, english);
+    if (fs.existsSync(file(locale))) translations[locale] = checkedLesson(read(locale, label), label, parityEnglish(english, locale, key));
   }
   return { en, translations };
 }

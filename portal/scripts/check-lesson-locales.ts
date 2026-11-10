@@ -4,8 +4,9 @@
  *   npx tsx scripts/check-lesson-locales.ts <file.az.json> ...    only these files
  *   npx tsx scripts/check-lesson-locales.ts --coverage           also: every English lesson has a translation in every interface locale
  * Each file must pass the lesson schema, the integrity rules and the locale parity rules
- * (src/lib/content/locale-parity.ts); a language with a ready market pack (content/market/<lang>.json) must
- * also hold no token of the Azerbaijani world (src/lib/content/market.ts, scripts/apply-market.ts).
+ * (src/lib/content/locale-parity.ts); a language with a ready market pack (content/market/<lang>.json) is
+ * compared with its English original through the pack's address map and must hold no token of the
+ * Azerbaijani world, in its text or its addresses (src/lib/content/market.ts, scripts/apply-market.ts).
  * Exit code 1 when anything fails (or, with --coverage, is missing).
  */
 import fs from "node:fs";
@@ -13,19 +14,10 @@ import path from "node:path";
 import { lessonFileSchema, lessonIntegrityErrors } from "../src/lib/content/validate";
 import { localeParityErrors } from "../src/lib/content/locale-parity";
 import { LOCALES } from "../src/i18n/config";
-import { azWorldSchema, marketPackSchema, marketTokenErrors } from "../src/lib/content/market";
+import { marketTokenErrors } from "../src/lib/content/market";
+import { parityEnglish, readMarket, readyPack } from "../src/lib/content/market-files";
 
-// A language with a ready market pack (content/market/<lang>.json) must hold no token of the Azerbaijani world.
-const MARKET = path.join(process.cwd(), "content", "market");
-const world = azWorldSchema.parse(JSON.parse(fs.readFileSync(path.join(MARKET, "az-world.json"), "utf8")));
-const marketLocales = new Set(
-  fs
-    .readdirSync(MARKET)
-    .filter((f) => /^[a-z]{2}\.json$/.test(f))
-    .map((f) => marketPackSchema.parse(JSON.parse(fs.readFileSync(path.join(MARKET, f), "utf8"))))
-    .filter((p) => p.status === "ready")
-    .map((p) => p.lang),
-);
+const market = readMarket();
 
 const TRANSLATION = /\.(?!en\.)[a-z]{2}\.json$/;
 
@@ -48,6 +40,7 @@ let failed = 0;
 for (const file of files) {
   const enFile = file.replace(/\.[a-z]{2}\.json$/, ".en.json");
   const rel = path.relative(process.cwd(), file);
+  const locale = file.slice(-7, -5);
   const errors: string[] = [];
   let doc: unknown;
   try {
@@ -60,8 +53,12 @@ for (const file of files) {
     if (!parsed.success) errors.push(...parsed.error.issues.slice(0, 10).map((i) => `schema ${i.path.join(".")}: ${i.message}`));
     else errors.push(...lessonIntegrityErrors(parsed.data).map((e) => `integrity: ${e}`));
     if (!fs.existsSync(enFile)) errors.push(`no English original ${path.relative(process.cwd(), enFile)}`);
-    else errors.push(...localeParityErrors(JSON.parse(fs.readFileSync(enFile, "utf8")), doc));
-    if (marketLocales.has(file.slice(-7, -5))) errors.push(...marketTokenErrors(doc, world).map((e) => `market ${e}`));
+    else {
+      const seed = `${path.basename(path.dirname(file))}/${path.basename(file).slice(0, -8)}`;
+      errors.push(...localeParityErrors(parityEnglish(JSON.parse(fs.readFileSync(enFile, "utf8")), locale, seed, market), doc));
+    }
+    const pack = readyPack(locale, market);
+    if (pack) errors.push(...marketTokenErrors(doc, market.world, pack).map((e) => `market ${e}`));
   }
   if (errors.length) {
     failed++;

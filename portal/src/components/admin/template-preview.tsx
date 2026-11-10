@@ -13,7 +13,7 @@ export function TemplatePreview({ tpl, locale, compact = false }: { tpl: Campaig
       <div className="rounded-xl bg-sunken p-3">
         <p className="mb-1.5 flex items-center gap-1.5 text-tab font-semibold text-ink-muted">
           <MessageSquare className="size-3.5" />
-          {templateText(tpl.sender.name, locale)}
+          {templateText(tpl.sender.address, locale)}
         </p>
         <p className={cn("rounded-2xl rounded-es-sm bg-surface px-3 py-2 text-caption shadow-xs", compact && "line-clamp-3")}>
           {body} <span className="text-brand-600 underline">sk-kargo.info/a7K</span>
@@ -28,7 +28,7 @@ export function TemplatePreview({ tpl, locale, compact = false }: { tpl: Campaig
       <div className="rounded-xl bg-ink p-3 text-white">
         <p className="flex items-center gap-1.5 text-tab font-semibold opacity-80">
           <Icon className="size-3.5" />
-          {templateText(tpl.sender.name, locale)} · {tpl.sender.address}
+          {templateText(tpl.sender.name, locale)} · {templateText(tpl.sender.address, locale)}
         </p>
         <p className={cn("mt-1.5 text-caption italic", compact && "line-clamp-3")}>{open + body + close}</p>
       </div>
@@ -39,7 +39,7 @@ export function TemplatePreview({ tpl, locale, compact = false }: { tpl: Campaig
       <p className="flex items-center gap-1.5 text-tab text-ink-muted">
         <Mail className="size-3.5 shrink-0" />
         <b className="text-ink">{templateText(tpl.sender.name, locale)}</b>
-        <span className="truncate">&lt;{tpl.sender.address}&gt;</span>
+        <span className="truncate">&lt;{templateText(tpl.sender.address, locale)}&gt;</span>
       </p>
       <p className="mt-1.5 text-caption font-bold">{templateText(tpl.subject, locale)}</p>
       <p className={cn("mt-1 text-tab whitespace-pre-line text-ink-muted", compact && "line-clamp-3")}>{body}</p>

@@ -21,7 +21,8 @@ export type CampaignTemplate = {
   harvest: boolean;
   qr?: boolean;
   name: L10n;
-  sender: { name: L10n; address: string };
+  /** `address` is shown in the previews; a market language has its own (the lessons' address map). */
+  sender: { name: L10n; address: L10n };
   subject: L10n;
   body: L10n;
   cta?: L10n;
@@ -51,6 +52,8 @@ function brand(id: string, names: L10n): L10n {
 }
 const SURET_KARGO = brand("suretkargo", same("SuretKargo"));
 const ULDUZ_BANK = brand("ulduzbank", same("UlduzBank"));
+/** A national prize brand: the country in its name follows the market. */
+const BONUS: L10n = { ...same("BonusAz"), de: "BonusDE", fr: "BonusFR", ar: "بونص SA" };
 
 export const TEMPLATES: CampaignTemplate[] = [
   {
@@ -73,7 +76,7 @@ export const TEMPLATES: CampaignTemplate[] = [
     },
     sender: {
       name: { az: "Mühasibatlıq", en: "Accounting", ru: "Бухгалтерия", tr: "Muhasebe", ro: "Contabilitate", ka: "ბუღალტერია", uk: "Бухгалтерія", de: "Buchhaltung", fr: "Comptabilité", ar: "إدارة الحسابات" },
-      address: "muhasibat@xidmetagentIiyi.az",
+      address: { ...same("muhasibat@xidmetagentIiyi.az"), de: "buchhaltung@buergerdienst-onIine.de", fr: "comptabilite@guichet-pubIic-local.fr", ar: "accounts@pubIic-services-agency.sa" },
     },
     subject: {
       az: "Sentyabr ayı üzrə maaş vərəqəniz hazırdır",
@@ -158,8 +161,8 @@ export const TEMPLATES: CampaignTemplate[] = [
       ar: "غرامة غير مسددة: إشعار أخير",
     },
     sender: {
-      name: { az: "E-Xidmət Portalı", en: "E-Xidmet Portal", ru: "Портал E-Xidmet", tr: "E-Xidmət Portalı", ro: "Portalul E-Xidmət", ka: "E-Xidmet პორტალი", uk: "Портал E-Xidmet", de: "E-Xidmət-Portal", fr: "Portail E-Xidmət", ar: "بوابة E-Xidmet" },
-      address: "bildiris@e-xidmet-portal.info",
+      name: brand("e-xidmet", { az: "E-Xidmət Portalı", en: "E-Xidmet Portal", ru: "Портал E-Xidmet", tr: "E-Xidmət Portalı", ro: "Portalul E-Xidmət", ka: "E-Xidmet პორტალი", uk: "Портал E-Xidmet", de: "E-Xidmət-Portal", fr: "Portail E-Xidmət", ar: "بوابة E-Xidmet" }),
+      address: { ...same("bildiris@e-xidmet-portal.info"), de: "benachrichtigung@eamt-portal.info", fr: "notification@demarcheplus-portal.info", ar: "notice@khadamati-portal.info" },
     },
     subject: {
       az: "Son xəbərdarlıq: 40 AZN cərimə ödənilməyib",
@@ -243,7 +246,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "Facture en retard",
       ar: "فاتورة متأخرة السداد",
     },
-    sender: { name: OFIS_TECHIZAT, address: "hesab@ofistechizat-az.com" },
+    sender: { name: OFIS_TECHIZAT, address: { ...same("hesab@ofistechizat-az.com"), de: "konto@buerobedarf-de.com", fr: "compte@bureaufournitures-fr.com", ar: "account@officesupplies-sa.com" } },
     subject: {
       az: "Faktura №0925 — ödəniş gecikir",
       en: "Invoice #0925 is overdue",
@@ -343,7 +346,7 @@ export const TEMPLATES: CampaignTemplate[] = [
     },
     sender: {
       name: { az: "İT Dəstək", en: "IT Support", ru: "ИТ-поддержка", tr: "BT Destek", ro: "Suport IT", ka: "IT მხარდაჭერა", uk: "ІТ-підтримка", de: "IT-Support", fr: "Support informatique", ar: "الدعم الفني" },
-      address: "it-destek@rxagentlik-support.info",
+      address: { ...same("it-destek@rxagentlik-support.info"), de: "it-hilfe@rx-amt-support.info", fr: "it-assistance@direction-rx-support.info", ar: "it-support@rx-authority-support.info" },
     },
     subject: {
       az: "İki addımlı giriş bu gün bitir — QR kodu skan edin",
@@ -426,7 +429,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "Changement de coordonnées bancaires",
       ar: "تغيير البيانات البنكية",
     },
-    sender: { name: OFIS_TECHIZAT, address: "maliyye@ofistechizat.az.co" },
+    sender: { name: OFIS_TECHIZAT, address: { ...same("maliyye@ofistechizat.az.co"), de: "finanzen@buerobedarf.de.co", fr: "finances@bureaufournitures.fr.co", ar: "finance@officesupplies.sa.co" } },
     subject: {
       az: "Yeni bank rekvizitlərimiz",
       en: "Our new bank details",
@@ -484,9 +487,9 @@ export const TEMPLATES: CampaignTemplate[] = [
         ro: "Domeniul se termină în „.az.co”, nu în „.az”.",
         ka: "დომენი „.az.co“-ით მთავრდება და არა „.az“-ით.",
         uk: "Домен закінчується на «.az.co», а не на «.az».",
-        de: "Die Domain endet auf „.az.co“, nicht auf „.az“.",
-        fr: "Le domaine se termine par « .az.co », et non par « .az ».",
-        ar: "ينتهي النطاق باللاحقة «.az.co» وليس «.az».",
+        de: "Die Domain endet auf „.de.co“, nicht auf „.de“.",
+        fr: "Le domaine se termine par « .fr.co », et non par « .fr ».",
+        ar: "ينتهي النطاق باللاحقة «.sa.co» وليس «.sa».",
       },
     ],
   },
@@ -521,7 +524,7 @@ export const TEMPLATES: CampaignTemplate[] = [
         fr: "Fonds de coopération internationale",
         ar: "صندوق التعاون الدولي",
       },
-      address: "events@intl-coopfund.org",
+      address: same("events@intl-coopfund.org"),
     },
     subject: {
       az: "Dəvət: Bakı Rəqəmsal Forumunda əsas məruzə",
@@ -543,9 +546,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "Stimate domnule Hasanov,\n\nAm fi onorați să susțineți discursul de deschidere al forumului. Programul și detaliile organizatorice se află pe portalul fondului. Vă rugăm să vă conectați cu contul de serviciu pentru a confirma.",
       ka: "პატივცემულო ბატონო ჰასანოვ,\n\nპატივი იქნება ჩვენთვის, თუ ფორუმის გახსნაზე ძირითად მოხსენებას წარმოადგენთ. პროგრამა და ორგანიზაციული დეტალები ფონდის პორტალზეა. მონაწილეობის დასადასტურებლად გთხოვთ, შეხვიდეთ სამსახურებრივი ანგარიშით.",
       uk: "Шановний пане Гасанове!\n\nДля нас буде честю, якщо ви виступите з ключовою доповіддю на відкритті форуму. Програма й організаційні деталі — на порталі фонду. Щоб підтвердити участь, увійдіть, будь ласка, з робочим обліковим записом.",
-      de: "Sehr geehrter Herr Həsənov,\n\nes wäre uns eine Ehre, wenn Sie die Eröffnungs-Keynote des Forums halten. Programm und Ablauf finden Sie im Portal des Fonds. Bitte melden Sie sich zur Bestätigung mit Ihrem Dienstkonto an.",
-      fr: "Monsieur Hasanov,\n\nNous serions honorés que vous prononciez le discours d’ouverture du forum. Le programme et les informations pratiques se trouvent sur le portail du fonds. Merci de vous connecter avec votre compte professionnel pour confirmer votre participation.",
-      ar: "السيد حسنوف المحترم،\n\nيشرفنا أن تلقي الكلمة الافتتاحية في المنتدى. البرنامج والتفاصيل التنظيمية متاحة على بوابة الصندوق. يرجى تسجيل الدخول بحساب العمل لتأكيد مشاركتك.",
+      de: "Sehr geehrter Herr Becker,\n\nes wäre uns eine Ehre, wenn Sie die Eröffnungs-Keynote des Forums halten. Programm und Ablauf finden Sie im Portal des Fonds. Bitte melden Sie sich zur Bestätigung mit Ihrem Dienstkonto an.",
+      fr: "Monsieur Durand,\n\nNous serions honorés que vous prononciez le discours d’ouverture du forum. Le programme et les informations pratiques se trouvent sur le portail du fonds. Merci de vous connecter avec votre compte professionnel pour confirmer votre participation.",
+      ar: "السيد العتيبي المحترم،\n\nيشرفنا أن تلقي الكلمة الافتتاحية في المنتدى. البرنامج والتفاصيل التنظيمية متاحة على بوابة الصندوق. يرجى تسجيل الدخول بحساب العمل لتأكيد مشاركتك.",
     },
     cta: { az: "Proqrama baxın", en: "View the programme", ru: "Открыть программу", tr: "Programı görüntüle", ro: "Vizualizați programul", ka: "პროგრამის ნახვა", uk: "Відкрити програму", de: "Programm ansehen", fr: "Voir le programme", ar: "عرض البرنامج" },
     redFlags: [
@@ -605,7 +608,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "SMS de livraison de colis",
       ar: "رسالة نصية عن توصيل طرد",
     },
-    sender: { name: SURET_KARGO, address: "SuretKargo" },
+    sender: { name: SURET_KARGO, address: SURET_KARGO },
     subject: { az: "Bağlama", en: "Parcel", ru: "Посылка", tr: "Kargo", ro: "Colet", ka: "ამანათი", uk: "Посилка", de: "Paket", fr: "Colis", ar: "طرد" },
     body: {
       az: "SuretKargo: Bağlamanız ünvan natamam olduğu üçün saxlanılıb. 1.20 AZN ödəyib çatdırılmanı yenidən planlaşdırın:",
@@ -676,7 +679,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "SMS annonçant un gain",
       ar: "رسالة نصية عن الفوز بجائزة",
     },
-    sender: { name: same("BonusAz"), address: "BonusAz" },
+    sender: { name: BONUS, address: BONUS },
     subject: { az: "Uduş", en: "Prize", ru: "Выигрыш", tr: "Ödül", ro: "Premiu", ka: "პრიზი", uk: "Виграш", de: "Gewinn", fr: "Gain", ar: "جائزة" },
     body: {
       az: "Təbriklər! Nömrəniz smartfon uduşu qazandı. Çatdırılma üçün 4.99 AZN ödəyin, təklif bu gün bitir:",
@@ -747,7 +750,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       fr: "SMS d’alerte bancaire",
       ar: "رسالة تنبيه من البنك",
     },
-    sender: { name: ULDUZ_BANK, address: "UlduzBank" },
+    sender: { name: ULDUZ_BANK, address: ULDUZ_BANK },
     subject: { az: "Kart bloku", en: "Card block", ru: "Блокировка карты", tr: "Kart blokesi", ro: "Card blocat", ka: "ბარათის დაბლოკვა", uk: "Блокування картки", de: "Kartensperre", fr: "Carte bloquée", ar: "إيقاف البطاقة" },
     body: {
       az: "UlduzBank: Kartınızda şübhəli əməliyyat aşkarlandı və kart müvəqqəti bloklandı. Bloku açmaq üçün məlumatlarınızı təsdiqləyin:",
@@ -820,7 +823,7 @@ export const TEMPLATES: CampaignTemplate[] = [
     },
     sender: {
       name: { az: "«İT Dəstək»", en: "“IT Support”", ru: "«ИТ-поддержка»", tr: "“BT Destek”", ro: "„Suport IT”", ka: "„IT მხარდაჭერა“", uk: "«ІТ-підтримка»", de: "„IT-Support“", fr: "« Support informatique »", ar: "«الدعم الفني»" },
-      address: "+994 12 000 33 44",
+      address: { ...same("+994 12 000 33 44"), de: "+49 30 000 33 44", fr: "+33 1 00 00 33 44", ar: "+966 11 000 3344" },
     },
     subject: CALL,
     body: {
@@ -882,7 +885,7 @@ export const TEMPLATES: CampaignTemplate[] = [
     },
     sender: {
       name: { az: "Kamran Babayev", en: "Kamran Babayev", ru: "Камран Бабаев", tr: "Kamran Babayev", ro: "Kamran Babayev", ka: "ქამრან ბაბაევი", uk: "Камран Бабаєв", de: "Kamran Babayev", fr: "Kamran Babayev", ar: "كامران باباييف" },
-      address: "+994 50 000 77 12",
+      address: { ...same("+994 50 000 77 12"), de: "+49 151 000 77 12", fr: "+33 6 00 00 77 12", ar: "+966 55 000 7712" },
     },
     subject: CALL,
     body: {
@@ -967,7 +970,7 @@ export const TEMPLATES: CampaignTemplate[] = [
         fr: "Le nouvel assistant du directeur",
         ar: "المساعد الجديد للمدير",
       },
-      address: "+994 55 000 41 90",
+      address: { ...same("+994 55 000 41 90"), de: "+49 151 000 41 90", fr: "+33 6 00 00 41 90", ar: "+966 55 000 4190" },
     },
     subject: same("USB"),
     body: {

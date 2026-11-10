@@ -1254,7 +1254,10 @@ touch any of its text, and record a term there when you settle one.
    - Emails, SMS, chats, calls and screens read like a realistic attack on an employee in Azerbaijan in
      that language and keep every red flag the lesson teaches: the stories stay in the Azerbaijani company
      world in every language (Safarov Industries, manat/AZN, +994 numbers, Azerbaijani institutions;
-     ADR-026).
+     ADR-026). A language with a ready market pack (content/market/<lang>.json: de, fr, ar today) is then
+     moved to its own market by `npx tsx scripts/apply-market.ts <lang>` (people, places, money, phones,
+     authorities, brands and the matching addresses, from the English source); the checker compares it
+     with the English through the same address map and fails any token of the Azerbaijani world left.
    - Translated like any label (section 5): `app` on a notification, permission or chat ("Settings" →
      «Ayarlar», «Настройки»), except the identifiers `whatsapp`, `telegram`, `generic` and `chat`; the
      e-mail's To line `to` ("you", a person's name), keeping every address in it; a login page's `brand`

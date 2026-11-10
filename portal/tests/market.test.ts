@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { applyMarket, azWorldSchema, brandName, marketPackSchema, marketTokenErrors, type MarketPack } from "@/lib/content/market";
+import { applyMarket, azWorldSchema, brandName, marketPackSchema, marketSource, marketTokenErrors, type MarketPack } from "@/lib/content/market";
 import { localeParityErrors } from "@/lib/content/locale-parity";
 import type { Brand } from "@/lib/content/types";
 import { brandsFor } from "@/server/brands";
@@ -19,8 +19,10 @@ const packs = Object.fromEntries(
 ) as Record<string, MarketPack>;
 const brands = read(path.join(__dirname, "..", "content", "library", "brands.json")) as Record<string, Brand>;
 const READY = ["de", "fr", "ar"];
+/** A name as an address writes it in German: "Müller" → "mueller". */
+const slug = (name: string) => name.toLowerCase().replace(/ü/g, "ue").replace(/ö/g, "oe").replace(/ä/g, "ae").replace(/ß/g, "ss");
 
-/** A lesson in the shape of the library's translations: ids, answers and addresses must survive. */
+/** A lesson in the shape of the library's translations: ids and answers must survive, addresses follow the cast. */
 const sim = {
   type: "simulation",
   id: "sim",
@@ -36,9 +38,11 @@ const sim = {
         brandRef: "ulduzbank",
         from: { name: [{ text: "UlduzBank" }], address: [{ text: "leyla.mammadova@ulduzbank.az" }] },
         subject: [{ text: "Zahlung über 40 AZN an AZ00ULDZ00000000400520007731" }],
-        body: [[{ text: "Leyla Məmmədova, Kamran Əliyev <k.aliyev@idare.example>, Gəncə, Kafe_Nargiz_Free" }]],
+        body: [[{ text: "Leyla Məmmədova, Kamran Əliyev <k.aliyev@idare.example>, Gəncə, Kafe_Nargiz_Free, Hesabat_sentyabr.docx" }], [{ text: "Herr Tural hat TexKomek 24 angerufen." }]],
+        url: [{ text: "https://" }, { text: "ulduzbnak.example" }, { text: "/giris" }],
+        link: { text: "Öffnen", href: "https://ulduzbank.az/kartlar" },
       },
-      actions: [{ id: "report", label: "Melden", kind: "report", outcome: "safe", feedback: "Richtig, Leyla." }],
+      actions: [{ id: "report", label: "Melden", kind: "report", outcome: "safe", feedback: "Richtig, Leyla. Die Bank schreibt von ulduzbank.az." }],
     },
   ],
 };
@@ -62,9 +66,11 @@ describe("market packs", () => {
     expect(marketPackSchema.safeParse(packs.tr).success).toBe(true);
   });
 
-  it.each(READY)("%s names an analogue for every brand of the Azerbaijani world, and no pack value is a token of that world", (lang) => {
+  it.each(READY)("%s names an analogue for every brand and address word of the Azerbaijani world, and no pack value is a token of that world", (lang) => {
     const pack = packs[lang];
     expect(Object.keys(pack.brands).sort()).toEqual(Object.keys(world.brands).sort());
+    expect(Object.keys(pack.addresses).sort()).toEqual([...world.addressWords].sort());
+    for (const id of Object.keys(world.brandSlugs)) expect(pack.brands[id], id).toBeDefined();
     const values = [
       ...Object.values(pack.people).flat(),
       ...pack.cities,
@@ -81,31 +87,48 @@ describe("applyMarket", () => {
   it("is deterministic and idempotent", () => {
     const once = de();
     expect(de()).toEqual(once);
-    expect(applyMarket(once, "module/fixture", packs.de, world)).toEqual(once);
+    expect(applyMarket(once, "module/fixture", packs.de, world, fixture)).toEqual(once);
   });
 
-  it("changes only learner-facing text: ids, answers, brandRefs and addresses stay", () => {
-    for (const lang of READY) expect(localeParityErrors(fixture, applyMarket(fixture, "module/fixture", packs[lang], world)), lang).toEqual([]);
-    expect(marketTokenErrors(de(), world)).toEqual([]);
-    const out = text(de());
-    expect(out).toContain("leyla.mammadova@ulduzbank.az");
-    expect(out).toContain("k.aliyev@idare.example");
-    expect(out).toContain('"brandRef":"ulduzbank"');
+  it("changes only learner-facing text and addresses: ids, answers and brandRefs stay, and parity holds against the mapped English", () => {
+    for (const lang of READY) {
+      const out = applyMarket(fixture, "module/fixture", packs[lang], world);
+      expect(localeParityErrors(marketSource(fixture, "module/fixture", packs[lang], world), out), lang).toEqual([]);
+    }
+    // The fixture is German text, so only German leaves no token behind.
+    expect(marketTokenErrors(de(), world, packs.de)).toEqual([]);
+    expect(text(de())).toContain('"brandRef":"ulduzbank"');
+    expect(text(de())).toContain('"correct":true');
   });
 
-  it("keeps one name per character within a lesson, drops a stale initial and localises money, numbers and brands", () => {
+  it("keeps one name per character within a lesson, in its text and its addresses", () => {
     const [s, q] = de().scenes as [Sim, Choice];
     const leyla = s.title.replace(" schreibt", "");
-    const [given] = leyla.split(" ");
+    const [given, family] = leyla.split(" ");
     expect(packs.de.people.female).toContain(given);
-    expect(s.intro).toMatch(new RegExp(`^${given} aus (${packs.de.cities.join("|")}) braucht 300 Euro\\.$`));
+    expect(s.intro).toMatch(new RegExp(`^${given} aus Berlin braucht 300 Euro\\.$`));
     expect(q.question.options[0].label).toBe(given);
     const step = s.steps[0];
+    expect(step.artifact.from.address[0].text).toBe(`${slug(given)}.${slug(family)}@nordsparkasse.de`);
+    const kamran = /, (\p{L}+) (\p{L}+) </u.exec(step.artifact.body[0][0].text)!;
+    expect(step.artifact.body[0][0].text).toContain(`<${slug(kamran[1])[0]}.${slug(kamran[2])}@verwaltungsamt.example>`);
+  });
+
+  it("drops a stale initial and localises money, numbers, brands, file names, links and look-alikes", () => {
+    const step = (de().scenes[0] as Sim).steps[0];
     expect(step.say).toMatch(/^Hier spricht Staatsanwalt \p{Lu}\p{L}+\. Rufen Sie \+49 151 000 47 12 an\.$/u);
     expect(step.artifact.from.name[0].text).toBe("Nordsparkasse");
     expect(step.artifact.subject[0].text).toBe("Zahlung über 40 € an DE00000000400520007731");
-    expect(step.artifact.body[0][0].text).toMatch(new RegExp(`^${leyla}, `));
-    expect(step.artifact.body[0][0].text).toContain("Cafe_Lindenhof_Free");
+    expect(step.artifact.body[0][0].text).toMatch(/, Cafe_Lindenhof_Free, Bericht_September\.docx$/);
+    expect(step.artifact.url.map((p) => p.text)).toEqual(["https://", "nordsprakasse.example", "/anmeldung"]);
+    expect(step.artifact.link.href).toBe("https://nordsparkasse.de/karten");
+    expect(step.actions[0].feedback).toMatch(/schreibt von nordsparkasse\.de\.$/);
+  });
+
+  it("gives a title the family name, and a brand its number only once", () => {
+    const body = (de().scenes[0] as Sim).steps[0].artifact.body[1][0].text;
+    expect(body).toMatch(new RegExp(`^Herr (${packs.de.people.family.join("|")}) hat TechHilfe 24 angerufen\\.$`));
+    expect(applyMarket({ text: "TexKomek 24 demande" }, "x", packs.fr, world).text).toBe("TechAide 24 demande");
   });
 
   it("depends on the lesson: another seed may cast other names, the same seed always the same", () => {
@@ -115,33 +138,42 @@ describe("applyMarket", () => {
     expect(title("a/1")).toBe(seeds[0]);
   });
 
-  it("undoes a French elision and gives a Latin spelling inside an Arabic password", () => {
+  it("undoes a French elision, gives a Latin spelling inside an Arabic password and reads the Arabic article", () => {
     const fr = applyMarket({ say: "Le téléphone d’Aysel." }, "x", packs.fr, world);
     expect(fr.say).toMatch(/^Le téléphone de \p{Lu}/u);
     const ar = applyMarket({ text: "آيسل: كلمة المرور Aysel2027" }, "x", packs.ar, world);
     const [name, latin] = ar.text.split(": كلمة المرور ");
     expect(packs.ar.people.female).toContain(`${name}|${latin.replace("2027", "")}`);
+    expect(applyMarket({ value: "ملايين المانات" }, "x", packs.ar, world).value).toBe("ملايين الريالات");
+    expect(marketTokenErrors({ value: "ملايين المانات" }, world)).toEqual(['$.value: "مانات" belongs to the Azerbaijani world']);
   });
 });
 
 describe("the lesson checker's market rule", () => {
   it("reports every token of the Azerbaijani world outside addresses", () => {
     const errors = marketTokenErrors(fixture, world);
-    for (const token of ["Leyla", "Məmmədova", "Bakı", "Manat", "Abbasov", "+994", "AZN", "AZ00ULDZ00000000400520007731", "UlduzBank", "Kafe_Nargiz", "Gəncə"])
+    for (const token of ["Leyla", "Məmmədova", "Bakı", "Manat", "Abbasov", "+994", "AZN", "AZ00ULDZ00000000400520007731", "UlduzBank", "Kafe_Nargiz", "Gəncə", "Hesabat"])
       expect(errors.some((e) => e.includes(`"${token}"`)), token).toBe(true);
     expect(errors.some((e) => e.includes("mammadova@"))).toBe(false);
     expect(marketTokenErrors({ text: "Schreiben Sie an leyla.mammadova@idare.example" }, world)).toEqual([]);
+  });
+
+  it("with the market's pack, also reports a renamed sender whose address keeps the old name or brand", () => {
+    const errors = marketTokenErrors({ to: "Anna Fischer <leyla.hasanova@rxagentlik.az>", href: "https://ulduzbank.az/giris" }, world, packs.de);
+    for (const word of ["leyla", "hasanova", "rxagentlik", "az", "ulduzbank", "giris"]) expect(errors.some((e) => e.includes(`"${word}" in`)), word).toBe(true);
+    expect(marketTokenErrors({ to: "Anna Fischer <anna.fischer@rx-amt.de>", href: "https://wifi-paket.test" }, world, packs.de)).toEqual([]);
   });
 
   it.each(READY)("passes every committed %s lesson, which a second run leaves unchanged", (lang) => {
     for (const mod of fs.readdirSync(LESSONS)) {
       for (const f of fs.readdirSync(path.join(LESSONS, mod)).filter((x) => x.endsWith(`.${lang}.json`))) {
         const doc = read(path.join(LESSONS, mod, f));
-        expect(marketTokenErrors(doc, world), `${mod}/${f}`).toEqual([]);
-        expect(applyMarket(doc, `${mod}/${f.slice(0, -8)}`, packs[lang], world), `${mod}/${f}`).toEqual(doc);
+        const id = f.slice(0, -8);
+        expect(marketTokenErrors(doc, world, packs[lang]), `${mod}/${f}`).toEqual([]);
+        expect(applyMarket(doc, `${mod}/${id}`, packs[lang], world, read(path.join(LESSONS, mod, `${id}.en.json`))), `${mod}/${f}`).toEqual(doc);
       }
     }
-  });
+  }, 60_000);
 });
 
 describe("brand names per language", () => {
@@ -160,14 +192,15 @@ describe("brand names per language", () => {
     expect(brandsFor(scenes, "az")["xidmet-agentliyi"]).toEqual(brands["xidmet-agentliyi"]);
   });
 
-  it("shows the local brand in the simulation templates", () => {
+  it("shows the local brand and sender in the simulation templates", () => {
     const sms = TEMPLATE_BY_KEY.get("parcel-sms")!;
     for (const lang of READY) {
       expect(templateText(sms.sender.name, lang)).toBe(brands.suretkargo.names?.[lang]);
+      expect(templateText(sms.sender.address, lang)).toBe(brands.suretkargo.names?.[lang]);
       expect(templateText(sms.body, lang)).toContain(brands.suretkargo.names?.[lang]);
       expect(templateText(sms.body, lang)).not.toContain("AZN");
     }
-    expect(templateText(sms.sender.name, "az")).toBe("SuretKargo");
+    expect(templateText(sms.sender.address, "az")).toBe("SuretKargo");
     expect(templateText(TEMPLATE_BY_KEY.get("invoice")!.sender.name, "de")).toBe("BüroBedarf GmbH");
     expect(templateText(TEMPLATE_BY_KEY.get("bank-sms")!.body, "fr")).toContain("Banque Étoile");
   });

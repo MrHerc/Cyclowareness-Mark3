@@ -6,6 +6,7 @@ import { APP_IDENTIFIERS, addressTokens, localeParityErrors } from "../src/lib/c
 import { pickLessonContent, sharedContentLocale } from "../src/lib/content/lesson-locale";
 import { LESSON_TRANSLATIONS, readLibraryLesson } from "../src/server/services/library";
 import { LOCALES } from "../src/i18n/config";
+import { parityEnglish } from "../src/lib/content/market-files";
 
 const root = path.join(__dirname, "..", "content", "library");
 const modules = JSON.parse(readFileSync(path.join(root, "modules.json"), "utf8")) as { slug: string; lessons: { id: string }[] }[];
@@ -38,7 +39,7 @@ describe("lesson translations on disk", () => {
       const parsed = lessonFileSchema.safeParse(raw);
       expect(parsed.success ? [] : parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`)).toEqual([]);
       if (parsed.success) expect(lessonIntegrityErrors(parsed.data)).toEqual([]);
-      expect(localeParityErrors(JSON.parse(readFileSync(lessonFile(slug, id, "en"), "utf8")), raw)).toEqual([]);
+      expect(localeParityErrors(parityEnglish(JSON.parse(readFileSync(lessonFile(slug, id, "en"), "utf8")), locale, `${slug}/${id}`), raw)).toEqual([]);
     });
   }
 

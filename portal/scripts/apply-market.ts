@@ -4,11 +4,13 @@
  *   npx tsx scripts/apply-market.ts            every pack with status "ready"
  *   npx tsx scripts/apply-market.ts de fr      only these languages
  * Deterministic and idempotent: a second run changes nothing. Only <lesson>.<lang>.json files are written,
- * never the English source. Run scripts/check-lesson-locales.ts afterwards.
+ * never the English source, which casts the lesson (people and addresses follow it). Run it on a fresh
+ * translation, then scripts/check-lesson-locales.ts.
  */
 import fs from "node:fs";
 import path from "node:path";
-import { applyMarket, azWorldSchema, marketPackSchema, type MarketPack } from "../src/lib/content/market";
+import { applyMarket } from "../src/lib/content/market";
+import { readMarket } from "../src/lib/content/market-files";
 import type { Brand } from "../src/lib/content/types";
 
 const CONTENT = path.join(process.cwd(), "content");
@@ -27,17 +29,13 @@ function writeJson(file: string, doc: unknown): boolean {
   return true;
 }
 
-const world = azWorldSchema.parse(readJson(path.join(CONTENT, "market", "az-world.json")));
+const { world, packs: all } = readMarket();
 const named = process.argv.slice(2);
-const packs = fs
-  .readdirSync(path.join(CONTENT, "market"))
-  .filter((f) => /^[a-z]{2}\.json$/.test(f))
-  .map((f) => marketPackSchema.parse(readJson(path.join(CONTENT, "market", f))))
-  .filter((p) => (named.length ? named.includes(p.lang) : p.status === "ready"));
+const packs = all.filter((p) => (named.length ? named.includes(p.lang) : p.status === "ready"));
 for (const p of packs) if (p.status !== "ready") throw new Error(`content/market/${p.lang}.json is a skeleton: fill it first`);
 
 const brands = readJson(BRANDS) as Record<string, Brand>;
-for (const pack of packs as MarketPack[]) {
+for (const pack of packs) {
   let changed = 0;
   let files = 0;
   for (const mod of fs.readdirSync(LESSONS)) {
@@ -45,8 +43,9 @@ for (const pack of packs as MarketPack[]) {
     if (!fs.statSync(dir).isDirectory()) continue;
     for (const f of fs.readdirSync(dir).filter((x) => x.endsWith(`.${pack.lang}.json`))) {
       files++;
+      const id = f.slice(0, -`.${pack.lang}.json`.length);
       const file = path.join(dir, f);
-      if (writeJson(file, applyMarket(readJson(file), `${mod}/${f.slice(0, -`.${pack.lang}.json`.length)}`, pack, world))) changed++;
+      if (writeJson(file, applyMarket(readJson(file), `${mod}/${id}`, pack, world, readJson(path.join(dir, `${id}.en.json`))))) changed++;
     }
   }
   // A brand's local name is its registry name through the same pass ("OfisTəchizat MMC" → "BüroBedarf GmbH").
