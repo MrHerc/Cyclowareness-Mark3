@@ -66,6 +66,8 @@ const schema = z
     if (v.SMS_PROVIDER === "webhook" && !v.SMS_WEBHOOK_URL) ctx.addIssue({ code: "custom", path: ["SMS_WEBHOOK_URL"], message: "required when SMS_PROVIDER=webhook" });
     if (v.PLATFORM_SMTP_HOST && !v.PLATFORM_MAIL_FROM) ctx.addIssue({ code: "custom", path: ["PLATFORM_MAIL_FROM"], message: "required when PLATFORM_SMTP_HOST is set" });
     if (v.HSTS_PRELOAD === "1" && v.HSTS_INCLUDE_SUBDOMAINS !== "1") ctx.addIssue({ code: "custom", path: ["HSTS_PRELOAD"], message: "preload requires HSTS_INCLUDE_SUBDOMAINS=1" });
+    // The same value in both means the old key is nowhere: everything sealed with it would be unreadable.
+    if (v.APP_SECRET_PREVIOUS && v.APP_SECRET_PREVIOUS === v.APP_SECRET) ctx.addIssue({ code: "custom", path: ["APP_SECRET_PREVIOUS"], message: "must be the old key, not the current APP_SECRET" });
   });
 
 /**

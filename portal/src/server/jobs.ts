@@ -363,6 +363,16 @@ async function deleteInBatches(db: DB, table: PgTable, key: PgColumn, where: Ret
   }
 }
 
+/** The same day of the month `months` earlier (UTC), clamped to the last day when that month is shorter. */
+export function monthsBefore(now: Date, months: number): Date {
+  const d = new Date(now);
+  d.setUTCDate(1);
+  d.setUTCMonth(d.getUTCMonth() - months);
+  const last = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+  d.setUTCDate(Math.min(now.getUTCDate(), last));
+  return d;
+}
+
 /**
  * Once a day per process: sign-in attempts past every lockout window, ended rate-limit windows,
  * expired sessions and sign-in links, watermark codes of ended sessions after 90 days, delivered or
@@ -396,11 +406,7 @@ async function cleanup(db: DB, now: Date): Promise<number> {
   total += await deleteInBatches(db, t.demoRequests, t.demoRequests.id, and(lt(t.demoRequests.createdAt, ago(730 * DAY))), deadline);
   // Each organisation's own retention, 0 = keep forever. Lesson progress, XP, attestations and
   // certificates are compliance evidence and are never deleted; open risks are still being remediated.
-  const monthsAgo = (months: number) => {
-    const d = new Date(now);
-    d.setUTCMonth(d.getUTCMonth() - months);
-    return d;
-  };
+  const monthsAgo = (months: number) => monthsBefore(now, months);
   for (const org of await db.select({ id: t.tenants.id, settings: t.tenants.settings }).from(t.tenants)) {
     if (Date.now() > deadline) break;
     const { auditMonths, learningMonths } = withDefaults(org.settings).retention;

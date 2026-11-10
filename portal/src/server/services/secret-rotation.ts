@@ -4,7 +4,7 @@ import * as t from "../db/schema";
 import { decryptSecret, encryptSecret, sealedWithCurrentKey } from "../crypto";
 import { withDefaults } from "../../lib/tenant-defaults";
 
-export type RotationCounts = { tenants: number; users: number; unreadable: number };
+export type RotationCounts = { tenants: number; users: number; unreadable: number; skipped: string[] };
 
 /**
  * Why scripts/rotate-secret.ts must not run: without a 32+ APP_SECRET, crypto.ts would seal every secret
@@ -36,10 +36,11 @@ export async function countVerifiedDomains(db: DB): Promise<number> {
  * Re-encrypts every stored secret with the current APP_SECRET after a rotation (docs/OPERATIONS.md,
  * "Rotating APP_SECRET"): the *Enc fields of tenants.settings and users.totp_secret. A value already
  * under the current key is left alone, so a second run changes nothing; one that opens with no key
- * (sealed with a secret that is neither current nor previous) is left as it is and counted.
+ * (sealed with a secret that is neither current nor previous) is left as it is and counted. An
+ * organisation deleted after the id list was read is skipped and reported, the others still finish.
  */
 export async function rotateStoredSecrets(db: DB): Promise<RotationCounts> {
-  const counts: RotationCounts = { tenants: 0, users: 0, unreadable: 0 };
+  const counts: RotationCounts = { tenants: 0, users: 0, unreadable: 0, skipped: [] };
   const resealed = (value: string | undefined | null): string | undefined => {
     if (!value || sealedWithCurrentKey(value)) return undefined;
     const plain = decryptSecret(value);
@@ -55,6 +56,7 @@ export async function rotateStoredSecrets(db: DB): Promise<RotationCounts> {
     // Read and written under a lock, so an administrator's settings save meanwhile is not overwritten.
     const changed = await db.transaction(async (tx) => {
       const [row] = await tx.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, id)).for("update");
+      if (!row) return null;
       const s = withDefaults(structuredClone(row.settings));
       const holders: [{ [field: string]: unknown } | undefined, string][] = [
         [s.identity.sso, "clientSecretEnc"],
@@ -73,7 +75,8 @@ export async function rotateStoredSecrets(db: DB): Promise<RotationCounts> {
       if (changed) await tx.update(t.tenants).set({ settings: s }).where(eq(t.tenants.id, id));
       return changed;
     });
-    if (changed) counts.tenants++;
+    if (changed === null) counts.skipped.push(id);
+    else if (changed) counts.tenants++;
   }
 
   const users = await db.select({ id: t.users.id, totpSecret: t.users.totpSecret }).from(t.users).where(isNotNull(t.users.totpSecret));
