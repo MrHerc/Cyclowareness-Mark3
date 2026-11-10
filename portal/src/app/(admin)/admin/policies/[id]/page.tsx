@@ -2,6 +2,7 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { CheckCircle2, Circle, Download } from "lucide-react";
 import { db, t } from "@/server/db";
+import { avatarSrc } from "@/server/avatar";
 import { allowed } from "@/server/auth/viewer";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PageHeader, TabsNav } from "@/components/ui/layout";
@@ -30,7 +31,7 @@ export default async function PolicyAdminPage({ params, searchParams }: PageProp
   // What learners open from "View": the newest published version.
   const readable = versions.find((x) => x.publishedAt) ?? null;
   const [people, counts, signoffs] = await Promise.all([
-    db().select({ id: t.users.id, name: t.users.name, email: t.users.email, avatarUrl: t.users.avatarUrl }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.status, "active"))),
+    db().select({ id: t.users.id, name: t.users.name, email: t.users.email, avatarUrl: avatarSrc }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.status, "active"))),
     versions.length
       ? db()
           .select({ versionId: t.policySignoffs.versionId, n: count() })

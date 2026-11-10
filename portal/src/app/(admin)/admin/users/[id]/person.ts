@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { isUuid } from "@/lib/ids";
 import { db, t } from "@/server/db";
+import { avatarSrc } from "@/server/avatar";
 import { requirePermission } from "@/server/auth/viewer";
 import { scopeDepartmentIds } from "@/server/queries/admin";
 
@@ -17,7 +18,7 @@ export const personForPage = cache(async (id: string) => {
   const v = await requirePermission("people.read");
   if (!isUuid(id)) notFound();
   const [person] = await db()
-    .select({ u: t.users, dept: t.departments.name })
+    .select({ u: t.users, avatar: avatarSrc, dept: t.departments.name })
     .from(t.users)
     .leftJoin(t.departments, eq(t.departments.id, t.users.departmentId))
     .where(and(eq(t.users.id, id), eq(t.users.tenantId, v.tenant.id)));

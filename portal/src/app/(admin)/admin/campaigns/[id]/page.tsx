@@ -2,6 +2,7 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { AlertTriangle, Check, Minus } from "lucide-react";
 import { db, t } from "@/server/db";
+import { avatarSrc } from "@/server/avatar";
 import { allowed } from "@/server/auth/viewer";
 import { campaignAudience, campaignStats } from "@/server/services/campaigns";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
@@ -29,7 +30,7 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
     campaignStats(db(), [c.id]),
     campaignAudience(db(), c),
     db()
-      .select({ r: t.campaignRecipients, name: t.users.name, avatar: t.users.avatarUrl, department: t.departments.name })
+      .select({ r: t.campaignRecipients, name: t.users.name, avatar: avatarSrc, department: t.departments.name })
       .from(t.campaignRecipients)
       .innerJoin(t.users, eq(t.users.id, t.campaignRecipients.userId))
       .leftJoin(t.departments, eq(t.departments.id, t.users.departmentId))

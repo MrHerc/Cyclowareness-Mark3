@@ -1,14 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
 import { Geologica, Noto_Sans_Arabic, Noto_Sans_Georgian } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dirOf } from "@/i18n/config";
 import { getViewer } from "@/server/auth/viewer";
 import { brandStyle } from "@/lib/color";
 import { Toaster } from "@/components/ui/toast";
 import { ServiceWorkerRegister } from "@/components/sw-register";
-import { AzNumbersGate } from "@/components/az-numbers-gate";
+import { IntlScope } from "@/components/intl-scope";
 import { env } from "@/server/env";
 import "./globals.css";
 
@@ -47,13 +46,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang={locale} dir={dirOf(locale)} className={`${geologica.variable} ${georgian.variable} ${arabic.variable}`} data-motion={viewer?.user.motion ?? "full"} style={style}>
       <body>
-        <NextIntlClientProvider>
-          <AzNumbersGate>
-            {children}
-            <Toaster />
-            <ServiceWorkerRegister />
-          </AzNumbersGate>
-        </NextIntlClientProvider>
+        <IntlScope surface="root">
+          {children}
+          <Toaster />
+          <ServiceWorkerRegister />
+        </IntlScope>
       </body>
     </html>
   );

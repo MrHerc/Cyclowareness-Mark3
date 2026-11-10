@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { Role } from "../src/server/db/schema";
 import { featuresFor, type Feature } from "../src/lib/tenant-defaults";
 
-vi.mock("../src/server/db", () => ({ db: () => ({}), t: {} }));
+vi.mock("../src/server/db", async () => ({ db: () => ({}), t: await import("../src/server/db/schema") }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
 
 const { allowed, privileged, twoFactorGap } = await import("../src/server/auth/viewer");
