@@ -13,6 +13,7 @@ import { analyzeUrl } from "../sandbox/analyze";
 import { emitEvent } from "../services/events";
 import { departmentClosure } from "../services/assignments";
 import { aiEnabled, draftLesson, lessonDraftSchema, type LessonDraft } from "../ai";
+import { lessonFileSchema } from "../../lib/content/validate";
 import { rateLimit } from "../rate-limit";
 import { isLocale, LOCALES, pick } from "../../i18n/config";
 import { AUDIENCES, CATEGORIES } from "../../lib/domain/catalog";
@@ -490,6 +491,21 @@ export async function saveStudioLessonAction(input: z.infer<typeof lessonSchema>
   if (!p.success) return { ok: false, error: "invalid" };
   const d = p.data;
   if (d.question.options.filter((o) => o.correct).length !== 1) return { ok: false, error: "invalid" };
+  const moods = ["talk", "think", "alert", "talk", "happy", "talk", "think", "talk"] as const;
+  // Written in the library's lesson format and checked by the same schema the player's content passes.
+  const lessonFile = lessonFileSchema.safeParse({
+    formatVersion: 1,
+    id: "lesson-1",
+    title: d.title,
+    minutes: d.minutes,
+    scenes: [
+      { type: "intro", id: "intro", title: d.title, body: d.intro, mood: "talk" },
+      { type: "tutor", id: "steps", beats: d.points.map((say, i) => ({ id: `b${i + 1}`, say, mood: moods[i % moods.length] })) },
+      { type: "choice", id: "check", question: { prompt: d.question.prompt, options: d.question.options.map((o, i) => ({ id: `o${i + 1}`, label: o.label, correct: o.correct, feedback: o.feedback })) } },
+      { type: "recap", id: "recap", points: d.recap, mood: "celebrate" },
+    ],
+  });
+  if (!lessonFile.success) return { ok: false, error: "invalid" };
   const slug = `own-${slugify(d.title)}-${Date.now().toString(36).slice(-4)}`;
   const label = { [d.locale]: d.title };
   const [mod] = await db()
@@ -497,14 +513,7 @@ export async function saveStudioLessonAction(input: z.infer<typeof lessonSchema>
     .values({ tenantId: v.tenant.id, slug, category: d.category, audiences: [AUDIENCES[0]], title: label, subtitle: { [d.locale]: d.subtitle }, minutes: d.minutes, xp: 40 + d.minutes * 5, difficulty: d.difficulty, origin: d.ai ? "ai" : "custom", status: "draft", sortOrder: 1000, createdBy: v.user.id })
     .returning({ id: t.modules.id });
   const [lesson] = await db().insert(t.lessons).values({ moduleId: mod.id, key: "lesson-1", title: label, minutes: d.minutes, position: 1 }).returning({ id: t.lessons.id });
-  const moods = ["talk", "think", "alert", "talk", "happy", "talk", "think", "talk"] as const;
-  const scenes = [
-    { type: "intro", id: "intro", title: d.title, body: d.intro, mood: "talk" },
-    { type: "tutor", id: "steps", beats: d.points.map((say, i) => ({ id: `b${i + 1}`, say, mood: moods[i % moods.length] })) },
-    { type: "choice", id: "check", question: { prompt: d.question.prompt, options: d.question.options.map((o, i) => ({ id: `o${i + 1}`, label: o.label, correct: o.correct, feedback: o.feedback })) } },
-    { type: "recap", id: "recap", points: d.recap, mood: "celebrate" },
-  ];
-  await db().insert(t.lessonContents).values({ lessonId: lesson.id, locale: d.locale, scenes });
+  await db().insert(t.lessonContents).values({ lessonId: lesson.id, locale: d.locale, scenes: lessonFile.data.scenes });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "module.created", targetType: "module", targetId: mod.id, meta: { title: d.title, origin: d.ai ? "ai" : "custom" } });
   refresh();
   return { ok: true, slug };

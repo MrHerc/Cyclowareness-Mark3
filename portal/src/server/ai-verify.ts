@@ -30,7 +30,8 @@ export type TrainingRequest = {
 export const trainingDraftSchema = z.object({
   title: z.string().trim().min(3).max(120),
   subtitle: z.string().trim().max(240),
-  lessons: z.array(lessonFileSchema).min(1).max(3),
+  // The model is not asked for the format version: the Studio writes the current one.
+  lessons: z.array(lessonFileSchema.extend({ formatVersion: lessonFileSchema.shape.formatVersion.default(1) })).min(1).max(3),
 });
 export type TrainingDraft = { title: string; subtitle: string; lessons: LessonFile[] };
 

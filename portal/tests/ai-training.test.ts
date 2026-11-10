@@ -12,6 +12,7 @@ function good(): TrainingDraft {
     subtitle: "Spot a fake invoice email before you pay.",
     lessons: [
       {
+        formatVersion: 1,
         id: "lesson-1",
         title: "Check before you pay",
         minutes: 6,
@@ -112,6 +113,16 @@ describe("schema step", () => {
     const d = good();
     d.lessons[0].scenes.push({ type: "scenario", id: "sc", title: "T", start: "nope", nodes: [{ id: "n1", text: "Hi" }] });
     expect(messages(schemaCheck(d).issues)).toContain("start node nope missing");
+  });
+
+  it("writes formatVersion 1 on a lesson the model sent without it, and refuses another version", () => {
+    const d = good();
+    const unversioned: Partial<TrainingDraft["lessons"][0]> = { ...d.lessons[0] };
+    delete unversioned.formatVersion;
+    const r = schemaCheck({ ...d, lessons: [unversioned] });
+    expect(r.issues).toEqual([]);
+    expect(r.draft?.lessons[0].formatVersion).toBe(1);
+    expect(schemaCheck({ ...d, lessons: [{ ...unversioned, formatVersion: 2 }] }).draft).toBeNull();
   });
 });
 

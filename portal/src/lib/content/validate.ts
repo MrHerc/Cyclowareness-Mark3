@@ -17,9 +17,9 @@ const scene = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("tutor"),
     id: z.string(),
-    beats: z.array(z.object({ id: z.string(), say: z.string().min(1), mood: z.string(), gesture: z.string().optional(), visual: visual.optional(), highlight: z.string().optional(), checkpoint: checkpointSchema.optional(), stage: z.string().optional() }).passthrough()).min(1),
+    beats: z.array(z.object({ id: z.string(), say: z.string().min(1), mood: z.string(), gesture: z.string().optional(), visual: visual.optional(), highlight: z.string().optional(), checkpoint: checkpointSchema.optional(), stage: z.literal("back").optional() })).min(1),
   }),
-  z.object({ type: z.literal("intro"), id: z.string(), title: z.string(), body: z.string() }).passthrough(),
+  z.object({ type: z.literal("intro"), id: z.string(), title: z.string(), body: z.string(), mood: z.string().optional(), visual: visual.optional() }),
   z.object({
     type: z.literal("simulation"),
     id: z.string(),
@@ -29,34 +29,56 @@ const scene = z.discriminatedUnion("type", [
     steps: z.array(
       z.object({
         id: z.string(),
+        label: z.string().optional(),
+        say: z.string().optional(),
+        spoken: z.string().optional(),
         artifact,
         actions: z.array(z.object({ id: z.string(), label: z.string(), kind: z.string(), outcome, feedback: z.string(), next: z.string().optional() })).min(1),
-      }).passthrough(),
+      }),
     ).min(1),
   }),
   z.object({
     type: z.literal("choice"),
     id: z.string(),
     question: z.object({ prompt: z.string(), options: z.array(option).min(2) }),
+    explain: z.string().optional(),
     multi: z.boolean().optional(),
     visual: visual.optional(),
-  }).passthrough(),
+  }),
   z.object({ type: z.literal("hotspot"), id: z.string(), prompt: z.string(), artifact, spots: z.array(z.object({ id: z.string(), label: z.string(), explain: z.string() })).min(1), minToFind: z.number().int().min(1) }),
   z.object({ type: z.literal("swipe"), id: z.string(), prompt: z.string(), cards: z.array(z.object({ id: z.string(), artifact, verdict: z.enum(["threat", "safe"]), explain: z.string() })).min(1) }),
-  z.object({ type: z.literal("match"), id: z.string(), prompt: z.string(), pairs: z.array(z.object({ id: z.string(), left: z.string(), right: z.string() })).min(2) }).passthrough(),
-  z.object({ type: z.literal("order"), id: z.string(), prompt: z.string(), items: z.array(z.object({ id: z.string(), label: z.string() })).min(2) }).passthrough(),
+  z.object({ type: z.literal("match"), id: z.string(), prompt: z.string(), pairs: z.array(z.object({ id: z.string(), left: z.string(), right: z.string() })).min(2), explain: z.string().optional() }),
+  z.object({ type: z.literal("order"), id: z.string(), prompt: z.string(), items: z.array(z.object({ id: z.string(), label: z.string() })).min(2), explain: z.string().optional() }),
   z.object({
     type: z.literal("scenario"),
     id: z.string(),
     title: z.string(),
     start: z.string(),
-    nodes: z.array(z.object({ id: z.string(), text: z.string(), choices: z.array(z.object({ label: z.string(), next: z.string().optional(), outcome: outcome.optional(), feedback: z.string() })).optional() }).passthrough()).min(1),
+    nodes: z
+      .array(
+        z.object({
+          id: z.string(),
+          text: z.string(),
+          speaker: z.string().optional(),
+          voice: z.string().optional(),
+          channel: z.string().optional(),
+          character: z.string().optional(),
+          spoken: z.string().optional(),
+          manner: z.string().optional(),
+          visual: visual.optional(),
+          outcome: outcome.optional(),
+          choices: z.array(z.object({ label: z.string(), next: z.string().optional(), outcome: outcome.optional(), feedback: z.string() })).optional(),
+        }),
+      )
+      .min(1),
   }),
   z.object({ type: z.literal("password"), id: z.string(), prompt: z.string(), targetScore: z.number().int().min(0).max(4), tips: z.array(z.string()) }),
-  z.object({ type: z.literal("recap"), id: z.string(), points: z.array(z.string()).min(1) }).passthrough(),
+  z.object({ type: z.literal("recap"), id: z.string(), points: z.array(z.string()).min(1), mood: z.string().optional() }),
 ]);
 
 export const lessonFileSchema = z.object({
+  /** Bumped (with a migration of the files) when the format changes incompatibly; readers can then tell old files apart. */
+  formatVersion: z.literal(1),
   id: z.string(),
   title: z.string(),
   minutes: z.number().int().positive(),

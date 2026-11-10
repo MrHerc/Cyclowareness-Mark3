@@ -91,9 +91,11 @@ async function ensureOperator(tx: DB, email: string): Promise<string | null> {
 export async function bootstrap(): Promise<void> {
   const email = env.BOOTSTRAP_OPERATOR_EMAIL?.toLowerCase();
   const pending = await locked(async (tx) => {
+    const started = performance.now();
     const lib = await syncLibrary(tx);
     const paths = await syncPaths(tx);
-    log.info(`[bootstrap] library synced: ${lib.modules} modules, ${lib.lessons} lessons (texts: ${Object.entries(lib.locales).map(([l, n]) => `${l} ${n}`).join(", ")}), ${paths} paths.`);
+    // The duration shows whether the import still fits the container's start period as the library grows.
+    log.info(`[bootstrap] library synced in ${Math.round(performance.now() - started)} ms: ${lib.modules} modules, ${lib.lessons} lessons (texts: ${Object.entries(lib.locales).map(([l, n]) => `${l} ${n}`).join(", ")}), ${lib.written} library rows written, ${paths} paths.`);
     return email ? ensureOperator(tx, email) : null;
   });
   // After the commit: the link's token row refers to the operator created above.

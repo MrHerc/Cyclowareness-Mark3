@@ -30,7 +30,7 @@ vi.mock("../src/server/auth/viewer", () => ({ getSession: async () => h.session,
 vi.mock("../src/server/sms", () => ({ smsAvailable: () => true, sendSms: async (to: string) => (h.sms.push(to), { ok: true, simulated: true }) }));
 vi.mock("../src/server/mail", () => ({ queueEmail: async (_db: unknown, _tenant: unknown, mail: { to: string }) => void h.mails.push(mail.to), renderEmailHtml: () => "" }));
 vi.mock("../src/server/services/audit", () => ({ audit: async () => undefined }));
-vi.mock("../src/server/services/library", () => ({ CONTENT_SYNC_LOCK_KEY: 1, syncLibrary: async () => ({ modules: 0, lessons: 0, locales: { en: 0, az: 0, ru: 0 } }), syncPaths: async () => 0 }));
+vi.mock("../src/server/services/library", () => ({ CONTENT_SYNC_LOCK_KEY: 1, syncLibrary: async () => ({ modules: 0, lessons: 0, locales: { en: 0, az: 0, ru: 0 }, written: 0 }), syncPaths: async () => 0 }));
 vi.mock("next-intl/server", () => ({ getTranslations: async () => (key: string) => key }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ set: () => undefined, get: () => undefined }), headers: async () => new Headers() }));
 vi.mock("next/server", () => ({ after: (fn: () => unknown) => void h.later.push(fn) }));
@@ -376,6 +376,8 @@ describe("bootstrap", () => {
     await bootstrap();
     const links = info.mock.calls.filter((c) => String(c[0]).includes("/account/invite/"));
     expect(links).toHaveLength(1);
+    // Each start logs how long the library import took and how many rows it wrote.
+    expect(info.mock.calls.filter((c) => /library synced in \d+ ms: .*, 0 library rows written,/.test(String(c[0])))).toHaveLength(2);
     info.mockRestore();
   });
 });
