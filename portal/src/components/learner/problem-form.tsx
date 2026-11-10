@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { AlertTriangle } from "lucide-react";
 import { reportProblemAction } from "@/server/actions/learning";
 import { Textarea } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Notice } from "@/components/ui/layout";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { cn } from "@/lib/cn";
-
-type ProblemResult = Awaited<ReturnType<typeof reportProblemAction>>;
 
 /**
  * "Report a problem" form (lesson player, /profile). Submitted through a transition rather than the
@@ -21,7 +19,7 @@ export function ProblemForm({ context, onSent, className }: { context: string; o
   const t = useTranslations("learner.problem");
   const tc = useTranslations("common");
   const [error, setError] = useState<string | null>(null);
-  const [pending, startSubmit] = useTransition();
+  const { run, pending } = useAction(reportProblemAction, { successToast: t("sent"), onSuccess: onSent, onError: setError });
   const messageError = error === "message" ? t("messageError") : null;
   const formError = !error || messageError ? null : error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.generic");
   return (
@@ -29,14 +27,7 @@ export function ProblemForm({ context, onSent, className }: { context: string; o
       className={cn("grid gap-3", className)}
       onSubmit={(e) => {
         e.preventDefault();
-        const data = new FormData(e.currentTarget);
-        startSubmit(async () => {
-          const res = await reportProblemAction(undefined, data).catch((): ProblemResult => ({ error: "generic" }));
-          if (res.ok) {
-            toast(t("sent"));
-            onSent();
-          } else setError(res.error ?? "generic");
-        });
+        run(undefined, new FormData(e.currentTarget));
       }}
     >
       {formError ? (

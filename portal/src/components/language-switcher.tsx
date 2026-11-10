@@ -1,11 +1,11 @@
 "use client";
 
-import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Globe } from "lucide-react";
 import { LOCALES, LOCALE_NAMES, langAttrs, type Locale } from "@/i18n/config";
 import { setLocaleAction } from "@/server/actions/auth";
+import { useAction } from "@/components/ui/use-action";
 import { cn } from "@/lib/cn";
 
 /**
@@ -19,7 +19,7 @@ export function LanguageSwitcher({ className, locales = LOCALES }: { className?:
   const locale = useLocale() as Locale;
   const router = useRouter();
   const t = useTranslations("auth");
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(setLocaleAction, { onSuccess: () => router.refresh() });
   return (
     <label
       className={cn(
@@ -38,12 +38,7 @@ export function LanguageSwitcher({ className, locales = LOCALES }: { className?:
         aria-label={t("language")}
         value={locale}
         disabled={pending}
-        onChange={(e) =>
-          start(async () => {
-            await setLocaleAction(e.target.value);
-            router.refresh();
-          })
-        }
+        onChange={(e) => run(e.target.value)}
         className="absolute -inset-px cursor-pointer appearance-none rounded-pill opacity-0"
       >
         {LOCALES.filter((l) => l === locale || locales.includes(l)).map((l) => (

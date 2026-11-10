@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useClientFormat } from "@/lib/client-format";
@@ -8,6 +8,7 @@ import { Bell, CheckCheck } from "lucide-react";
 import { markNotificationsReadAction } from "@/server/actions/notifications";
 import { cn } from "@/lib/cn";
 import { coarseHitArea } from "@/components/ui/button";
+import { useAction } from "@/components/ui/use-action";
 
 export type NotificationItem = { id: string; title: string; body: string | null; href: string | null; createdAt: string; read: boolean };
 
@@ -15,7 +16,7 @@ export function NotificationsButton({ items }: { items: NotificationItem[] }) {
   const t = useTranslations("common");
   const format = useClientFormat();
   const [open, setOpen] = useState(false);
-  const [pending, start] = useTransition();
+  const { run: markRead, pending } = useAction(markNotificationsReadAction);
   const ref = useRef<HTMLDivElement>(null);
   const unread = items.filter((i) => !i.read).length;
 
@@ -59,7 +60,7 @@ export function NotificationsButton({ items }: { items: NotificationItem[] }) {
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => start(() => markNotificationsReadAction())}
+                onClick={() => markRead()}
                 className={cn("inline-flex items-center gap-1 text-tab font-semibold text-brand-600 hover:underline disabled:opacity-50", coarseHitArea)}
               >
                 <CheckCheck className="size-4" />

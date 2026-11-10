@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, ChevronRight, Lock, ShieldAlert } from "lucide-react";
 import { simulationClickAction, simulationSubmitAction } from "@/server/actions/campaigns";
 import { Mascot } from "@/components/mascot/mascot";
 import { buttonClass } from "@/components/ui/button";
+import { useAction } from "@/components/ui/use-action";
 
 /**
  * Teachable moment after a simulated phishing click. The click is counted by a beacon sent on
@@ -36,7 +37,12 @@ export function TeachableMoment({
   const t = useTranslations("site.teach");
   const [stage, setStage] = useState<"beacon" | "login" | "teach">(harvest && !alreadySubmitted ? "beacon" : "teach");
   const [submitted, setSubmitted] = useState(alreadySubmitted);
-  const [pending, start] = useTransition();
+  const { run: submit, pending } = useAction(simulationSubmitAction, {
+    onSuccess: () => {
+      setSubmitted(true);
+      setStage("teach");
+    },
+  });
   useEffect(() => {
     // The fake sign-in waits for the beacon either way: a failed request must not hide the lesson.
     simulationClickAction(token, qr ? "qr" : "link")
@@ -64,11 +70,7 @@ export function TeachableMoment({
           className="w-full max-w-sm rounded-md bg-white p-8 shadow-[0_2px_6px_rgba(0,0,0,.2)]"
           onSubmit={(e) => {
             e.preventDefault();
-            start(async () => {
-              await simulationSubmitAction(token);
-              setSubmitted(true);
-              setStage("teach");
-            });
+            submit(token);
           }}
         >
           <p className="text-title-sm font-semibold text-[#1b1b1b]">{brandName}</p>

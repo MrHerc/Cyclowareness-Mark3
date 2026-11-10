@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Pill } from "@/components/ui/pill";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { defang } from "@/lib/defang";
 import { cn } from "@/lib/cn";
 
@@ -128,7 +128,14 @@ export function SandboxPanel({ analyst = false }: { analyst?: boolean }) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [escalated, setEscalated] = useState<Set<string>>(new Set());
-  const [pending, start] = useTransition();
+  const { run: escalate, pending } = useAction(
+    async (id: string) => {
+      const res = await escalateAnalysisAction(id);
+      if (res.ok) setEscalated((s) => new Set(s).add(id));
+      return res;
+    },
+    { successToast: t("escalated") },
+  );
   const fileInput = useRef<HTMLInputElement>(null);
   const state = last === "file" ? fileState : last === "url" ? urlState : undefined;
   const errText = (e?: string) => (e === "rateLimited" ? t("errors.rateLimited") : e === "tooBig" ? t("errors.tooBig") : e === "noFile" ? t("errors.noFile") : e === "noUrl" ? t("errors.noUrl") : e ? tc("errors.generic") : null);
@@ -243,14 +250,7 @@ export function SandboxPanel({ analyst = false }: { analyst?: boolean }) {
             onEscalate={
               escalated.has(state.analysis.id) || pending
                 ? undefined
-                : () =>
-                    start(async () => {
-                      const res = await escalateAnalysisAction(state.analysis!.id).catch(() => ({ ok: false }));
-                      if (res.ok) {
-                        setEscalated(new Set(escalated).add(state.analysis!.id));
-                        toast(t("escalated"));
-                      } else toast(tc("errors.generic"), "error");
-                    })
+                : () => escalate(state.analysis!.id)
             }
           />
         </div>

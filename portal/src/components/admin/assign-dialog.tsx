@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Search } from "lucide-react";
 import { createAssignmentAction } from "@/server/actions/workspace";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Segmented, Select } from "@/components/ui/field";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { searchFold } from "@/components/secops/search-fold";
 import { cn } from "@/lib/cn";
 
@@ -41,7 +41,11 @@ export function AssignDialog({
   const [dueDate, setDueDate] = useState("");
   const [dueDays, setDueDays] = useState(30);
   const [reason, setReason] = useState("");
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(createAssignmentAction, {
+    successToast: (res) => t("assigned", { count: res.count ?? 0 }),
+    onSuccess: () => setOpen(false),
+    errorMap: () => tc("errors.invalid"),
+  });
   const list = useMemo(() => (target === "module" ? modules : paths).filter((m) => !q || searchFold(m.title).includes(searchFold(q))), [target, modules, paths, q]);
   const valid = !!targetId && (scope !== "department" || !!departmentId) && (scope !== "user" || !!userId) && (dueKind !== "fixed" || !!dueDate);
 
@@ -144,22 +148,16 @@ export function AssignDialog({
             <Button
               disabled={!valid || pending}
               onClick={() =>
-                start(async () => {
-                  const res = await createAssignmentAction({
-                    target,
-                    targetId,
-                    scope,
-                    departmentId: scope === "department" ? departmentId : null,
-                    userId: scope === "user" ? userId : null,
-                    dueKind,
-                    dueDate: dueKind === "fixed" ? dueDate : null,
-                    dueDays: dueKind === "after_joining" ? dueDays : null,
-                    reason: reason || null,
-                  });
-                  if (res.ok) {
-                    toast(t("assigned", { count: res.count ?? 0 }));
-                    setOpen(false);
-                  } else toast(tc("errors.invalid"), "error");
+                run({
+                  target,
+                  targetId,
+                  scope,
+                  departmentId: scope === "department" ? departmentId : null,
+                  userId: scope === "user" ? userId : null,
+                  dueKind,
+                  dueDate: dueKind === "fixed" ? dueDate : null,
+                  dueDays: dueKind === "after_joining" ? dueDays : null,
+                  reason: reason || null,
                 })
               }
             >

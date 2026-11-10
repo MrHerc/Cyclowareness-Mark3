@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useOrgTimeZone } from "@/lib/client-format";
 import { Check, Pencil, Plus, Trash2 } from "lucide-react";
@@ -8,7 +8,7 @@ import { deleteSessionAction, reviewFeedbackAction, saveSessionAction, setAttend
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { fromZonedLocalInput, fromZonedParts, toZonedLocalInput, zonedParts } from "@/lib/baku-clock";
 
 /* ───────── live sessions ───────── */
@@ -19,7 +19,6 @@ export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
   const t = useTranslations("secops.sessions");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
-  const [pending, start] = useTransition();
   // The start is entered in the organisation's time zone, the one sessions are listed in, not the
   // browser's: a new one defaults to 11:00 there a week from now.
   const timeZone = useOrgTimeZone();
@@ -45,6 +44,25 @@ export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
     if (serverField === name) setServerField(null);
   };
   const valid = f.title.trim().length >= 3 && f.location.trim().length >= 2 && f.host.trim().length >= 2 && !!startsAt && !durationError && !capacityError;
+  const { run, pending } = useAction(saveSessionAction, {
+    successToast: t("saved"),
+    onSuccess: () => {
+      setOpen(false);
+      setServerField(null);
+      if (!initial) {
+        const next = fresh();
+        setF(next);
+        setLocal(toZonedLocalInput(next.startsAt, timeZone));
+        setDur(String(next.durationMin));
+        setCap("");
+      }
+    },
+    // The refused field is marked until it is edited.
+    errorMap: (res) => {
+      setServerField(res.field ?? null);
+      return tc("errors.invalid");
+    },
+  });
   return (
     <>
       {initial ? (
@@ -68,25 +86,7 @@ export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
             </Button>
             <Button
               disabled={pending || !valid}
-              onClick={() =>
-                start(async () => {
-                  const res = await saveSessionAction({ ...f, durationMin, capacity, startsAt: startsAt!.toISOString() });
-                  if (!res.ok) {
-                    setServerField(res.field ?? null);
-                    return toast(tc("errors.invalid"), "error");
-                  }
-                  toast(t("saved"));
-                  setOpen(false);
-                  setServerField(null);
-                  if (!initial) {
-                    const next = fresh();
-                    setF(next);
-                    setLocal(toZonedLocalInput(next.startsAt, timeZone));
-                    setDur(String(next.durationMin));
-                    setCap("");
-                  }
-                })
-              }
+              onClick={() => run({ ...f, durationMin, capacity, startsAt: startsAt!.toISOString() })}
             >
               {t("form.save")}
             </Button>
@@ -129,7 +129,7 @@ export function DeleteSession({ id }: { id: string }) {
   const t = useTranslations("secops.sessions");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(deleteSessionAction, { successToast: t("deleted"), onSuccess: () => setOpen(false) });
   return (
     <>
       <Button size="icon-sm" variant="ghost" aria-label={t("delete")} onClick={() => setOpen(true)}>
@@ -146,7 +146,7 @@ export function DeleteSession({ id }: { id: string }) {
             <Button variant="ghost" onClick={() => setOpen(false)}>
               {tc("cancel")}
             </Button>
-            <Button variant="danger" disabled={pending} onClick={() => start(async () => void ((await deleteSessionAction(id)).ok && (toast(t("deleted")), setOpen(false))))}>
+            <Button variant="danger" disabled={pending} onClick={() => run(id)}>
               {t("delete")}
             </Button>
           </>
@@ -157,8 +157,18 @@ export function DeleteSession({ id }: { id: string }) {
 }
 
 export function AttendanceToggle({ sessionId, userId, attended, label }: { sessionId: string; userId: string; attended: boolean; label: string }) {
-  const [pending, start] = useTransition();
   const [on, setOn] = useState(attended);
+  // The box shows the change at once and goes back if it is not saved; a retry from the toast sets it again.
+  const { run, pending } = useAction(async (next: boolean) => {
+    try {
+      const res = await setAttendanceAction(sessionId, userId, next);
+      setOn(res.ok ? next : !next);
+      return res;
+    } catch (error) {
+      setOn(!next);
+      throw error;
+    }
+  });
   return (
     <input
       type="checkbox"
@@ -169,9 +179,7 @@ export function AttendanceToggle({ sessionId, userId, attended, label }: { sessi
       onChange={(e) => {
         const next = e.target.checked;
         setOn(next);
-        start(async () => {
-          if (!(await setAttendanceAction(sessionId, userId, next)).ok) setOn(!next);
-        });
+        run(next);
       }}
     />
   );
@@ -183,14 +191,14 @@ const TICKET_STATUSES = ["open", "in_progress", "answered", "closed"] as const;
 
 export function TicketStatus({ id, status }: { id: string; status: (typeof TICKET_STATUSES)[number] }) {
   const t = useTranslations("secops.support");
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(setTicketStatusAction, { successToast: t("updated") });
   return (
     <Select
       aria-label={t("setStatus")}
       className="h-10 w-44"
       value={status}
       disabled={pending}
-      onChange={(e) => start(async () => void ((await setTicketStatusAction(id, e.target.value)).ok && toast(t("updated"))))}
+      onChange={(e) => run(id, e.target.value)}
     >
       {TICKET_STATUSES.map((s) => (
         <option key={s} value={s}>
@@ -205,9 +213,9 @@ export function TicketStatus({ id, status }: { id: string; status: (typeof TICKE
 
 export function ReviewFeedback({ id }: { id: string }) {
   const t = useTranslations("secops.feedback");
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(reviewFeedbackAction, { successToast: t("reviewed") });
   return (
-    <Button size="sm" variant="ghost" icon={<Check />} disabled={pending} onClick={() => start(async () => void ((await reviewFeedbackAction(id)).ok && toast(t("reviewed"))))}>
+    <Button size="sm" variant="ghost" icon={<Check />} disabled={pending} onClick={() => run(id)}>
       {t("markReviewed")}
     </Button>
   );

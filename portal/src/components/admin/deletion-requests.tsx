@@ -1,16 +1,16 @@
 "use client";
 
-import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useClientFormat } from "@/lib/client-format";
 import { UserX } from "lucide-react";
 import { decideDeletionAction } from "@/server/actions/people";
 import { Button } from "@/components/ui/button";
+import { useAction } from "@/components/ui/use-action";
 
 export function DeletionRequests({ people }: { people: { id: string; name: string; email: string; at: string }[] }) {
   const t = useTranslations("admin.people");
   const format = useClientFormat();
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(decideDeletionAction);
   return (
     <section className="rounded-xl border border-warn-100 bg-warn-50 p-4">
       <p className="flex items-center gap-2 text-body-sm font-bold text-warn-700">
@@ -26,10 +26,10 @@ export function DeletionRequests({ people }: { people: { id: string; name: strin
                 <bdi>{p.email}</bdi> · {format.dateTime(new Date(p.at), { dateStyle: "medium" })}
               </span>
             </span>
-            <Button size="sm" variant="secondary" disabled={pending} onClick={() => start(async () => void (await decideDeletionAction(p.id, false)))}>
+            <Button size="sm" variant="secondary" disabled={pending} onClick={() => run(p.id, false)}>
               {t("decline")}
             </Button>
-            <Button size="sm" variant="danger" disabled={pending} onClick={() => start(async () => void (await decideDeletionAction(p.id, true)))}>
+            <Button size="sm" variant="danger" disabled={pending} onClick={() => run(p.id, true)}>
               {t("approve")}
             </Button>
           </li>

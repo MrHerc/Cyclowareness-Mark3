@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, ChevronRight, Eye, EyeOff, Mail, RotateCcw, ShieldAlert, ShieldCheck, XCircle, Zap, Smartphone, Link2 } from "lucide-react";
 import { playLabAction, type LabResult } from "@/server/actions/engage";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { type PassphraseContext, passphraseRules } from "@/lib/password-strength";
 import { cn } from "@/lib/cn";
 
@@ -21,20 +21,14 @@ const OPTIONS: Record<string, string[]> = {
 
 export function GameClient({ game, items, forge }: { game: string; items: Item[]; forge: PassphraseContext }) {
   const t = useTranslations("learner.lab");
-  const tc = useTranslations("common");
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [result, setResult] = useState<Extract<LabResult, { score: number }> | null>(null);
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(playLabAction, { onSuccess: setResult });
   const [pw, setPw] = useState("");
   const [show, setShow] = useState(false);
 
-  const submit = (a: Record<string, string>) =>
-    start(async () => {
-      const res = await playLabAction(game, a);
-      if ("score" in res) setResult(res);
-      else toast(res.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.generic"), "error");
-    });
+  const submit = (a: Record<string, string>) => run(game, a);
   const reset = () => {
     setI(0);
     setAnswers({});

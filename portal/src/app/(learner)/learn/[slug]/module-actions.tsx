@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -9,7 +9,7 @@ import { attestModuleAction, rateModuleAction } from "@/server/actions/learning"
 import { Dialog } from "@/components/ui/dialog";
 import { Button, textLinkClass } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/field";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { cn } from "@/lib/cn";
 
 /** "Confirm the module" (attestation) dialog. Opens automatically from ?confirm=1; once confirmed it returns to `returnHref` (the page without it). */
@@ -18,7 +18,14 @@ export function AttestCard({ slug, moduleTitle, text, autoOpen, returnHref }: { 
   const router = useRouter();
   const [open, setOpen] = useState(autoOpen);
   const [checked, setChecked] = useState(false);
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(attestModuleAction, {
+    successToast: t("attest.done"),
+    onSuccess: () => {
+      setOpen(false);
+      router.replace(returnHref);
+    },
+    errorMap: () => t("attest.error"),
+  });
   // ?confirm=1 arriving on an already mounted card opens it too (state adjusted during render, no effect).
   const [autoOpened, setAutoOpened] = useState(autoOpen);
   if (autoOpen !== autoOpened) {
@@ -48,16 +55,7 @@ export function AttestCard({ slug, moduleTitle, text, autoOpen, returnHref }: { 
           className="mt-5 w-full"
           size="lg"
           disabled={!checked || pending}
-          onClick={() =>
-            start(async () => {
-              const res = await attestModuleAction(slug);
-              if (res.ok) {
-                toast(t("attest.done"));
-                setOpen(false);
-                router.replace(returnHref);
-              } else toast(t("attest.error"), "error");
-            })
-          }
+          onClick={() => run(slug)}
         >
           {t("attest.submit")}
         </Button>
@@ -86,7 +84,7 @@ export function RateModule({ slug }: { slug: string }) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [sent, setSent] = useState(false);
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(rateModuleAction, { onSuccess: () => setSent(true) });
   if (sent) return <p className="text-caption font-semibold text-safe-700">{t("rateThanks")}</p>;
   return (
     <div>
@@ -105,12 +103,7 @@ export function RateModule({ slug }: { slug: string }) {
             size="sm"
             variant="secondary"
             disabled={pending}
-            onClick={() =>
-              start(async () => {
-                await rateModuleAction({ slug, rating, comment });
-                setSent(true);
-              })
-            }
+            onClick={() => run({ slug, rating, comment })}
           >
             {t("rateSend")}
           </Button>
