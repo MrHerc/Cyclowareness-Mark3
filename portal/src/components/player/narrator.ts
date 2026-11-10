@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
-import { wordAt, type NarrationClips } from "@/lib/tts/clips";
+import { wordAt, type NarrationClip, type NarrationClips } from "@/lib/tts/clips";
 import { speechText, wordOffsets, wordsOf } from "@/lib/tts/text";
 
 export { speechText, wordsOf };
@@ -133,6 +133,60 @@ const clampRate = (rate: number) => Math.max(0.5, Math.min(2, rate));
 const clampVolume = (volume: number) => Math.max(0, Math.min(1, volume));
 
 /**
+ * The clip that reads `clean` (speechText) in `textLang`, or undefined when the speech engine must read it:
+ * the lesson's clips are in the hook's language only, and a text without one (a changed sentence, an
+ * interface string in another language) goes to Web Speech.
+ */
+export function clipFor(clips: NarrationClips | null | undefined, clean: string, textLang: string, clipsLang: string): NarrationClip | undefined {
+  return clips && sameLanguage(textLang, clipsLang) && Object.hasOwn(clips, clean) ? clips[clean] : undefined;
+}
+
+/** The clip after `clean` in the manifest, which lists the lesson's texts in reading order: the one to fetch ahead. */
+export function nextClipUrl(clips: NarrationClips, clean: string): string | undefined {
+  const keys = Object.keys(clips);
+  const at = keys.indexOf(clean);
+  return at >= 0 && at + 1 < keys.length ? clips[keys[at + 1]].url : undefined;
+}
+
+/** 10 ms of silence (8 kHz, 8-bit WAV). */
+export const SILENT_CLIP = "data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
+/** The events that count as a user gesture for media playback (a tap ends with touchend/pointerup, a mouse press starts one). */
+const GESTURES = ["pointerup", "touchend", "mousedown", "keydown"] as const;
+
+/**
+ * iOS lets an audio element play without a gesture only after it has played inside one. On the first
+ * gesture on `target`, play SILENT_CLIP on the clips' element (synchronously, inside the gesture), then
+ * disarm. `element()` returns null when a clip is already playing: that element is unlocked.
+ * Returns the disarm function for unmounting.
+ */
+export function armAudioUnlock(target: EventTarget, element: () => HTMLAudioElement | null): () => void {
+  const armed = new AbortController();
+  const disarm = () => armed.abort();
+  const unlock = () => {
+    disarm();
+    const el = element();
+    if (!el) return;
+    el.src = SILENT_CLIP;
+    // A clip that speak() sets meanwhile replaces the silence (its play() rejects with AbortError).
+    el.play().then(
+      () => {
+        if (el.src === SILENT_CLIP) el.pause();
+      },
+      () => {},
+    );
+  };
+  // Capture phase: before any handler can stop the event, and before React's click starts a clip.
+  GESTURES.forEach((e) => target.addEventListener(e, unlock, { capture: true, signal: armed.signal }));
+  return disarm;
+}
+
+/** True where an audio element's volume cannot be set from script (iOS: always 1), so a volume slider would do nothing. */
+export function volumeIsFixed(el: { volume: number }): boolean {
+  el.volume = 0.5;
+  return el.volume !== 0.5;
+}
+
+/**
  * `clips`: the lesson's pre-generated clips for `lang` (src/server/narration.ts), keyed by speechText;
  * a text without a clip, or in another language, goes to the speech engine. `volume`: 0–1.
  */
@@ -155,6 +209,8 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
   const endClip = useRef<(() => void) | null>(null);
   const supported = typeof window !== "undefined" && "speechSynthesis" in window;
   const hasClips = !!clips && Object.keys(clips).length > 0;
+  // Clip URLs already fetched ahead into the HTTP cache (they are immutable).
+  const prefetched = useRef(new Set<string>());
   const engineVoice = useVoiceAvailability(lang);
   // The lesson's own clips read it whatever voices this browser has.
   const voice: VoiceAvailability = hasClips ? "available" : engineVoice;
@@ -185,6 +241,9 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
 
   useEffect(() => stop, [stop]);
 
+  // The first tap anywhere unlocks the clips' element, so a clip started later without a tap (auto-advance) plays on iOS.
+  useEffect(() => (hasClips ? armAudioUnlock(window, () => (endClip.current ? null : (audio.current ??= new Audio()))) : undefined), [hasClips]);
+
   // A clip takes speed and volume changes at once; an utterance keeps the values it started with.
   useEffect(() => {
     const el = audio.current;
@@ -210,7 +269,7 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
       const clean = speechText(text);
       const words = wordsOf(clean);
       const useLang = opts.lang ?? lang;
-      const clip = clips && sameLanguage(useLang, lang) && Object.hasOwn(clips, clean) ? clips[clean] : undefined;
+      const clip = clipFor(clips, clean, useLang, lang);
       if (!enabled || !clean || (!clip && !supported)) {
         opts.onWord?.(words.length);
         return;
@@ -361,6 +420,14 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
         // AbortError: paused or replaced before it started.
         if (name !== "AbortError") fail(name === "NotAllowedError" ? "not-allowed" : "network", name !== "NotAllowedError");
       });
+      // Warm the cache with the next line's clip, so the swap after this one starts at once (one element: no second Audio on iOS).
+      const next = clips && nextClipUrl(clips, clean);
+      if (next && !prefetched.current.has(next)) {
+        prefetched.current.add(next);
+        void fetch(next)
+          .then((r) => r.blob())
+          .catch(() => prefetched.current.delete(next));
+      }
     },
     [supported, lang, stop, clips],
   );

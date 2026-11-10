@@ -1,37 +1,38 @@
 /**
- * Generates the lessons' natural narration: one ElevenLabs clip per spoken string and language, with
- * word timings for the karaoke highlight (lesson-engine.md §1.6). Clips already on disk are reused, so a
- * rerun only pays for new or changed text.
- *   npx tsx --env-file=.env.local scripts/generate-narration.ts --dry-run
- *   npx tsx --env-file=.env.local scripts/generate-narration.ts --locales az,ru --only <module>[/<lesson>] --concurrency 4
- * Needs ELEVENLABS_API_KEY and a voice per language: ELEVENLABS_VOICE_<LOCALE> (ELEVENLABS_VOICE_AZ…) or
- * ELEVENLABS_VOICE_ID for all. --dry-run prints the character count and cost estimate only (no key needed).
- * Writes public/generated/tts/<locale>/<key>.mp3 and content/narration/<locale>/<module>__<lesson>.json
- * (read by src/server/narration.ts). Without a clip the player keeps the browser's voice.
+ * Generates the lessons' natural narration: one clip per spoken string and language, with word timings
+ * for the karaoke highlight (lesson-engine.md §1.6, recipe 6.6). Clips already on disk are reused, so a
+ * rerun only makes new or changed text.
+ *   npm run narration -- --lang en --provider piper
+ *   npm run narration -- --lang az,ru --provider azure --dry-run
+ *   npm run narration -- --lang en --provider piper --only <module>[/<lesson>] --concurrency 2
+ * Providers (scripts/narration/): piper (free, offline, build machine only), azure (AZURE_SPEECH_KEY and
+ * AZURE_SPEECH_REGION), elevenlabs (ELEVENLABS_API_KEY and ELEVENLABS_VOICE_<LOCALE> or ELEVENLABS_VOICE_ID).
+ * Every clip is encoded by the build machine's ffmpeg (FFMPEG, else ffmpeg on PATH; deliberately not an app
+ * dependency, so `npm ci` and the image never fetch it) to MP3, mono, 48 kbps, loudness-normalised.
+ * Writes public/generated/tts/<locale>/<key>.mp3 (git-ignored) and content/narration/<locale>/<module>__<lesson>.json
+ * (committed, read by src/server/narration.ts). Without a clip the player keeps the browser's voice.
  */
+import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { IntlMessageFormat } from "intl-messageformat";
-import { z } from "zod";
 import { LOCALES, isLocale } from "../src/i18n/config";
 import type { LessonFile } from "../src/lib/content/types";
-import { NARRATION_DIR, clipUrl, manifestName, wordTimings, type NarrationClip, type NarrationClips } from "../src/lib/tts/clips";
-import { TTS_MODEL, clipKey } from "../src/lib/tts/key";
+import { NARRATION_DIR, clipUrl, manifestName, type NarrationClip, type NarrationClips } from "../src/lib/tts/clips";
+import { clipKey } from "../src/lib/tts/key";
 import { spokenTexts, type SpokenUi } from "../src/lib/tts/spoken";
+import { azure } from "./narration/azure";
+import { elevenLabs } from "./narration/elevenlabs";
+import { piper } from "./narration/piper";
+import { Fatal, failureStreak, type Provider } from "./narration/provider";
 
 const LESSONS = path.join(process.cwd(), "content", "library", "lessons");
 const PUBLIC = path.join(process.cwd(), "public");
 const MANIFESTS = path.join(process.cwd(), ...NARRATION_DIR);
-const API = "https://api.elevenlabs.io/v1/text-to-speech";
-const OUTPUT_FORMAT = "mp3_44100_128";
-/** Rough API price of eleven_v3; the plan decides the real one. */
-const USD_PER_1K_CHARS = 0.08;
-/** eleven_v3's longest request. */
-const MAX_CHARS = 5000;
-const REQUEST_TIMEOUT_MS = 90_000;
-const MAX_ATTEMPTS = 6;
-
-class Fatal extends Error {}
+const FFMPEG = process.env.FFMPEG || "ffmpeg";
+/** Failures in a row that mean a broken engine, encoder or disk rather than one bad text. */
+const MAX_FAILURES_IN_A_ROW = 10;
+const PROVIDERS: Record<string, (concurrency: number) => Provider> = { piper, azure: () => azure(), elevenlabs: elevenLabs };
 
 function fail(message: string): never {
   console.error(message);
@@ -39,18 +40,20 @@ function fail(message: string): never {
 }
 
 function parseArgs(argv: string[]) {
-  const out: { locales: string[]; only?: string; dryRun: boolean; concurrency: number } = { locales: [...LOCALES], dryRun: false, concurrency: 4 };
+  const out: { locales: string[]; provider: string; only?: string; dryRun: boolean; concurrency: number } = { locales: [...LOCALES], provider: "elevenlabs", dryRun: false, concurrency: 4 };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const value = () => (argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[++i] : fail(`${a} needs a value`));
     if (a === "--dry-run") out.dryRun = true;
-    else if (a === "--locales") out.locales = value().split(",").map((l) => l.trim()).filter(Boolean);
+    else if (a === "--locales" || a === "--lang") out.locales = value().split(",").map((l) => l.trim()).filter(Boolean);
+    else if (a === "--provider") out.provider = value();
     else if (a === "--only") out.only = value().replace(/\/+$/, "");
     else if (a === "--concurrency") out.concurrency = Number(value());
-    else fail(`Unknown argument ${a}. Options: --locales az,ru --only <module>[/<lesson>] --dry-run --concurrency 4`);
+    else fail(`Unknown argument ${a}. Options: --lang az,ru --provider ${Object.keys(PROVIDERS).join("|")} --only <module>[/<lesson>] --dry-run --concurrency 4`);
   }
   const bad = out.locales.filter((l) => !isLocale(l));
   if (bad.length || !out.locales.length) fail(`Unknown locale ${bad.join(", ") || "(none)"}; choose from ${LOCALES.join(", ")}`);
+  if (!Object.hasOwn(PROVIDERS, out.provider)) fail(`Unknown provider ${out.provider}; choose from ${Object.keys(PROVIDERS).join(", ")}`);
   if (!Number.isInteger(out.concurrency) || out.concurrency < 1 || out.concurrency > 16) fail("--concurrency must be 1 to 16");
   return out;
 }
@@ -107,44 +110,21 @@ function writeAtomic(file: string, data: string | Buffer) {
   fs.renameSync(`${file}.part`, file);
 }
 
-const alignmentSchema = z
-  .object({ characters: z.array(z.string()), character_start_times_seconds: z.array(z.number()), character_end_times_seconds: z.array(z.number()) })
-  .refine((a) => a.characters.length === a.character_start_times_seconds.length && a.characters.length === a.character_end_times_seconds.length);
-const responseSchema = z.object({ audio_base64: z.string().min(1), alignment: alignmentSchema.nullish() });
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const backoff = (attempt: number) => Math.min(30_000, 1000 * 2 ** (attempt - 1)) + Math.floor(Math.random() * 500);
-
-/** One request with retries on rate limits, server errors, timeouts and network failures. The key is sent, never printed. */
-async function synthesize(apiKey: string, voice: string, locale: string, key: string, text: string) {
-  const url = `${API}/${encodeURIComponent(voice)}/with-timestamps?output_format=${OUTPUT_FORMAT}`;
-  // The seed makes a regenerated clip sound the same (best effort on the provider's side).
-  const body = JSON.stringify({ text, model_id: TTS_MODEL, language_code: locale, seed: parseInt(key.slice(0, 8), 16) });
-  for (let attempt = 1; ; attempt++) {
-    let res: Response;
-    try {
-      res = await fetch(url, { method: "POST", headers: { "xi-api-key": apiKey, "content-type": "application/json", accept: "application/json" }, body, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
-    } catch (e) {
-      if (attempt >= MAX_ATTEMPTS) throw new Error(`no answer after ${attempt} attempts (${(e as Error).name})`);
-      await sleep(backoff(attempt));
-      continue;
-    }
-    if (res.ok) {
-      const parsed = responseSchema.safeParse(await res.json());
-      if (!parsed.success) throw new Error("unexpected response shape");
-      if (!parsed.data.alignment) throw new Error("the response has no character timings");
-      return { audio: Buffer.from(parsed.data.audio_base64, "base64"), alignment: parsed.data.alignment };
-    }
-    const detail = (await res.text().catch(() => "")).slice(0, 300);
-    // A wrong key, a used-up quota or a voice the account cannot use stops the whole run.
-    if (res.status === 401 || res.status === 403) throw new Fatal(`HTTP ${res.status}: ${detail}`);
-    if ((res.status === 429 || res.status >= 500) && attempt < MAX_ATTEMPTS) {
-      const after = Number(res.headers.get("retry-after"));
-      await sleep(after > 0 ? Math.min(after, 60) * 1000 : backoff(attempt));
-      continue;
-    }
-    throw new Error(`HTTP ${res.status}: ${detail}`);
-  }
+/** Any audio ffmpeg reads → MP3, mono, 24 kHz, 48 kbps, normalised to −16 LUFS so every provider sounds equally loud. */
+function encodeMp3(input: Buffer): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const args = ["-hide_banner", "-loglevel", "error", "-i", "pipe:0", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ac", "1", "-ar", "24000", "-c:a", "libmp3lame", "-b:a", "48k", "-f", "mp3", "pipe:1"];
+    const child = spawn(FFMPEG, args);
+    const out: Buffer[] = [];
+    let err = "";
+    child.stdout.on("data", (d: Buffer) => out.push(d));
+    child.stderr.on("data", (d: Buffer) => (err = (err + d.toString()).slice(-1000)));
+    child.on("error", (e) => reject(new Fatal(`ffmpeg (${FFMPEG}): ${e.message}; install ffmpeg with libmp3lame on the build machine or set FFMPEG to it`)));
+    child.on("close", (code) => (code === 0 ? resolve(Buffer.concat(out)) : reject(new Error(`ffmpeg exit ${code}: ${err.slice(-300)}`))));
+    // ffmpeg that fails early closes its input: the exit code reports it.
+    child.stdin.on("error", () => {});
+    child.stdin.end(input);
+  });
 }
 
 async function pool<T>(items: readonly T[], size: number, run: (item: T) => Promise<void>, stopped: () => boolean) {
@@ -158,24 +138,18 @@ async function pool<T>(items: readonly T[], size: number, run: (item: T) => Prom
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
-  const voiceOf = (locale: string) => (process.env[`ELEVENLABS_VOICE_${locale.toUpperCase()}`] || process.env.ELEVENLABS_VOICE_ID || "").trim();
-  for (const locale of args.locales) {
-    const voice = voiceOf(locale);
-    // The voice id goes into the request path.
-    if (voice && !/^[A-Za-z0-9]{8,64}$/.test(voice)) fail(`The ${locale} voice id is not an ElevenLabs voice id (letters and digits only).`);
-  }
+  const provider = PROVIDERS[args.provider](args.concurrency);
 
   type Plan = { locale: string; voice: string; lessons: Lesson[]; ready: Map<string, NarrationClip>; clips: number; chars: number; newClips: number; newChars: number };
   const plans: Plan[] = args.locales.map((locale) => {
-    const voice = voiceOf(locale);
+    const voice = provider.voice(locale);
     const lessons = lessonsIn(locale, args.only, spokenUi(locale));
     // Clips of earlier runs whose audio is still on disk (with no voice set, none can match).
     const ready = new Map([...knownClips(locale)].filter(([url]) => voice && fs.existsSync(path.join(PUBLIC, url))));
     const plan = { locale, voice, lessons, ready, clips: 0, chars: 0, newClips: 0, newChars: 0 };
     const seen = new Set<string>();
     for (const text of lessons.flatMap((l) => l.texts)) {
-      const key = clipKey(locale, TTS_MODEL, voice, text);
+      const key = clipKey(locale, provider.model, voice, text);
       if (seen.has(key)) continue;
       seen.add(key);
       plan.clips++;
@@ -189,60 +163,65 @@ async function main() {
   });
   if (args.only && plans.every((p) => !p.lessons.length)) fail(`No library lesson matches --only ${args.only}`);
 
-  const usd = (chars: number) => `${((chars / 1000) * USD_PER_1K_CHARS).toFixed(2)} USD`;
-  console.log(`Model ${TTS_MODEL}, ${OUTPUT_FORMAT}, about ${USD_PER_1K_CHARS} USD per 1,000 characters.`);
+  const usd = (chars: number) => `${((chars / 1000) * provider.usdPer1kChars).toFixed(2)} USD`;
+  console.log(`Provider ${args.provider} (${provider.model}), about ${provider.usdPer1kChars} USD per 1,000 characters.`);
   for (const p of plans) {
     console.log(
-      `${p.locale}: ${p.lessons.length} lessons, ${p.clips} clips, ${p.chars.toLocaleString("en")} characters; to generate ${p.newClips} clips, ${p.newChars.toLocaleString("en")} characters (~${usd(p.newChars)})${p.voice ? "" : "; no voice set, so every clip counts as new"}`,
+      `${p.locale}${p.voice ? ` (${p.voice})` : ""}: ${p.lessons.length} lessons, ${p.clips} clips, ${p.chars.toLocaleString("en")} characters; to generate ${p.newClips} clips, ${p.newChars.toLocaleString("en")} characters (~${usd(p.newChars)})${p.voice ? "" : "; no voice set, so every clip counts as new"}`,
     );
   }
   const total = plans.reduce((n, p) => n + p.newChars, 0);
   console.log(`Total to generate: ${plans.reduce((n, p) => n + p.newClips, 0)} clips, ${total.toLocaleString("en")} characters (~${usd(total)}).`);
   if (args.dryRun) return;
 
-  if (!apiKey) fail("ELEVENLABS_API_KEY is not set (use --dry-run for the estimate only).");
   const voiceless = plans.filter((p) => !p.voice).map((p) => p.locale);
-  if (voiceless.length) fail(`No voice for ${voiceless.join(", ")}: set ELEVENLABS_VOICE_ID or ELEVENLABS_VOICE_<LOCALE>.`);
+  if (voiceless.length) fail(`No ${args.provider} voice for ${voiceless.join(", ")}: see scripts/narration/${args.provider}.ts for the variable that sets it.`);
 
   let failed = 0;
+  const tooMany = failureStreak(MAX_FAILURES_IN_A_ROW);
   let fatal: string | null = null;
-  for (const p of plans) {
-    for (const lesson of p.lessons) {
-      if (fatal) break;
-      const textOf = new Map(lesson.texts.map((text) => [clipKey(p.locale, TTS_MODEL, p.voice, text), text]));
-      // A clip shared with an earlier lesson (an interface string) is made once.
-      const missing = [...textOf.keys()].filter((key) => !p.ready.has(clipUrl(p.locale, key)));
-      let made = 0;
-      await pool(
-        missing,
-        args.concurrency,
-        async (key) => {
-          const text = textOf.get(key) ?? "";
-          const url = clipUrl(p.locale, key);
-          try {
-            if (text.length > MAX_CHARS) throw new Error(`longer than ${MAX_CHARS} characters`);
-            const { audio, alignment } = await synthesize(apiKey, p.voice, p.locale, key, text);
-            writeAtomic(path.join(PUBLIC, url), audio);
-            const durationMs = Math.round(Math.max(0, ...alignment.character_end_times_seconds) * 1000);
-            p.ready.set(url, { url, durationMs, words: wordTimings(text, alignment) });
-            made++;
-          } catch (e) {
-            failed++;
-            if (e instanceof Fatal) fatal = e.message;
-            console.error(`FAIL ${p.locale} ${lesson.key} "${text.slice(0, 60)}${text.length > 60 ? "…" : ""}": ${(e as Error).message}`);
-          }
-        },
-        () => fatal !== null,
-      );
-      // Written after every lesson: the manifests are the only record of the clips' word timings.
-      const manifest: NarrationClips = {};
-      for (const [key, text] of textOf) {
-        const clip = p.ready.get(clipUrl(p.locale, key));
-        if (clip) manifest[text] = clip;
+  try {
+    for (const p of plans) {
+      for (const lesson of p.lessons) {
+        if (fatal) break;
+        const textOf = new Map(lesson.texts.map((text) => [clipKey(p.locale, provider.model, p.voice, text), text]));
+        // A clip shared with an earlier lesson (an interface string) is made once.
+        const missing = [...textOf.keys()].filter((key) => !p.ready.has(clipUrl(p.locale, key)));
+        let made = 0;
+        await pool(
+          missing,
+          args.concurrency,
+          async (key) => {
+            const text = textOf.get(key) ?? "";
+            const url = clipUrl(p.locale, key);
+            try {
+              if (text.length > provider.maxChars) throw new Error(`longer than ${provider.maxChars} characters`);
+              const { audio, durationMs, words } = await provider.synthesize(p.locale, p.voice, key, text);
+              writeAtomic(path.join(PUBLIC, url), await encodeMp3(audio));
+              p.ready.set(url, { url, durationMs, words });
+              made++;
+              tooMany(true);
+            } catch (e) {
+              failed++;
+              if (e instanceof Fatal) fatal = e.message;
+              else if (tooMany(false)) fatal = `${MAX_FAILURES_IN_A_ROW} clips failed in a row, the last: ${(e as Error).message}`;
+              console.error(`FAIL ${p.locale} ${lesson.key} "${text.slice(0, 60)}${text.length > 60 ? "…" : ""}": ${(e as Error).message}`);
+            }
+          },
+          () => fatal !== null,
+        );
+        // Written after every lesson: the manifests are the only record of the clips' word timings.
+        const manifest: NarrationClips = {};
+        for (const [key, text] of textOf) {
+          const clip = p.ready.get(clipUrl(p.locale, key));
+          if (clip) manifest[text] = clip;
+        }
+        if (Object.keys(manifest).length) writeAtomic(path.join(MANIFESTS, p.locale, manifestName(lesson.key)), `${JSON.stringify(manifest)}\n`);
+        console.log(`${p.locale} ${lesson.key}: ${made} generated, ${Object.keys(manifest).length} of ${lesson.texts.length} texts have a clip`);
       }
-      if (Object.keys(manifest).length) writeAtomic(path.join(MANIFESTS, p.locale, manifestName(lesson.key)), `${JSON.stringify(manifest)}\n`);
-      console.log(`${p.locale} ${lesson.key}: ${made} generated, ${Object.keys(manifest).length} of ${lesson.texts.length} texts have a clip`);
     }
+  } finally {
+    provider.close?.();
   }
   if (fatal) fail(`Stopped: ${fatal}`);
   if (failed) fail(`${failed} clips failed; run again to retry them.`);

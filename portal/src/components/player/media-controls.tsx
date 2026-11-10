@@ -12,16 +12,22 @@ import { cn } from "@/lib/cn";
 import { speechText } from "@/lib/tts/text";
 import { SPEEDS, type Shortcut, type TranscriptLine } from "./controls";
 import { useLine, type Captions, type CaptionLoad } from "./captions";
+import { volumeIsFixed } from "./narrator";
 
 /** A round icon button of the player header. */
 export function HeaderButton({ className, ...props }: ComponentProps<"button">) {
   return <button type="button" className={cn("grid size-10 shrink-0 place-items-center pointer-coarse:size-11 rounded-full text-ink hover:bg-sunken aria-pressed:bg-brand-50 aria-pressed:text-brand-700 [&_svg]:size-4.5", className)} {...props} />;
 }
 
-/** Mute (the sound switch) and the narration volume slider. */
+const noSubscribe = () => () => {};
+let fixedVolume: boolean | undefined;
+const readFixedVolume = () => (fixedVolume ??= volumeIsFixed(new Audio()));
+
+/** Mute (the sound switch) and the narration volume slider; no slider where the volume cannot be set (iOS: the device buttons set it). */
 export function VolumeControl({ volume, onVolume, soundOn, onToggleSound, className }: { volume: number; onVolume: (v: number) => void; soundOn: boolean; onToggleSound: () => void; className?: string }) {
   const t = useTranslations("player");
   const format = useClientFormat();
+  const fixed = useSyncExternalStore(noSubscribe, readFixedVolume, () => false);
   const Icon = !soundOn || volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -29,6 +35,7 @@ export function VolumeControl({ volume, onVolume, soundOn, onToggleSound, classN
         <Icon className={cn(!soundOn && "text-ink-subtle")} />
       </HeaderButton>
       <input
+        hidden={fixed}
         type="range"
         min={0}
         max={1}

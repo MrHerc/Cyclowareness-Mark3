@@ -536,6 +536,8 @@ export function LessonPlayer(p: PlayerProps) {
               <div className="grid gap-1.5">
                 <p className="text-caption font-semibold text-ink-muted">{t("volume")}</p>
                 <VolumeControl volume={volume} onVolume={volumePref.set} soundOn={soundOn} onToggleSound={toggleSound} />
+                {/* The recorded clips are machine speech: say so (Azure TTS Code of Conduct; fair to every learner). */}
+                {p.clips && Object.keys(p.clips).length ? <p className="text-caption text-ink-muted">{t("syntheticVoice")}</p> : null}
               </div>
               <div className="grid gap-1.5">
                 <SpeedSelect labelled value={speed} onChange={speedPref.set} />
