@@ -127,16 +127,17 @@ re-encrypted, so nothing has to be re-entered. Every instance (`app`, `worker`) 
 3. **Re-encrypt.** The runtime image ships neither `tsx` nor the TypeScript scripts, so run it from a
    checkout of the deployed version (`portal` folder, `npm ci`) with the server's environment
    (`DATABASE_URL`, `APP_SECRET=<new>`, `APP_SECRET_PREVIOUS=<old>`, `APP_DOMAIN_PROOF_SECRET`):
-   `npx tsx scripts/rotate-secret.ts`. With Docker Compose, the `seed` service is built from the
+   `npm run secret:rotate`. With Docker Compose, the `seed` service is built from the
    builder stage and reads `.env`, so once the keys are there:
-   `docker compose --profile tools run --rm seed npx tsx scripts/rotate-secret.ts`. It aborts
+   `docker compose --profile tools run --rm seed npm run secret:rotate`. It aborts
    when `DATABASE_URL` is set and `APP_SECRET` is missing or shorter than 32 characters (it would
    otherwise seal everything with the development key), when `APP_SECRET_PREVIOUS` is set but too
    short to count, and when `APP_DOMAIN_PROOF_SECRET` is not set while an organisation has a verified
    domain (go back to step 1). It prints how many organisations' settings and how many
    authenticator keys it re-encrypted, nothing else, and is safe to run again (the second run reports
    zero). A value that opens with neither key is left as it is and counted; that organisation then
-   re-enters the secret in Settings.
+   re-enters the secret in Settings. An organisation deleted while the script runs is skipped and
+   its id printed; the others are still re-encrypted.
 4. **Remove the old key.** Take `APP_SECRET_PREVIOUS` out of the environment and restart. Write the
    rotation down in the timeline of the incident that caused it.
 

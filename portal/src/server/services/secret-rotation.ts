@@ -4,10 +4,10 @@ import * as t from "../db/schema";
 import { decryptSecret, encryptSecret, sealedWithCurrentKey } from "../crypto";
 import { withDefaults } from "../../lib/tenant-defaults";
 
-export type RotationCounts = { tenants: number; users: number; unreadable: number };
+export type RotationCounts = { tenants: number; users: number; unreadable: number; skipped: string[] };
 
 /**
- * Why scripts/rotate-secret.ts must not run: without a 32+ APP_SECRET, crypto.ts would seal every secret
+ * Why `npm run secret:rotate` must not run: without a 32+ APP_SECRET, crypto.ts would seal every secret
  * with the public development key; the embedded development database is the only place that may happen.
  * A previous key too short to count is ignored by crypto.ts, which would report every old value unreadable.
  * Without APP_DOMAIN_PROOF_SECRET the proof key follows APP_SECRET, so step 4 would silently break every
@@ -20,6 +20,7 @@ export function rotationRefusal(
   if ((e.NODE_ENV === "production" || e.DATABASE_URL) && (e.APP_SECRET ?? "").length < 32) {
     return "APP_SECRET (32+ characters, the new key) must be set: a rotation cannot seal stored secrets with the development key.";
   }
+  if (e.APP_SECRET_PREVIOUS && e.APP_SECRET_PREVIOUS === e.APP_SECRET) return "APP_SECRET_PREVIOUS equals APP_SECRET: set it to the old key.";
   if (e.APP_SECRET_PREVIOUS && e.APP_SECRET_PREVIOUS.length < 32) return "APP_SECRET_PREVIOUS is shorter than 32 characters and would be ignored: set it to the old key exactly.";
   if (verifiedDomains > 0 && !e.APP_DOMAIN_PROOF_SECRET) {
     return `APP_DOMAIN_PROOF_SECRET is not set and ${verifiedDomains} organisation(s) have a verified domain: their published TXT records would stop verifying once the old key is removed. Set it to the old APP_SECRET first (docs/OPERATIONS.md, "Rotating APP_SECRET", step 1).`;
@@ -36,10 +37,11 @@ export async function countVerifiedDomains(db: DB): Promise<number> {
  * Re-encrypts every stored secret with the current APP_SECRET after a rotation (docs/OPERATIONS.md,
  * "Rotating APP_SECRET"): the *Enc fields of tenants.settings and users.totp_secret. A value already
  * under the current key is left alone, so a second run changes nothing; one that opens with no key
- * (sealed with a secret that is neither current nor previous) is left as it is and counted.
+ * (sealed with a secret that is neither current nor previous) is left as it is and counted. An
+ * organisation deleted after the id list was read is skipped and reported, the others still finish.
  */
 export async function rotateStoredSecrets(db: DB): Promise<RotationCounts> {
-  const counts: RotationCounts = { tenants: 0, users: 0, unreadable: 0 };
+  const counts: RotationCounts = { tenants: 0, users: 0, unreadable: 0, skipped: [] };
   const resealed = (value: string | undefined | null): string | undefined => {
     if (!value || sealedWithCurrentKey(value)) return undefined;
     const plain = decryptSecret(value);
@@ -55,6 +57,7 @@ export async function rotateStoredSecrets(db: DB): Promise<RotationCounts> {
     // Read and written under a lock, so an administrator's settings save meanwhile is not overwritten.
     const changed = await db.transaction(async (tx) => {
       const [row] = await tx.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, id)).for("update");
+      if (!row) return null;
       const s = withDefaults(structuredClone(row.settings));
       const holders: [{ [field: string]: unknown } | undefined, string][] = [
         [s.identity.sso, "clientSecretEnc"],
@@ -73,7 +76,8 @@ export async function rotateStoredSecrets(db: DB): Promise<RotationCounts> {
       if (changed) await tx.update(t.tenants).set({ settings: s }).where(eq(t.tenants.id, id));
       return changed;
     });
-    if (changed) counts.tenants++;
+    if (changed === null) counts.skipped.push(id);
+    else if (changed) counts.tenants++;
   }
 
   const users = await db.select({ id: t.users.id, totpSecret: t.users.totpSecret }).from(t.users).where(isNotNull(t.users.totpSecret));

@@ -3,7 +3,7 @@ import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, 
 /**
  * Encryption for secrets stored in the database (SMTP and SSO passwords, TOTP keys, webhook
  * secrets): AES-256-GCM with a key derived from APP_SECRET. During a rotation APP_SECRET_PREVIOUS
- * still opens what the old key sealed; scripts/rotate-secret.ts re-encrypts it all (docs/OPERATIONS.md).
+ * still opens what the old key sealed; `npm run secret:rotate` re-encrypts it all (docs/OPERATIONS.md).
  */
 function secret(): string {
   const value = process.env.APP_SECRET;
@@ -22,9 +22,13 @@ function key(purpose: string, value = secret()): Buffer {
   return createHash("sha256").update(`${purpose}:${value}`).digest();
 }
 
-/** Key id written into v2 ciphertexts, so decryption knows which secret sealed them. */
+/**
+ * Key id written into v2 ciphertexts, so decryption knows which secret sealed them. Derived with its
+ * own purpose label like every key, so the id is not a prefix of the plain hash of the secret or of
+ * any other derivation (a v2 written before the label falls back to every key, see decryptSecret).
+ */
 function kid(value: string): string {
-  return createHash("sha256").update(value).digest("hex").slice(0, 8);
+  return key("kid", value).toString("hex").slice(0, 8);
 }
 
 export function encryptSecret(plain: string): string {
@@ -35,7 +39,7 @@ export function encryptSecret(plain: string): string {
   return ["v2", kid(current), iv.toString("base64url"), cipher.getAuthTag().toString("base64url"), data.toString("base64url")].join(":");
 }
 
-/** True when the ciphertext was sealed with the current APP_SECRET (what scripts/rotate-secret.ts leaves alone). */
+/** True when the ciphertext was sealed with the current APP_SECRET (what `npm run secret:rotate` leaves alone). */
 export function sealedWithCurrentKey(value: string): boolean {
   return value.startsWith(`v2:${kid(secret())}:`);
 }

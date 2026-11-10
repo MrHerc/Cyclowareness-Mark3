@@ -1,9 +1,11 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { LOCALES } from "../src/i18n/config";
+import { defaultSettings } from "../src/lib/tenant-defaults";
 import { DB_SETUP_TIMEOUT, addTenant, addUser, testDb } from "./helpers/db";
 
 // Key versioning and rotation (ADR: one previous key, no KMS): v1 ciphertexts written before the change, v2 key ids,
@@ -89,6 +91,9 @@ describe("ciphertext versions", () => {
   it("writes v2 with the current key's id and opens it by that id after the secret moved to APP_SECRET_PREVIOUS", () => {
     const sealed = encryptSecret("ldap-bind-password");
     expect(sealed).toMatch(/^v2:[0-9a-f]{8}:/);
+    // The id is derived with its own label, never the plain hash of the secret.
+    expect(kidOf(sealed)).toBe(createHash("sha256").update(`kid:${CURRENT}`).digest("hex").slice(0, 8));
+    expect(kidOf(sealed)).not.toBe(createHash("sha256").update(CURRENT).digest("hex").slice(0, 8));
     expect(sealedWithCurrentKey(sealed)).toBe(true);
     vi.stubEnv("APP_SECRET", PREVIOUS);
     vi.stubEnv("APP_SECRET_PREVIOUS", CURRENT);
@@ -135,7 +140,7 @@ describe("rotate-secret", () => {
     const current = await addUser(db, tenant.id, { totpSecret: sealedWith(CURRENT, "CURRENTKEY") });
     const unreadable = await addUser(db, tenant.id, { totpSecret: sealedWith("some-other-secret-nobody-has-any-more-0123456789", "LOST") });
 
-    expect(await rotateStoredSecrets(db)).toEqual({ tenants: 2, users: 1, unreadable: 1 });
+    expect(await rotateStoredSecrets(db)).toEqual({ tenants: 2, users: 1, unreadable: 1, skipped: [] });
     expect(decryptSecret((await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, partial.id)))[0].settings.email.passwordEnc)).toBe("partial-password");
     const [row] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenant.id));
     const resealed = [row.settings.identity.sso?.clientSecretEnc, row.settings.identity.ldap?.passwordEnc, row.settings.email.passwordEnc, row.settings.integrations.webhookSecretEnc] as string[];
@@ -147,10 +152,30 @@ describe("rotate-secret", () => {
     expect(await totp(unreadable.id)).toBe(unreadable.totpSecret);
     expect((await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, untouched.id)))[0].settings).toEqual(untouched.settings);
 
-    expect(await rotateStoredSecrets(db)).toEqual({ tenants: 0, users: 0, unreadable: 1 });
+    expect(await rotateStoredSecrets(db)).toEqual({ tenants: 0, users: 0, unreadable: 1, skipped: [] });
     rotation(false);
     expect(resealed.map(decryptSecret)).toEqual(["sso-secret", "ldap-password", V1_PLAIN, "already-current"]);
     expect(decryptSecret(await totp(user.id))).toBe("JBSWY3DPEHPK3PXP");
+  });
+});
+
+describe("rotate-secret with an organisation deleted mid-run", () => {
+  it("skips the missing row, finishes the others and reports the skipped id", async () => {
+    rotation(true);
+    const sealed = (plain: string) => ({ ...defaultSettings("en"), email: { enabled: true, passwordEnc: sealedWith(PREVIOUS, plain) } });
+    const doomed = await addTenant(db, { settings: sealed("doomed-password") });
+    const survivor = await addTenant(db, { settings: sealed("survivor-password") });
+    // The id list is read before the per-organisation locks: the first lock finds the row gone.
+    const transaction = db.transaction.bind(db);
+    vi.spyOn(db, "transaction").mockImplementationOnce(async (fn) => {
+      await db.delete(t.tenants).where(eq(t.tenants.id, doomed.id));
+      return transaction(fn);
+    });
+    const counts = await rotateStoredSecrets(db);
+    expect(counts.skipped).toEqual([doomed.id]);
+    const [row] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, survivor.id));
+    expect(sealedWithCurrentKey(row.settings.email.passwordEnc as string)).toBe(true);
+    expect(decryptSecret(row.settings.email.passwordEnc)).toBe("survivor-password");
   });
 });
 
@@ -160,6 +185,8 @@ describe("rotate-secret refusal", () => {
     expect(rotationRefusal({ DATABASE_URL: "postgres://db/portal", APP_SECRET: weak })).toMatch(/APP_SECRET \(32\+/);
     expect(rotationRefusal({ NODE_ENV: "production", APP_SECRET: "" })).toMatch(/APP_SECRET \(32\+/);
     expect(rotationRefusal({ APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: weak })).toMatch(/APP_SECRET_PREVIOUS/);
+    // The script does not load env.ts, so it refuses the old key left equal to the new one itself.
+    expect(rotationRefusal({ DATABASE_URL: "postgres://db/portal", APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: CURRENT })).toMatch(/equals APP_SECRET/);
     expect(rotationRefusal({ DATABASE_URL: "postgres://db/portal", APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: PREVIOUS })).toBeNull();
     // The embedded development database is the only place the fallback key may be used.
     expect(rotationRefusal({ APP_SECRET: "" })).toBeNull();

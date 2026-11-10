@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
-import { runJobs } from "../src/server/jobs";
+import { monthsBefore, runJobs } from "../src/server/jobs";
 import { defaultSettings } from "../src/lib/tenant-defaults";
 import { riskTitles } from "../src/lib/risk-title";
 import { addModule, addTenant, addUser, DB_SETUP_TIMEOUT, testDb } from "./helpers/db";
@@ -96,6 +96,31 @@ describe("job runner tick", () => {
         { auditEntries: 0, answers: 1, risks: 1, learningBefore: "2025-11-07T10:00:00.000Z" },
       ]),
     );
+  }, 60_000);
+
+  it("cuts off on the same day of the month, clamped to the last day of a shorter month", () => {
+    const at = (iso: string) => new Date(iso).toISOString();
+    expect(monthsBefore(new Date("2026-11-07T10:00:00Z"), 12).toISOString()).toBe(at("2025-11-07T10:00:00Z"));
+    // setUTCMonth alone would roll these over into the next month (3 April, 1 June, 1 March).
+    expect(monthsBefore(new Date("2026-03-31T10:00:00Z"), 1).toISOString()).toBe(at("2026-02-28T10:00:00Z"));
+    expect(monthsBefore(new Date("2026-05-31T10:00:00Z"), 1).toISOString()).toBe(at("2026-04-30T10:00:00Z"));
+    expect(monthsBefore(new Date("2028-02-29T10:00:00Z"), 12).toISOString()).toBe(at("2027-02-28T10:00:00Z"));
+    expect(monthsBefore(new Date("2026-03-31T10:00:00Z"), 13).toISOString()).toBe(at("2025-02-28T10:00:00Z"));
+    expect(monthsBefore(new Date("2026-01-15T00:00:00Z"), 2).toISOString()).toBe(at("2025-11-15T00:00:00Z"));
+  });
+
+  it("purges the audit log no earlier than 12 months even when a shorter value was stored before the floor existed", async () => {
+    const now = new Date("2026-11-09T10:00:00Z");
+    const tenant = await addTenant(db, { settings: { ...defaultSettings("en"), retention: { auditMonths: 1, learningMonths: 0 } } });
+    await db.insert(t.auditLog).values([
+      { tenantId: tenant.id, action: "two months", at: new Date(now.getTime() - 60 * DAY) },
+      { tenantId: tenant.id, action: "old", at: new Date(now.getTime() - 400 * DAY) },
+    ]);
+    globalThis.__jobsCleanupDay = undefined;
+    await runJobs(db, now);
+    const rows = await db.select({ a: t.auditLog.action, meta: t.auditLog.meta }).from(t.auditLog).where(eq(t.auditLog.tenantId, tenant.id));
+    expect(rows.map((r) => r.a).sort()).toEqual(["retention.purged", "two months"]);
+    expect(rows.find((r) => r.a === "retention.purged")?.meta).toMatchObject({ auditEntries: 1, auditBefore: "2025-11-09T10:00:00.000Z" });
   }, 60_000);
 
   it("stops at the time budget, keeps the organisation's rows and leaves the day to the next tick", async () => {

@@ -75,3 +75,29 @@ describe("production start-up", () => {
     expect(appUrl()).toBe("http://localhost:3000");
   });
 });
+
+describe("key ring variables", () => {
+  const PREVIOUS = "y".repeat(40);
+
+  it("APP_SECRET_PREVIOUS: blank means no rotation, too short or equal to APP_SECRET refuses to start", async () => {
+    const { env } = await load({ APP_SECRET: SECRET, APP_SECRET_PREVIOUS: "" });
+    expect(env.previousSecret).toBeUndefined();
+    const on = await load({ APP_SECRET: SECRET, APP_SECRET_PREVIOUS: PREVIOUS });
+    expect(on.env.previousSecret).toBe(PREVIOUS);
+    await expect(load({ APP_SECRET: SECRET, APP_SECRET_PREVIOUS: "short" })).rejects.toThrow(/APP_SECRET_PREVIOUS/);
+    await expect(load({ APP_SECRET: SECRET, APP_SECRET_PREVIOUS: SECRET })).rejects.toThrow(/not the current APP_SECRET[\s\S]*APP_SECRET_PREVIOUS/);
+    // The old key alone is not a configuration: production still needs the current one.
+    await expect(load({ NODE_ENV: "production", APP_URL: "https://portal.example.com", TRUST_PROXY: "1", APP_SECRET_PREVIOUS: PREVIOUS })).rejects.toThrow(/APP_SECRET must be set in production/);
+  });
+
+  it("APP_DOMAIN_PROOF_SECRET: blank follows APP_SECRET, too short refuses, equal to APP_SECRET is the runbook's step 1", async () => {
+    const { env } = await load({ APP_SECRET: SECRET, APP_DOMAIN_PROOF_SECRET: "" });
+    expect(env.domainProofSecret).toBe(SECRET);
+    const own = await load({ APP_SECRET: SECRET, APP_DOMAIN_PROOF_SECRET: PREVIOUS });
+    expect(own.env.domainProofSecret).toBe(PREVIOUS);
+    await expect(load({ APP_SECRET: SECRET, APP_DOMAIN_PROOF_SECRET: "short" })).rejects.toThrow(/APP_DOMAIN_PROOF_SECRET/);
+    const pinned = await load({ APP_SECRET: SECRET, APP_DOMAIN_PROOF_SECRET: SECRET });
+    expect(pinned.env.domainProofSecret).toBe(SECRET);
+    await expect(load({ NODE_ENV: "production", APP_URL: "https://portal.example.com", TRUST_PROXY: "1", APP_DOMAIN_PROOF_SECRET: PREVIOUS })).rejects.toThrow(/APP_SECRET must be set in production/);
+  });
+});

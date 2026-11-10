@@ -268,6 +268,9 @@ export const WEBHOOK_EVENTS = [
   "sandbox.malicious",
 ] as const;
 
+/** The audit log is the evidence of the administrators' own actions: when it is purged at all, it is kept at least this long. */
+export const MIN_AUDIT_MONTHS = 12;
+
 export function defaultSettings(locale = "az"): TenantSettings {
   return {
     defaultLocale: locale,
