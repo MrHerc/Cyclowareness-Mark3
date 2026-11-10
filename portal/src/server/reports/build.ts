@@ -46,13 +46,15 @@ export async function scopedPeople(v: Viewer, f: ReportFilters) {
   const departments = await db().select().from(t.departments).where(eq(t.departments.tenantId, v.tenant.id));
   const closure = departmentClosure(departments);
   const dept = f.departmentId ? narrowToDepartment(scope, closure, f.departmentId) : scope;
-  const users = await db()
-    .select()
-    .from(t.users)
-    .where(and(eq(t.users.tenantId, v.tenant.id), ne(t.users.status, "deleted"), ne(t.users.role, "super_admin")))
-    .orderBy(asc(t.users.name));
+  const covered = and(eq(t.users.tenantId, v.tenant.id), ne(t.users.status, "deleted"), ne(t.users.role, "super_admin"));
+  const users = await db().select().from(t.users).where(covered).orderBy(asc(t.users.name));
   const deptName = new Map(departments.map((d) => [d.id, d.name]));
-  return { users: users.filter((u) => !dept || (u.departmentId && dept.has(u.departmentId))), deptName };
+  // The same people as a subquery for SQL: a list binds one parameter per person and passes PostgreSQL's 65,535 per statement.
+  const inScope = db()
+    .select({ id: t.users.id })
+    .from(t.users)
+    .where(and(covered, dept ? inArray(t.users.departmentId, [...dept]) : undefined));
+  return { users: users.filter((u) => !dept || (u.departmentId && dept.has(u.departmentId))), deptName, inScope };
 }
 
 /**
@@ -71,8 +73,7 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
   const c = (k: string) => tr(`cols.${k}` as "cols.person");
   const title = tr(`kinds.${kind}.title`);
   const r = range(f, v.tenant.settings.timeZone);
-  const { users, deptName } = await scopedPeople(v, f);
-  const ids = users.map((u) => u.id);
+  const { users, deptName, inScope } = await scopedPeople(v, f);
   const dept = (u: { departmentId: string | null }) => (u.departmentId ? (deptName.get(u.departmentId) ?? "") : "");
   const modules = await db().select().from(t.modules).where(or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)));
   const modById = new Map(modules.map((m) => [m.id, m]));
@@ -86,8 +87,8 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
       };
 
     case "completion": {
-      const assigned = await resolveAssignments(db(), v.tenant.id, ids);
-      const progress = ids.length ? await db().select().from(t.moduleProgress).where(inArray(t.moduleProgress.userId, ids)) : [];
+      const assigned = await resolveAssignments(db(), v.tenant.id, inScope);
+      const progress = users.length ? await db().select().from(t.moduleProgress).where(inArray(t.moduleProgress.userId, inScope)) : [];
       const pm = new Map(progress.map((p) => [`${p.userId}:${p.moduleId}`, p]));
       const today = todayIn(v.tenant.settings.timeZone);
       const rows: Cell[][] = [];
@@ -104,11 +105,11 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
     }
 
     case "risk": {
-      const open = ids.length
+      const open = users.length
         ? await db()
             .select({ userId: t.behaviorRisks.userId, n: sql<number>`count(*)` })
             .from(t.behaviorRisks)
-            .where(and(inArray(t.behaviorRisks.userId, ids), eq(t.behaviorRisks.status, "open")))
+            .where(and(inArray(t.behaviorRisks.userId, inScope), eq(t.behaviorRisks.status, "open")))
             .groupBy(t.behaviorRisks.userId)
         : [];
       const om = new Map(open.map((o) => [o.userId, Number(o.n)]));
@@ -120,8 +121,8 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
     }
 
     case "modules": {
-      const assigned = await resolveAssignments(db(), v.tenant.id, ids);
-      const progress = ids.length ? await db().select().from(t.moduleProgress).where(and(inArray(t.moduleProgress.userId, ids), eq(t.moduleProgress.status, "completed"))) : [];
+      const assigned = await resolveAssignments(db(), v.tenant.id, inScope);
+      const progress = users.length ? await db().select().from(t.moduleProgress).where(and(inArray(t.moduleProgress.userId, inScope), eq(t.moduleProgress.status, "completed"))) : [];
       // "Completed" counts everyone who finished the module, also on their own; "Completion %" is the share of the
       // people it is assigned to who finished it, which would pass 100 % if the others were counted as well.
       const doneBy = new Map<string, number>();
@@ -133,12 +134,12 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
       }
       const assignedBy = new Map<string, number>();
       for (const m of assigned.values()) for (const a of m.values()) assignedBy.set(a.moduleId, (assignedBy.get(a.moduleId) ?? 0) + 1);
-      const scores = ids.length
+      const scores = users.length
         ? await db()
             .select({ moduleId: t.lessons.moduleId, total: sql<number>`count(*)`, good: sql<number>`count(*) filter (where ${t.answers.correct})` })
             .from(t.answers)
             .innerJoin(t.lessons, eq(t.lessons.id, t.answers.lessonId))
-            .where(and(inArray(t.answers.userId, ids), eq(t.answers.firstTry, true)))
+            .where(and(inArray(t.answers.userId, inScope), eq(t.answers.firstTry, true)))
             .groupBy(t.lessons.moduleId)
         : [];
       const sm = new Map(scores.map((s) => [s.moduleId, Number(s.total) ? Math.round((Number(s.good) / Number(s.total)) * 100) : null]));
@@ -173,8 +174,8 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
     }
 
     case "confirmations": {
-      const att = ids.length ? await db().select().from(t.attestations).where(inArray(t.attestations.userId, ids)).orderBy(desc(t.attestations.at)) : [];
-      const waiting = ids.length ? await db().select().from(t.moduleProgress).where(and(inArray(t.moduleProgress.userId, ids), eq(t.moduleProgress.status, "awaiting_attestation"))) : [];
+      const att = users.length ? await db().select().from(t.attestations).where(inArray(t.attestations.userId, inScope)).orderBy(desc(t.attestations.at)) : [];
+      const waiting = users.length ? await db().select().from(t.moduleProgress).where(and(inArray(t.moduleProgress.userId, inScope), eq(t.moduleProgress.status, "awaiting_attestation"))) : [];
       const uById = new Map(users.map((u) => [u.id, u]));
       const rows: Cell[][] = [
         ...att.filter((a) => within(a.at, r)).map((a) => {
@@ -191,12 +192,12 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
 
     case "simulations": {
       const tcmp = await getTranslations({ locale, namespace: "admin.campaigns" });
-      const rec = ids.length
+      const rec = users.length
         ? await db()
             .select({ r: t.campaignRecipients, name: t.campaigns.name, channel: t.campaigns.channel, templateKey: t.campaigns.templateKey })
             .from(t.campaignRecipients)
             .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
-            .where(and(eq(t.campaigns.tenantId, v.tenant.id), inArray(t.campaignRecipients.userId, ids)))
+            .where(and(eq(t.campaigns.tenantId, v.tenant.id), inArray(t.campaignRecipients.userId, inScope)))
             .orderBy(desc(t.campaignRecipients.sentAt))
         : [];
       const uById = new Map(users.map((u) => [u.id, u]));

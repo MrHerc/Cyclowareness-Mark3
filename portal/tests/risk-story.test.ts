@@ -25,7 +25,9 @@ vi.mock("next-intl/server", () => ({
 
 const { riskStory, storySentences, STORY_MIN_DAYS } = await import("../src/server/queries/risk-story");
 const { overviewData } = await import("../src/server/queries/admin");
-const { buildRiskStory } = await import("../src/server/reports/build");
+const { buildReport, buildRiskStory } = await import("../src/server/reports/build");
+const { departmentLeague } = await import("../src/server/services/league");
+const { recomputeRisk, snapshotTenant } = await import("../src/server/services/risk");
 
 beforeAll(ready, DB_SETUP_TIMEOUT);
 
@@ -152,7 +154,7 @@ describe("riskStory", () => {
 });
 
 describe("riskStory at scale", () => {
-  it("reads a scope larger than PostgreSQL's 65 535 parameters per statement", async () => {
+  it("reads a scope larger than PostgreSQL's 65 535 parameters per statement, as do the overview, league, rescoring, daily KPIs and reports", async () => {
     const tenant = await addTenant(db);
     const dept = await addDepartment(db, tenant.id, "Operations");
     const admin = await addUser(db, tenant.id, { role: "tenant_admin", riskScore: 0 });
@@ -164,7 +166,18 @@ describe("riskStory at scale", () => {
     if (s.empty) throw new Error("expected a story");
     expect(s.certified.total).toBe(70_001);
     expect(s.weakest).toMatchObject({ name: "Operations", risk: 40 });
-  }, 120_000);
+
+    // The other paths that read the whole organisation (or a department of it) pass the people as a subquery too.
+    const v = as(tenant.id, admin);
+    expect((await overviewData(v, "en", null)).kpis.learners).toBe(70_001);
+    expect((await overviewData(v, "en", dept.id)).kpis.learners).toBe(70_000);
+    expect((await departmentLeague(db, tenant.id)).find((r) => r.id === dept.id)).toBeDefined();
+    expect((await recomputeRisk(db, tenant.id)).size).toBe(70_001);
+    expect(await snapshotTenant(db, tenant.id)).toMatchObject({ learners: 70_001 });
+    expect((await buildReport(v, "risk", {}, "en")).rows.length).toBeGreaterThan(70_001);
+    await buildReport(v, "completion", {}, "en");
+    for (const kind of ["completion", "modules", "confirmations", "simulations"] as const) await buildReport(v, kind, { departmentId: dept.id }, "en");
+  }, 300_000);
 });
 
 describe("storySentences", () => {

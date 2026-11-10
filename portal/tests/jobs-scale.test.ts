@@ -1,7 +1,8 @@
-import { eq } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { runJobs } from "../src/server/jobs";
+import { dayKey } from "../src/lib/domain/gamification";
 import { resolveAssignments } from "../src/server/services/assignments";
 import { computeTenantRisk, INLINE_RECOMPUTE_MAX, recomputeChanged, recomputeRisk } from "../src/server/services/risk";
 import { DB_SETUP_TIMEOUT, addDepartment, addModule, addTenant, addUser, assignEveryone, testDb } from "./helpers/db";
@@ -131,4 +132,31 @@ describe("hourly jobs", () => {
     expect(await db.select().from(t.jobRuns).where(eq(t.jobRuns.tenantId, tenant.id))).toEqual([]);
     expect(ran(await runJobs(db, new Date(start.getTime() + 60_000)), tenant.id)).toEqual(["reminders", "managers", "refreshers", "teachable"]);
   }, 120_000);
+});
+
+describe("indexes", () => {
+  it("cover the lookups that grow with clicks and campaigns", async () => {
+    const { rows } = await db.execute<{ indexname: string }>(sql`select indexname from pg_indexes where schemaname = 'public'`);
+    expect(rows.map((r) => r.indexname)).toEqual(
+      expect.arrayContaining(["recipients_clicked_idx", "campaigns_user_idx", "drill_runs_campaign_idx", "teachable_loops_source_campaign_idx", "teachable_loops_resim_campaign_idx"]),
+    );
+  });
+});
+
+// Last in the file: the hourly-job tests above would otherwise rescore these 17,000 people on every new day they tick.
+describe("daily risk snapshot at scale", () => {
+  it("records 17,000 people, more than one INSERT of values can bind (4 each, 65,535 at most), and is done for the day", async () => {
+    const tenant = await addTenant(db);
+    await db.execute(sql`insert into users (tenant_id, email, name, locale, risk_score) select ${tenant.id}, 'snap' || g || '@test.example', 'Snap ' || g, 'en', 99 from generate_series(1, 17000) g`);
+    const day = dayKey(NOW, tenant.settings.timeZone);
+    const out = await runJobs(db, NOW);
+    expect(out[`snapshot:${tenant.id}`]).toBe(1);
+    const [snapshots] = await db.select({ n: count() }).from(t.userRiskSnapshots).where(and(eq(t.userRiskSnapshots.tenantId, tenant.id), eq(t.userRiskSnapshots.day, day)));
+    expect(snapshots.n).toBe(17_000);
+    expect(await db.select({ day: t.riskSnapshots.day }).from(t.riskSnapshots).where(eq(t.riskSnapshots.tenantId, tenant.id))).toEqual([{ day }]);
+    // A minute later the day is recorded: no second whole-organisation rescoring.
+    await db.update(t.users).set({ riskScore: 99 }).where(eq(t.users.tenantId, tenant.id));
+    expect((await runJobs(db, new Date(NOW.getTime() + 60_000)))[`snapshot:${tenant.id}`]).toBe(0);
+    expect([...(await scores(tenant.id)).values()].every((s) => s === 99)).toBe(true);
+  }, 240_000);
 });

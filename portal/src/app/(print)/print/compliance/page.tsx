@@ -59,12 +59,11 @@ export default async function CompliancePack({ searchParams }: PageProps<"/print
     [tr("compliance.settingRows.email"), s.email.enabled ? yes : no],
   ];
   // Cross-check: modules marked completed must each have a stored attestation (same people as the sections above).
-  const { users } = await scopedPeople(v, filters);
-  const ids = users.map((u) => u.id);
-  const [completed, attests] = ids.length
+  const { users, inScope } = await scopedPeople(v, filters);
+  const [completed, attests] = users.length
     ? await Promise.all([
-        db().select({ userId: t.moduleProgress.userId, moduleId: t.moduleProgress.moduleId, title: t.modules.title }).from(t.moduleProgress).innerJoin(t.modules, eq(t.modules.id, t.moduleProgress.moduleId)).where(and(inArray(t.moduleProgress.userId, ids), eq(t.moduleProgress.status, "completed"))),
-        db().select({ userId: t.attestations.userId, moduleId: t.attestations.moduleId }).from(t.attestations).where(inArray(t.attestations.userId, ids)),
+        db().select({ userId: t.moduleProgress.userId, moduleId: t.moduleProgress.moduleId, title: t.modules.title }).from(t.moduleProgress).innerJoin(t.modules, eq(t.modules.id, t.moduleProgress.moduleId)).where(and(inArray(t.moduleProgress.userId, inScope), eq(t.moduleProgress.status, "completed"))),
+        db().select({ userId: t.attestations.userId, moduleId: t.attestations.moduleId }).from(t.attestations).where(inArray(t.attestations.userId, inScope)),
       ])
     : [[], []];
   const attested = new Set(attests.map((a) => `${a.userId}:${a.moduleId}`));

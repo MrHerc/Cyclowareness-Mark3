@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { featuresFor, reportAddress, withDefaults } from "../src/lib/tenant-defaults";
@@ -355,6 +355,17 @@ describe("targetTraining", () => {
     expect(await targetTraining(db, { ...base, userIds: [], moduleId: (await addModule(db)).id })).toEqual([]);
     expect(await targetTraining(db, { ...base, userIds: [person.id], moduleId: "00000000-0000-4000-8000-000000000000" })).toEqual([]);
   });
+
+  it("targets 8,200 people, more than one INSERT of behaviour risks can bind (8 each, 65,535 at most)", async () => {
+    const tenant = await addTenant(db);
+    const mod = await addModule(db);
+    const people = await db.execute<{ id: string }>(sql`insert into users (tenant_id, email, name, locale) select ${tenant.id}, 'target' || g || '@test.example', 'Target ' || g, 'en' from generate_series(1, 8200) g returning id`);
+    const userIds = people.rows.map((r) => r.id);
+    const targets = await targetTraining(db, { tenantId: tenant.id, userIds, moduleId: mod.id, severity: "medium", kind: "path", title: "Refresher", sourceRef: "REFRESH-2026-11" });
+    expect(targets).toHaveLength(8_200);
+    const [risks] = await db.select({ n: count() }).from(t.behaviorRisks).where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.sourceRef, "REFRESH-2026-11")));
+    expect(risks.n).toBe(8_200);
+  }, 300_000);
 });
 
 describe("moduleScores", () => {

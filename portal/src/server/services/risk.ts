@@ -20,12 +20,15 @@ export async function computeTenantRisk(db: DB, tenantId: string, now = new Date
   const since90 = new Date(now.getTime() - 90 * DAY);
   const since180 = new Date(now.getTime() - 180 * DAY);
   const today = dayKey(now, await tenantTimeZone(db, tenantId));
+  const population = and(eq(t.users.tenantId, tenantId), ne(t.users.status, "deleted"));
   const users = await db
     .select({ id: t.users.id })
     .from(t.users)
-    .where(and(eq(t.users.tenantId, tenantId), ne(t.users.status, "deleted"), onlyUserIds?.length ? inArray(t.users.id, onlyUserIds) : undefined));
+    .where(and(population, onlyUserIds?.length ? inArray(t.users.id, onlyUserIds) : undefined));
   const ids = users.map((u) => u.id);
   if (!ids.length) return new Map();
+  // The whole organisation goes to SQL as a subquery: one parameter per person passes PostgreSQL's 65,535 per statement.
+  const people = onlyUserIds?.length ? ids : db.select({ id: t.users.id }).from(t.users).where(population);
 
   const assigned = await resolveAssignments(db, tenantId, onlyUserIds);
   const moduleIds = [...new Set([...assigned.values()].flatMap((m) => [...m.keys()]))];
@@ -39,11 +42,11 @@ export async function computeTenantRisk(db: DB, tenantId: string, now = new Date
     db
       .select({ userId: t.lessonProgress.userId, lessonId: t.lessonProgress.lessonId })
       .from(t.lessonProgress)
-      .where(and(inArray(t.lessonProgress.userId, ids), isNotNull(t.lessonProgress.completedAt))),
+      .where(and(inArray(t.lessonProgress.userId, people), isNotNull(t.lessonProgress.completedAt))),
     db
       .select({ userId: t.moduleProgress.userId, moduleId: t.moduleProgress.moduleId })
       .from(t.moduleProgress)
-      .where(and(inArray(t.moduleProgress.userId, ids), eq(t.moduleProgress.status, "completed"))),
+      .where(and(inArray(t.moduleProgress.userId, people), eq(t.moduleProgress.status, "completed"))),
     db
       .select({
         userId: t.campaignRecipients.userId,
@@ -52,17 +55,17 @@ export async function computeTenantRisk(db: DB, tenantId: string, now = new Date
         reports: sql<number>`count(${t.campaignRecipients.reportedAt})`,
       })
       .from(t.campaignRecipients)
-      .where(and(inArray(t.campaignRecipients.userId, ids), gte(t.campaignRecipients.sentAt, since90)))
+      .where(and(inArray(t.campaignRecipients.userId, people), gte(t.campaignRecipients.sentAt, since90)))
       .groupBy(t.campaignRecipients.userId),
     db
       .select({ userId: t.answers.userId, n: sql<number>`count(*)` })
       .from(t.answers)
-      .where(and(inArray(t.answers.userId, ids), gte(t.answers.at, since90), inArray(t.answers.outcome, ["risky", "compromised"])))
+      .where(and(inArray(t.answers.userId, people), gte(t.answers.at, since90), inArray(t.answers.outcome, ["risky", "compromised"])))
       .groupBy(t.answers.userId),
     db
       .select({ userId: t.behaviorRisks.userId, severity: t.behaviorRisks.severity })
       .from(t.behaviorRisks)
-      .where(and(inArray(t.behaviorRisks.userId, ids), eq(t.behaviorRisks.status, "open"))),
+      .where(and(inArray(t.behaviorRisks.userId, people), eq(t.behaviorRisks.status, "open"))),
     db
       .select({
         userId: t.answers.userId,
@@ -70,7 +73,7 @@ export async function computeTenantRisk(db: DB, tenantId: string, now = new Date
         good: sql<number>`count(*) filter (where ${t.answers.correct} and ${t.answers.firstTry})`,
       })
       .from(t.answers)
-      .where(and(inArray(t.answers.userId, ids), gte(t.answers.at, since180), eq(t.answers.firstTry, true)))
+      .where(and(inArray(t.answers.userId, people), gte(t.answers.at, since180), eq(t.answers.firstTry, true)))
       .groupBy(t.answers.userId),
   ]);
 
@@ -165,10 +168,8 @@ export async function recomputeChanged(db: DB, tenantId: string, before: Map<str
 
 /** Organisation KPIs for one day (average risk, assigned completion, report and click rate). */
 export async function tenantKpis(db: DB, tenantId: string, now = new Date()) {
-  const users = await db
-    .select({ id: t.users.id, risk: t.users.riskScore })
-    .from(t.users)
-    .where(and(eq(t.users.tenantId, tenantId), eq(t.users.status, "active"), inArray(t.users.role, ["learner", "department_head", "executive", "analyst", "campaign_manager", "content_creator", "tenant_admin"])));
+  const counted = and(eq(t.users.tenantId, tenantId), eq(t.users.status, "active"), inArray(t.users.role, ["learner", "department_head", "executive", "analyst", "campaign_manager", "content_creator", "tenant_admin"]));
+  const users = await db.select({ id: t.users.id, risk: t.users.riskScore }).from(t.users).where(counted);
   const avgRisk = users.length ? Math.round(users.reduce((s, u) => s + u.risk, 0) / users.length) : 0;
 
   const assigned = await resolveAssignments(db, tenantId);
@@ -180,7 +181,7 @@ export async function tenantKpis(db: DB, tenantId: string, now = new Date()) {
     ? await db
         .select({ userId: t.lessonProgress.userId, lessonId: t.lessonProgress.lessonId })
         .from(t.lessonProgress)
-        .where(and(inArray(t.lessonProgress.userId, users.map((u) => u.id)), isNotNull(t.lessonProgress.completedAt)))
+        .where(and(inArray(t.lessonProgress.userId, db.select({ id: t.users.id }).from(t.users).where(counted)), isNotNull(t.lessonProgress.completedAt)))
     : [];
   const doneSet = new Set(done.map((d) => `${d.userId}:${d.lessonId}`));
   let total = 0;

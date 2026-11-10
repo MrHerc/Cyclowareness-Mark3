@@ -432,7 +432,7 @@ async function cleanup(db: DB, now: Date): Promise<number> {
     const { auditMonths: stored, learningMonths } = withDefaults(org.settings).retention;
     // The same floor as the settings form: a value of 1 to 11 stored before the floor existed cannot purge recent history.
     const auditMonths = stored > 0 ? Math.max(stored, MIN_AUDIT_MONTHS) : 0;
-    const purged = { auditEntries: 0, answers: 0, risks: 0 };
+    const purged = { auditEntries: 0, answers: 0, risks: 0, recipients: 0, loops: 0, riskSnapshots: 0, threatReports: 0, sandboxAnalyses: 0, labAttempts: 0 };
     // The entries that explain the gaps (the retention setting and earlier purges) are never purged themselves.
     if (auditMonths > 0)
       purged.auditEntries = await deleteInBatches(
@@ -443,10 +443,25 @@ async function cleanup(db: DB, now: Date): Promise<number> {
         deadline,
       );
     if (learningMonths > 0) {
-      purged.answers = await deleteInBatches(db, t.answers, t.answers.id, and(eq(t.answers.tenantId, org.id), lt(t.answers.at, monthsAgo(learningMonths))), deadline);
-      purged.risks = await deleteInBatches(db, t.behaviorRisks, t.behaviorRisks.id, and(eq(t.behaviorRisks.tenantId, org.id), lt(t.behaviorRisks.closedAt, monthsAgo(learningMonths))), deadline);
+      const cut = monthsAgo(learningMonths);
+      purged.answers = await deleteInBatches(db, t.answers, t.answers.id, and(eq(t.answers.tenantId, org.id), lt(t.answers.at, cut)), deadline);
+      purged.risks = await deleteInBatches(db, t.behaviorRisks, t.behaviorRisks.id, and(eq(t.behaviorRisks.tenantId, org.id), lt(t.behaviorRisks.closedAt, cut)), deadline);
+      purged.loops = await deleteInBatches(db, t.teachableLoops, t.teachableLoops.id, and(eq(t.teachableLoops.tenantId, org.id), eq(t.teachableLoops.status, "closed"), lt(t.teachableLoops.assignedAt, cut)), deadline);
+      // Who opened, clicked or submitted in a campaign that ended before the cut (a cancelled one has no end, so its creation);
+      // recipients carry no tenant id, so they are found through the campaign. Their teachable loops go with them (cascade).
+      const ended = db
+        .select({ id: t.campaigns.id })
+        .from(t.campaigns)
+        .where(and(eq(t.campaigns.tenantId, org.id), inArray(t.campaigns.status, ["completed", "cancelled"]), lt(sql`coalesce(${t.campaigns.completedAt}, ${t.campaigns.createdAt})`, cut)));
+      purged.recipients = await deleteInBatches(db, t.campaignRecipients, t.campaignRecipients.id, and(inArray(t.campaignRecipients.campaignId, ended), or(isNull(t.campaignRecipients.sentAt), lt(t.campaignRecipients.sentAt, cut))), deadline);
+      purged.riskSnapshots = await deleteInBatches(db, t.userRiskSnapshots, t.userRiskSnapshots.id, and(eq(t.userRiskSnapshots.tenantId, org.id), lt(t.userRiskSnapshots.day, cut.toISOString().slice(0, 10))), deadline);
+      // Reported mail can quote third parties; reports still being handled stay.
+      purged.threatReports = await deleteInBatches(db, t.threatReports, t.threatReports.id, and(eq(t.threatReports.tenantId, org.id), inArray(t.threatReports.status, ["converted", "dismissed"]), lt(t.threatReports.createdAt, cut)), deadline);
+      purged.sandboxAnalyses = await deleteInBatches(db, t.sandboxAnalyses, t.sandboxAnalyses.id, and(eq(t.sandboxAnalyses.tenantId, org.id), lt(t.sandboxAnalyses.createdAt, cut)), deadline);
+      // The XP a lab earned is an xp_events row, which stays.
+      purged.labAttempts = await deleteInBatches(db, t.labAttempts, t.labAttempts.id, and(eq(t.labAttempts.tenantId, org.id), lt(t.labAttempts.at, cut)), deadline);
     }
-    const count = purged.auditEntries + purged.answers + purged.risks;
+    const count = Object.values(purged).reduce((a, b) => a + b, 0);
     total += count;
     // A purge leaves its own entry, so a gap in the organisation's history is explained rather than suspect.
     if (count > 0) {
@@ -472,16 +487,10 @@ async function dailySnapshot(db: DB, tenantId: string, timeZone: string, now: Da
   const [today] = await db.select({ id: t.riskSnapshots.id }).from(t.riskSnapshots).where(and(eq(t.riskSnapshots.tenantId, tenantId), eq(t.riskSnapshots.day, day)));
   if (today) return 0;
   await recomputeRisk(db, tenantId, undefined, now);
-  const people = await db
-    .select({ id: t.users.id, score: t.users.riskScore })
-    .from(t.users)
-    .where(and(eq(t.users.tenantId, tenantId), eq(t.users.status, "active")));
-  if (people.length) {
-    await db
-      .insert(t.userRiskSnapshots)
-      .values(people.map((p) => ({ tenantId, userId: p.id, day, score: p.score })))
-      .onConflictDoNothing();
-  }
+  // INSERT … SELECT: a row of values per person binds 4 parameters each, past PostgreSQL's 65,535 per statement at 16,384 people.
+  await db.execute(
+    sql`insert into ${t.userRiskSnapshots} (tenant_id, user_id, day, score) select tenant_id, id, ${day}::date, risk_score from ${t.users} where tenant_id = ${tenantId} and status = 'active' on conflict do nothing`,
+  );
   await snapshotTenant(db, tenantId, now);
   return 1;
 }

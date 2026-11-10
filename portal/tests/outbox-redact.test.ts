@@ -43,6 +43,22 @@ describe("account links in the outbox", () => {
     expect(row.html).toBe('<a href="https://portal.example/account/invite/redacted">Open</a>');
   });
 
+  it("logs a refused delivery with the server's codes but without the recipient's address", async () => {
+    const rejection = Object.assign(new Error("Can't send mail - all recipients were rejected: 550 5.1.1 <name@bank.az>: Recipient address rejected"), { code: "EENVELOPE", responseCode: 550 });
+    sendMail.mockRejectedValueOnce(rejection);
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const res = await queueEmail(db, tenantId, { to: "name@bank.az", kind: "welcome", subject: "Welcome", text: "Hello", html: "<p>Hello</p>", lang: "en" });
+      expect(res.status).toBe("queued");
+      const line = error.mock.calls.map((c) => String(c[0])).find((l) => l.includes("[mail] delivery"));
+      expect(line).toContain("550");
+      expect(line).toContain("EENVELOPE");
+      expect(line).not.toContain("name@bank.az");
+    } finally {
+      error.mockRestore();
+    }
+  });
+
   it("redacts reset links too and leaves other links alone", () => {
     expect(redactAccountLinks("https://p.example/account/reset/abc234?x=1 https://p.example/learn/phishing")).toBe("https://p.example/account/reset/redacted?x=1 https://p.example/learn/phishing");
   });

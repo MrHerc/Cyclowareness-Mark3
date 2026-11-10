@@ -17,12 +17,10 @@ const TREND_DAYS = 7;
  * Events after the cut-off are ignored (lesson completions, simulations sent and reports).
  */
 export async function departmentLeague(db: DB, tenantId: string, now = new Date()): Promise<LeagueRowWithTrend[]> {
+  const active = and(eq(t.users.tenantId, tenantId), eq(t.users.status, "active"));
   const [departments, users, [tenant]] = await Promise.all([
     db.select({ id: t.departments.id, name: t.departments.name }).from(t.departments).where(eq(t.departments.tenantId, tenantId)),
-    db
-      .select({ id: t.users.id, departmentId: t.users.departmentId })
-      .from(t.users)
-      .where(and(eq(t.users.tenantId, tenantId), eq(t.users.status, "active"))),
+    db.select({ id: t.users.id, departmentId: t.users.departmentId }).from(t.users).where(active),
     db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId)),
   ]);
   // Ties are ordered by name the way the organisation's language sorts it (Ə, Ç, Ş in place), the same for every viewer.
@@ -32,20 +30,21 @@ export async function departmentLeague(db: DB, tenantId: string, now = new Date(
   const lessons = moduleIds.length ? await db.select({ id: t.lessons.id, moduleId: t.lessons.moduleId }).from(t.lessons).where(inArray(t.lessons.moduleId, moduleIds)) : [];
   const byModule = new Map<string, string[]>();
   for (const l of lessons) byModule.set(l.moduleId, [...(byModule.get(l.moduleId) ?? []), l.id]);
-  const userIds = users.map((u) => u.id);
+  // A subquery, not a list: one parameter per person passes PostgreSQL's 65,535 per statement.
+  const people = db.select({ id: t.users.id }).from(t.users).where(active);
   const earliest = new Date(now.getTime() - (REPORT_WINDOW_DAYS + TREND_DAYS) * DAY);
   const [done, sims] = await Promise.all([
-    userIds.length
+    users.length
       ? db
           .select({ userId: t.lessonProgress.userId, lessonId: t.lessonProgress.lessonId, completedAt: t.lessonProgress.completedAt })
           .from(t.lessonProgress)
-          .where(and(inArray(t.lessonProgress.userId, userIds), isNotNull(t.lessonProgress.completedAt), lte(t.lessonProgress.completedAt, now)))
+          .where(and(inArray(t.lessonProgress.userId, people), isNotNull(t.lessonProgress.completedAt), lte(t.lessonProgress.completedAt, now)))
       : [],
-    userIds.length
+    users.length
       ? db
           .select({ userId: t.campaignRecipients.userId, sentAt: t.campaignRecipients.sentAt, reportedAt: t.campaignRecipients.reportedAt })
           .from(t.campaignRecipients)
-          .where(and(inArray(t.campaignRecipients.userId, userIds), isNotNull(t.campaignRecipients.sentAt), gte(t.campaignRecipients.sentAt, earliest), lte(t.campaignRecipients.sentAt, now)))
+          .where(and(inArray(t.campaignRecipients.userId, people), isNotNull(t.campaignRecipients.sentAt), gte(t.campaignRecipients.sentAt, earliest), lte(t.campaignRecipients.sentAt, now)))
       : [],
   ]);
 

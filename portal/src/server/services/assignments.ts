@@ -3,7 +3,7 @@
  * sub-departments) or one person, and point at a module or a learning path.
  */
 import { cache } from "react";
-import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
+import { and, eq, inArray, isNull, ne, or, type SQLWrapper } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { DEFAULT_TIME_ZONE } from "../../lib/day";
@@ -121,8 +121,12 @@ async function moduleIdsBySlug(db: DB, tenantId: string): Promise<Map<string, st
   return map;
 }
 
-/** Assignments, people, department closure and path contents of a tenant, loaded once. */
-async function loadAssignments(db: DB, tenantId: string, onlyUserIds?: string[]) {
+/**
+ * Assignments, people, department closure and path contents of a tenant, loaded once. A large scope comes as a
+ * subquery of user ids: a list binds one parameter per person and passes PostgreSQL's 65,535 per statement.
+ */
+async function loadAssignments(db: DB, tenantId: string, onlyUserIds?: string[] | SQLWrapper) {
+  const only = Array.isArray(onlyUserIds) && !onlyUserIds.length ? undefined : onlyUserIds;
   const [assignments, departments, users, slugMap, timeZone] = await Promise.all([
     db.select().from(t.assignments).where(eq(t.assignments.tenantId, tenantId)),
     db.select({ id: t.departments.id, parentId: t.departments.parentId }).from(t.departments).where(eq(t.departments.tenantId, tenantId)),
@@ -133,7 +137,7 @@ async function loadAssignments(db: DB, tenantId: string, onlyUserIds?: string[])
         and(
           eq(t.users.tenantId, tenantId),
           ne(t.users.status, "deleted"),
-          onlyUserIds && onlyUserIds.length ? inArray(t.users.id, onlyUserIds) : undefined,
+          only ? inArray(t.users.id, only) : undefined,
         ),
       ),
     moduleIdsBySlug(db, tenantId),
@@ -149,7 +153,7 @@ async function loadAssignments(db: DB, tenantId: string, onlyUserIds?: string[])
   return { assignments, users: users as UserLite[], closure, modulesOf, timeZone };
 }
 
-export async function resolveAssignments(db: DB, tenantId: string, onlyUserIds?: string[]): Promise<Map<string, Map<string, AssignedModule>>> {
+export async function resolveAssignments(db: DB, tenantId: string, onlyUserIds?: string[] | SQLWrapper): Promise<Map<string, Map<string, AssignedModule>>> {
   return resolveLoaded(await loadAssignments(db, tenantId, onlyUserIds));
 }
 

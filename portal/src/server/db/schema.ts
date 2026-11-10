@@ -59,7 +59,7 @@ export type TenantSettings = {
   protection: { contentProtection: boolean; watermark: boolean; androidScreenBlock?: boolean };
   /** `teachable`: the teachable-moment loop after a simulation click (services/teachable.ts). */
   learning: { timeLimits: boolean; refresher: boolean; riskThreshold: number; dailyGoalXp: number; teachable: boolean };
-  /** Months the daily clean-up keeps audit entries, and answers and closed risks; 0 keeps them forever. */
+  /** Months the daily clean-up keeps audit entries, and learning and simulation results (jobs.ts cleanup); 0 keeps them forever. */
   retention: { auditMonths: number; learningMonths: number };
   attestationText: Record<string, string>;
   /** `title` and `text`: the organisation's own wording per language ({ az, en, ru }); a language without one gets the default. */
@@ -892,7 +892,7 @@ export const campaigns = pgTable(
     createdBy: uuid("created_by"),
     createdAt: createdAt(),
   },
-  (t) => [index("campaigns_tenant_idx").on(t.tenantId)],
+  (t) => [index("campaigns_tenant_idx").on(t.tenantId), index("campaigns_user_idx").on(t.userId).where(sql`user_id is not null`)],
 );
 
 export const campaignRecipients = pgTable(
@@ -912,7 +912,12 @@ export const campaignRecipients = pgTable(
     submittedAt: ts("submitted_at"),
     reportedAt: ts("reported_at"),
   },
-  (t) => [index("recipients_campaign_idx").on(t.campaignId), index("recipients_user_idx").on(t.userId)],
+  (t) => [
+    index("recipients_campaign_idx").on(t.campaignId),
+    index("recipients_user_idx").on(t.userId),
+    // The teachable-moment step reads the last day's clicks.
+    index("recipients_clicked_idx").on(t.clickedAt).where(sql`clicked_at is not null`),
+  ],
 );
 
 /**
@@ -943,7 +948,12 @@ export const teachableLoops = pgTable(
     resimResult: text("resim_result", { enum: ["clicked", "submitted", "reported", "passed"] }),
     status: text("status", { enum: ["assigned", "completed", "resim", "closed"] }).notNull().default("assigned"),
   },
-  (t) => [index("teachable_loops_tenant_idx").on(t.tenantId, t.status), index("teachable_loops_user_idx").on(t.userId, t.status)],
+  (t) => [
+    index("teachable_loops_tenant_idx").on(t.tenantId, t.status),
+    index("teachable_loops_user_idx").on(t.userId, t.status),
+    index("teachable_loops_source_campaign_idx").on(t.sourceCampaignId),
+    index("teachable_loops_resim_campaign_idx").on(t.resimCampaignId),
+  ],
 );
 
 /** One planned step of a live drill (src/lib/drill/plan.ts): what one recipient does, and when. */
@@ -988,7 +998,7 @@ export const drillRuns = pgTable(
     createdBy: uuid("created_by"),
     createdAt: createdAt(),
   },
-  (t) => [index("drill_runs_tenant_idx").on(t.tenantId, t.createdAt)],
+  (t) => [index("drill_runs_tenant_idx").on(t.tenantId, t.createdAt), index("drill_runs_campaign_idx").on(t.campaignId)],
 );
 
 /* ───────────────────────── Support & feedback ───────────────────────── */
