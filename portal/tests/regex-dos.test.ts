@@ -38,6 +38,17 @@ describe("svgLogoProblem on hostile input", () => {
     expect(svgLogoProblem('<svg><rect style="fill:url(https://evil.example/f"/></svg>')).toBe("external_ref");
     expect(svgLogoProblem("<svg><rect fill=\"url()\"/></svg>")).toBe("external_ref");
   });
+
+  it("drops comments, CDATA and processing instructions, decodes references and scans prefixes in linear time", () => {
+    for (const token of ["<!--", "<![CDATA[", "<?", "&#1;", "&#x41;", "<!DOCTYPE", "<!ATTLIST", "<style>", "</style", " style=\"", ' href="', "<svg:", " xml:", "<a:b:c", ' x:href="#a"', "@", "\\", "\\75 ", "\x1b(B", "<style><g/>", '<style a="', '<!DOCTYPE svg SYSTEM "', "image-set(", "&", "&bsol", " ", "  :", "<﻿:", ' a :href="']) {
+      const flood = `<svg>${token.repeat(Math.ceil(524_288 / token.length))}</svg>`;
+      expect(ms(() => svgLogoProblem(flood)), token).toBeLessThan(LINEAR_MS);
+    }
+    // One DOCTYPE or <style> start followed by a long run, where a backtracking pattern would turn quadratic.
+    for (const lead of ["<!DOCTYPE svg", "<!DOCTYPE svg PUBLIC ", "<style", "<style>"]) {
+      expect(ms(() => svgLogoProblem(`${lead}${" ".repeat(524_288)}`)), lead).toBeLessThan(LINEAR_MS);
+    }
+  }, 60_000);
 });
 
 describe("Markdown on hostile input", () => {
