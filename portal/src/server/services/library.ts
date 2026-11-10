@@ -6,7 +6,8 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { and, eq, isNull } from "drizzle-orm";
+import { isDeepStrictEqual } from "node:util";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { log } from "../log";
@@ -101,9 +102,17 @@ export function readLibraryLesson(slug: string, id: string): { en: CheckedLesson
   return { en, translations };
 }
 
-export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: number; locales: Record<Locale, number> }> {
+/** Whether any of `values` differs from the stored row (jsonb comes back with its keys in another order). */
+const changed = (row: Record<string, unknown>, values: Record<string, unknown>) => Object.entries(values).some(([k, v]) => !isDeepStrictEqual(row[k], v));
+
+/**
+ * `written` counts the rows inserted, updated or deleted: an unchanged library writes none, so a start
+ * with the same content costs reads only.
+ */
+export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: number; locales: Record<Locale, number>; written: number }> {
   const { modules, titles } = readLibrary();
   let lessonCount = 0;
+  let written = 0;
   const locales = Object.fromEntries(LOCALES.map((l) => [l, 0])) as Record<Locale, number>;
   /** `{ en, <translation>: text }`, English where a translation has none. */
   const localized = (en: string, text: (x: I18n) => string | undefined) => ({ en, ...Object.fromEntries(LESSON_TRANSLATIONS.map((l) => [l, text(titles[l]) ?? en])) });
@@ -125,13 +134,17 @@ export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: n
       status: "published" as const,
       sortOrder: order,
     };
-    const [existing] = await db.select({ id: t.modules.id }).from(t.modules).where(and(eq(t.modules.slug, m.slug), isNull(t.modules.tenantId)));
+    const [existing] = await db.select().from(t.modules).where(and(eq(t.modules.slug, m.slug), isNull(t.modules.tenantId)));
     let moduleId: string;
     if (existing) {
       moduleId = existing.id;
-      await db.update(t.modules).set(values).where(eq(t.modules.id, moduleId));
+      if (changed(existing, values)) {
+        await db.update(t.modules).set(values).where(eq(t.modules.id, moduleId));
+        written++;
+      }
     } else {
       [{ id: moduleId }] = await db.insert(t.modules).values(values).returning({ id: t.modules.id });
+      written++;
     }
 
     for (const [position, les] of m.lessons.entries()) {
@@ -139,37 +152,53 @@ export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: n
       const key = `${m.slug}/${les.id}`;
       const lessonTitle = localized(les.title, (x) => x.lessons[key]);
       const [row] = await db
-        .select({ id: t.lessons.id })
+        .select()
         .from(t.lessons)
         .where(and(eq(t.lessons.moduleId, moduleId), eq(t.lessons.key, les.id)));
       let lessonId: string;
+      const lessonValues = { title: lessonTitle, minutes: les.minutes, position };
       if (row) {
         lessonId = row.id;
-        await db.update(t.lessons).set({ title: lessonTitle, minutes: les.minutes, position }).where(eq(t.lessons.id, lessonId));
+        if (changed(row, lessonValues)) {
+          await db.update(t.lessons).set(lessonValues).where(eq(t.lessons.id, lessonId));
+          written++;
+        }
       } else {
         [{ id: lessonId }] = await db
           .insert(t.lessons)
-          .values({ moduleId, key: les.id, title: lessonTitle, minutes: les.minutes, position })
+          .values({ moduleId, key: les.id, ...lessonValues })
           .returning({ id: t.lessons.id });
+        written++;
       }
       const texts: Partial<Record<Locale, CheckedLesson>> = { en, ...translations };
       for (const locale of LOCALES) {
         const lesson = texts[locale];
         if (!lesson) {
           // The files are the source: a translation that was removed stops being served.
-          await db.delete(t.lessonContents).where(and(eq(t.lessonContents.lessonId, lessonId), eq(t.lessonContents.locale, locale)));
+          const gone = await db
+            .delete(t.lessonContents)
+            .where(and(eq(t.lessonContents.lessonId, lessonId), eq(t.lessonContents.locale, locale)))
+            .returning({ locale: t.lessonContents.locale });
+          written += gone.length;
           continue;
         }
-        await db
+        const saved = await db
           .insert(t.lessonContents)
           .values({ lessonId, locale, scenes: lesson.scenes })
-          .onConflictDoUpdate({ target: [t.lessonContents.lessonId, t.lessonContents.locale], set: { scenes: lesson.scenes, updatedAt: new Date() } });
+          .onConflictDoUpdate({
+            target: [t.lessonContents.lessonId, t.lessonContents.locale],
+            set: { scenes: lesson.scenes, updatedAt: new Date() },
+            // Unchanged text keeps its row (and updatedAt) untouched.
+            setWhere: sql`${t.lessonContents.scenes} is distinct from excluded.scenes`,
+          })
+          .returning({ locale: t.lessonContents.locale });
+        written += saved.length;
         locales[locale]++;
       }
       lessonCount++;
     }
   }
-  return { modules: modules.length, lessons: lessonCount, locales };
+  return { modules: modules.length, lessons: lessonCount, locales, written };
 }
 
 type PathFile = {

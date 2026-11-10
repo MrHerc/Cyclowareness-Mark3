@@ -19,14 +19,25 @@ describe("content library", () => {
     for (const l of m.lessons) {
       it(`${m.slug}/${l.id} is a valid lesson`, () => {
         const raw = JSON.parse(readFileSync(path.join(root, "lessons", m.slug, `${l.id}.en.json`), "utf8"));
+        expect(Object.keys(raw)[0]).toBe("formatVersion");
         const parsed = lessonFileSchema.parse(raw);
         expect(lessonIntegrityErrors(parsed)).toEqual([]);
+        // The scene schemas drop unknown keys, so every key the files use must be in them. Known gap: the
+        // library's choice scenes put `multi` and `visual` inside `question`, where nothing reads them.
+        const expected = structuredClone(raw);
+        for (const s of expected.scenes) {
+          if (s.type !== "choice") continue;
+          delete s.question.multi;
+          delete s.question.visual;
+        }
+        expect(parsed).toEqual(expected);
       });
     }
   }
 
   it("refuses a malformed tutor checkpoint and one without a correct option", () => {
     const lesson = (checkpoint: unknown, stage?: unknown) => ({
+      formatVersion: 1,
       id: "l",
       title: "L",
       minutes: 1,
@@ -42,6 +53,13 @@ describe("content library", () => {
     expect(lessonIntegrityErrors(lessonFileSchema.parse(lesson({ prompt: "Q?", options }, "back")))).toEqual([]);
     const noneCorrect = lessonFileSchema.parse(lesson({ prompt: "Q?", options: options.map((o) => ({ ...o, correct: false })) }));
     expect(lessonIntegrityErrors(noneCorrect)).toEqual(["t/b: checkpoint without correct option"]);
+  });
+
+  it("refuses a lesson without formatVersion 1", () => {
+    const lesson = { id: "l", title: "L", minutes: 1, scenes: [{ type: "recap", id: "r", points: ["a"] }] };
+    expect(lessonFileSchema.safeParse({ formatVersion: 1, ...lesson }).success).toBe(true);
+    expect(lessonFileSchema.safeParse(lesson).success).toBe(false);
+    expect(lessonFileSchema.safeParse({ formatVersion: 2, ...lesson }).success).toBe(false);
   });
 
   it("has 14 multi-answer choice scenes (more than one correct option, or multi: true)", () => {

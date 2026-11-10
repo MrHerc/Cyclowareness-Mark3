@@ -89,7 +89,8 @@ export type Beat = {
   visual?: Visual;
   highlight?: string;
   checkpoint?: Checkpoint;
-  stage?: string;
+  /** Only value in the library (one beat); the player ignores it. */
+  stage?: "back";
 };
 
 export type Outcome = "safe" | "risky" | "compromised";
@@ -106,6 +107,10 @@ export type ScenarioNode = {
   channel?: string;
   character?: string;
   spoken?: string;
+  /** Delivery hint for the voice ("worried"); not read by the player yet. */
+  manner?: string;
+  /** Not drawn by the scenario renderer yet. */
+  visual?: Visual;
   choices?: ScenarioChoice[];
   outcome?: Outcome;
 };
@@ -134,7 +139,7 @@ export type Scene =
 
 export type SceneType = Scene["type"];
 
-export type LessonFile = { id: string; title: string; minutes: number; scenes: Scene[] };
+export type LessonFile = { formatVersion: 1; id: string; title: string; minutes: number; scenes: Scene[] };
 
 export type Brand = {
   id: string;
