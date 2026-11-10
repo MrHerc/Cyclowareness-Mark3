@@ -28,8 +28,8 @@ Rules for using the platform: the parties, account security, acceptable use, sim
 
 ## 4. Accounts and Sign-In
 
-4.1. Accounts are created only by the Organisation: manually, by file import or by synchronisation with its own directory. There is no open registration.
-4.2. Depending on the Organisation's settings, a User signs in with an email address and a password of at least 12 characters, with the Organisation's Active Directory password, or through the Organisation's single sign-on system (OpenID Connect or SAML). Two-step sign-in uses one-time codes from an authenticator app and backup codes; the Organisation may make it mandatory for certain roles.
+4.1. Accounts are created only by the Organisation: manually, by file import or through its single sign-on system. There is no open registration.
+4.2. Depending on the Organisation's settings, a User signs in with an email address and a password of at least 12 characters or through the Organisation's single sign-on system (OpenID Connect). Two-step sign-in uses one-time codes from an authenticator app and backup codes; the Organisation may make it mandatory for certain roles.
 4.3. Each account belongs to one person and may not be shared with anyone else.
 4.4. The Organisation may limit the number of devices that can be signed in to one account at the same time. When the limit is reached, the oldest session is closed.
 4.5. The Organisation determines the User's role and department and may suspend or delete the account. When a User leaves the Organisation, access is usually discontinued.

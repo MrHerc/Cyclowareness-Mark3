@@ -28,8 +28,8 @@ Regeln für die Nutzung der Plattform: die Parteien, die Kontosicherheit, die zu
 
 ## 4. Konten und Anmeldung
 
-4.1. Konten werden ausschließlich von der Organisation angelegt: manuell, per Dateiimport oder durch Synchronisierung mit ihrem eigenen Verzeichnisdienst. Eine offene Registrierung gibt es nicht.
-4.2. Je nach den Einstellungen der Organisation meldet sich der Nutzer mit einer E-Mail-Adresse und einem Passwort von mindestens 12 Zeichen, mit dem Active-Directory-Passwort der Organisation oder über das Single-Sign-on-System der Organisation (OpenID Connect oder SAML) an. Die Zwei-Faktor-Authentisierung verwendet Einmalcodes aus einer Authenticator-App sowie Backup-Codes; die Organisation kann sie für bestimmte Rollen verbindlich vorschreiben.
+4.1. Konten werden ausschließlich von der Organisation angelegt: manuell, per Dateiimport oder über ihr eigenes Single-Sign-on-System. Eine offene Registrierung gibt es nicht.
+4.2. Je nach den Einstellungen der Organisation meldet sich der Nutzer mit einer E-Mail-Adresse und einem Passwort von mindestens 12 Zeichen oder über das Single-Sign-on-System der Organisation (OpenID Connect) an. Die Zwei-Faktor-Authentisierung verwendet Einmalcodes aus einer Authenticator-App sowie Backup-Codes; die Organisation kann sie für bestimmte Rollen verbindlich vorschreiben.
 4.3. Jedes Konto gehört einer einzigen Person und darf nicht mit anderen geteilt werden.
 4.4. Die Organisation kann die Anzahl der Geräte begrenzen, die gleichzeitig bei einem Konto angemeldet sein können. Ist die Höchstzahl erreicht, wird die älteste Anmeldesitzung beendet.
 4.5. Die Organisation legt die Rolle und die Abteilung des Nutzers fest und kann das Konto sperren oder löschen. Scheidet ein Nutzer aus der Organisation aus, wird sein Zugang in der Regel beendet.

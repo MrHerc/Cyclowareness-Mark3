@@ -4,7 +4,7 @@ import { createElement, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { CreatedLinkDialog, writeClipboard } from "@/components/admin/created-link";
+import { CreatedLinkDialog, copyOrShow, writeClipboard } from "@/components/admin/created-link";
 import admin from "../messages/en/admin.json";
 import common from "../messages/en/common.json";
 
@@ -23,6 +23,19 @@ describe("created invite or reset link", () => {
     vi.stubGlobal("navigator", { clipboard: { writeText } });
     expect(await writeClipboard(url)).toBe(true);
     expect(writeText).toHaveBeenCalledWith(url);
+  });
+
+  it("hands the link to the dialog when the clipboard refuses it, and toasts when it copies", async () => {
+    vi.stubGlobal("navigator", { clipboard: { writeText: () => Promise.reject(new DOMException("denied", "NotAllowedError")) } });
+    const copied = vi.fn();
+    const show = vi.fn();
+    await copyOrShow(url, copied, show);
+    expect(show).toHaveBeenCalledWith(url);
+    expect(copied).not.toHaveBeenCalled();
+    vi.stubGlobal("navigator", { clipboard: { writeText: async () => undefined } });
+    await copyOrShow(url, copied, show);
+    expect(copied).toHaveBeenCalledOnce();
+    expect(show).toHaveBeenCalledOnce();
   });
 
   it("shows the link in a read-only field with a copy button and a status line", () => {
@@ -46,6 +59,10 @@ describe("created invite or reset link", () => {
     const dir = path.join(__dirname, "..", "src", "components", "admin");
     for (const file of fs.readdirSync(dir, { recursive: true, encoding: "utf8" }).filter((f) => f.endsWith(".tsx") || f.endsWith(".ts")))
       expect(fs.readFileSync(path.join(dir, file), "utf8"), file).not.toMatch(/\bprompt\(/);
-    for (const file of ["people-client.tsx", "person-actions.tsx"]) expect(fs.readFileSync(path.join(dir, file), "utf8")).toContain("<CreatedLinkDialog url={createdLink}");
+    for (const file of ["people-client.tsx", "person-actions.tsx"]) {
+      const src = fs.readFileSync(path.join(dir, file), "utf8");
+      expect(src, file).toContain("<CreatedLinkDialog url={createdLink}");
+      expect(src, file).toMatch(/copyOrShow\(res\.url, \(\) => toast\(t?p?\("linkCopied"\)\), setCreatedLink\)/);
+    }
   });
 });

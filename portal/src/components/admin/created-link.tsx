@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,15 +17,25 @@ export async function writeClipboard(text: string): Promise<boolean> {
   }
 }
 
+/** Copies a created link, or hands it to `show` when the clipboard refuses, so it is never lost. */
+export async function copyOrShow(url: string, copied: () => void, show: (url: string) => void) {
+  if (await writeClipboard(url)) copied();
+  else show(url);
+}
+
 function CreatedLink({ url }: { url: string }) {
   const t = useTranslations("admin.people");
   const tc = useTranslations("common");
   const [status, setStatus] = useState(t("linkNotCopied"));
+  const ref = useRef<HTMLInputElement>(null);
+  // The parent dialog's showModal runs after this effect and would focus its Close button; focusing the
+  // field afterwards selects the link and reads the instruction it is described by.
+  useEffect(() => queueMicrotask(() => ref.current?.focus()), []);
   return (
     <div className="grid gap-3">
       <Field label={t("linkLabel")} htmlFor="created-link">
         <div className="flex gap-2">
-          <Input id="created-link" readOnly value={url} dir="ltr" className="font-mono text-tab" autoFocus onFocus={(e) => e.currentTarget.select()} aria-describedby="created-link-status" />
+          <Input id="created-link" readOnly value={url} dir="ltr" className="font-mono text-tab" ref={ref} onFocus={(e) => e.currentTarget.select()} aria-describedby="created-link-status" />
           <Button variant="secondary" size="icon" aria-label={tc("copy")} onClick={async () => setStatus((await writeClipboard(url)) ? t("linkCopied") : t("linkNotCopied"))}>
             <Copy />
           </Button>

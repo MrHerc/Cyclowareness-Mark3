@@ -28,8 +28,8 @@ Règles d’utilisation de la plateforme : les parties, la sécurité des compt
 
 ## 4. Comptes et connexion
 
-4.1. Les comptes sont créés uniquement par l’Organisation : manuellement, par import de fichier ou par synchronisation avec son propre annuaire. Il n’existe pas d’inscription libre.
-4.2. Selon les paramètres de l’Organisation, l’Utilisateur se connecte avec une adresse e-mail et un mot de passe d’au moins 12 caractères, avec le mot de passe Active Directory de l’Organisation, ou par l’intermédiaire du système d’authentification unique (SSO) de l’Organisation (OpenID Connect ou SAML). La double authentification utilise des codes à usage unique générés par une application d’authentification ainsi que des codes de secours ; l’Organisation peut la rendre obligatoire pour certains rôles.
+4.1. Les comptes sont créés uniquement par l’Organisation : manuellement, par import de fichier ou via son propre système d’authentification unique. Il n’existe pas d’inscription libre.
+4.2. Selon les paramètres de l’Organisation, l’Utilisateur se connecte avec une adresse e-mail et un mot de passe d’au moins 12 caractères, ou par l’intermédiaire du système d’authentification unique (SSO) de l’Organisation (OpenID Connect). La double authentification utilise des codes à usage unique générés par une application d’authentification ainsi que des codes de secours ; l’Organisation peut la rendre obligatoire pour certains rôles.
 4.3. Chaque compte appartient à une seule personne et ne peut être partagé avec quiconque.
 4.4. L’Organisation peut limiter le nombre d’appareils pouvant être connectés simultanément à un même compte. Lorsque la limite est atteinte, la session la plus ancienne est fermée.
 4.5. L’Organisation détermine le rôle et le service de l’Utilisateur et peut suspendre ou supprimer le compte. Lorsqu’un Utilisateur quitte l’Organisation, il est généralement mis fin à son accès.

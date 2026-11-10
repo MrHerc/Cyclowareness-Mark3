@@ -28,8 +28,8 @@ Regulile de utilizare a platformei: părțile, securitatea conturilor, utilizare
 
 ## 4. Conturi și conectare
 
-4.1. Conturile sunt create numai de Organizație: manual, prin import din fișier sau prin sincronizare cu propriul serviciu de director. Nu există înregistrare liberă.
-4.2. În funcție de setările Organizației, Utilizatorul se conectează cu o adresă de e-mail și o parolă de cel puțin 12 caractere, cu parola Active Directory a Organizației sau prin sistemul de autentificare unică al Organizației (OpenID Connect sau SAML). Verificarea în doi pași utilizează coduri de unică folosință generate de o aplicație de autentificare, precum și coduri de rezervă; Organizația o poate face obligatorie pentru anumite roluri.
+4.1. Conturile sunt create numai de Organizație: manual, prin import din fișier sau prin propriul sistem de autentificare unică. Nu există înregistrare liberă.
+4.2. În funcție de setările Organizației, Utilizatorul se conectează cu o adresă de e-mail și o parolă de cel puțin 12 caractere sau prin sistemul de autentificare unică al Organizației (OpenID Connect). Verificarea în doi pași utilizează coduri de unică folosință generate de o aplicație de autentificare, precum și coduri de rezervă; Organizația o poate face obligatorie pentru anumite roluri.
 4.3. Fiecare cont aparține unei singure persoane și nu poate fi partajat cu nicio altă persoană.
 4.4. Organizația poate limita numărul de dispozitive care pot fi conectate simultan la același cont. Când limita este atinsă, cea mai veche sesiune este închisă.
 4.5. Organizația stabilește rolul și departamentul Utilizatorului și poate suspenda sau șterge contul. Când Utilizatorul părăsește Organizația, accesul îi este, de regulă, retras.

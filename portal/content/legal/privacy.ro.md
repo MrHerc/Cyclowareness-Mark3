@@ -90,7 +90,6 @@ Ce date cu caracter personal sunt prelucrate pe platformă, în ce scop și pe c
 - Întrebările și răspunsurile stocate ale lui AI Sel (fără legătură cu vreun cont): până la 12 luni, după care sunt șterse automat.
 - Solicitările de demonstrație transmise prin site-ul public: 24 de luni, cu excepția cazului în care sunt șterse mai devreme (punctul 3.3).
 - Evidențele privind livrarea e-mailurilor: 90 de zile de la finalizarea livrării.
-- Rapoartele de sincronizare cu serviciul de director: 180 de zile.
 - Jurnalul de audit: nu poate fi modificat sau șters prin intermediul Serviciului; este păstrat pe durata în care contractul Organizației este în vigoare și, ulterior, pe perioada prevăzută în contract sau impusă de legislație.
 - Copiile de rezervă (Versiunea cloud): sunt înlocuite cu altele noi într-un ciclu continuu, în prezent de 14 zile.
 - După încetarea contractului: datele Organizației sunt returnate sau șterse conform prevederilor contractului său; copiile de rezervă expiră potrivit ciclului lor.

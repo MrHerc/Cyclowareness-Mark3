@@ -90,7 +90,6 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 - AI Sel-in saxlanılan sualları və cavabları (heç bir hesabla əlaqəsi olmadan): 12 aya qədər, sonra avtomatik silinir.
 - Açıq saytdan gələn demo sorğuları: daha tez silinmədikdə 24 ay (3.3-cü bənd).
 - Məktubların çatdırılma qeydləri: çatdırılma başa çatdıqdan sonra 90 gün.
-- Kataloq sinxronlaşdırması hesabatları: 180 gün.
 - Audit jurnalı: Xidmət vasitəsilə dəyişdirilə və silinə bilməz; Təşkilatın müqaviləsi qüvvədə olduğu müddətdə və ondan sonra müqavilədə müəyyən edilmiş və ya qanunvericiliyin tələb etdiyi müddətdə saxlanılır.
 - Ehtiyat nüsxələr (Bulud versiyası): fasiləsiz dövrlə yenisi ilə əvəz olunur, hazırda 14 gün.
 - Müqaviləyə xitam verildikdən sonra: Təşkilatın məlumatları onun müqaviləsində müəyyən edildiyi kimi qaytarılır və ya silinir; ehtiyat nüsxələr öz dövrünə uyğun köhnəlir.

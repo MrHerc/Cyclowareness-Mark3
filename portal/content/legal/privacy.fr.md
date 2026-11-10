@@ -90,7 +90,6 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 - Questions et réponses conservées d’AI Sel (sans lien avec un compte) : jusqu’à 12 mois, puis elles sont supprimées automatiquement.
 - Demandes de démonstration envoyées depuis le site public : 24 mois, sauf suppression anticipée (point 3.3).
 - Enregistrements de remise des e-mails : 90 jours après l’achèvement de la remise.
-- Rapports de synchronisation de l’annuaire : 180 jours.
 - Journal d’audit : ne peut être ni modifié ni supprimé au moyen du Service ; il est conservé pendant toute la durée du contrat de l’Organisation puis, au-delà, pendant la durée prévue par le contrat ou exigée par la législation.
 - Sauvegardes (Version cloud) : remplacées par de nouvelles sauvegardes selon un cycle continu, actuellement de 14 jours.
 - Après la fin du contrat : les données de l’Organisation sont restituées ou supprimées selon les modalités prévues par son contrat ; les sauvegardes expirent selon leur cycle.

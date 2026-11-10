@@ -90,7 +90,6 @@ What personal data is processed on the platform, for what purpose and on what le
 - AI Sel's stored questions and answers (without a link to any account): up to 12 months, after which they are deleted automatically.
 - Demo requests from the public website: 24 months, unless deleted sooner (clause 3.3).
 - Email delivery records: 90 days after delivery is completed.
-- Directory synchronisation reports: 180 days.
 - Audit log: cannot be changed or deleted through the Service; it is kept for as long as the Organisation's agreement is in force and, thereafter, for the period set out in the agreement or required by legislation.
 - Backups (Cloud Version): replaced by new ones on a continuous rolling cycle, currently 14 days.
 - After termination of the agreement: the Organisation's data is returned or deleted as set out in its agreement; backups expire in accordance with their cycle.

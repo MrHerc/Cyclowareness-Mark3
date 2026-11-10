@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
-import { CreatedLinkDialog, writeClipboard } from "@/components/admin/created-link";
+import { CreatedLinkDialog, copyOrShow } from "@/components/admin/created-link";
 import { LOCALES, LOCALE_NAMES } from "@/i18n/config";
 
 const ROLES = ["learner", "department_head", "executive", "analyst", "campaign_manager", "content_creator", "tenant_admin"] as const;
@@ -78,8 +78,7 @@ export function PersonActions({
       const res = await createLinkAction(person.id, kind, password);
       if (res.ok && res.url) {
         close();
-        if (await writeClipboard(res.url)) toast(tp("linkCopied"));
-        else setCreatedLink(res.url);
+        await copyOrShow(res.url, () => toast(tp("linkCopied")), setCreatedLink);
       } else setPwError(stepUpError(res.error));
     });
 

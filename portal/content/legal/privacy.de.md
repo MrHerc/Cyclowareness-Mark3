@@ -90,7 +90,6 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 - Gespeicherte Fragen und Antworten von AI Sel (ohne Verknüpfung mit einem Konto): bis zu 12 Monate, danach werden sie automatisch gelöscht.
 - Demo-Anfragen über die öffentliche Website: 24 Monate, sofern sie nicht früher gelöscht werden (Ziffer 3.3).
 - Zustellprotokolle für E-Mails: 90 Tage nach Abschluss der Zustellung.
-- Berichte zur Verzeichnissynchronisierung: 180 Tage.
 - Audit-Protokoll: kann über den Dienst weder geändert noch gelöscht werden; es wird für die Dauer des Vertrags der Organisation und danach für den im Vertrag festgelegten oder gesetzlich vorgeschriebenen Zeitraum aufbewahrt.
 - Backups (Cloud-Version): werden in einem fortlaufenden rollierenden Zyklus, derzeit 14 Tage, durch neue ersetzt.
 - Nach Beendigung des Vertrags: Die Daten der Organisation werden nach Maßgabe ihres Vertrags zurückgegeben oder gelöscht; Backups verfallen gemäß ihrem Zyklus.

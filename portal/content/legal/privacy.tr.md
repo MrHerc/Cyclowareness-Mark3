@@ -90,7 +90,6 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 - AI Sel'in saklanan soruları ve yanıtları (hiçbir hesapla bağlantısı olmadan): en fazla 12 ay; bu sürenin sonunda otomatik olarak silinir.
 - Herkese açık web sitesinden gelen demo talepleri: daha önce silinmedikçe 24 ay (3.3. madde).
 - E-posta teslim kayıtları: teslimin tamamlanmasından sonra 90 gün.
-- Dizin eşitleme raporları: 180 gün.
 - Denetim günlüğü: Hizmet üzerinden değiştirilemez veya silinemez; Kuruluşun sözleşmesi yürürlükte olduğu sürece ve sonrasında sözleşmede belirlenen veya mevzuatın gerektirdiği süre boyunca saklanır.
 - Yedek kopyalar (Bulut Sürümü): kesintisiz dönen bir döngüyle yenileriyle değiştirilir; bu süre şu anda 14 gündür.
 - Sözleşmenin sona ermesinden sonra: Kuruluşun verileri sözleşmesinde belirlendiği şekilde iade edilir veya silinir; yedek kopyaların süresi kendi döngülerine göre dolar.

@@ -28,8 +28,8 @@ Platformun kullanım kuralları: taraflar, hesap güvenliği, kabul edilebilir k
 
 ## 4. Hesaplar ve giriş
 
-4.1. Hesaplar yalnızca Kuruluş tarafından oluşturulur: elle, dosyadan içe aktarma yoluyla veya Kuruluşun kendi dizin hizmetiyle eşitleme yoluyla. Açık kayıt imkânı yoktur.
-4.2. Kuruluşun ayarlarına bağlı olarak Kullanıcı; bir e-posta adresi ve en az 12 karakterden oluşan bir parolayla, Kuruluşun Active Directory parolasıyla ya da Kuruluşun tek oturum açma sistemi (OpenID Connect veya SAML) üzerinden giriş yapar. İki adımlı doğrulamada bir kimlik doğrulama uygulamasının ürettiği tek kullanımlık kodlar ve yedek kodlar kullanılır; Kuruluş iki adımlı doğrulamayı belirli roller için zorunlu kılabilir.
+4.1. Hesaplar yalnızca Kuruluş tarafından oluşturulur: elle, dosyadan içe aktarma yoluyla veya Kuruluşun kendi tek oturum açma sistemi aracılığıyla. Açık kayıt imkânı yoktur.
+4.2. Kuruluşun ayarlarına bağlı olarak Kullanıcı; bir e-posta adresi ve en az 12 karakterden oluşan bir parolayla ya da Kuruluşun tek oturum açma sistemi (OpenID Connect) üzerinden giriş yapar. İki adımlı doğrulamada bir kimlik doğrulama uygulamasının ürettiği tek kullanımlık kodlar ve yedek kodlar kullanılır; Kuruluş iki adımlı doğrulamayı belirli roller için zorunlu kılabilir.
 4.3. Her hesap tek bir kişiye aittir ve başka biriyle paylaşılamaz.
 4.4. Kuruluş, bir hesapta aynı anda oturum açık olabilecek cihaz sayısını sınırlayabilir. Sınıra ulaşıldığında en eski oturum kapatılır.
 4.5. Kullanıcının rolünü ve departmanını Kuruluş belirler; Kuruluş hesabı askıya alabilir veya silebilir. Kullanıcı Kuruluştan ayrıldığında erişimi genellikle sonlandırılır.
