@@ -31,7 +31,7 @@ import { notificationsSchema } from "../schemas/notifications";
  * `error: "secretRequired"`: the server changed, so the stored password or secret must be entered again.
  * `wrongPassword` and `rateLimited`: the step-up the identity settings take (saveIdentityAction).
  */
-export type SaveResult = { ok: boolean; field?: string; error?: "secretRequired" | StepUpError };
+export type SaveResult = { ok: boolean; field?: string; error?: "secretRequired" | "simulationNotProven" | StepUpError };
 const invalid = (p: { error: { issues: { path: PropertyKey[] }[] } }): SaveResult => ({ ok: false, field: p.error.issues[0]?.path.map(String).join(".") || undefined });
 
 /**
@@ -373,7 +373,7 @@ export async function saveEmailAction(input: z.infer<typeof emailSchema>): Promi
   const current = await currentSettings(v);
   if (smtpSecret(current) === "required") return { ok: false, field: "password", error: "secretRequired" };
   // A simulation may only be sent from a look-alike domain this organisation has proven (verifySimulationDomainAction).
-  if (d.simulationFromAddress && addressDomain(d.simulationFromAddress) !== current.email.simulationDomain) return { ok: false, field: "simulationFromAddress" };
+  if (d.simulationFromAddress && addressDomain(d.simulationFromAddress) !== current.email.simulationDomain) return { ok: false, field: "simulationFromAddress", error: "simulationNotProven" };
   await saveSettings(
     v,
     (s) => {
@@ -517,7 +517,7 @@ export async function saveProtectionAction(contentProtection: boolean, watermark
   return { ok: true };
 }
 
-/** Settings → Security: lets the platform operator issue a sign-in link for an administrator (adminLinkAction) for the next 72 hours. */
+/** Settings → Security: lets the platform operator issue a password reset link for an administrator (adminLinkAction) for the next 72 hours. */
 export async function grantSupportAccessAction(): Promise<{ ok: boolean }> {
   const v = await actionViewer("settings.write");
   const until = new Date(Date.now() + 72 * 60 * 60_000).toISOString();

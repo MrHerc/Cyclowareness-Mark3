@@ -38,6 +38,17 @@ export function narrowToDepartment(scope: Set<string> | null, closure: Map<strin
   return closure.has(departmentId) && (!scope || scope.has(departmentId)) ? closure.get(departmentId)! : new Set<string>();
 }
 
+/**
+ * The active people of a department scope (null: the whole organisation) as a subquery. A list with one
+ * parameter per person reaches PostgreSQL's limit of 65 535 parameters per statement in a large organisation.
+ */
+export function activeInScope(tenantId: string, departmentIds: Set<string> | null) {
+  return db()
+    .select({ id: t.users.id })
+    .from(t.users)
+    .where(and(eq(t.users.tenantId, tenantId), eq(t.users.status, "active"), departmentIds ? inArray(t.users.departmentId, [...departmentIds]) : undefined));
+}
+
 export type PersonRow = {
   id: string;
   name: string;
@@ -80,12 +91,13 @@ export async function listPeople(v: Viewer, opts: { departmentIds?: Set<string> 
     .where(and(eq(t.users.tenantId, v.tenant.id), opts.includeDeleted ? undefined : ne(t.users.status, "deleted")))
     .orderBy(asc(t.users.name));
   const filtered = scope ? rows.filter((r) => r.departmentId && scope.has(r.departmentId)) : rows;
-  const ids = filtered.map((r) => r.id);
-  const waiting = ids.length
+  // Counted for the whole organisation and looked up per row: a list of the people can reach the parameter limit (activeInScope).
+  const waiting = filtered.length
     ? await db()
         .select({ userId: t.moduleProgress.userId, n: count() })
         .from(t.moduleProgress)
-        .where(and(inArray(t.moduleProgress.userId, ids), eq(t.moduleProgress.status, "awaiting_attestation")))
+        .innerJoin(t.users, eq(t.users.id, t.moduleProgress.userId))
+        .where(and(eq(t.users.tenantId, v.tenant.id), eq(t.moduleProgress.status, "awaiting_attestation")))
         .groupBy(t.moduleProgress.userId)
     : [];
   const wmap = new Map(waiting.map((w) => [w.userId, Number(w.n)]));
@@ -96,8 +108,8 @@ export async function overviewData(v: Viewer, locale: string, departmentFilter: 
   const scope = await scopeDepartmentIds(v);
   const departments = await getDepartments(v.tenant.id);
   const closure = departmentClosure(departments);
-  let deptScope: Set<string> | null = scope;
-  if (departmentFilter && closure.has(departmentFilter) && (!scope || scope.has(departmentFilter))) deptScope = closure.get(departmentFilter)!;
+  const deptScope = departmentFilter ? narrowToDepartment(scope, closure, departmentFilter) : scope;
+  const inScope = activeInScope(v.tenant.id, deptScope);
   const people = (await listPeople(v, { departmentIds: deptScope })).filter((p) => p.status === "active");
   const ids = people.map((p) => p.id);
   const now = new Date();
@@ -108,17 +120,18 @@ export async function overviewData(v: Viewer, locale: string, departmentFilter: 
       .from(t.riskSnapshots)
       .where(and(eq(t.riskSnapshots.tenantId, v.tenant.id), gte(t.riskSnapshots.day, dayPlus(-31, v.tenant.settings.timeZone, now))))
       .orderBy(asc(t.riskSnapshots.day)),
-    resolveAssignments(db(), v.tenant.id, ids),
+    // Unscoped: the whole organisation, without a list of people; the rows are read per person below.
+    resolveAssignments(db(), v.tenant.id, deptScope ? ids : undefined),
     departmentLeague(db(), v.tenant.id),
     ids.length
       ? db()
           .select({ sent: count(), reported: sql<number>`count(${t.campaignRecipients.reportedAt})`, clicked: sql<number>`count(${t.campaignRecipients.clickedAt})` })
           .from(t.campaignRecipients)
-          .where(and(inArray(t.campaignRecipients.userId, ids), gte(t.campaignRecipients.sentAt, new Date(now.getTime() - 90 * DAY))))
+          .where(and(inArray(t.campaignRecipients.userId, inScope), gte(t.campaignRecipients.sentAt, new Date(now.getTime() - 90 * DAY))))
       : Promise.resolve([{ sent: 0, reported: 0, clicked: 0 }]),
     db().select({ id: t.lessons.id, moduleId: t.lessons.moduleId }).from(t.lessons),
     ids.length
-      ? db().select({ userId: t.lessonProgress.userId, lessonId: t.lessonProgress.lessonId }).from(t.lessonProgress).where(and(inArray(t.lessonProgress.userId, ids), isNotNull(t.lessonProgress.completedAt)))
+      ? db().select({ userId: t.lessonProgress.userId, lessonId: t.lessonProgress.lessonId }).from(t.lessonProgress).where(and(inArray(t.lessonProgress.userId, inScope), isNotNull(t.lessonProgress.completedAt)))
       : Promise.resolve([]),
     db().select({ id: t.modules.id, slug: t.modules.slug, title: t.modules.title, category: t.modules.category }).from(t.modules),
     db().select({ moduleId: t.feedback.moduleId, r: avg(t.feedback.rating), n: count() }).from(t.feedback).where(and(eq(t.feedback.tenantId, v.tenant.id), isNotNull(t.feedback.moduleId))).groupBy(t.feedback.moduleId),
@@ -127,7 +140,7 @@ export async function overviewData(v: Viewer, locale: string, departmentFilter: 
           .select({ moduleId: t.lessons.moduleId, total: count(), good: sql<number>`count(*) filter (where ${t.answers.correct} and ${t.answers.firstTry})` })
           .from(t.answers)
           .innerJoin(t.lessons, eq(t.lessons.id, t.answers.lessonId))
-          .where(and(inArray(t.answers.userId, ids), eq(t.answers.firstTry, true)))
+          .where(and(inArray(t.answers.userId, inScope), eq(t.answers.firstTry, true)))
           .groupBy(t.lessons.moduleId)
       : Promise.resolve([]),
   ]);
@@ -140,7 +153,7 @@ export async function overviewData(v: Viewer, locale: string, departmentFilter: 
   let completed = 0;
   const moduleStats = new Map<string, { assignedTo: number; completedBy: number }>();
   const progress = ids.length
-    ? await db().select().from(t.moduleProgress).where(inArray(t.moduleProgress.userId, ids))
+    ? await db().select().from(t.moduleProgress).where(inArray(t.moduleProgress.userId, inScope))
     : [];
   const progressMap = new Map(progress.map((p) => [`${p.userId}:${p.moduleId}`, p]));
   for (const p of people) {

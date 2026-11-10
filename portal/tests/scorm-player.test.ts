@@ -13,6 +13,7 @@ const scenes = await import("@/components/player/scenes");
 const { ScormApp, ScormProviders } = await import("@/scorm/app");
 const { connect } = await import("@/scorm/scorm-api");
 const { loadMessages } = await import("@/i18n/messages");
+const { DoneScreen } = await import("@/components/player/player");
 
 /** The first scene of each type in the English library lessons. */
 function oneOfEach(): Map<SceneType, Scene> {
@@ -81,5 +82,23 @@ describe("offline SCORM player", () => {
     // The leave link stays inside the package, as a hash the app routes on.
     expect(html).toContain('href="#/learn/demo"');
     expect(html).not.toMatch(/href="\//);
+  });
+
+  it("finishes without the portal's Home button and XP line, which the portal player keeps", async () => {
+    const data = await packageData("en", []);
+    const { player } = await loadMessages("en");
+    const done = player.done as { home: string; noXp: string };
+    const props = { slug: "demo", moduleTitle: "Demo module", next: null, attestationText: "" };
+    const render = (p: object) =>
+      renderToStaticMarkup(
+        createElement(ScormProviders, { data }, createElement(DoneScreen, { p: p as never, result: { ok: true, xp: 0, moduleStatus: "completed", nextKey: null }, initialToken: null, still: true, onAttested: () => {} })),
+      );
+    const scorm = render({ ...props, onComplete: () => ({ ok: true }) });
+    expect(scorm).toContain('href="#/learn/demo"');
+    expect(scorm).not.toContain(done.home);
+    expect(scorm).not.toContain(done.noXp);
+    const portal = render(props);
+    expect(portal).toContain(done.home);
+    expect(portal).toContain(done.noXp);
   });
 });

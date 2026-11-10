@@ -617,7 +617,7 @@ function ProblemSection({ context, onSent }: { context: string; onSent: () => vo
   );
 }
 
-function DoneScreen({ p, result, initialToken, still, onAttested }: { p: PlayerProps; result: LessonResult | null; initialToken: string | null; still: boolean; onAttested: (token: string | null) => void }) {
+export function DoneScreen({ p, result, initialToken, still, onAttested }: { p: PlayerProps; result: LessonResult | null; initialToken: string | null; still: boolean; onAttested: (token: string | null) => void }) {
   const t = useTranslations("player.done");
   const ta = useTranslations("learner.attest");
   const router = useRouter();
@@ -628,26 +628,30 @@ function DoneScreen({ p, result, initialToken, still, onAttested }: { p: PlayerP
   const [token, setToken] = useState<string | null>(initialToken);
   const [pending, start] = useTransition();
   const awaiting = result?.moduleStatus === "awaiting_attestation" && !confirmed;
+  // In an LMS (SCORM package) there is no portal to go home to and no XP to earn.
+  const offline = !!p.onComplete;
 
   return (
     <div className="grid flex-1 place-items-center pb-16 text-center">
       <div className="w-full max-w-md animate-reveal">
         <Mascot mood="celebrate" gesture="cheer" gestureKey="done" className="mx-auto size-48" still={still} />
         <h1 className="mt-3 text-headline font-bold">{t("title")}</h1>
-        <p className="relative mt-3 inline-flex items-center gap-1.5 rounded-pill bg-reward-100 px-4 py-2 text-body font-bold text-reward-ink">
-          {result?.xp ? (
-            <>
-              <Burst />
-              {full ? (
-                <span aria-hidden className="pointer-events-none absolute inset-x-0 -top-3 mx-auto w-fit animate-fly-up rounded-pill bg-reward-500 px-2.5 py-0.5 text-caption font-bold text-(--accent-on) [animation-delay:0.35s]">
-                  {t("xp", { xp: result.xp })}
-                </span>
-              ) : null}
-            </>
-          ) : null}
-          <Zap className="size-5 fill-reward-500 text-reward-600" />
-          {result?.xp ? t("xp", { xp: result.xp }) : t("noXp")}
-        </p>
+        {offline ? null : (
+          <p className="relative mt-3 inline-flex items-center gap-1.5 rounded-pill bg-reward-100 px-4 py-2 text-body font-bold text-reward-ink">
+            {result?.xp ? (
+              <>
+                <Burst />
+                {full ? (
+                  <span aria-hidden className="pointer-events-none absolute inset-x-0 -top-3 mx-auto w-fit animate-fly-up rounded-pill bg-reward-500 px-2.5 py-0.5 text-caption font-bold text-(--accent-on) [animation-delay:0.35s]">
+                    {t("xp", { xp: result.xp })}
+                  </span>
+                ) : null}
+              </>
+            ) : null}
+            <Zap className="size-5 fill-reward-500 text-reward-600" />
+            {result?.xp ? t("xp", { xp: result.xp }) : t("noXp")}
+          </p>
+        )}
 
         {awaiting ? (
           <div className="mt-6 rounded-2xl border border-reward-200 bg-surface p-5 text-start shadow-raised">
@@ -700,9 +704,11 @@ function DoneScreen({ p, result, initialToken, still, onAttested }: { p: PlayerP
             <ButtonLink href={`/learn/${p.slug}`} variant="secondary">
               {t("backToModule")}
             </ButtonLink>
-            <ButtonLink href="/app" variant="ghost" icon={<Home />}>
-              {t("home")}
-            </ButtonLink>
+            {offline ? null : (
+              <ButtonLink href="/app" variant="ghost" icon={<Home />}>
+                {t("home")}
+              </ButtonLink>
+            )}
           </div>
         </div>
       </div>

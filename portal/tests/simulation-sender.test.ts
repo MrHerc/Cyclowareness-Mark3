@@ -40,7 +40,7 @@ beforeAll(async () => {
 
 describe("simulation sender address", () => {
   it("is saved only once its look-alike domain is proven by the TXT record", async () => {
-    expect(await saveEmailAction({ ...SERVER, simulationFromAddress: "accounts@ofis-techizat.example" })).toEqual({ ok: false, field: "simulationFromAddress" });
+    expect(await saveEmailAction({ ...SERVER, simulationFromAddress: "accounts@ofis-techizat.example" })).toEqual({ ok: false, field: "simulationFromAddress", error: "simulationNotProven" });
     expect(await verifySimulationDomainAction("not an address")).toEqual({ ok: false, found: false });
     expect(await verifySimulationDomainAction("accounts@ofis-techizat.example")).toEqual({ ok: true, found: false, domain: "ofis-techizat.example" });
     expect((await email()).simulationDomain).toBeUndefined();
@@ -50,7 +50,7 @@ describe("simulation sender address", () => {
     expect(await saveEmailAction({ ...SERVER, simulationFromAddress: "accounts@ofis-techizat.example" })).toEqual({ ok: true });
     expect((await email()).simulationFromAddress).toBe("accounts@ofis-techizat.example");
     // Another domain, even the organisation's own, is not the proven one.
-    expect(await saveEmailAction({ ...SERVER, simulationFromAddress: "accounts@acme.example" })).toEqual({ ok: false, field: "simulationFromAddress" });
+    expect(await saveEmailAction({ ...SERVER, simulationFromAddress: "accounts@acme.example" })).toEqual({ ok: false, field: "simulationFromAddress", error: "simulationNotProven" });
     expect((await email()).simulationFromAddress).toBe("accounts@ofis-techizat.example");
   });
 
