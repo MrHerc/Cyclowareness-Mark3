@@ -330,6 +330,7 @@ npx vitest run --coverage                  # with the line-coverage floor of vit
 npx playwright install chromium            # once: the browser for the smoke suite
 npm run e2e                                # browser smoke suite (e2e/), English and Arabic
 CI=1 npm run e2e                           # the same against the production build (run `npm run build` first)
+k6 run load/launch.js -e BASE_URL=… -e ACTION_ID=… -e TARGETS=…   # load test against staging: 10 organisations × 5,000 people launch at once (preparation in the file)
 ```
 
 `npm run e2e` (`playwright test`) starts its own server on port 3400 (`E2E_PORT` changes it) through `e2e/server.mjs`: like `npm run demo` it rebuilds the demo organisation in the embedded database `.data/pg`, so stop `npm run dev` in the same folder first. It signs in with `SEED_PASSWORD` from the environment, else from `.env.local`, else from `.env.example`. The journeys: a learner opens Home, a module and a lesson scene; the admin opens the console, People and the campaign wizard; the operator is sent to set up two-step verification before `/super`. Failed tests keep a trace in `test-results/` (`npx playwright show-trace <file>`). CI runs the same suite against the production build in the `e2e` job, applies the migrations twice to PostgreSQL 16, checks that `drizzle/` matches the schema and builds the Docker image.

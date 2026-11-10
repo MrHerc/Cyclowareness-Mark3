@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { and, asc, eq, isNull, or } from "drizzle-orm";
+import { and, asc, eq, getTableColumns, isNull, or } from "drizzle-orm";
 import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { assignedForUser } from "../services/assignments";
@@ -43,6 +43,11 @@ export function reachableModules(v: Viewer, drafts: boolean) {
   );
 }
 
+/** The library's modules and the organisation's own, whatever their status (progress on an unpublished module still resolves); never another organisation's. */
+export function tenantModules(v: Pick<Viewer, "tenant">) {
+  return or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id));
+}
+
 /**
  * Every published module this person can see, with their progress. Cached per request.
  * `drafts` adds the organisation's own unpublished lessons (studio authors previewing them).
@@ -50,7 +55,7 @@ export function reachableModules(v: Viewer, drafts: boolean) {
 export const getCatalog = cache(async (v: Viewer, locale: string, drafts = false): Promise<CatalogModule[]> => {
   const [mods, lessons, mp, lp, assigned] = await Promise.all([
     db().select().from(t.modules).where(reachableModules(v, drafts)).orderBy(asc(t.modules.sortOrder)),
-    db().select().from(t.lessons).orderBy(asc(t.lessons.position)),
+    db().select(getTableColumns(t.lessons)).from(t.lessons).innerJoin(t.modules, eq(t.modules.id, t.lessons.moduleId)).where(tenantModules(v)).orderBy(asc(t.lessons.position)),
     db().select().from(t.moduleProgress).where(eq(t.moduleProgress.userId, v.user.id)),
     db().select({ lessonId: t.lessonProgress.lessonId, completedAt: t.lessonProgress.completedAt }).from(t.lessonProgress).where(eq(t.lessonProgress.userId, v.user.id)),
     assignedForUser(db(), v.tenant.id, v.user.id),

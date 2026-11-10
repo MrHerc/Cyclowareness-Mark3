@@ -169,15 +169,31 @@ async function simulationInfo(db: DB, m: { kind: string; text: string }): Promis
  * job runner sends it (bulk sends such as campaigns and invitations stay out of the request).
  */
 export async function queueEmail(db: DB, tenantId: string | null, mail: Mail, opts: { defer?: boolean } = {}): Promise<{ id: string; status: "sent" | "failed" | "logged" | "queued" }> {
-  // Mail without its own HTML (the demo request) carries a visitor's words: no address in it becomes a button.
-  const html = mail.html ?? renderEmailHtml(mail.text, { lang: mail.lang, button: null });
-  const [row] = await db
+  const [row] = await queueEmails(db, tenantId, [mail], opts);
+  return row;
+}
+
+/** queueEmail for many messages: one INSERT for all of them (the caller keeps each batch to a few hundred). */
+export async function queueEmails(db: DB, tenantId: string | null, mails: Mail[], opts: { defer?: boolean } = {}): Promise<{ id: string; status: "sent" | "failed" | "logged" | "queued" }[]> {
+  if (!mails.length) return [];
+  const rows = await db
     .insert(t.outbox)
-    .values({ tenantId, to: mail.to, subject: mail.subject, text: mail.text, html, kind: mail.kind, status: "queued" })
+    .values(
+      mails.map((mail) => ({
+        tenantId,
+        to: mail.to,
+        subject: mail.subject,
+        text: mail.text,
+        // Mail without its own HTML (the demo request) carries a visitor's words: no address in it becomes a button.
+        html: mail.html ?? renderEmailHtml(mail.text, { lang: mail.lang, button: null }),
+        kind: mail.kind,
+        status: "queued" as const,
+      })),
+    )
     .returning({ id: t.outbox.id });
-  if (opts.defer) return { id: row.id, status: "queued" };
-  const status = await deliver(db, row.id, { fromName: mail.fromName });
-  return { id: row.id, status };
+  const out: { id: string; status: "sent" | "failed" | "logged" | "queued" }[] = [];
+  for (const [i, row] of rows.entries()) out.push({ id: row.id, status: opts.defer ? "queued" : await deliver(db, row.id, { fromName: mails[i].fromName }) });
+  return out;
 }
 
 /**

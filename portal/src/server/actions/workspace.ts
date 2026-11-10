@@ -11,8 +11,8 @@ import { departmentKey } from "../../lib/departments";
 import { isUniqueViolation } from "../db/errors";
 import { audit } from "../services/audit";
 import { notifyUsers } from "../services/notify";
-import { assignmentTargets, coveringAssignments, departmentClosure, dueFor, gainsCoverage } from "../services/assignments";
-import { recomputeRisk } from "../services/risk";
+import { assignmentTargets, coveringAssignments, departmentClosure, dueFor, gainsCoverage, resolveAssignments } from "../services/assignments";
+import { recomputeChanged, recomputeRisk } from "../services/risk";
 import { getTranslations } from "next-intl/server";
 import { LOCALES, isLocale, pick } from "../../i18n/config";
 import type { PolicyText } from "../../lib/policy-text";
@@ -264,6 +264,7 @@ export async function updateDueAction(id: string, dueKind: "none" | "fixed" | "a
   if (!isUuid(id) || !["none", "fixed", "after_joining"].includes(dueKind)) return { ok: false };
   if (dueKind === "fixed" && !parseDay(dueDate)) return { ok: false };
   if (dueKind === "after_joining" && !(dueDays && dueDays > 0 && dueDays <= 365)) return { ok: false };
+  const before = await resolveAssignments(db(), v.tenant.id);
   const changed = await db()
     .update(t.assignments)
     .set({ dueKind, dueDate: dueKind === "fixed" ? dueDate : null, dueDays: dueKind === "after_joining" ? dueDays : null })
@@ -271,7 +272,7 @@ export async function updateDueAction(id: string, dueKind: "none" | "fixed" | "a
     .returning({ id: t.assignments.id });
   if (!changed.length) return { ok: false };
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "assignment.due_changed", targetType: "assignment", targetId: id });
-  await recomputeRisk(db(), v.tenant.id);
+  await recomputeChanged(db(), v.tenant.id, before);
   refresh();
   return { ok: true };
 }
@@ -279,10 +280,11 @@ export async function updateDueAction(id: string, dueKind: "none" | "fixed" | "a
 export async function removeAssignmentAction(id: string): Promise<{ ok: boolean }> {
   const v = await actionViewer("assignments.write");
   if (!isUuid(id)) return { ok: false };
+  const before = await resolveAssignments(db(), v.tenant.id);
   const removed = await db().delete(t.assignments).where(and(eq(t.assignments.id, id), eq(t.assignments.tenantId, v.tenant.id))).returning({ id: t.assignments.id });
   if (!removed.length) return { ok: false };
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "assignment.removed", targetType: "assignment", targetId: id });
-  await recomputeRisk(db(), v.tenant.id);
+  await recomputeChanged(db(), v.tenant.id, before);
   refresh();
   return { ok: true };
 }

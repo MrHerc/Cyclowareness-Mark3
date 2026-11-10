@@ -1082,6 +1082,20 @@ export const jobTicks = pgTable("job_ticks", {
   durationMs: integer("duration_ms").notNull(),
 });
 
+/**
+ * When a per-organisation job last ran (reminders, manager alerts, refreshers run at most hourly).
+ * A "risk" row is a whole-organisation rescoring an admin action left to the next tick (ran_at: when it was asked for).
+ */
+export const jobRuns = pgTable(
+  "job_runs",
+  {
+    job: text("job").notNull(),
+    tenantId: tenantRef(),
+    ranAt: ts("ran_at").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.job, t.tenantId] })],
+);
+
 export const tutorCache = pgTable("tutor_cache", {
   id: text("id").primaryKey(), // sha256 of tenant, locale, lesson, scene, the normalised question and a hash of the lesson text (tutorCacheId)
   tenantId: tenantRef(),

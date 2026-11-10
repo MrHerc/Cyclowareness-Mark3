@@ -10,7 +10,7 @@ const { db, ready } = testDb();
 vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src/server/db/schema") }));
 
 const { badgeFacts, badgesFor } = await import("../src/server/queries/badges");
-const { continueModule, getCatalog, nextLesson, yourPath } = await import("../src/server/queries/catalog");
+const { continueModule, getCatalog, nextLesson, tenantModules, yourPath } = await import("../src/server/queries/catalog");
 const learner = await import("../src/server/queries/learner");
 
 beforeAll(ready, DB_SETUP_TIMEOUT);
@@ -111,6 +111,24 @@ describe("getCatalog", () => {
     expect(catalog.find((m) => m.id === own.id)).toMatchObject({ title: "Our version", status: "not_started", assigned: false, due: null });
 
     expect((await getCatalog(v, "en", true)).map((m) => m.id)).toContain(draft.id);
+  });
+
+  it("looks up the library's and the organisation's own modules and lessons only (tenantModules)", async () => {
+    const { tenant, v } = await person();
+    const library = await addModule(db, { lessons: 1 });
+    const own = await addModule(db, { lessons: 1, tenantId: tenant.id, status: "draft" });
+    const foreign = await addModule(db, { lessons: 1, tenantId: (await addTenant(db)).id });
+    const modules = (await db.select({ id: t.modules.id }).from(t.modules).where(tenantModules(v))).map((m) => m.id);
+    expect(modules).toEqual(expect.arrayContaining([library.id, own.id]));
+    expect(modules).not.toContain(foreign.id);
+    const lessons = (await db.select({ id: t.lessons.id }).from(t.lessons).innerJoin(t.modules, eq(t.modules.id, t.lessons.moduleId)).where(tenantModules(v))).map((l) => l.id);
+    expect(lessons).toEqual(expect.arrayContaining([library.lessons[0].id, own.lessons[0].id]));
+    expect(lessons).not.toContain(foreign.lessons[0].id);
+    // The admin overview resolves the assigned library module through the scoped lookups.
+    await assignEveryone(db, tenant.id, library.id);
+    const { overviewData } = await import("../src/server/queries/admin");
+    const admin = { ...v, user: { ...v.user, role: "tenant_admin" } } as Viewer;
+    expect((await overviewData(admin, "en", null)).moduleRows).toMatchObject([{ moduleId: library.id, slug: library.slug, assignedTo: 1 }]);
   });
 
   it("lower-cases audiences saved by older Studio versions", async () => {

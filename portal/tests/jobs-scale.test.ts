@@ -1,0 +1,113 @@
+import { eq } from "drizzle-orm";
+import { beforeAll, describe, expect, it, vi } from "vitest";
+import * as t from "../src/server/db/schema";
+import { runJobs } from "../src/server/jobs";
+import { resolveAssignments } from "../src/server/services/assignments";
+import { computeTenantRisk, INLINE_RECOMPUTE_MAX, recomputeChanged, recomputeRisk } from "../src/server/services/risk";
+import { DB_SETUP_TIMEOUT, addDepartment, addModule, addTenant, addUser, assignEveryone, testDb } from "./helpers/db";
+
+const { db, ready } = testDb();
+beforeAll(ready, DB_SETUP_TIMEOUT);
+
+const NOW = new Date("2026-11-09T10:00:00Z");
+const HOUR = 3_600_000;
+const DAY = 86_400_000;
+
+/** `n` people in one INSERT, each with a stored score the recompute has to overwrite. */
+async function people(tenantId: string, n: number) {
+  return db
+    .insert(t.users)
+    .values(Array.from({ length: n }, (_, i) => ({ tenantId, email: `p${i}-${tenantId}@test.example`, name: `P ${i}`, locale: "en", riskScore: 99 })))
+    .returning({ id: t.users.id });
+}
+
+const scores = async (tenantId: string) => new Map((await db.select({ id: t.users.id, s: t.users.riskScore }).from(t.users).where(eq(t.users.tenantId, tenantId))).map((u) => [u.id, u.s]));
+
+describe("recomputeRisk at scale", () => {
+  it("writes 1,200 scores in one UPDATE per 500 people, equal to the per-person evidence", async () => {
+    const tenant = await addTenant(db);
+    const users = await people(tenant.id, 1_200);
+    const mod = await addModule(db, { lessons: 3 });
+    await assignEveryone(db, tenant.id, mod.id, { dueKind: "fixed", dueDate: "2026-10-01", createdAt: new Date(NOW.getTime() - 60 * DAY) });
+    // Evidence that differs from person to person: training done, simulation clicks and open risks.
+    await db.insert(t.lessonProgress).values(users.filter((_, i) => i % 4).map((u, i) => ({ userId: u.id, lessonId: mod.lessons[i % 3].id, completedAt: NOW })));
+    const [c] = await db.insert(t.campaigns).values({ tenantId: tenant.id, name: "C", channel: "email", templateKey: "payslip", audience: "all", status: "running", launchedAt: NOW }).returning();
+    await db.insert(t.campaignRecipients).values(users.filter((_, i) => i % 3 === 0).map((u, i) => ({ campaignId: c.id, userId: u.id, token: `tok-${i}`.padEnd(16, "x"), sentAt: NOW, clickedAt: i % 2 ? NOW : null })));
+    await db.insert(t.behaviorRisks).values(users.filter((_, i) => i % 5 === 0).map((u) => ({ tenantId: tenant.id, userId: u.id, kind: "phishing_click" as const, severity: "high" as const, title: "x" })));
+
+    const expected = await computeTenantRisk(db, tenant.id, NOW);
+    expect(new Set([...expected.values()].map((b) => b.score)).size).toBeGreaterThan(3);
+    const execute = vi.spyOn(db, "execute");
+    try {
+      await recomputeRisk(db, tenant.id, undefined, NOW);
+      expect(execute).toHaveBeenCalledTimes(3);
+    } finally {
+      execute.mockRestore();
+    }
+    const stored = await scores(tenant.id);
+    expect(stored.size).toBe(1_200);
+    for (const [id, b] of expected) expect(stored.get(id)).toBe(b.score);
+  }, 120_000);
+});
+
+describe("assignment changes", () => {
+  it("rescore only the people whose assigned modules or due days moved", async () => {
+    const tenant = await addTenant(db);
+    const sales = await addDepartment(db, tenant.id, "Sales");
+    const it_ = await addDepartment(db, tenant.id, "IT");
+    const a = await addUser(db, tenant.id, { departmentId: sales.id, riskScore: 99 });
+    const b = await addUser(db, tenant.id, { departmentId: sales.id, riskScore: 99 });
+    const other = await addUser(db, tenant.id, { departmentId: it_.id, riskScore: 99 });
+    const mod = await addModule(db, { lessons: 2 });
+    const [assignment] = await db.insert(t.assignments).values({ tenantId: tenant.id, moduleId: mod.id, scope: "department", departmentId: sales.id, dueKind: "none" }).returning();
+
+    const before = await resolveAssignments(db, tenant.id);
+    await db.delete(t.assignments).where(eq(t.assignments.id, assignment.id));
+    expect(await recomputeChanged(db, tenant.id, before, NOW)).toBe("inline");
+    const stored = await scores(tenant.id);
+    expect(stored.get(a.id)).not.toBe(99);
+    expect(stored.get(b.id)).not.toBe(99);
+    expect(stored.get(other.id)).toBe(99);
+  });
+
+  it(`leave more than ${INLINE_RECOMPUTE_MAX} people to the next job tick, which rescores the whole organisation once`, async () => {
+    const tenant = await addTenant(db);
+    await people(tenant.id, INLINE_RECOMPUTE_MAX + 1);
+    const mod = await addModule(db, { lessons: 1 });
+    const before = await resolveAssignments(db, tenant.id);
+    await assignEveryone(db, tenant.id, mod.id);
+    expect(await recomputeChanged(db, tenant.id, before, NOW)).toBe("deferred");
+    expect([...(await scores(tenant.id)).values()].every((s) => s === 99)).toBe(true);
+
+    // Today's daily snapshot is done, so only the deferred rescoring can move the scores.
+    await db.insert(t.riskSnapshots).values({ tenantId: tenant.id, day: "2026-11-09", avgRisk: 0, completion: 0, reportRate: 0, clickRate: 0 });
+    const out = await runJobs(db, NOW);
+    expect(out[`risk:${tenant.id}`]).toBe(1);
+    expect([...(await scores(tenant.id)).values()].some((s) => s === 99)).toBe(false);
+    expect(await db.select().from(t.jobRuns).where(eq(t.jobRuns.job, "risk"))).toEqual([]);
+    expect(`risk:${tenant.id}` in (await runJobs(db, new Date(NOW.getTime() + 60_000)))).toBe(false);
+  }, 120_000);
+});
+
+describe("hourly jobs", () => {
+  const ran = (out: Record<string, number>, tenantId: string) => ["reminders", "managers", "refreshers"].filter((job) => `${job}:${tenantId}` in out);
+
+  it("run once an hour per organisation, counted from the start of the tick, even one that overran", async () => {
+    const tenant = await addTenant(db);
+    const start = new Date("2026-11-12T09:00:00Z");
+    // The first tick takes ten minutes on the wall clock.
+    let clock = Date.now();
+    const spy = vi.spyOn(Date, "now").mockImplementation(() => (clock += 60_000));
+    try {
+      expect(ran(await runJobs(db, start), tenant.id)).toEqual(["reminders", "managers", "refreshers"]);
+    } finally {
+      spy.mockRestore();
+    }
+    const runs = await db.select().from(t.jobRuns).where(eq(t.jobRuns.tenantId, tenant.id));
+    expect(runs.map((r) => r.ranAt)).toEqual([start, start, start]);
+
+    expect(ran(await runJobs(db, new Date(start.getTime() + 59 * 60_000)), tenant.id)).toEqual([]);
+    expect(ran(await runJobs(db, new Date(start.getTime() + HOUR)), tenant.id)).toEqual(["reminders", "managers", "refreshers"]);
+    expect(ran(await runJobs(db, new Date(start.getTime() + HOUR + 60_000)), tenant.id)).toEqual([]);
+  }, 120_000);
+});
