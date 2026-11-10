@@ -1,0 +1,136 @@
+{
+  "formatVersion": 1,
+  "module": "sim-swap-otp",
+  "title": "SIM swap and OTP in practice",
+  "intro": "Lose your number, lose your accounts. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "no-service",
+      "title": "SahilTel: No service",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "SahilTel: No service",
+        "body": [
+          "Emergency calls only. SIM card not recognised."
+        ]
+      },
+      "options": [
+        {
+          "id": "call-operator",
+          "label": "Call the operator from another phone"
+        },
+        {
+          "id": "sleep",
+          "label": "Turn the phone off and sleep"
+        }
+      ],
+      "safe": "call-operator",
+      "explain": "If your number moved to another card, the operator can block it and give it back to you.",
+      "risk": "money"
+    },
+    {
+      "id": "offer",
+      "title": "Call from SahilTel Customer Service",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "SahilTel Customer Service",
+        "number": "+994 12 000 44 10",
+        "body": [
+          "Hello, this is Gunel from SahilTel. Old SIM cards, excuse me, are being switched off this month, so we are renewing yours for free."
+        ]
+      },
+      "options": [
+        {
+          "id": "go-on",
+          "label": "All right, what should I do?"
+        },
+        {
+          "id": "own-call",
+          "label": "I will call the operator's official number myself"
+        }
+      ],
+      "safe": "own-call",
+      "explain": "If a renewal is real, the official line will confirm it.",
+      "risk": "credentials"
+    },
+    {
+      "id": "bank-login",
+      "title": "UlduzBank Mobil: Sign-in from a new device",
+      "prompt": "The SIM is dead, but the bank app still reaches you over home internet. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "UlduzBank Mobil: Sign-in from a new device",
+        "body": [
+          "Android, Ganja, 00:27. If this was not you, freeze your card."
+        ]
+      },
+      "options": [
+        {
+          "id": "freeze",
+          "label": "Open the app and freeze the card"
+        },
+        {
+          "id": "dismiss",
+          "label": "Dismiss"
+        }
+      ],
+      "safe": "freeze",
+      "explain": "No money leaves a frozen card, and you can unfreeze it later with the bank.",
+      "risk": "money"
+    },
+    {
+      "id": "own-code",
+      "title": "Message from UlduzBank",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "sms",
+        "name": "UlduzBank",
+        "time": "14:02",
+        "body": [
+          "Your sign-in code: 482193. Do not tell this code to anyone."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "If you asked for this code yourself, it is a normal message. Type the code in yourself and nowhere else.",
+      "risk": "money"
+    },
+    {
+      "id": "sim-changed",
+      "title": "Message from SahilTel",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "sms",
+        "name": "SahilTel",
+        "time": "23:52",
+        "body": [
+          "A request to replace the SIM card for your number has been received."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "If you did not ask for a new SIM, this is the first sign of an attack. Call your operator at once.",
+      "risk": "money"
+    }
+  ]
+}

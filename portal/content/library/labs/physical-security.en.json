@@ -1,0 +1,135 @@
+{
+  "formatVersion": 1,
+  "module": "physical-security",
+  "title": "Physical security in practice",
+  "intro": "Sometimes an attack walks in the door. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "visitor",
+      "title": "Unexpected technician at reception",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "Reception desk",
+        "number": "Extension 115",
+        "body": [
+          "Hello, there is an air conditioning technician here. He says you, excuse me, called him. Shall I send him up?"
+        ]
+      },
+      "options": [
+        {
+          "id": "send-up",
+          "label": "Yes, send him up"
+        },
+        {
+          "id": "hold",
+          "label": "I did not call anyone, keep him at the desk"
+        }
+      ],
+      "safe": "hold",
+      "explain": "An unexpected visitor does not get in without a check.",
+      "risk": "data"
+    },
+    {
+      "id": "borrow",
+      "title": "Message from Elnur Hüseynov",
+      "prompt": "What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Elnur Hüseynov",
+        "time": "10:24",
+        "body": [
+          "Hi, I left my badge at home. Leave yours at the guard post, I will return it tonight."
+        ]
+      },
+      "options": [
+        {
+          "id": "lend",
+          "label": "OK, I will leave it"
+        },
+        {
+          "id": "decline",
+          "label": "No, get a temporary badge at the post"
+        }
+      ],
+      "safe": "decline",
+      "explain": "The guard post checks ID and issues a temporary badge.",
+      "risk": "data"
+    },
+    {
+      "id": "usb-found",
+      "title": "Drive found in the corridor",
+      "prompt": "What do you do with this file?",
+      "artifact": {
+        "kind": "file",
+        "name": "Ixtisar_siyahisi_2026.xlsx",
+        "size": "3 KB",
+        "text": "Source: USB: ARXIV (F:)"
+      },
+      "options": [
+        {
+          "id": "plug",
+          "label": "Plug it in and look"
+        },
+        {
+          "id": "hand-in",
+          "label": "Hand it to security"
+        }
+      ],
+      "safe": "hand-in",
+      "explain": "Never plug in a found device, give it to the specialists.",
+      "risk": "malware"
+    },
+    {
+      "id": "name-drop",
+      "title": "Visitor names a manager",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "Reception desk",
+        "number": "Extension 115",
+        "body": [
+          "He says Mr Kamran approved it. He only needs five minutes in the server room."
+        ]
+      },
+      "options": [
+        {
+          "id": "let-in",
+          "label": "Then let him in"
+        },
+        {
+          "id": "check-order",
+          "label": "I check the order with facilities"
+        }
+      ],
+      "safe": "check-order",
+      "explain": "Check the order through official channels, not the visitor's word.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "tagged",
+      "title": "Kontakto: Gulnar tagged you in a photo",
+      "prompt": "Your badge is clearly visible in the photo. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Kontakto: Gulnar tagged you in a photo",
+        "body": [
+          "“First day with the team!” 24 likes"
+        ]
+      },
+      "options": [
+        {
+          "id": "ask-remove",
+          "label": "Ask Gulnar to change the photo"
+        },
+        {
+          "id": "like",
+          "label": "Like it and move on"
+        }
+      ],
+      "safe": "ask-remove",
+      "explain": "A photo of the badge can help someone fake it or get into the building.",
+      "risk": "data"
+    }
+  ]
+}

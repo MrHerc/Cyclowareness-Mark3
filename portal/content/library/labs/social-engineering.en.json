@@ -1,0 +1,138 @@
+{
+  "formatVersion": 1,
+  "module": "social-engineering",
+  "title": "Social engineering in practice",
+  "intro": "Spot tricks in calls, texts and visits. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "alarm",
+      "title": "Call from SahilBank",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "SahilBank",
+        "number": "+994 12 000 00 00",
+        "body": [
+          "Hello, this is Fuad Mammadov from SahilBank security. Someone is trying to take 1,200 manat from your card right now."
+        ]
+      },
+      "options": [
+        {
+          "id": "card",
+          "label": "I give the last card digits"
+        },
+        {
+          "id": "keep",
+          "label": "I share no card details by phone"
+        }
+      ],
+      "safe": "keep",
+      "explain": "Never give card details on an incoming call; the name and number can be faked.",
+      "risk": "money"
+    },
+    {
+      "id": "hello",
+      "title": "Message from +44 7700 900456",
+      "prompt": "The number is new, the name is familiar. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "+44 7700 900456",
+        "time": "10:24",
+        "body": [
+          "Hi Mum! It's me, Aysel. My phone broke, this is my new number."
+        ]
+      },
+      "options": [
+        {
+          "id": "reply",
+          "label": "Hi, sweetheart! What happened?"
+        },
+        {
+          "id": "verify",
+          "label": "Call Aysel's old number"
+        }
+      ],
+      "safe": "verify",
+      "explain": "A new number with a familiar name is checked through another channel, such as the old number.",
+      "risk": "account"
+    },
+    {
+      "id": "no-badge",
+      "title": "Message from IT Support (new)",
+      "prompt": "An unknown technician, and no pass. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "IT Support (new)",
+        "time": "10:24",
+        "body": [
+          "Hi, I have come to fix your printer and I am at the entrance. I left my pass at home, can you come down and open the door?"
+        ]
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Coming, I will open it"
+        },
+        {
+          "id": "verify",
+          "label": "I call the official IT support number"
+        }
+      ],
+      "safe": "verify",
+      "explain": "Check an unexpected technician's visit yourself through the official channel.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "bank-call-back",
+      "title": "Call: SahilBank",
+      "prompt": "Safe or scam?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Call: SahilBank",
+        "time": "10:24",
+        "body": [
+          "We saw a suspicious payment on your card. Do not tell us anything, call the number on the back of your card."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "It asks for nothing and sends you to the official number. Call the number on your card to check.",
+      "risk": "money"
+    },
+    {
+      "id": "police-safe-account",
+      "title": "Call: +994 12 000 11 22",
+      "prompt": "Safe or scam?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Call: +994 12 000 11 22",
+        "time": "10:24",
+        "body": [
+          "This is the police. A loan was opened in your name. Move your money to a safe account now."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "The police never ask you to move money to a safe account. This is a well known scam.",
+      "risk": "money"
+    }
+  ]
+}

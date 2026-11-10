@@ -1,0 +1,147 @@
+{
+  "formatVersion": 1,
+  "module": "travel-security",
+  "title": "Travel Security in practice",
+  "intro": "Protect your devices on every trip. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "booking-ok",
+      "title": "Your booking is confirmed",
+      "prompt": "On the road: safe or a trap?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Lumera Hotel",
+          "address": "reservations@lumera-hotel.example"
+        },
+        "subject": "Your booking is confirmed",
+        "time": "18:22",
+        "body": [
+          "Check-in is after 14:00. Payment is made at reception."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The hotel's own domain, no link, no payment request. A normal confirmation.",
+      "risk": "money"
+    },
+    {
+      "id": "conf-qr",
+      "title": "Forum materials QR code",
+      "prompt": "On the road: safe or a trap?",
+      "artifact": {
+        "kind": "web",
+        "title": "Scan to download the forum materials",
+        "url": "https://forum2026-materials.example.net/app.apk",
+        "body": [
+          "You scanned a QR code: Scan to download the forum materials"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "An .apk file installs an app on your phone. You do not need an app for slides, check the official site.",
+      "risk": "malware"
+    },
+    {
+      "id": "booking-scam",
+      "title": "Your booking will be cancelled",
+      "prompt": "On the road: safe or a trap?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Lumera Hotel",
+          "address": "billing@lumera-hotels-pay.example.info"
+        },
+        "subject": "Your booking will be cancelled",
+        "time": "23:51",
+        "body": [
+          "Confirm your card details within 2 hours:",
+          "lumera-hotels-pay.example.info/card"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A different domain and an urgent payment demand. Call the hotel yourself to check the booking.",
+      "risk": "money"
+    },
+    {
+      "id": "passport-chat",
+      "title": "Message from Forum Organising Committee",
+      "prompt": "On the road: safe or a trap?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Forum Organising Committee",
+        "time": "10:24",
+        "body": [
+          "Dear delegate, to finish registration, send a photo of your passport and your room number here."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Passports are collected on the official registration page, not in an anonymous chat. A room number reveals where you are.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "room-info",
+      "title": "Message from Lumera Hotel",
+      "prompt": "On the road: safe or a trap?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Lumera Hotel",
+        "time": "15:03",
+        "body": [
+          "Welcome! Breakfast is 07:00 to 10:30 on the ground floor."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "No link and no request, just information.",
+      "risk": "data"
+    }
+  ]
+}

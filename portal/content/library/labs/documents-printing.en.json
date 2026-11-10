@@ -1,0 +1,136 @@
+{
+  "formatVersion": 1,
+  "module": "documents-printing",
+  "title": "Documents and printing in practice",
+  "intro": "Protect papers from printer to shredder. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "salary-print",
+      "title": "Print: Salary_table_October.xlsx",
+      "prompt": "This document contains staff salaries. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Print: Salary_table_October.xlsx",
+        "body": [
+          "Printer: Corridor-2 (shared)",
+          "Secure print: off",
+          "Copies: 1"
+        ]
+      },
+      "options": [
+        {
+          "id": "secure",
+          "label": "Send with secure print"
+        },
+        {
+          "id": "direct",
+          "label": "Print directly"
+        }
+      ],
+      "safe": "secure",
+      "explain": "The document waits in the queue and comes out only when you are at the printer.",
+      "risk": "data"
+    },
+    {
+      "id": "lock-screen",
+      "title": "Screen lock",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Screen lock",
+        "body": [
+          "Your computer will be unattended for 15 minutes. Lock it now?"
+        ]
+      },
+      "options": [
+        {
+          "id": "lock",
+          "label": "Lock"
+        },
+        {
+          "id": "later",
+          "label": "Later"
+        }
+      ],
+      "safe": "lock",
+      "explain": "On an unlocked screen anyone can write from your mailbox or take files.",
+      "risk": "account"
+    },
+    {
+      "id": "paper-out",
+      "title": "Çap Mərkəzi: Corridor-2: out of paper",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Çap Mərkəzi: Corridor-2: out of paper",
+        "body": [
+          "Business_trip_list.pdf is queued. It will print as soon as paper is loaded."
+        ]
+      },
+      "options": [
+        {
+          "id": "cancel",
+          "label": "Cancel print"
+        },
+        {
+          "id": "ignore",
+          "label": "Dismiss"
+        }
+      ],
+      "safe": "cancel",
+      "explain": "Once paper is loaded the page would come out without you, so resend it with secure print.",
+      "risk": "data"
+    },
+    {
+      "id": "old-usb",
+      "title": "Format flash drive (E:)?",
+      "prompt": "The drive holds old staff lists. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Format flash drive (E:)?",
+        "body": [
+          "Quick format: file space will be marked as free."
+        ]
+      },
+      "options": [
+        {
+          "id": "hand-over",
+          "label": "Eject and give to technical support"
+        },
+        {
+          "id": "quick-format",
+          "label": "Quick format and bin it"
+        }
+      ],
+      "safe": "hand-over",
+      "explain": "Technical support wipes the drive fully or destroys it.",
+      "risk": "data"
+    },
+    {
+      "id": "driver-popup",
+      "title": "Printer driver out of date",
+      "prompt": "A website offers you printer software. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Printer driver out of date",
+        "body": [
+          "Download Drayver Yeniləyici to keep printing.",
+          "printer-drayver.example.info"
+        ]
+      },
+      "options": [
+        {
+          "id": "install",
+          "label": "Download now"
+        },
+        {
+          "id": "cancel",
+          "label": "Close"
+        }
+      ],
+      "safe": "cancel",
+      "explain": "Only technical support installs printer drivers.",
+      "risk": "malware"
+    }
+  ]
+}

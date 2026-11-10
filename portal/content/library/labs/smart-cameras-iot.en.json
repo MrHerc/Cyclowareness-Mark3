@@ -1,0 +1,139 @@
+{
+  "formatVersion": 1,
+  "module": "smart-cameras-iot",
+  "title": "Smart devices and cameras in practice",
+  "intro": "Who is your camera filming for?. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "first-login",
+      "title": "Camera panel first sign-in",
+      "prompt": "You set up a new camera at home and open its panel for the first time. What do you do?",
+      "artifact": {
+        "kind": "web",
+        "title": "BaxışKam",
+        "url": "http://192.168.1.64/login",
+        "body": [
+          "BaxışKam camera panel. First sign-in: use the password on the sticker under the camera."
+        ],
+        "fields": [
+          "Username",
+          "Password"
+        ],
+        "button": "Sign in"
+      },
+      "options": [
+        {
+          "id": "login",
+          "label": "Sign in"
+        },
+        {
+          "id": "close",
+          "label": "Close tab"
+        }
+      ],
+      "safe": "login",
+      "explain": "This is the camera's own address on your home network. Sign in, then change the default password right away.",
+      "risk": "credentials"
+    },
+    {
+      "id": "night-alert",
+      "title": "Körpə Gözü: Live view from a new device",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Körpə Gözü: Live view from a new device",
+        "body": [
+          "Unknown device, from abroad, 01:07"
+        ]
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open notification"
+        },
+        {
+          "id": "ignore",
+          "label": "Leave it till morning"
+        }
+      ],
+      "safe": "open",
+      "explain": "First see what is happening in your own app.",
+      "risk": "account"
+    },
+    {
+      "id": "change-default",
+      "title": "Default password in use",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Default password in use",
+        "body": [
+          "Change the password now for your security."
+        ]
+      },
+      "options": [
+        {
+          "id": "change",
+          "label": "Change password"
+        },
+        {
+          "id": "later",
+          "label": "Remind me later"
+        }
+      ],
+      "safe": "change",
+      "explain": "Changing the default password is the single most important step for a camera.",
+      "risk": "credentials"
+    },
+    {
+      "id": "guest-network",
+      "title": "Guest network: Home-Devices",
+      "prompt": "Is this setting safe or a threat?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Guest network: Home-Devices",
+        "body": [
+          "Camera, TV and robot vacuum are here. Phones and laptops stay on the main network."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "Even if a weak device is hacked, it cannot reach your phone or computer.",
+      "risk": "device"
+    },
+    {
+      "id": "upnp-on",
+      "title": "Router: UPnP",
+      "prompt": "Is this setting safe or a threat?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Router: UPnP",
+        "body": [
+          "On. Devices can open ports by themselves."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "This feature lets devices open doors on their own. If you do not need it, turn it off.",
+      "risk": "device"
+    }
+  ]
+}

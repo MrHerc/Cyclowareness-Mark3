@@ -1,0 +1,145 @@
+{
+  "formatVersion": 1,
+  "module": "deepfake-scams",
+  "title": "Deepfake scams in practice",
+  "intro": "A familiar voice is not proof. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "plea",
+      "title": "Call from Unknown number",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "Unknown number",
+        "number": "+994 50 000 73 26",
+        "body": [
+          "Hello, it's me, Narmin! There was an accident and the police are holding me. I need 900 manat now, don't tell the family!"
+        ]
+      },
+      "options": [
+        {
+          "id": "send",
+          "label": "Where do I send it?"
+        },
+        {
+          "id": "code-word",
+          "label": "What is our code word?"
+        }
+      ],
+      "safe": "code-word",
+      "explain": "A cloned voice will not know the word you agreed on.",
+      "risk": "money"
+    },
+    {
+      "id": "new-account",
+      "title": "Message from Aynur Guliyeva (new account)",
+      "prompt": "What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Aynur Guliyeva (new account)",
+        "time": "10:24",
+        "body": [
+          "Hi! My old account was closed, this is my new one.",
+          "I am video calling you now, I urgently need a document."
+        ]
+      },
+      "options": [
+        {
+          "id": "wait",
+          "label": "OK, I am waiting"
+        },
+        {
+          "id": "verify",
+          "label": "I will call your old number first"
+        }
+      ],
+      "safe": "verify",
+      "explain": "The new account story is meant to stop you from checking.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "fake-article",
+      "title": "News page with a presenter video",
+      "prompt": "The video on this page talks just like the TV presenter. What do you do?",
+      "artifact": {
+        "kind": "web",
+        "title": "Presenter reveals the secret on air: 3000 a month",
+        "url": "https://bulvar-xeber.example.net/neftinvest",
+        "body": [
+          "Video: the presenter explains how anyone can earn 3,000 manat a month with NeftInvest.",
+          "Places are limited. Sign up today."
+        ],
+        "button": "Sign up"
+      },
+      "options": [
+        {
+          "id": "register",
+          "label": "Watch the video and sign up"
+        },
+        {
+          "id": "close",
+          "label": "Close the tab"
+        }
+      ],
+      "safe": "close",
+      "explain": "A big profit promise and a fake domain are enough.",
+      "risk": "money"
+    },
+    {
+      "id": "meeting",
+      "title": "Team meeting tomorrow at 10:00",
+      "prompt": "Is this request normal or dangerous?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Səbinə Əliyeva",
+          "address": "s.aliyeva@idare.example"
+        },
+        "subject": "Team meeting tomorrow at 10:00",
+        "time": "11:05",
+        "body": [
+          "The meeting link is in the internal calendar. No agenda attached, just note the time."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "A normal meeting invite: the agency's domain and nothing is asked.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "card-code",
+      "title": "Message from Tural (relative)",
+      "prompt": "Is this request normal or dangerous?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Tural (relative)",
+        "time": "10:24",
+        "body": [
+          "You saw me on video, it's me. Tell me the code your card just got, it's for a ticket."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Nobody, not even a relative, should ask for your card code. Video is not proof.",
+      "risk": "credentials"
+    }
+  ]
+}

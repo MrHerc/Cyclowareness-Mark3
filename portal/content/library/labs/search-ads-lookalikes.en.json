@@ -1,0 +1,144 @@
+{
+  "formatVersion": 1,
+  "module": "search-ads-lookalikes",
+  "title": "Fake sites in search in practice",
+  "intro": "The first result is not always right. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "results",
+      "title": "Searching for the Gorush app",
+      "prompt": "You search for the Gorush app. Which result do you open?",
+      "artifact": {
+        "kind": "web",
+        "title": "Search: gorus yukle",
+        "url": "https://tapan.example/axtar?q=gorus+yukle",
+        "body": [
+          "Sponsored · gorus-app-download.example.net: Gorush, free download",
+          "gorus.example: Gorush, official site. Download for Windows and phone."
+        ]
+      },
+      "options": [
+        {
+          "id": "ad",
+          "label": "Sponsored: gorus-app-download.example.net"
+        },
+        {
+          "id": "organic",
+          "label": "gorus.example: official site"
+        }
+      ],
+      "safe": "organic",
+      "explain": "The ad leads to another site; the app's own site is the result below it.",
+      "risk": "impersonation"
+    },
+    {
+      "id": "search-ad",
+      "title": "Searching for the citizen portal",
+      "prompt": "You search for the citizen portal. Which result do you open?",
+      "artifact": {
+        "kind": "web",
+        "title": "Search: vetendas portali arayis",
+        "url": "https://tapan.example/axtar?q=vetendas+portali+arayis",
+        "body": [
+          "Sponsored · vetendasportal-gov.example: Vatandash Portal, official site",
+          "vetendasportal.gov.az: Vatandash Portal, online certificates"
+        ]
+      },
+      "options": [
+        {
+          "id": "ad",
+          "label": "Open the ad"
+        },
+        {
+          "id": "official",
+          "label": "Open the vetendasportal.gov.az result"
+        }
+      ],
+      "safe": "official",
+      "explain": "The ad leads to a look-alike; the official result is the one whose address ends in gov.az.",
+      "risk": "account"
+    },
+    {
+      "id": "fake-site",
+      "title": "Gorush download page",
+      "prompt": "The ad opened this page, which looks like the real site. Look at the address. What do you do?",
+      "artifact": {
+        "kind": "web",
+        "title": "Gorush: free download",
+        "url": "https://gorus-app-download.example.net/yukle",
+        "body": [
+          "Video meetings for everyone. Download GorusSetup_2026.exe."
+        ],
+        "button": "Download"
+      },
+      "options": [
+        {
+          "id": "download",
+          "label": "Download"
+        },
+        {
+          "id": "leave",
+          "label": "Close the tab"
+        }
+      ],
+      "safe": "leave",
+      "explain": "The address was not the app's own site. Go to the official site yourself.",
+      "risk": "malware"
+    },
+    {
+      "id": "fake-login",
+      "title": "Citizen portal sign-in on a phone",
+      "prompt": "On a phone only the start of the address shows. Read it to the end. What do you do?",
+      "artifact": {
+        "kind": "web",
+        "title": "Vatandash Portal",
+        "url": "https://vetendasportal.gov.az-arayis.example/giris",
+        "body": [
+          "Vatandash Portal. Sign in with your FIN code."
+        ],
+        "fields": [
+          "FIN code",
+          "Password"
+        ],
+        "button": "Sign in"
+      },
+      "options": [
+        {
+          "id": "login",
+          "label": "Sign in"
+        },
+        {
+          "id": "close",
+          "label": "Close the page"
+        }
+      ],
+      "safe": "close",
+      "explain": "The real owner of a site is at the end of the address, and this one did not end in gov.az.",
+      "risk": "credentials"
+    },
+    {
+      "id": "fake-file",
+      "title": "Downloaded Gorush installer",
+      "prompt": "The file has downloaded. Will you open it?",
+      "artifact": {
+        "kind": "file",
+        "name": "GorusSetup_2026.exe",
+        "size": "84 MB",
+        "text": "Source: gorus-app-download.example.net"
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open"
+        },
+        {
+          "id": "delete",
+          "label": "Delete"
+        }
+      ],
+      "safe": "delete",
+      "explain": "Delete the file, tell technical support, and get the app from the official site.",
+      "risk": "malware"
+    }
+  ]
+}

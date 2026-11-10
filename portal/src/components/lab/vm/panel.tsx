@@ -22,6 +22,7 @@ export function LabPanel({
   elapsed,
   onFinish,
   announce,
+  lang,
   className,
 }: {
   brief: string;
@@ -34,6 +35,8 @@ export function LabPanel({
   elapsed: string;
   onFinish: () => void;
   announce: string;
+  /** The language of the brief and objectives when it is not the page's (a mini-lab shown in English). */
+  lang?: string;
   className?: string;
 }) {
   const t = useTranslations("learner.lab.vm.panel");
@@ -49,7 +52,9 @@ export function LabPanel({
           {elapsed}
         </span>
       </div>
-      <p className="rounded-lg bg-brand-50 px-3.5 py-3 text-caption text-brand-900">{brief}</p>
+      <p lang={lang} className="rounded-lg bg-brand-50 px-3.5 py-3 text-caption text-brand-900">
+        {brief}
+      </p>
 
       <section aria-labelledby="lab-objectives">
         <div className="flex items-baseline justify-between">
@@ -66,7 +71,7 @@ export function LabPanel({
               {o.done ? <CheckCircle2 className="mt-px size-4.5 shrink-0 animate-rise" aria-hidden /> : o.secret ? <Flag className="mt-px size-4.5 shrink-0 text-ink-disabled" aria-hidden /> : <Circle className="mt-px size-4.5 shrink-0 text-ink-disabled" aria-hidden />}
               <span className={cn("min-w-0 flex-1", o.secret && !o.done && "text-ink-subtle italic")}>
                 <span className="sr-only">{o.done ? t("doneSr") : t("todoSr")} </span>
-                {o.secret && !o.done ? t("secret") : o.label}
+                {o.secret && !o.done ? t("secret") : <span lang={lang}>{o.label}</span>}
               </span>
               <span className="shrink-0 font-semibold tabular-nums opacity-80">{t("plus", { points: o.points })}</span>
             </li>
@@ -74,7 +79,8 @@ export function LabPanel({
         </ul>
       </section>
 
-      <section aria-labelledby="lab-rules">
+      {/* A mini-lab has neither rules nor hints. */}
+      <section aria-labelledby="lab-rules" hidden={!rules.length}>
         <h3 id="lab-rules" className="text-caption font-bold tracking-wide text-ink-muted uppercase">
           {t("rules")}
         </h3>
@@ -89,7 +95,7 @@ export function LabPanel({
         </ul>
       </section>
 
-      <section aria-labelledby="lab-hints">
+      <section aria-labelledby="lab-hints" hidden={!hintsTotal}>
         <h3 id="lab-hints" className="text-caption font-bold tracking-wide text-ink-muted uppercase">
           {t("hints")}
         </h3>

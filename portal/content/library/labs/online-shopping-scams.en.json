@@ -1,0 +1,139 @@
+{
+  "formatVersion": 1,
+  "module": "online-shopping-scams",
+  "title": "Online shopping scams in practice",
+  "intro": "Low price, prepayment, then silence. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "prepay",
+      "title": "Seller asks for prepayment",
+      "prompt": "The seller asks for prepayment straight away. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Serin Klimat Sale",
+        "time": "10:24",
+        "body": [
+          "Hi! The offer ends today at 18:00.",
+          "Send your name and address and transfer 299 AZN to this card: **** **** **** 0000. Delivery tomorrow."
+        ]
+      },
+      "options": [
+        {
+          "id": "ask-cod",
+          "label": "Can I pay on delivery?"
+        },
+        {
+          "id": "pay",
+          "label": "Transfer 299 AZN now"
+        }
+      ],
+      "safe": "ask-cod",
+      "explain": "A real shop usually agrees to payment on delivery; a scammer wants the money first.",
+      "risk": "money"
+    },
+    {
+      "id": "landing",
+      "title": "Buyer's link to receive money",
+      "prompt": "You are selling an item and the buyer sent this link to receive the payment. Look at the address bar. What do you do?",
+      "artifact": {
+        "kind": "web",
+        "title": "Money is waiting for you: 260.00 AZN",
+        "url": "https://alsat-odenis.example.net/qebul",
+        "body": [
+          "The buyer has paid. Press the button and enter your card to receive the money."
+        ],
+        "button": "Receive money"
+      },
+      "options": [
+        {
+          "id": "receive",
+          "label": "Receive money"
+        },
+        {
+          "id": "close",
+          "label": "Close tab"
+        }
+      ],
+      "safe": "close",
+      "explain": "This is not the classifieds site, and a page that wants your card does not pay you. Type nothing there.",
+      "risk": "money"
+    },
+    {
+      "id": "deposit",
+      "title": "Seller now wants a deposit",
+      "prompt": "Here comes the excuse: now it wants a deposit. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Serin Klimat Sale",
+        "time": "10:24",
+        "body": [
+          "No payment on delivery at the sale price. Send at least a 50 AZN deposit and pay the rest to the courier."
+        ]
+      },
+      "options": [
+        {
+          "id": "pay-deposit",
+          "label": "Send 50 AZN deposit"
+        },
+        {
+          "id": "check",
+          "label": "Find the shop's official page myself"
+        }
+      ],
+      "safe": "check",
+      "explain": "Checking the official page and buyer reviews takes a few minutes.",
+      "risk": "money"
+    },
+    {
+      "id": "official",
+      "title": "Kontakto: Serin Klimat, since 2014",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Kontakto: Serin Klimat, since 2014",
+        "body": [
+          "Air conditioner 1,149 AZN. Pay on delivery, cash or card. Shop and service centre in Narimanov."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "A realistic price, a page that is years old and payment on delivery. You see the goods first and pay after.",
+      "risk": "money"
+    },
+    {
+      "id": "rush",
+      "title": "Only 3 left, card payment only",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Serin Klimat Sale",
+        "time": "10:24",
+        "body": [
+          "The offer ends today, only 3 left. Payment by card to card only, 100% in advance."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Pressure plus card to card prepayment only is the main sign of a fake shop. That money is very hard to get back.",
+      "risk": "money"
+    }
+  ]
+}

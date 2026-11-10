@@ -1,0 +1,130 @@
+{
+  "formatVersion": 1,
+  "module": "dangerous-attachments",
+  "title": "Dangerous attachments in practice",
+  "intro": "Names can lie, check the file type. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "decree-exe",
+      "title": "Decree with a double extension",
+      "prompt": "File extensions are shown. Do you open this file?",
+      "artifact": {
+        "kind": "file",
+        "name": "Qerar_2026.pdf.exe",
+        "size": "1,8 MB",
+        "text": "Source: Downloads: qerar@nazirlik-sened.example.net"
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open"
+        },
+        {
+          "id": "delete",
+          "label": "Delete"
+        }
+      ],
+      "safe": "delete",
+      "explain": "A real decree is never a program.",
+      "risk": "malware"
+    },
+    {
+      "id": "protected-view",
+      "title": "Protected View: this file came from the internet",
+      "prompt": "The document is blank and wants a click. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Protected View: this file came from the internet",
+        "body": [
+          "The document is blank, only a picture shows:",
+          "\"To see the text, click Enable Editing, then Enable Content.\""
+        ]
+      },
+      "options": [
+        {
+          "id": "enable",
+          "label": "Enable Editing"
+        },
+        {
+          "id": "close",
+          "label": "Close the document"
+        }
+      ],
+      "safe": "close",
+      "explain": "A blank page asking for a click is a trap.",
+      "risk": "malware"
+    },
+    {
+      "id": "report-iso",
+      "title": "Report as a disk image",
+      "prompt": "What do you do with this file?",
+      "artifact": {
+        "kind": "file",
+        "name": "Hesabat_sentyabr.iso",
+        "size": "4,2 MB",
+        "text": "Source: Downloads: hesabat@audit-xidmet.example.net"
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open"
+        },
+        {
+          "id": "delete",
+          "label": "Delete"
+        }
+      ],
+      "safe": "delete",
+      "explain": "Do not open a disk image you did not expect.",
+      "risk": "malware"
+    },
+    {
+      "id": "manual-pdf",
+      "title": "Guide from IT",
+      "prompt": "Safe or threat?",
+      "artifact": {
+        "kind": "file",
+        "name": "Telimat_2026.pdf",
+        "size": "310 KB",
+        "text": "Source: it@idare.example, expected guide"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "Internal address, expected document, ordinary PDF. Fine to open.",
+      "risk": "malware"
+    },
+    {
+      "id": "salary-lnk",
+      "title": "Salary table shortcut",
+      "prompt": "Safe or threat?",
+      "artifact": {
+        "kind": "file",
+        "name": "Maas_cedveli.xlsx.lnk",
+        "size": "2 KB",
+        "text": "Source: Unknown sender"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A shortcut wearing a spreadsheet name. Opening it can run a hidden command.",
+      "risk": "malware"
+    }
+  ]
+}

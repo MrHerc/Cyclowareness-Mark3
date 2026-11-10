@@ -1,0 +1,134 @@
+{
+  "formatVersion": 1,
+  "module": "backups-recovery",
+  "title": "Backup and recovery in practice",
+  "intro": "Always keep one copy off the network. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "backup-done",
+      "title": "Weekly backup is ready",
+      "prompt": "The weekly backup is ready. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Weekly backup is ready",
+        "body": [
+          "ARXIV-DISK: ten years of documents, 212 GB. You can remove the disk now."
+        ]
+      },
+      "options": [
+        {
+          "id": "eject",
+          "label": "Eject disk"
+        },
+        {
+          "id": "keep",
+          "label": "Keep connected"
+        }
+      ],
+      "safe": "eject",
+      "explain": "An ejected disk cannot be encrypted in the next attack.",
+      "risk": "data"
+    },
+    {
+      "id": "backup-off",
+      "title": "Settings: Backup is off",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Settings: Backup is off",
+        "body": [
+          "Last backup: 143 days ago. Turn it on now?"
+        ]
+      },
+      "options": [
+        {
+          "id": "turn-on",
+          "label": "Turn on backup"
+        },
+        {
+          "id": "later",
+          "label": "Later"
+        }
+      ],
+      "safe": "turn-on",
+      "explain": "From now on, photos are copied automatically every night.",
+      "risk": "data"
+    },
+    {
+      "id": "restore-test",
+      "title": "Restore check",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Restore check",
+        "body": [
+          "Restore one folder from the latest copy as a test?"
+        ]
+      },
+      "options": [
+        {
+          "id": "test",
+          "label": "Test restore"
+        },
+        {
+          "id": "skip",
+          "label": "Skip"
+        }
+      ],
+      "safe": "test",
+      "explain": "Only a copy that opens is a real copy.",
+      "risk": "data"
+    },
+    {
+      "id": "storage-sms",
+      "title": "Message from BuludXidmet",
+      "prompt": "In the morning, a message like this arrives. What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "BuludXidmet",
+        "time": "10:02",
+        "body": [
+          "Your storage is full. Your photos will be deleted in 24 hours. Upgrade your plan: buludxidmet-plan.example.info"
+        ]
+      },
+      "options": [
+        {
+          "id": "click",
+          "label": "Open link"
+        },
+        {
+          "id": "report",
+          "label": "Report as spam"
+        }
+      ],
+      "safe": "report",
+      "explain": "This is a fake: a real service does not threaten to delete your photos in a day.",
+      "risk": "data"
+    },
+    {
+      "id": "personal-cloud",
+      "title": "Upload the folder to your personal account?",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Upload the folder to your personal account?",
+        "body": [
+          "Arxiv_2016_2026: 212 GB. Account: sevda.k@poct-mail.example.net"
+        ]
+      },
+      "options": [
+        {
+          "id": "upload",
+          "label": "Upload"
+        },
+        {
+          "id": "decline",
+          "label": "Decline"
+        }
+      ],
+      "safe": "decline",
+      "explain": "If an extra copy is needed, technical support creates it in an approved place.",
+      "risk": "data"
+    }
+  ]
+}

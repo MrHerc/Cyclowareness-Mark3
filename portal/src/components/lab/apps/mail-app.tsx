@@ -22,6 +22,8 @@ export type MailMsg = {
   attachment?: { name: string; shown: string; size: string; kind: string };
   headers: string[];
   tone: string;
+  /** The language of the message text when it is not the page's (a mini-lab shown in English). */
+  lang?: string;
 };
 
 export type MailEvent = "headers" | "reply" | "peek" | "attachInfo" | "attachOpen" | "linkOpen" | "report";
@@ -39,7 +41,7 @@ const initials = (name: string, locale: string) =>
  * A mail client: message list, reader with Reply, Report phishing and View original (raw headers), a link
  * whose real target shows in the status bar on hover, focus or long-press, and attachments with details.
  */
-export function MailApp({ msgs, reported, onEvent }: { msgs: MailMsg[]; reported: Record<string, string>; onEvent: (e: MailEvent, id: string) => void }) {
+export function MailApp({ msgs, reported, onEvent, ranText }: { msgs: MailMsg[]; reported: Record<string, string>; onEvent: (e: MailEvent, id: string) => void; ranText?: string }) {
   const t = useTranslations("learner.lab.vm.mail");
   const locale = useLocale();
   const [sel, setSel] = useState<string | null>(null);
@@ -75,7 +77,7 @@ export function MailApp({ msgs, reported, onEvent }: { msgs: MailMsg[]; reported
                 <span className={cn("mt-0.5 grid size-8 shrink-0 place-items-center rounded-full text-tab-sm font-bold text-white", m.tone)} aria-hidden>
                   {initials(m.fromName, locale)}
                 </span>
-                <span className="min-w-0 flex-1">
+                <span lang={m.lang} className="min-w-0 flex-1">
                   <span className="flex items-baseline gap-2">
                     <span className={cn("min-w-0 flex-1 truncate text-caption", read.includes(m.id) ? "font-medium" : "font-bold")}>{m.fromName}</span>
                     <span className="shrink-0 text-tab-sm text-ink-subtle tabular-nums">{m.time}</span>
@@ -94,7 +96,7 @@ export function MailApp({ msgs, reported, onEvent }: { msgs: MailMsg[]; reported
       </div>
       <div className={cn("min-h-0 min-w-0 flex-col", msg ? "flex" : "hidden @[34rem]:flex")}>
         {msg ? (
-          <Reader key={msg.id} msg={msg} view={view} setView={setView} reported={reported[msg.id]} onEvent={(e) => onEvent(e, msg.id)} onBack={() => setSel(null)} />
+          <Reader key={msg.id} msg={msg} view={view} setView={setView} reported={reported[msg.id]} onEvent={(e) => onEvent(e, msg.id)} onBack={() => setSel(null)} ranText={ranText} />
         ) : (
           <p className="m-auto px-6 text-center text-caption text-ink-subtle">{t("empty")}</p>
         )}
@@ -103,7 +105,7 @@ export function MailApp({ msgs, reported, onEvent }: { msgs: MailMsg[]; reported
   );
 }
 
-function Reader({ msg, view, setView, reported, onEvent, onBack }: { msg: MailMsg; view: "read" | "original" | "reply"; setView: (v: "read" | "original" | "reply") => void; reported?: string; onEvent: (e: MailEvent) => void; onBack: () => void }) {
+function Reader({ msg, view, setView, reported, onEvent, onBack, ranText }: { msg: MailMsg; view: "read" | "original" | "reply"; setView: (v: "read" | "original" | "reply") => void; reported?: string; onEvent: (e: MailEvent) => void; onBack: () => void; ranText?: string }) {
   const t = useTranslations("learner.lab.vm.mail");
   const locale = useLocale();
   const [status, setStatus] = useState<string | null>(null);
@@ -184,8 +186,10 @@ function Reader({ msg, view, setView, reported, onEvent, onBack }: { msg: MailMs
         </div>
       ) : (
         // The message is in the learner's language: it reads in that direction inside the left-to-right VM.
-        <div dir={dirOf(locale)} className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
-          <h3 className="text-body font-bold break-words">{msg.subject}</h3>
+        <div dir={dirOf(msg.lang ?? locale)} className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+          <h3 lang={msg.lang} className="text-body font-bold break-words">
+            {msg.subject}
+          </h3>
           <div className="mt-2 flex items-start gap-2.5">
             <span className={cn("grid size-9 shrink-0 place-items-center rounded-full text-tab font-bold text-white", msg.tone)} aria-hidden>
               {initials(msg.fromName, locale)}
@@ -202,7 +206,7 @@ function Reader({ msg, view, setView, reported, onEvent, onBack }: { msg: MailMs
               </p>
             </div>
           </div>
-          <div className="mt-3 grid gap-2.5 text-caption leading-relaxed text-ink">
+          <div lang={msg.lang} className="mt-3 grid gap-2.5 text-caption leading-relaxed text-ink">
             {msg.body.map((p, i) => (
               <div key={i} className="grid gap-2.5">
                 <p className="break-words">{p}</p>
@@ -312,7 +316,7 @@ function Reader({ msg, view, setView, reported, onEvent, onBack }: { msg: MailMs
                   {prompt === "ask" ? t("openTitle") : t("ranTitle")}
                 </h3>
                 <p id="att-body" className="mt-1 text-tab break-words text-ink-muted">
-                  {prompt === "ask" ? t("openBody", { name: msg.attachment?.shown.trim() ?? "" }) : t("ranBody")}
+                  {prompt === "ask" ? t("openBody", { name: msg.attachment?.shown.trim() ?? "" }) : (ranText ?? t("ranBody"))}
                 </p>
               </div>
             </div>

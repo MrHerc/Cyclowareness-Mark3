@@ -8,10 +8,22 @@ import { Ring } from "@/components/ui/progress";
 import type { VmLabResult } from "@/server/lab/vm-action";
 import { HINT_COST, type LabDef, type LabScore } from "../model/labs";
 
-export type DebriefTexts = { title: string; objective: (id: string) => string; why: (id: string) => string; rule: (id: string) => string; ruleWhy: (id: string) => string };
+/** Where the debrief's second button leads: the lab list by default, a mini-lab's module page. */
+export type DebriefBack = { href: string; label: string };
+export type DebriefTexts = {
+  title: string;
+  objective: (id: string) => string;
+  why: (id: string) => string;
+  rule: (id: string) => string;
+  ruleWhy: (id: string) => string;
+  /** The language of the objective texts when it is not the page's (a mini-lab shown in English). */
+  lang?: string;
+  /** Replaces the "nothing found" line, which points to hints, for a lab without hints. */
+  nothingFound?: string;
+};
 
 /** After the lab: the score, what was found and missed and why it matters, the risky actions, the hints. */
-export function Debrief<S>({ def, score, hints, texts, notes, result, pending, elapsed, onAgain }: { def: LabDef<S>; score: LabScore; hints: number; texts: DebriefTexts; notes: string[]; result: VmLabResult | null; pending: boolean; elapsed: string; onAgain: () => void }) {
+export function Debrief<S>({ def, score, hints, texts, notes, result, pending, elapsed, back, onAgain }: { def: LabDef<S>; score: LabScore; hints: number; texts: DebriefTexts; notes: string[]; result: VmLabResult | null; pending: boolean; elapsed: string; back?: DebriefBack; onAgain: () => void }) {
   const t = useTranslations("learner.lab.vm.debrief");
   const tl = useTranslations("learner.lab");
   const found = def.objectives.filter((o) => score.achieved.includes(o.id));
@@ -71,15 +83,17 @@ export function Debrief<S>({ def, score, hints, texts, notes, result, pending, e
               {found.map((o) => (
                 <li key={o.id} className="rounded-lg border border-safe-100 bg-safe-50/60 p-3.5">
                   <p className="flex items-start justify-between gap-3 text-body-sm font-semibold">
-                    <span>{texts.objective(o.id)}</span>
+                    <span lang={texts.lang}>{texts.objective(o.id)}</span>
                     <span className="shrink-0 text-safe-700 tabular-nums">+{o.points}</span>
                   </p>
-                  <p className="mt-1 text-caption text-ink-muted">{texts.why(o.id)}</p>
+                  <p lang={texts.lang} className="mt-1 text-caption text-ink-muted">
+                    {texts.why(o.id)}
+                  </p>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-caption text-ink-muted">{t("nothingFound")}</p>
+            <p className="mt-3 text-caption text-ink-muted">{texts.nothingFound ?? t("nothingFound")}</p>
           )}
         </section>
         <section aria-labelledby="db-missed">
@@ -92,10 +106,12 @@ export function Debrief<S>({ def, score, hints, texts, notes, result, pending, e
               {missed.map((o) => (
                 <li key={o.id} className="rounded-lg border border-warn-100 bg-warn-50/60 p-3.5">
                   <p className="flex items-start justify-between gap-3 text-body-sm font-semibold">
-                    <span>{texts.objective(o.id)}</span>
+                    <span lang={texts.lang}>{texts.objective(o.id)}</span>
                     <span className="shrink-0 text-ink-subtle tabular-nums">+{o.points}</span>
                   </p>
-                  <p className="mt-1 text-caption text-ink-muted">{texts.why(o.id)}</p>
+                  <p lang={texts.lang} className="mt-1 text-caption text-ink-muted">
+                    {texts.why(o.id)}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -103,7 +119,8 @@ export function Debrief<S>({ def, score, hints, texts, notes, result, pending, e
             <p className="mt-3 rounded-lg bg-safe-50 p-3.5 text-caption text-safe-700">{t("nothingMissed")}</p>
           )}
         </section>
-        <section aria-labelledby="db-risky" className="md:col-span-2">
+        {/* A lab without rules (a mini-lab) has no risky actions to list. */}
+        <section aria-labelledby="db-risky" className="md:col-span-2" hidden={!def.rules.length}>
           <h3 id="db-risky" className="flex items-center gap-2 text-body font-bold text-risk-700">
             <ShieldAlert className="size-5" aria-hidden />
             {t("risky")}
@@ -143,7 +160,7 @@ export function Debrief<S>({ def, score, hints, texts, notes, result, pending, e
         <Button variant="secondary" icon={<RotateCcw />} onClick={onAgain}>
           {t("again")}
         </Button>
-        <ButtonLink href="/lab">{tl("backToLab")}</ButtonLink>
+        <ButtonLink href={back?.href ?? "/lab"}>{back?.label ?? tl("backToLab")}</ButtonLink>
       </div>
     </Card>
   );

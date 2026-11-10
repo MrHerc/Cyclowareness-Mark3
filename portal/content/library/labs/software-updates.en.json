@@ -1,0 +1,153 @@
+{
+  "formatVersion": 1,
+  "module": "software-updates",
+  "title": "Software Updates in practice",
+  "intro": "Updates close the door on attackers. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "planned-update",
+      "title": "Planned update tonight",
+      "prompt": "Real update or a trap?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Technical support",
+          "address": "it-support@idare.example"
+        },
+        "subject": "Planned update tonight",
+        "time": "14:10",
+        "body": [
+          "After 19:00 today, work computers will update automatically.",
+          "Leave your computer on and just save your work. You do not need to download anything."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "No link, no file, nothing to download. It only informs you.",
+      "risk": "malware"
+    },
+    {
+      "id": "sms-virus",
+      "title": "Message from Service",
+      "prompt": "Real update or a trap?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Service",
+        "time": "07:55",
+        "body": [
+          "Virus detected on your phone! Download the security update: fix-phone.example.info/app.apk"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Your phone does not send updates by SMS. This link installs a malicious app.",
+      "risk": "malware"
+    },
+    {
+      "id": "player-update",
+      "title": "Video site asks for a player update",
+      "prompt": "A video site says you must update your player. Real update or a trap?",
+      "artifact": {
+        "kind": "web",
+        "title": "Update your video player",
+        "url": "https://video-pleyer-yenile.example.net/pleyer_setup.exe",
+        "body": [
+          "This video needs the latest player.",
+          "Download pleyer_setup.exe to keep watching."
+        ],
+        "button": "Update now"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A site that says update your player to watch a video is a classic trap. Browsers play video on their own.",
+      "risk": "malware"
+    },
+    {
+      "id": "zip-update",
+      "title": "Your licence is expiring! Update required",
+      "prompt": "Real update or a trap?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "System Center",
+          "address": "noreply@system-update-center.example.info"
+        },
+        "subject": "Your licence is expiring! Update required",
+        "time": "09:03",
+        "body": [
+          "Install the attached update today."
+        ],
+        "attachment": {
+          "name": "Update_KB5039.zip",
+          "size": "1.8 MB"
+        }
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Updates do not arrive as email attachments. The archive may hide malware.",
+      "risk": "malware"
+    },
+    {
+      "id": "remote-helper",
+      "title": "Message from Tech support (official)",
+      "prompt": "Real update or a trap?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Tech support (official)",
+        "time": "10:24",
+        "body": [
+          "To update your computer remotely, install this program and send me the code on your screen."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A remote-control program gives the attacker full access to your computer. Call support yourself on a number you know.",
+      "risk": "credentials"
+    }
+  ]
+}

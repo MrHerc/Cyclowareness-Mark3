@@ -1,0 +1,139 @@
+{
+  "formatVersion": 1,
+  "module": "ai-tools-safety",
+  "title": "AI tools safety in practice",
+  "intro": "Use chatbots without leaking information. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "public-upload",
+      "title": "Upload to a public chatbot",
+      "prompt": "Vetendas_muracietleri.xlsx holds citizens' applications. Do you upload it here?",
+      "artifact": {
+        "kind": "web",
+        "title": "NeyroSöhbət: upload your file and we will summarise it",
+        "url": "https://neyrosohbet.example/yeni",
+        "body": [
+          "Free, no sign-up. Files up to 50 MB."
+        ],
+        "button": "Upload file"
+      },
+      "options": [
+        {
+          "id": "upload",
+          "label": "Upload Vetendas_muracietleri.xlsx"
+        },
+        {
+          "id": "skip",
+          "label": "Do not upload the file"
+        }
+      ],
+      "safe": "skip",
+      "explain": "A file with personal data is never uploaded to a public chatbot.",
+      "risk": "data"
+    },
+    {
+      "id": "pro-page",
+      "title": "Free Pro version offer",
+      "prompt": "Look at the address bar. Do you install it?",
+      "artifact": {
+        "kind": "web",
+        "title": "NeyroSöhbət Pro: every feature free",
+        "url": "https://neyrosohbet-pro.test",
+        "body": [
+          "Install our browser extension and get every Pro feature free, for ever.",
+          "Offer for today only."
+        ],
+        "button": "Install the extension"
+      },
+      "options": [
+        {
+          "id": "install",
+          "label": "Install the extension"
+        },
+        {
+          "id": "close",
+          "label": "Close the tab"
+        }
+      ],
+      "safe": "close",
+      "explain": "A service's \"free Pro\" version is not handed out on a foreign site.",
+      "risk": "malware"
+    },
+    {
+      "id": "history",
+      "title": "Use your chats to train the model?",
+      "prompt": "What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Use your chats to train the model?",
+        "body": [
+          "Your chat history will be stored on the service's servers."
+        ]
+      },
+      "options": [
+        {
+          "id": "allow",
+          "label": "Allow"
+        },
+        {
+          "id": "deny",
+          "label": "Decline"
+        }
+      ],
+      "safe": "deny",
+      "explain": "Turning training off helps, but still do not paste official information.",
+      "risk": "data"
+    },
+    {
+      "id": "komekci-notif",
+      "title": "İdarə Köməkçisi: Your summary is ready",
+      "prompt": "Safe or a trap?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "İdarə Köməkçisi: Your summary is ready",
+        "body": [
+          "You can open it on the internal portal."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The institution's approved tool sends an expected notice and asks for no link or code.",
+      "risk": "data"
+    },
+    {
+      "id": "voice-note",
+      "title": "Message from Manager",
+      "prompt": "Safe or a trap?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Manager",
+        "time": "10:24",
+        "body": [
+          "Hi, it's me. Send the confirmation code to this number right away, I will explain later."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A voice can be imitated with AI. Call your manager's known number yourself.",
+      "risk": "credentials"
+    }
+  ]
+}

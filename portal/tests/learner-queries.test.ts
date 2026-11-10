@@ -49,7 +49,7 @@ describe("badgeFacts", () => {
     await db.insert(t.lessonProgress).values(mod.lessons.map((l) => ({ userId: user.id, lessonId: l.id, completedAt: new Date() })));
     await db.insert(t.moduleProgress).values({ userId: user.id, moduleId: mod.id, status: "completed", percent: 100 });
     await db.insert(t.threatReports).values(Array.from({ length: 5 }, (_, i) => ({ tenantId: tenant.id, number: 100 + i, reporterId: user.id, channel: "email" as const, subject: "s" })));
-    await db.insert(t.labAttempts).values(["inbox-triage", "inbox-triage", "link-detective", "password-forge", "mfa-fatigue"].map((exercise) => ({ tenantId: tenant.id, userId: user.id, exercise, score: 1, max: 1, xp: 0 })));
+    await db.insert(t.labAttempts).values(["inbox-triage", "inbox-triage", "link-detective", "password-forge", "mfa-fatigue", "mini:quishing", "mini:phishing-email"].map((exercise) => ({ tenantId: tenant.id, userId: user.id, exercise, score: 1, max: 1, xp: 0 })));
     const [path] = await db.insert(t.learningPaths).values({ key: `p-${user.id}`, title: {}, description: {}, audience: {}, recurrence: {}, standards: [], moduleSlugs: [] }).returning();
     await db.insert(t.certificates).values([
       { tenantId: tenant.id, userId: user.id, moduleId: mod.id, serial: `S-${user.id}-1`, publicToken: `P-${user.id}-1` },

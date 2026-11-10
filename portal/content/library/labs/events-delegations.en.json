@@ -1,0 +1,148 @@
+{
+  "formatVersion": 1,
+  "module": "events-delegations",
+  "title": "Events and delegations in practice",
+  "intro": "Protect information at conferences and official visits. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "gift-usb",
+      "title": "Gift flash drive from the delegation",
+      "prompt": "The delegation gave you their presentation on a flash drive. What do you do with this file?",
+      "artifact": {
+        "kind": "file",
+        "name": "Cooperation_presentation.pdf",
+        "size": "2 KB",
+        "text": "Source: USB: NORDVALE (E:)"
+      },
+      "options": [
+        {
+          "id": "plug",
+          "label": "Plug into computer"
+        },
+        {
+          "id": "hand-over",
+          "label": "Hand to technical support"
+        }
+      ],
+      "safe": "hand-over",
+      "explain": "Technical support checks the device on a separate computer and passes the file on if needed.",
+      "risk": "malware"
+    },
+    {
+      "id": "portal-login",
+      "title": "Forum Wi-Fi sign-in page",
+      "prompt": "You joined the open network ReqemYol-Forum-FREE and this page opened. What do you do?",
+      "artifact": {
+        "kind": "web",
+        "title": "RəqəmYol Forum Wi-Fi",
+        "url": "http://wifi-reqemyol-forum.example.net/login",
+        "body": [
+          "Welcome to RəqəmYol Forum. Sign in with your work account to get online."
+        ],
+        "fields": [
+          "Work email",
+          "Work email password"
+        ],
+        "button": "Connect to internet"
+      },
+      "options": [
+        {
+          "id": "login",
+          "label": "Connect to internet"
+        },
+        {
+          "id": "close",
+          "label": "Close tab"
+        }
+      ],
+      "safe": "close",
+      "explain": "A Wi-Fi page never needs your work password. Leave the network and ask the registration desk for the right one.",
+      "risk": "credentials"
+    },
+    {
+      "id": "usb-file",
+      "title": "Drive already plugged in",
+      "prompt": "Someone plugged the delegation's drive into your computer and it shows this file. What do you do?",
+      "artifact": {
+        "kind": "file",
+        "name": "Cooperation_presentation.pdf",
+        "size": "2 KB",
+        "text": "Source: USB: NORDVALE (E:)"
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "Open"
+        },
+        {
+          "id": "eject",
+          "label": "Eject device"
+        }
+      ],
+      "safe": "eject",
+      "explain": "Eject the device without opening the file and give it to technical support.",
+      "risk": "malware"
+    },
+    {
+      "id": "badge-sms",
+      "title": "Message from ReqemYol",
+      "prompt": "Things that arrive during the event. Safe, or a threat?",
+      "artifact": {
+        "kind": "sms",
+        "name": "ReqemYol",
+        "time": "08:30",
+        "body": [
+          "Your badge is ready. Bring your ID card to the registration desk."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "No link, nothing to pay and nothing to type. This is a normal reminder.",
+      "risk": "data"
+    },
+    {
+      "id": "cert-mail",
+      "title": "Your attendance certificate",
+      "prompt": "Things that arrive during the event. Safe, or a threat?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "RəqəmYol Forum",
+          "address": "sertifikat@reqemyol-forum.example.info"
+        },
+        "subject": "Your attendance certificate",
+        "time": "17:05",
+        "body": [
+          "Sign in with your work email to download the certificate:"
+        ],
+        "link": {
+          "text": "reqemyol-forum.example.info/certificate",
+          "href": "https://reqemyol-forum.example.info/certificate",
+          "after": 0
+        }
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "The official site is reqemyol-forum.example, and this is a different domain. A certificate never needs your work password.",
+      "risk": "credentials"
+    }
+  ]
+}

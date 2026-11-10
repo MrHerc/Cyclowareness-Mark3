@@ -1,0 +1,161 @@
+{
+  "formatVersion": 1,
+  "module": "executive-threats",
+  "title": "Threats to Leaders in practice",
+  "intro": "High office, high-value target. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "approve",
+      "title": "Payment approval: 48,000 AZN",
+      "prompt": "Look at the payee and the note. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Payment approval: 48,000 AZN",
+        "body": [
+          "Payee: Qafqaz Terefdash LLC, new bank account",
+          "Note: the minister asked by phone, pay tonight, documents later."
+        ]
+      },
+      "options": [
+        {
+          "id": "hold",
+          "label": "Hold and verify"
+        },
+        {
+          "id": "approve",
+          "label": "Approve"
+        }
+      ],
+      "safe": "hold",
+      "explain": "An urgent payment to a new account is always checked on a channel you know.",
+      "risk": "money"
+    },
+    {
+      "id": "fake-deputy",
+      "title": "Confidential: must be done today",
+      "prompt": "Read the domain to the end. What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Saadat Mammadli",
+          "address": "r.mammadli@idare-gov.example.net"
+        },
+        "subject": "Confidential: must be done today",
+        "time": "09:12",
+        "body": [
+          "Hello. I am in a meeting and cannot call.",
+          "An advance payment to a partner must go out today, the details are attached.",
+          "This is confidential, do not discuss it with anyone.",
+          "Saadat Mammadli, Deputy Minister"
+        ],
+        "attachment": {
+          "name": "Rekvizitler.pdf",
+          "size": "88 KB"
+        }
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report as phishing"
+        },
+        {
+          "id": "reply",
+          "label": "Reply: on it"
+        },
+        {
+          "id": "attachment",
+          "label": "Open the attachment"
+        }
+      ],
+      "safe": "report",
+      "explain": "The domain is not yours, plus urgency, secrecy and avoiding a call.",
+      "risk": "money"
+    },
+    {
+      "id": "request",
+      "title": "Call from Saadat Mammadli",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "Saadat Mammadli",
+        "number": "+994 50 000 47 12",
+        "body": [
+          "Hi, it is me, Saadat. I am ill and hoarse. Transfer seventy-five thousand manat to a partner tonight, urgently."
+        ]
+      },
+      "options": [
+        {
+          "id": "phrase",
+          "label": "Please say our check phrase"
+        },
+        {
+          "id": "pay",
+          "label": "All right, I will transfer now"
+        }
+      ],
+      "safe": "phrase",
+      "explain": "A phrase you agreed on is a stronger check than a voice.",
+      "risk": "money"
+    },
+    {
+      "id": "agenda",
+      "title": "Agenda for tomorrow's meeting",
+      "prompt": "Is this request to your assistant safe?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Anar Hasanov",
+          "address": "a.hasanov@idare.example"
+        },
+        "subject": "Agenda for tomorrow's meeting",
+        "time": "17:30",
+        "body": [
+          "The agenda is attached. The meeting is on the third floor."
+        ],
+        "attachment": {
+          "name": "Gundelik.pdf",
+          "size": "96 KB"
+        }
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "Correct domain, expected topic, no request for money or data.",
+      "risk": "money"
+    },
+    {
+      "id": "gift-cards",
+      "title": "Message from Anar Hasanov (director)",
+      "prompt": "Is this request to your assistant safe?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Anar Hasanov (director)",
+        "time": "10:24",
+        "body": [
+          "I am in a meeting, cannot call. Buy 10 gift cards today and send photos of the codes here."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Gift card codes are like cash and cannot be recovered. Avoiding a call is another sign.",
+      "risk": "money"
+    }
+  ]
+}

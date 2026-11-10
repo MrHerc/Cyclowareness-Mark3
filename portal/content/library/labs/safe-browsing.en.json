@@ -1,0 +1,146 @@
+{
+  "formatVersion": 1,
+  "module": "safe-browsing",
+  "title": "Safe browsing in practice",
+  "intro": "The padlock is not a safety promise. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "official",
+      "title": "Certificate page on the state portal",
+      "prompt": "Look at the address bar. Safe, or a risk?",
+      "artifact": {
+        "kind": "web",
+        "title": "DövlətPortal: certificates",
+        "url": "https://dovletportal.az/xidmetler/arayis",
+        "body": [
+          "Online certificates. Sign in with your ID card or mobile signature."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The domain is the official portal itself: dovletportal.az. No extra words or dashes.",
+      "risk": "account"
+    },
+    {
+      "id": "free-download",
+      "title": "Free document editor download",
+      "prompt": "Look at the address bar. Safe, or a risk?",
+      "artifact": {
+        "kind": "web",
+        "title": "Free PDF editor",
+        "url": "https://free-download-pdf.top/Sened_pulsuz.exe",
+        "body": [
+          "Download Sened_pulsuz.exe, no licence needed.",
+          "Your download starts in 5 seconds."
+        ],
+        "button": "Download"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A program file from a free download site is often malicious. Get software through tech support.",
+      "risk": "malware"
+    },
+    {
+      "id": "subdomain-trick",
+      "title": "Bank sign-in under another domain",
+      "prompt": "Look at the address bar. Safe, or a risk?",
+      "artifact": {
+        "kind": "web",
+        "title": "SahilBank Online",
+        "url": "https://sahilbank.az.hesab-yoxla.info/login",
+        "body": [
+          "Sign in to internet banking."
+        ],
+        "fields": [
+          "Card number",
+          "Password"
+        ],
+        "button": "Sign in"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "The real domain is the last part: hesab-yoxla.info. The sahilbank.az in front is just bait.",
+      "risk": "credentials"
+    },
+    {
+      "id": "update-exe",
+      "title": "Browser update from a website",
+      "prompt": "Look at the address bar. Safe, or a risk?",
+      "artifact": {
+        "kind": "web",
+        "title": "Your browser is out of date",
+        "url": "https://brauzer-yenile.top/update.exe",
+        "body": [
+          "Download update.exe to keep browsing safely."
+        ],
+        "button": "Download update"
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Browser updates are not downloaded from websites. The browser updates itself.",
+      "risk": "malware"
+    },
+    {
+      "id": "bank-path",
+      "title": "Cards page on the bank's site",
+      "prompt": "Look at the address bar. Safe, or a risk?",
+      "artifact": {
+        "kind": "web",
+        "title": "SahilBank: cards",
+        "url": "https://www.sahilbank.az/az/kartlar",
+        "body": [
+          "Debit and credit cards. Compare cards and apply in a branch."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The domain is sahilbank.az. The rest is just the page path.",
+      "risk": "credentials"
+    }
+  ]
+}

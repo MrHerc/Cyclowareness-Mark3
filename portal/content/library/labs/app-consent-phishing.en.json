@@ -1,0 +1,147 @@
+{
+  "formatVersion": 1,
+  "module": "app-consent-phishing",
+  "title": "The \"Allow\" trap in practice",
+  "intro": "It wants no password, only permission. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "consent",
+      "title": "DokuBaxış Viewer asks for access",
+      "prompt": "Before the document opened, this window appeared. What do you do?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "DokuBaxış Viewer asks for access",
+        "body": [
+          "See your profile",
+          "Read your mail and send mail as you",
+          "Read and change all your files",
+          "Keep access when you are not there"
+        ]
+      },
+      "options": [
+        {
+          "id": "deny",
+          "label": "Deny"
+        },
+        {
+          "id": "allow",
+          "label": "Allow"
+        }
+      ],
+      "safe": "deny",
+      "explain": "Viewing a document needs no mail, no access to all files and no lasting access.",
+      "risk": "credentials"
+    },
+    {
+      "id": "code-chat",
+      "title": "Message from Leyla K. | Nordvale Council",
+      "prompt": "What do you do with this message?",
+      "artifact": {
+        "kind": "sms",
+        "name": "Leyla K. | Nordvale Council",
+        "time": "10:24",
+        "body": [
+          "Hello! Your panel at the Vienna forum is confirmed.",
+          "Code to join the meeting: QK7-MN4P",
+          "Enter the code on this page: giris.idare.example/cihaz"
+        ]
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report"
+        },
+        {
+          "id": "open-page",
+          "label": "Open the page"
+        }
+      ],
+      "safe": "report",
+      "explain": "If you did not start the sign-in, a code sent in a message is a trap.",
+      "risk": "credentials"
+    },
+    {
+      "id": "connected-apps",
+      "title": "Connected apps the next day",
+      "prompt": "The next day you look at the apps connected to your account. What do you do?",
+      "artifact": {
+        "kind": "web",
+        "title": "Connected apps",
+        "url": "https://hesab.idare.example/tetbiqler",
+        "body": [
+          "DokuBaxış Viewer, connected yesterday at 16:40.",
+          "Access: read and send your mail, read and change all your files, keep access when you are not there."
+        ]
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report to technical support so they revoke it"
+        },
+        {
+          "id": "password-only",
+          "label": "Only change the password"
+        },
+        {
+          "id": "leave",
+          "label": "Leave it"
+        }
+      ],
+      "safe": "report",
+      "explain": "Only revoking the permission removes the app, and a specialist will check for traces too.",
+      "risk": "credentials"
+    },
+    {
+      "id": "meeting-app",
+      "title": "Görüş asks for access",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Görüş asks for access",
+        "body": [
+          "See your calendar",
+          "See your profile"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "Görüş is the office's known app, and it asks only for what its job needs.",
+      "risk": "account"
+    },
+    {
+      "id": "greeting-card",
+      "title": "Bayram Təbriki asks for access",
+      "prompt": "Safe, or a risk?",
+      "artifact": {
+        "kind": "dialog",
+        "title": "Bayram Təbriki asks for access",
+        "body": [
+          "See your contacts",
+          "Send mail as you"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "A greeting card needs neither your contacts nor the right to send mail. This is for spreading phishing in your name.",
+      "risk": "account"
+    }
+  ]
+}

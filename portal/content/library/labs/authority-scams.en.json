@@ -1,0 +1,163 @@
+{
+  "formatVersion": 1,
+  "module": "authority-scams",
+  "title": "Fake authorities in practice",
+  "intro": "Fake prosecutor, court and tax traps. Decide what you would do in each moment from this module's lessons.",
+  "decisions": [
+    {
+      "id": "m1",
+      "title": "Notice of a criminal case",
+      "prompt": "Look at the sender's domain. What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Central Investigation Bureau",
+          "address": "bildiris@istintaq-buro-gov.test"
+        },
+        "subject": "Notice of a criminal case",
+        "time": "08:47",
+        "body": [
+          "Your name appears in a criminal case. Read the attached materials within 24 hours."
+        ],
+        "attachment": {
+          "name": "Is_materiallari.zip",
+          "size": "312 KB"
+        }
+      },
+      "options": [
+        {
+          "id": "report",
+          "label": "Report phishing"
+        },
+        {
+          "id": "open",
+          "label": "Open attachment"
+        },
+        {
+          "id": "reply",
+          "label": "Reply"
+        }
+      ],
+      "safe": "report",
+      "explain": "Fake domain, threat and archive: reporting protects your colleagues too.",
+      "risk": "malware"
+    },
+    {
+      "id": "accuse",
+      "title": "Call from Central Investigation Bureau",
+      "prompt": "How do you answer?",
+      "artifact": {
+        "kind": "call",
+        "name": "Central Investigation Bureau",
+        "number": "+994 12 000 10 02",
+        "body": [
+          "This is investigator Elçin Həsənov, Central Investigation Bureau. You ignored this morning's notice, and your name appears in a criminal case."
+        ]
+      },
+      "options": [
+        {
+          "id": "comply",
+          "label": "What should I do? Tell me"
+        },
+        {
+          "id": "verify",
+          "label": "I will call the bureau's official number myself"
+        }
+      ],
+      "safe": "verify",
+      "explain": "A real investigator will not object to you checking.",
+      "risk": "money"
+    },
+    {
+      "id": "m2",
+      "title": "Court summons",
+      "prompt": "What do you do with this e-mail?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Capital Justice Court",
+          "address": "cagiris@mehkeme-cagiris.test"
+        },
+        "subject": "Court summons",
+        "time": "09:30",
+        "body": [
+          "You must appear in court tomorrow at 10:00."
+        ],
+        "link": {
+          "text": "Download the summons here",
+          "href": "https://mehkeme-cagiris.test/vereqe",
+          "after": 0
+        }
+      },
+      "options": [
+        {
+          "id": "click",
+          "label": "Download summons"
+        },
+        {
+          "id": "report",
+          "label": "Report phishing"
+        }
+      ],
+      "safe": "report",
+      "explain": "Report a summons from a foreign domain and call the court yourself if needed.",
+      "risk": "malware"
+    },
+    {
+      "id": "legal-dept",
+      "title": "Official letter for you",
+      "prompt": "Is this message safe or a scam?",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": "Legal Department",
+          "address": "huquq@idare.example"
+        },
+        "subject": "Official letter for you",
+        "time": "11:20",
+        "body": [
+          "An official letter from the court has arrived in your name. You can collect it from the registry office against signature."
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "genuine",
+      "explain": "The letter came through the institution's own channel and asks for no money or link.",
+      "risk": "money"
+    },
+    {
+      "id": "fine-card",
+      "title": "Message from +994 70 000 52 19",
+      "prompt": "Is this message safe or a scam?",
+      "artifact": {
+        "kind": "sms",
+        "name": "+994 70 000 52 19",
+        "time": "11:02",
+        "body": [
+          "Central Investigation Bureau: transfer your fine to this card within 2 hours: 4169 **** 7731"
+        ]
+      },
+      "options": [
+        {
+          "id": "trap",
+          "label": "It is a risk"
+        },
+        {
+          "id": "genuine",
+          "label": "It is safe"
+        }
+      ],
+      "safe": "trap",
+      "explain": "Law enforcement does not collect fines to a personal card. Report this message.",
+      "risk": "money"
+    }
+  ]
+}
