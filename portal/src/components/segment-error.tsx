@@ -8,9 +8,10 @@ import { RetryButton } from "@/components/retry-button";
 
 /**
  * Error boundary body for a signed-in segment: it replaces only the page, so the shell's navigation stays usable.
+ * Try again uses `retry` (refetch, then re-render): `reset` alone re-renders the same failed server payload.
  * A server error's details are in the server log under the digest shown here; a client one goes to the console.
  */
-export function SegmentError({ error, reset, home }: { error: Error & { digest?: string }; reset: () => void; home: string }) {
+export function SegmentError({ error, retry, home }: { error: Error & { digest?: string }; retry: () => void; home: string }) {
   const tc = useTranslations("common");
   useEffect(() => {
     console.error(error);
@@ -25,7 +26,7 @@ export function SegmentError({ error, reset, home }: { error: Error & { digest?:
         <p className="text-body-sm text-ink-muted">{tc("errors.sectionBody")}</p>
         {error.digest ? <p className="font-mono text-tab text-ink-subtle">{error.digest}</p> : null}
         <div className="flex flex-wrap justify-center gap-2">
-          <RetryButton label={tc("retry")} onRetry={reset} />
+          <RetryButton label={tc("retry")} onRetry={retry} />
           <Link href={home} className="inline-flex h-11 items-center rounded-pill px-5 font-semibold text-ink-muted ring-1 ring-line hover:bg-sunken hover:text-ink">
             {tc("errors.goHome")}
           </Link>

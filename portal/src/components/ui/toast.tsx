@@ -18,7 +18,8 @@ export function toast(message: string, tone: Toast["tone"] = "success", ms = 420
   const id = nextId++;
   toasts = [...toasts, { id, tone, message, action }].slice(-4);
   emit();
-  setTimeout(() => dismiss(id), ms);
+  // A toast with an action stays until dismissed, so a keyboard or screen-reader user can still reach the button (WCAG 2.2.1).
+  if (!action) setTimeout(() => dismiss(id), ms);
 }
 
 function dismiss(id: number) {

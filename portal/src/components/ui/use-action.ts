@@ -27,9 +27,12 @@ const COMMON = ["invalid", "rateLimited", "forbidden"] as const;
 type Common = (typeof COMMON)[number];
 type Tc = (key: `errors.${Common | "generic"}` | "retry") => string;
 
-/** Settles one call: success toast and callback, a refusal's message, or the generic failure with a retry. */
+/**
+ * Settles one call: success toast and callback, a refusal's message, or the generic failure with a retry.
+ * Retry repeats the same call, so after a lost response a create action (incident, ticket reply, assignment) can run twice.
+ */
 export async function settle<R>(call: () => Promise<R>, options: ActionOptions<R>, tc: Tc, retry: () => void) {
-  const failed = () => (options.onError ? options.onError("generic") : toast(tc("errors.generic"), "error", 8000, { label: tc("retry"), onClick: retry }));
+  const failed = () => (options.onError ? options.onError("generic") : toast(tc("errors.generic"), "error", undefined, { label: tc("retry"), onClick: retry }));
   let res: R;
   try {
     res = await call();

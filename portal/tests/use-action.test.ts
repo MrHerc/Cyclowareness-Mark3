@@ -72,7 +72,7 @@ describe("settle (useAction's core)", () => {
   it("turns a rejected call into the generic message with a retry", async () => {
     const onSuccess = vi.fn();
     await settle(() => Promise.reject(new Error("offline")), { onSuccess, successToast: "Saved" }, tc, retry);
-    expect(toast).toHaveBeenCalledExactlyOnceWith("tc:errors.generic", "error", 8000, { label: "tc:retry", onClick: retry });
+    expect(toast).toHaveBeenCalledExactlyOnceWith("tc:errors.generic", "error", undefined, { label: "tc:retry", onClick: retry });
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
