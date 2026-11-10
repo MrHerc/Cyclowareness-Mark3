@@ -97,6 +97,8 @@ export function piper(workers = 1): Provider {
       if (pool.length < workers) pool.push(startWorker(voice));
       const worker = pool.reduce((a, b) => (b.busy() < a.busy() ? b : a));
       const wav = path.join(os.tmpdir(), `narration-${key}.wav`);
+      // The temp folder can vanish during a run of hours (a closed session's TMP): every clip would fail.
+      fs.mkdirSync(path.dirname(wav), { recursive: true });
       try {
         const out = JSON.parse(await worker.ask({ text, wav })) as PiperResult & { error?: string };
         if (out.error) throw new Error(out.error);

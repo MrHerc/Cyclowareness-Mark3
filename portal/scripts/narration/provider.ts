@@ -22,6 +22,12 @@ export type Provider = {
 /** Stops the whole run: a wrong key, a used-up quota, a missing voice or engine. */
 export class Fatal extends Error {}
 
+/** Counts failures in a row: the returned function, told each outcome, is true once `limit` clips have failed one after another. */
+export function failureStreak(limit: number) {
+  let inARow = 0;
+  return (ok: boolean) => (inARow = ok ? 0 : inARow + 1) >= limit;
+}
+
 /** The voice of a language from the environment (NAME_AZ, NAME_RU…), else `fallback`. */
 export function envVoice(name: string, locale: string, fallback = ""): string {
   return (process.env[`${name}_${locale.toUpperCase()}`] || fallback).trim();

@@ -7,14 +7,14 @@
  *   npm run narration -- --lang en --provider piper --only <module>[/<lesson>] --concurrency 2
  * Providers (scripts/narration/): piper (free, offline, build machine only), azure (AZURE_SPEECH_KEY and
  * AZURE_SPEECH_REGION), elevenlabs (ELEVENLABS_API_KEY and ELEVENLABS_VOICE_<LOCALE> or ELEVENLABS_VOICE_ID).
- * Every clip is encoded by ffmpeg (devDependency ffmpeg-static) to MP3, mono, 48 kbps, loudness-normalised.
+ * Every clip is encoded by the build machine's ffmpeg (FFMPEG, else ffmpeg on PATH; deliberately not an app
+ * dependency, so `npm ci` and the image never fetch it) to MP3, mono, 48 kbps, loudness-normalised.
  * Writes public/generated/tts/<locale>/<key>.mp3 (git-ignored) and content/narration/<locale>/<module>__<lesson>.json
  * (committed, read by src/server/narration.ts). Without a clip the player keeps the browser's voice.
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import ffmpegPath from "ffmpeg-static";
 import { IntlMessageFormat } from "intl-messageformat";
 import { LOCALES, isLocale } from "../src/i18n/config";
 import type { LessonFile } from "../src/lib/content/types";
@@ -24,11 +24,14 @@ import { spokenTexts, type SpokenUi } from "../src/lib/tts/spoken";
 import { azure } from "./narration/azure";
 import { elevenLabs } from "./narration/elevenlabs";
 import { piper } from "./narration/piper";
-import { Fatal, type Provider } from "./narration/provider";
+import { Fatal, failureStreak, type Provider } from "./narration/provider";
 
 const LESSONS = path.join(process.cwd(), "content", "library", "lessons");
 const PUBLIC = path.join(process.cwd(), "public");
 const MANIFESTS = path.join(process.cwd(), ...NARRATION_DIR);
+const FFMPEG = process.env.FFMPEG || "ffmpeg";
+/** Failures in a row that mean a broken engine, encoder or disk rather than one bad text. */
+const MAX_FAILURES_IN_A_ROW = 10;
 const PROVIDERS: Record<string, (concurrency: number) => Provider> = { piper, azure: () => azure(), elevenlabs: elevenLabs };
 
 function fail(message: string): never {
@@ -110,14 +113,13 @@ function writeAtomic(file: string, data: string | Buffer) {
 /** Any audio ffmpeg reads → MP3, mono, 24 kHz, 48 kbps, normalised to −16 LUFS so every provider sounds equally loud. */
 function encodeMp3(input: Buffer): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    if (!ffmpegPath) return reject(new Fatal("ffmpeg-static has no ffmpeg binary for this platform"));
     const args = ["-hide_banner", "-loglevel", "error", "-i", "pipe:0", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ac", "1", "-ar", "24000", "-c:a", "libmp3lame", "-b:a", "48k", "-f", "mp3", "pipe:1"];
-    const child = spawn(ffmpegPath, args);
+    const child = spawn(FFMPEG, args);
     const out: Buffer[] = [];
     let err = "";
     child.stdout.on("data", (d: Buffer) => out.push(d));
     child.stderr.on("data", (d: Buffer) => (err = (err + d.toString()).slice(-1000)));
-    child.on("error", (e) => reject(new Fatal(`ffmpeg: ${e.message}`)));
+    child.on("error", (e) => reject(new Fatal(`ffmpeg (${FFMPEG}): ${e.message}; install ffmpeg with libmp3lame on the build machine or set FFMPEG to it`)));
     child.on("close", (code) => (code === 0 ? resolve(Buffer.concat(out)) : reject(new Error(`ffmpeg exit ${code}: ${err.slice(-300)}`))));
     // ffmpeg that fails early closes its input: the exit code reports it.
     child.stdin.on("error", () => {});
@@ -176,6 +178,7 @@ async function main() {
   if (voiceless.length) fail(`No ${args.provider} voice for ${voiceless.join(", ")}: see scripts/narration/${args.provider}.ts for the variable that sets it.`);
 
   let failed = 0;
+  const tooMany = failureStreak(MAX_FAILURES_IN_A_ROW);
   let fatal: string | null = null;
   try {
     for (const p of plans) {
@@ -197,9 +200,11 @@ async function main() {
               writeAtomic(path.join(PUBLIC, url), await encodeMp3(audio));
               p.ready.set(url, { url, durationMs, words });
               made++;
+              tooMany(true);
             } catch (e) {
               failed++;
               if (e instanceof Fatal) fatal = e.message;
+              else if (tooMany(false)) fatal = `${MAX_FAILURES_IN_A_ROW} clips failed in a row, the last: ${(e as Error).message}`;
               console.error(`FAIL ${p.locale} ${lesson.key} "${text.slice(0, 60)}${text.length > 60 ? "…" : ""}": ${(e as Error).message}`);
             }
           },

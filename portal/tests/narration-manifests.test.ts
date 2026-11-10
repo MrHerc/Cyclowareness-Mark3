@@ -22,18 +22,15 @@ describe.each(NARRATED)("committed %s narration manifests", (locale) => {
       .map((f) => ({ key: `${mod}/${f.slice(0, -`.${locale}.json`.length)}`, file: path.join(LESSONS, mod, f) }))
       .map((l) => ({ ...l, manifest: path.join(process.cwd(), ...NARRATION_DIR, locale, manifestName(l.key)) })),
   );
-  // shortcut: only lessons generated so far are checked (the English Piper run is resumable); require every lesson once the run has finished.
-  const generated = lessons.filter((l) => fs.existsSync(l.manifest));
 
-  it("has manifests", () => expect(generated.length).toBeGreaterThan(0));
-
-  it.each(generated)("$key has a clip for every spoken text, with one forward-moving timing per karaoke word", ({ file, manifest: manifestFile }) => {
-    const lesson = JSON.parse(fs.readFileSync(file, "utf8")) as LessonFile;
+  it.each(lessons)("$key has a manifest whose clips have one forward-moving timing per karaoke word", ({ key, file, manifest: manifestFile }) => {
+    expect(fs.existsSync(manifestFile), `no manifest: npm run narration -- --lang ${locale} --only ${key}`).toBe(true);
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8")) as NarrationClips;
-    const texts = spokenTexts(lesson.scenes, ui);
-    expect(Object.keys(manifest)).toEqual(texts);
-    for (const text of texts) {
-      const clip = manifest[text];
+    // Text edited after the run has no clip yet and is read by Web Speech: reported, not failed, so lesson edits need no rerun.
+    const lesson = JSON.parse(fs.readFileSync(file, "utf8")) as LessonFile;
+    const stale = spokenTexts(lesson.scenes, ui).filter((t) => !Object.hasOwn(manifest, t));
+    if (stale.length) console.warn(`${locale} ${key}: ${stale.length} texts without a clip (rerun the generator)`);
+    for (const [text, clip] of Object.entries(manifest)) {
       expect(isClipUrl(clip.url, locale)).toBe(true);
       expect(clip.words.map((w) => w.w)).toEqual(wordsOf(text));
       clip.words.forEach((w, i) => {

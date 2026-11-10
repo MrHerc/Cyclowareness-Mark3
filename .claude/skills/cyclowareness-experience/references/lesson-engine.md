@@ -1436,12 +1436,13 @@ Providers (`scripts/narration/`, `--provider piper|azure|elevenlabs`, each retur
 the sentence's exact start and end; voices must be listed with their SHA-256 in `PIPER_VOICES`), `azure.ts`
 (batch synthesis REST API 2024-04-01 on an S0 resource: SSML job, poll, zip with `.wav` and `.word.json`,
 `boundaryAlignment` → `wordTimings`), `elevenlabs.ts` (the original with-timestamps call), `provider.ts`
-(`estimateWords`, `sentencesOf`, `fetchRetry`, `Fatal`). The generator encodes every clip with ffmpeg
-(`ffmpeg-static` devDependency): MP3 mono 24 kHz 48 kbps, loudnorm −16 LUFS. The clip key's `model` is the
+(`estimateWords`, `sentencesOf`, `fetchRetry`, `Fatal`, `failureStreak`: 10 failed clips in a row stop the run). The
+generator encodes every clip with the build machine's ffmpeg (`FFMPEG`, else `ffmpeg` on PATH; never an app
+dependency, so `npm ci` and the image never fetch the GPL binary): MP3 mono 24 kHz 48 kbps, loudnorm −16 LUFS. The clip key's `model` is the
 provider (`piper`, `azure`, `eleven_v3`) and its `voice` the provider's voice name.
 Tests: `tests/narration-providers.test.ts` (estimator, Piper mapping, keys, Azure against a fake HTTP server),
-`tests/narration-manifests.test.ts` (every committed en manifest covers every spoken text with one
-forward-moving timing per word).
+`tests/narration-manifests.test.ts` (every en lesson has a manifest; each entry has a valid clip URL and one
+forward-moving timing per word; texts edited since the run are reported, not failed: Web Speech reads them).
 
 The pieces:
 - `src/lib/tts/text.ts`: `speechText`, `wordsOf`, `wordOffsets`, shared by the player, the generator and

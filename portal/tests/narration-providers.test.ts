@@ -6,7 +6,7 @@ import { wordsOf } from "@/lib/tts/text";
 import { unzip, zip } from "@/server/zip";
 import { azure, boundaryAlignment, ssml, wavDurationMs } from "../scripts/narration/azure";
 import { piper, piperWords, type PiperResult } from "../scripts/narration/piper";
-import { Fatal, estimateWords, sentencesOf } from "../scripts/narration/provider";
+import { Fatal, estimateWords, failureStreak, sentencesOf } from "../scripts/narration/provider";
 
 /** A PCM WAV of `ms` silence at 24 kHz, 16-bit mono (Azure's riff-24khz-16bit-mono-pcm). */
 function wav(ms: number): Buffer {
@@ -41,6 +41,14 @@ describe("timing estimate", () => {
 
   it("splits karaoke words into sentences at . ! ? … and closing quotes", () => {
     expect(sentencesOf(wordsOf('Stop. Is it "real?" Check… then go'))).toEqual([["Stop."], ["Is", "it", '"real?"'], ["Check…"], ["then", "go"]]);
+  });
+});
+
+describe("failure streak", () => {
+  it("stops only after the limit of failures in a row; a success resets the count", () => {
+    const tooMany = failureStreak(3);
+    expect([false, false, true, false, false].map((ok) => tooMany(ok))).toEqual([false, false, false, false, false]);
+    expect(tooMany(false)).toBe(true);
   });
 });
 
