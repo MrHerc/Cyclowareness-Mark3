@@ -114,6 +114,23 @@ describe("applyMarket", () => {
     expect(step.artifact.body[0][0].text).toContain(`<${slug(kamran[1])[0]}.${slug(kamran[2])}@verwaltungsamt.example>`);
   });
 
+  it("gives a mailbox initial the mapped given name of its owner, also beside a namesake or with the given name alone", () => {
+    const mail = { formatVersion: 1, id: "mail", title: "Rauf Hüseynov und Səbinə Hüseynova", say: "Hallo Səbinə", from: { name: [{ text: "Səbinə Hüseynova" }], address: [{ text: "s.huseynova@idare.example" }] } };
+    const alone = { formatVersion: 1, id: "alone", say: "Hallo Səbinə", from: { address: [{ text: "s.huseynova@idare.example" }] } };
+    for (const lang of READY) {
+      const out = applyMarket(mail, "module/mail", packs[lang], world);
+      const [given, family] = out.from.name[0].text.split(" ").map((n) => n.split("|").at(-1)!);
+      const local = out.from.address[0].text.split("@")[0];
+      expect(local, lang).toMatch(new RegExp(`^${given.normalize("NFD")[0].toLowerCase()}\\.\\p{L}+$`, "u"));
+      expect(local.split(".")[1][0], lang).toBe(family.normalize("NFD")[0].toLowerCase());
+      expect(applyMarket(out, "module/mail", packs[lang], world, mail), lang).toEqual(out);
+      const solo = applyMarket(alone, "module/alone", packs[lang], world);
+      const sabina = applyMarket({ say: "Sabina" }, "module/alone", packs[lang], world, alone).say;
+      expect(solo.from.address[0].text[0], lang).toBe(sabina.normalize("NFD")[0].toLowerCase());
+      expect(applyMarket(solo, "module/alone", packs[lang], world, alone), lang).toEqual(solo);
+    }
+  });
+
   it("drops a stale initial and localises money, numbers, brands, file names, links and look-alikes", () => {
     const step = (de().scenes[0] as Sim).steps[0];
     expect(step.say).toMatch(/^Hier spricht Staatsanwalt \p{Lu}\p{L}+\. Rufen Sie \+49 151 000 47 12 an\.$/u);
@@ -183,6 +200,49 @@ describe("the lesson checker's market rule", () => {
         expect(applyMarket(doc, `${mod}/${id}`, packs[lang], world, read(path.join(LESSONS, mod, `${id}.en.json`))), `${mod}/${f}`).toEqual(doc);
       }
     }
+  }, 60_000);
+
+  it.each(READY)("gives every %s mailbox of a person the English names (s.huseynova@ of Səbinə) the initial of that person's name", (lang) => {
+    const givenForm = new Map(["female", "male"].flatMap((k) => Object.entries(world[k as "female"]).flatMap(([key, l]) => l.map((f) => [f, key] as const))));
+    const familyForm = new Map(Object.entries(world.family).flatMap(([key, l]) => l.map((f) => [f, key] as const)));
+    const alt = (forms: Iterable<string>) => [...forms].sort((a, b) => b.length - a.length).join("|");
+    const givenRe = new RegExp(`(?<!\\p{L})(${alt(givenForm.keys())})(?!\\p{L})`, "gu");
+    const pairRe = new RegExp(`(?<!\\p{L})(${alt(givenForm.keys())})\\s+(${alt(familyForm.keys())})(?!\\p{L})`, "gu");
+    const latins = (key: string) => [...(world.female[key] ?? []), ...(world.male[key] ?? [])].filter((f) => /^\p{Script=Latin}/u.test(f));
+    const latin = (key: string) => latins(key)[0];
+    const first = (name: string) => name.replace(/^Ə/, "E").normalize("NFD")[0].toLowerCase();
+    const strings = (en: unknown, loc: unknown, out: [string, string][] = []): [string, string][] => {
+      if (typeof en === "string" && typeof loc === "string") out.push([en, loc]);
+      else if (en && loc && typeof en === "object" && typeof loc === "object") for (const [k, v] of Object.entries(en)) strings(v, (loc as Record<string, unknown>)[k], out);
+      return out;
+    };
+    let checked = 0;
+    for (const mod of fs.readdirSync(LESSONS)) {
+      for (const f of fs.readdirSync(path.join(LESSONS, mod)).filter((x) => x.endsWith(`.${lang}.json`))) {
+        const id = f.slice(0, -8);
+        const en = read(path.join(LESSONS, mod, `${id}.en.json`));
+        const pairs = strings(en, read(path.join(LESSONS, mod, f)));
+        const named = new Set(pairs.flatMap(([s]) => [...s.replace(/\S+@\S*/g, " ").matchAll(givenRe)].map((m) => givenForm.get(m[1])!)));
+        const couples = pairs.flatMap(([s]) => [...s.matchAll(pairRe)].map((m) => [givenForm.get(m[1])!, familyForm.get(m[2])!] as const));
+        for (const [s, loc] of pairs) {
+          const theirs = [...loc.matchAll(/([\w.+-]+)@/g)].map((m) => m[1]);
+          [...s.matchAll(/([\w.+-]+)@/g)].forEach(([, local], i) => {
+            const m = /^([a-z])\.([a-z]+)(?=[.\d]|$)/.exec(local);
+            const family = m && [...familyForm].find(([form]) => slug(form).replace(/ə/g, "e").replace(/ı/g, "i").replace(/ş/g, "sh").replace(/ç/g, "ch") === m[2])?.[1];
+            if (!m || !family) return;
+            const has = (g: string) => latins(g).some((form) => first(form) === m[1]);
+            const byPair = [...new Set(couples.filter(([g, fam]) => fam === family && has(g)).map(([g]) => g))];
+            const byInitial = [...named].filter(has);
+            const who = byPair.length ? (byPair.length === 1 ? byPair[0] : undefined) : byInitial.length === 1 ? byInitial[0] : undefined;
+            if (!who) return;
+            const mapped = applyMarket({ say: latin(who) }, `${mod}/${id}`, packs[lang], world, en).say;
+            expect(theirs[i]?.[0], `${mod}/${f}: ${local}@ of ${who} (${mapped})`).toBe(first(mapped));
+            checked++;
+          });
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(25);
   }, 60_000);
 });
 

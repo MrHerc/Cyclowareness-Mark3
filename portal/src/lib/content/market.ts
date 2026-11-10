@@ -220,13 +220,14 @@ function fill(pattern: string, digits: string): string {
     .join("");
 }
 
-type Cast = { picked: Record<Pool, Map<string, string>>; familyOf: Map<string, string>; givenOf: Map<string, string> };
+type Cast = { picked: Record<Pool, Map<string, string>>; familyOf: Map<string, string>; pairs: [string, string][]; given: string[] };
 
 /**
  * Who plays whom in a lesson: the people and places of the English source (its text and its addresses),
- * then those only the translation names, picked per `seed` (the lesson's "module/id"). `familyOf` and
- * `givenOf` pair the names the English writes together ("Rauf Kərimov"), for an initial in an address
- * (r.kerimov@) and a title before a given name; a title without a pair gets a family name of its own ("~rauf").
+ * then those only the translation names, picked per `seed` (the lesson's "module/id"). `pairs` are the
+ * given and family names the English writes together ("Rauf Kərimov") and `given` every given name of the
+ * English, for an initial in an address (r.kerimov@); `familyOf` (a given name's first pair) serves an
+ * initial after a given name and a title before one; a title without a pair gets a family name of its own ("~rauf").
  */
 function castFor(en: unknown, doc: unknown, seed: string, pack: MarketPack, world: AzWorld, { re, hits }: Matcher): Cast {
   const people = addressPeople(world);
@@ -235,7 +236,7 @@ function castFor(en: unknown, doc: unknown, seed: string, pack: MarketPack, worl
   const fromEn = empty();
   const fromDoc = empty();
   const familyOf = new Map<string, string>();
-  const givenOf = new Map<string, string>();
+  const pairs: [string, string][] = [];
   const scan = (part: string, into: Record<Pool, string[]>, source: boolean) => {
     let given: { key: string; end: number } | undefined;
     for (const m of part.matchAll(re)) {
@@ -244,7 +245,7 @@ function castFor(en: unknown, doc: unknown, seed: string, pack: MarketPack, worl
       into[hit.kind as Pool].push(hit.key);
       if (source && given && hit.kind === "family" && /^\s+$/u.test(part.slice(given.end, m.index + m[1].length))) {
         if (!familyOf.has(given.key)) familyOf.set(given.key, hit.key);
-        if (!givenOf.has(hit.key)) givenOf.set(hit.key, given.key);
+        pairs.push([given.key, hit.key]);
       }
       const isGiven = hit.kind === "female" || hit.kind === "male";
       if (!source && isGiven && !m[1] && pack.honorifics.some((h) => part.slice(0, m.index).endsWith(`${h} `))) into.family.push(`~${hit.key}`);
@@ -261,7 +262,7 @@ function castFor(en: unknown, doc: unknown, seed: string, pack: MarketPack, worl
   fromDoc.family = fromDoc.family.filter((k) => !(k.startsWith("~") && familyOf.has(k.slice(1))));
   const pools: Record<Pool, string[]> = { ...pack.people, cities: pack.cities, districts: pack.districts };
   const picked = Object.fromEntries(POOLS.map((p) => [p, assign(fromEn[p], fromDoc[p], pools[p], `${seed}/${p}`)])) as Record<Pool, Map<string, string>>;
-  return { picked, familyOf, givenOf };
+  return { picked, familyOf, pairs, given: [...fromEn.female, ...fromEn.male] };
 }
 
 /** The pack's address map for one lesson: brand slugs, Azerbaijani words and the names of the lesson's cast. */
@@ -285,6 +286,15 @@ function addressMapper(pack: MarketPack, world: AzWorld, cast: Cast): (token: st
     for (const kind of ["female", "male", "family"] as const) if (key && cast.picked[kind].has(key)) return addressForm(cast.picked[kind].get(key)!);
   };
   const caseLike = (from: string, to: string) => (/\p{Lu}/u.test(from[0]) ? to[0].toUpperCase() + to.slice(1) : to);
+  const initials = (key: string) => new Set([...(world.female[key] ?? []), ...(world.male[key] ?? [])].filter((f) => /^\p{Script=Latin}/u.test(f)).map((f) => addressForm(f)[0]));
+  const only = (keys: string[]) => (new Set(keys).size === 1 ? keys[0] : undefined);
+  // Whose initial it is (s.huseynova@): the English's "Səbinə Hüseynova", else its only given name with that
+  // initial; ambiguous or absent leaves the initial as it is (a deliberate wrong-initial cue keeps its initial).
+  const ownerOf = (initial: string, family: string) => {
+    const paired = cast.pairs.filter(([, f]) => f === family).map(([g]) => g);
+    const named = paired.filter((g) => initials(g).has(initial.toLowerCase()));
+    return named.length ? only(named) : only(cast.given.filter((g) => initials(g).has(initial.toLowerCase())));
+  };
   // A piece cut after "gov." ("https://vetendasportal.gov." + "az-arayis.example") takes the label the pack gives gov.az ("bund.").
   const gov = pack.addresses["gov.az"]?.split(".")[0];
   const official = (out: string) => (gov && out.endsWith(".gov.") ? `${out.slice(0, -"gov.".length)}${gov}.` : out);
@@ -294,19 +304,31 @@ function addressMapper(pack: MarketPack, world: AzWorld, cast: Cast): (token: st
       if (!person) return `${before ? `${before}.` : ""}${caseLike(form, words.get(form.toLowerCase())!)}${after ? `.${after}` : ""}`;
       const to = slug(person.key);
       if (!to) return whole;
-      const pair = slug(person.kind === "family" ? cast.givenOf.get(person.key) : cast.familyOf.get(person.key));
-      if (before && person.kind === "family" && pair) before = pair[0];
+      const owner = before && person.kind === "family" ? slug(ownerOf(before, person.key)) : undefined;
+      if (before && owner) before = caseLike(before, owner[0]);
+      const pair = slug(cast.familyOf.get(person.key));
       if (after && person.kind !== "family" && pair) after = pair[0];
       return `${before ? `${before}.` : ""}${caseLike(form, to)}${after ? `.${after}` : ""}`;
     }));
 }
 
-/** Rewrites the addresses of `text` where they still equal the English value's (`en`); any other text stays. */
+/** A mapped address as a pattern that takes any one-letter initial ("s.fischer@" also finds "m.fischer@"). */
+const anyInitial = (to: string) => esc(to).replace(/(?<!\p{L})\p{L}(?=\\\.)/gu, "\\p{L}");
+
+/**
+ * Rewrites the addresses of `text` where they still equal the English value's (`en`); any other text stays.
+ * An address that differs from the mapped one only in an initial (a cast's earlier initial) is mapped too.
+ */
 function mapAddresses(text: string, en: string, key: string, map: (token: string) => string): string {
   const tokens = valueAddresses(en, key);
   if (!tokens.length) return text;
-  if (tokens[0] === en.trim()) return text.trim() === tokens[0] ? text.replace(tokens[0], map(tokens[0])) : text;
-  return text.replace(new RegExp(tokens.sort(byLength).map(esc).join("|"), "gu"), map);
+  const pairs = tokens.sort(byLength).map((t) => [t, map(t)] as const);
+  if (tokens[0] === en.trim()) {
+    const [from, to] = pairs[0];
+    return text.trim() === from || new RegExp(`^${anyInitial(to)}$`, "u").test(text.trim()) ? text.replace(text.trim(), to) : text;
+  }
+  const re = new RegExp(pairs.map(([t, to]) => `(${esc(t)}|${anyInitial(to)})`).join("|"), "gu");
+  return text.replace(re, (...groups: unknown[]) => pairs[groups.slice(1, pairs.length + 1).findIndex((g) => g !== undefined)][1]);
 }
 
 /** The English lesson with its addresses through the pack's map: what a market translation must match (parity). */
@@ -319,7 +341,8 @@ export function marketSource<T>(en: T, seed: string, pack: MarketPack, world: Az
  * The lesson with the Azerbaijani world replaced by the pack's: deterministic (people and places are
  * picked per `seed`, the lesson's "module/id", from its English source `en`, so one character keeps one
  * name through the lesson, in its text and in its addresses) and idempotent (no pack value is a token of
- * the world list, which the tests check, and an address is only rewritten while it equals the English one).
+ * the world list, which the tests check, and an address is only rewritten while it equals the English one or,
+ * but for an initial, the mapped one).
  */
 export function applyMarket<T>(doc: T, seed: string, pack: MarketPack, world: AzWorld, en: unknown = doc): T {
   const m = matcher(world, pack);
