@@ -110,4 +110,25 @@ describe("hourly jobs", () => {
     expect(ran(await runJobs(db, new Date(start.getTime() + HOUR)), tenant.id)).toEqual(["reminders", "managers", "refreshers"]);
     expect(ran(await runJobs(db, new Date(start.getTime() + HOUR + 60_000)), tenant.id)).toEqual([]);
   }, 120_000);
+
+  it("a failing ledger write is that step's failure: the tick goes on and the job runs again next tick", async () => {
+    const tenant = await addTenant(db);
+    const start = new Date("2026-11-13T09:00:00Z");
+    const insert = db.insert.bind(db);
+    const spy = vi.spyOn(db, "insert").mockImplementation(((table: Parameters<typeof db.insert>[0]) => {
+      if (table === t.jobRuns) throw new Error("tenant deleted");
+      return insert(table);
+    }) as typeof db.insert);
+    let out: Record<string, number>;
+    try {
+      out = await runJobs(db, start);
+    } finally {
+      spy.mockRestore();
+    }
+    expect(out[`reminders:${tenant.id}`]).toBe(-1);
+    expect(out[`reports:${tenant.id}`]).not.toBe(-1);
+    expect(out.tick).toBe(1);
+    expect(await db.select().from(t.jobRuns).where(eq(t.jobRuns.tenantId, tenant.id))).toEqual([]);
+    expect(ran(await runJobs(db, new Date(start.getTime() + 60_000)), tenant.id)).toEqual(["reminders", "managers", "refreshers"]);
+  }, 120_000);
 });

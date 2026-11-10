@@ -133,6 +133,8 @@ export async function recomputeRisk(db: DB, tenantId: string, userIds?: string[]
       with v as (
         select u.id, u.risk_score as prev, x.score::int as score
         from users u join (values ${sql.join(scores.slice(i, i + WRITE_CHUNK), sql`, `)}) as x(id, score) on u.id = x.id::uuid
+        -- id order: overlapping recomputes take their row locks in the same order and cannot deadlock.
+        order by u.id
         for update of u
       )
       update users set risk_score = v.score from v where users.id = v.id

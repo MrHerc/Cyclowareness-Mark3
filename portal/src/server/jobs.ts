@@ -83,10 +83,12 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
   const hourly = async (job: string, tenantId: string, fn: () => Promise<number>) => {
     const elapsed = now.getTime() - (lastRun.get(`${job}:${tenantId}`)?.getTime() ?? -Infinity);
     if (elapsed >= 0 && elapsed < HOUR) return;
-    await step(`${job}:${tenantId}`, fn);
-    // A failed run is tried again on the next tick.
-    if (out[`${job}:${tenantId}`] === -1) return;
-    await db.insert(t.jobRuns).values({ job, tenantId, ranAt: now }).onConflictDoUpdate({ target: [t.jobRuns.job, t.jobRuns.tenantId], set: { ranAt: now } });
+    // Recorded inside the step: a failed run is tried again on the next tick, and a failing write stops nothing else.
+    await step(`${job}:${tenantId}`, async () => {
+      const n = await fn();
+      await db.insert(t.jobRuns).values({ job, tenantId, ranAt: now }).onConflictDoUpdate({ target: [t.jobRuns.job, t.jobRuns.tenantId], set: { ranAt: now } });
+      return n;
+    });
   };
   for (const row of tenants) {
     const tenant = { ...row, settings: withDefaults(row.settings) };
