@@ -19,7 +19,7 @@ import { clientIp } from "../request";
 import { rateLimit } from "../rate-limit";
 import { LOCALES, isLocale } from "../../i18n/config";
 import { isHexColor } from "../../lib/color";
-import { WEBHOOK_EVENTS, isTimeZone, withDefaults } from "../../lib/tenant-defaults";
+import { MIN_AUDIT_MONTHS, WEBHOOK_EVENTS, isTimeZone, withDefaults } from "../../lib/tenant-defaults";
 import { svgLogoProblem } from "../svg-safety";
 import { isUuid } from "../../lib/ids";
 import { endpointKey, storedSecretOutcome } from "../../lib/stored-secret";
@@ -494,8 +494,7 @@ export async function saveLearningAction(input: z.infer<typeof learningSchema>):
 }
 
 const months = z.number().int().min(0).max(120);
-// The audit log is the evidence of the administrators' own actions: when it is purged at all, it is kept at least a year.
-const retentionSchema = z.object({ auditMonths: months.refine((m) => m === 0 || m >= 12), learningMonths: months });
+const retentionSchema = z.object({ auditMonths: months.refine((m) => m === 0 || m >= MIN_AUDIT_MONTHS), learningMonths: months });
 
 export async function saveRetentionAction(input: z.infer<typeof retentionSchema>): Promise<SaveResult> {
   const v = await actionViewer("settings.write");

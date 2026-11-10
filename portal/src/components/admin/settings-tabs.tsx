@@ -1448,7 +1448,7 @@ export function ProtectionTab({ protection, retention }: { protection: TenantSet
   const [s, setS] = useState({ ...protection, androidScreenBlock: protection.androidScreenBlock ?? false });
   // Kept as typed: an emptied field is refused by the server instead of silently becoming 0 (keep everything).
   const [r, setR] = useState({ auditMonths: String(retention.auditMonths), learningMonths: String(retention.learningMonths) });
-  const months = (s: string) => (s.trim() === "" ? NaN : Number(s));
+  const months = (value: string) => (value.trim() === "" ? NaN : Number(value));
   const [img, setImg] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [result, setResult] = useState<string | null>(null);

@@ -39,7 +39,7 @@ export function encryptSecret(plain: string): string {
   return ["v2", kid(current), iv.toString("base64url"), cipher.getAuthTag().toString("base64url"), data.toString("base64url")].join(":");
 }
 
-/** True when the ciphertext was sealed with the current APP_SECRET (what scripts/rotate-secret.ts leaves alone). */
+/** True when the ciphertext was sealed with the current APP_SECRET (what `npm run secret:rotate` leaves alone). */
 export function sealedWithCurrentKey(value: string): boolean {
   return value.startsWith(`v2:${kid(secret())}:`);
 }

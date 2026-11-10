@@ -18,7 +18,7 @@ const schema = z
     ALLOW_HTTP_APP_URL: flag("0"),
     /** 32+ random bytes, used for encrypting stored secrets and signing tokens. */
     APP_SECRET: z.preprocess(blank, z.string().min(32).optional()),
-    /** The APP_SECRET before a rotation: stored secrets still open with it until scripts/rotate-secret.ts has re-encrypted them (docs/OPERATIONS.md). */
+    /** The APP_SECRET before a rotation: stored secrets still open with it until `npm run secret:rotate` has re-encrypted them (docs/OPERATIONS.md). */
     APP_SECRET_PREVIOUS: z.preprocess(blank, z.string().min(32).optional()),
     /** Key of every organisation's domain-proof TXT value. Defaults to APP_SECRET: set it once and never rotate it, or every published record changes. */
     APP_DOMAIN_PROOF_SECRET: z.preprocess(blank, z.string().min(32).optional()),

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { eq } from "drizzle-orm";
@@ -90,6 +91,9 @@ describe("ciphertext versions", () => {
   it("writes v2 with the current key's id and opens it by that id after the secret moved to APP_SECRET_PREVIOUS", () => {
     const sealed = encryptSecret("ldap-bind-password");
     expect(sealed).toMatch(/^v2:[0-9a-f]{8}:/);
+    // The id is derived with its own label, never the plain hash of the secret.
+    expect(kidOf(sealed)).toBe(createHash("sha256").update(`kid:${CURRENT}`).digest("hex").slice(0, 8));
+    expect(kidOf(sealed)).not.toBe(createHash("sha256").update(CURRENT).digest("hex").slice(0, 8));
     expect(sealedWithCurrentKey(sealed)).toBe(true);
     vi.stubEnv("APP_SECRET", PREVIOUS);
     vi.stubEnv("APP_SECRET_PREVIOUS", CURRENT);
@@ -181,6 +185,8 @@ describe("rotate-secret refusal", () => {
     expect(rotationRefusal({ DATABASE_URL: "postgres://db/portal", APP_SECRET: weak })).toMatch(/APP_SECRET \(32\+/);
     expect(rotationRefusal({ NODE_ENV: "production", APP_SECRET: "" })).toMatch(/APP_SECRET \(32\+/);
     expect(rotationRefusal({ APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: weak })).toMatch(/APP_SECRET_PREVIOUS/);
+    // The script does not load env.ts, so it refuses the old key left equal to the new one itself.
+    expect(rotationRefusal({ DATABASE_URL: "postgres://db/portal", APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: CURRENT })).toMatch(/equals APP_SECRET/);
     expect(rotationRefusal({ DATABASE_URL: "postgres://db/portal", APP_SECRET: CURRENT, APP_SECRET_PREVIOUS: PREVIOUS })).toBeNull();
     // The embedded development database is the only place the fallback key may be used.
     expect(rotationRefusal({ APP_SECRET: "" })).toBeNull();

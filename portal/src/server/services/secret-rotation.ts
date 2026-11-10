@@ -7,7 +7,7 @@ import { withDefaults } from "../../lib/tenant-defaults";
 export type RotationCounts = { tenants: number; users: number; unreadable: number; skipped: string[] };
 
 /**
- * Why scripts/rotate-secret.ts must not run: without a 32+ APP_SECRET, crypto.ts would seal every secret
+ * Why `npm run secret:rotate` must not run: without a 32+ APP_SECRET, crypto.ts would seal every secret
  * with the public development key; the embedded development database is the only place that may happen.
  * A previous key too short to count is ignored by crypto.ts, which would report every old value unreadable.
  * Without APP_DOMAIN_PROOF_SECRET the proof key follows APP_SECRET, so step 4 would silently break every
@@ -20,6 +20,7 @@ export function rotationRefusal(
   if ((e.NODE_ENV === "production" || e.DATABASE_URL) && (e.APP_SECRET ?? "").length < 32) {
     return "APP_SECRET (32+ characters, the new key) must be set: a rotation cannot seal stored secrets with the development key.";
   }
+  if (e.APP_SECRET_PREVIOUS && e.APP_SECRET_PREVIOUS === e.APP_SECRET) return "APP_SECRET_PREVIOUS equals APP_SECRET: set it to the old key.";
   if (e.APP_SECRET_PREVIOUS && e.APP_SECRET_PREVIOUS.length < 32) return "APP_SECRET_PREVIOUS is shorter than 32 characters and would be ignored: set it to the old key exactly.";
   if (verifiedDomains > 0 && !e.APP_DOMAIN_PROOF_SECRET) {
     return `APP_DOMAIN_PROOF_SECRET is not set and ${verifiedDomains} organisation(s) have a verified domain: their published TXT records would stop verifying once the old key is removed. Set it to the old APP_SECRET first (docs/OPERATIONS.md, "Rotating APP_SECRET", step 1).`;

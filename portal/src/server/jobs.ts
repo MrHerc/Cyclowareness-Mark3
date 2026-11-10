@@ -25,7 +25,7 @@ import { notifyUsers } from "./services/notify";
 import { recomputeRisk, snapshotTenant } from "./services/risk";
 import { targetTraining } from "./services/secops";
 import { dayKey } from "../lib/domain/gamification";
-import { featuresFor, withDefaults } from "../lib/tenant-defaults";
+import { MIN_AUDIT_MONTHS, featuresFor, withDefaults } from "../lib/tenant-defaults";
 import { dayPlus, todayIn, zonedTime } from "../lib/time";
 import { zonedParts } from "../lib/baku-clock";
 import { LOCALES, isLocale, pick, type Locale } from "../i18n/config";
@@ -409,7 +409,9 @@ async function cleanup(db: DB, now: Date): Promise<number> {
   const monthsAgo = (months: number) => monthsBefore(now, months);
   for (const org of await db.select({ id: t.tenants.id, settings: t.tenants.settings }).from(t.tenants)) {
     if (Date.now() > deadline) break;
-    const { auditMonths, learningMonths } = withDefaults(org.settings).retention;
+    const { auditMonths: stored, learningMonths } = withDefaults(org.settings).retention;
+    // The same floor as the settings form: a value of 1 to 11 stored before the floor existed cannot purge recent history.
+    const auditMonths = stored > 0 ? Math.max(stored, MIN_AUDIT_MONTHS) : 0;
     const purged = { auditEntries: 0, answers: 0, risks: 0 };
     // The entries that explain the gaps (the retention setting and earlier purges) are never purged themselves.
     if (auditMonths > 0)
