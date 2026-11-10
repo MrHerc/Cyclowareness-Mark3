@@ -9,6 +9,7 @@ import { Bell, Building2, FileUp, KeyRound, Link2, Mail, Plus, Search, UserX } f
 import { addPersonAction, createLinkAction, emailInvitesAction, importPeopleAction, moveDepartmentAction, remindPeopleAction, setStatusAction, type ImportPreview, type PersonState } from "@/server/actions/people";
 import { remindAwaitingAction } from "@/server/actions/admin-overview";
 import { ConfirmPasswordField, useStepUpError } from "@/components/admin/person-actions";
+import { CreatedLinkDialog, writeClipboard } from "@/components/admin/created-link";
 import { Avatar } from "@/components/ui/avatar";
 import { Button, TextButton } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -152,17 +153,14 @@ export function PeopleTable({
     setPwError(null);
   };
 
+  const [createdLink, setCreatedLink] = useState<string | null>(null);
   const copyLink = (id: string, kind: "invite" | "reset") =>
     start(async () => {
       const res = await createLinkAction(id, kind, password);
       if (res.ok && res.url) {
         closeReset();
-        try {
-          await navigator.clipboard.writeText(res.url);
-          toast(t("linkCopied"));
-        } catch {
-          window.prompt(t("linkCreated"), res.url);
-        }
+        if (await writeClipboard(res.url)) toast(t("linkCopied"));
+        else setCreatedLink(res.url);
       } else setPwError(stepUpError(res.error));
     });
 
@@ -315,6 +313,7 @@ export function PeopleTable({
           </Button>
         </form>
       </Dialog>
+      <CreatedLinkDialog url={createdLink} onClose={() => setCreatedLink(null)} />
     </div>
   );
 }

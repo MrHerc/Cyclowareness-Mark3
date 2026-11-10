@@ -21,7 +21,7 @@ Rules for using the platform: the parties, account security, acceptable use, sim
 
 ## 3. The Service
 
-3.1. Depending on the package selected by the Organisation, the Service includes interactive lessons and simulations, an assistant based on artificial intelligence (hereinafter, "AI Sel"), games, points (XP) and an inter-departmental league, certificates, a policy library with an attestation feature, simulated phishing and QR code training, an administration panel with reports, and integration with the Organisation's systems (single sign-on, Active Directory or LDAP, email, SIEM and ITSM).
+3.1. Depending on the package selected by the Organisation, the Service includes interactive lessons and simulations, an assistant based on artificial intelligence (hereinafter, "AI Sel"), games, points (XP) and an inter-departmental league, certificates, a policy library with an attestation feature, simulated phishing and QR code training, an administration panel with reports, and integration with the Organisation's systems (single sign-on, email, SIEM and ITSM).
 3.2. In the Local Version, the Organisation is responsible for hosting, backups, network security, the installation of updates and the configuration of connected external services. In that case, the Provider's obligations are only those set out in the Customer Agreement.
 3.3. The Service works in modern web browsers and in the Android app. Some features (camera, microphone, offline training) depend on the device and on the permissions granted by the User.
 3.4. The Service is a training tool. Completing training reduces the risk of human error but does not guarantee that the Organisation will never experience a cyber incident.
@@ -73,7 +73,7 @@ Rules for using the platform: the parties, account security, acceptable use, sim
 - must inform Users before use of the Service begins: that the Service is used, for what purposes, which results Administrators see and how they can exercise their rights; where required by legislation, must obtain written consent;
 - must keep the employee list accurate and must suspend or delete the accounts of persons who leave the Organisation;
 - must assign administrative roles only to persons who need them, must protect Administrator accounts and, as recommended, must make two-step sign-in mandatory for them;
-- must configure single sign-on, Active Directory or LDAP, its own mail server, SIEM or ITSM integrations securely; the Organisation is responsible for these systems and for the data that the Service sends to these systems on its instructions;
+- must configure single sign-on, its own mail server, SIEM or ITSM integrations securely; the Organisation is responsible for these systems and for the data that the Service sends to these systems on its instructions;
 - must ensure that the policies, logos, texts and other materials it uploads are lawful and that it has the right to use them;
 - must decide without undue delay on Users' requests relating to personal data (for example, erasure requests) and, if it refuses a request, must state the reason;
 - if it is a state body or is subject to special rules on information systems, data location or information security, must choose the version (Cloud or Local) and the settings that meet those rules.

@@ -21,7 +21,7 @@ Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, m
 
 ## 3. Xidmət
 
-3.1. Təşkilatın seçdiyi paketdən asılı olaraq Xidmətə interaktiv dərslər və simulyasiyalar, süni intellekt əsaslı köməkçi (bundan sonra "AI Sel"), oyunlar, xallar (XP) və şöbələr arası liqa, sertifikatlar, təsdiqetmə imkanı olan siyasətlər kitabxanası, saxta fişinq və QR kod təlimləri, hesabatlar olan inzibati panel, habelə Təşkilatın sistemləri ilə inteqrasiya (vahid giriş, Active Directory və ya LDAP, elektron poçt, SIEM və ITSM) daxildir.
+3.1. Təşkilatın seçdiyi paketdən asılı olaraq Xidmətə interaktiv dərslər və simulyasiyalar, süni intellekt əsaslı köməkçi (bundan sonra "AI Sel"), oyunlar, xallar (XP) və şöbələr arası liqa, sertifikatlar, təsdiqetmə imkanı olan siyasətlər kitabxanası, saxta fişinq və QR kod təlimləri, hesabatlar olan inzibati panel, habelə Təşkilatın sistemləri ilə inteqrasiya (vahid giriş, elektron poçt, SIEM və ITSM) daxildir.
 3.2. Lokal versiyada hostinqə, ehtiyat nüsxələrə, şəbəkə təhlükəsizliyinə, yeniləmələrin quraşdırılmasına və qoşulan xarici xidmətlərin ayarlanmasına Təşkilat cavabdehdir. Bu halda Təminatçının öhdəlikləri yalnız Müştəri müqaviləsində göstərilənlərdir.
 3.3. Xidmət müasir veb brauzerlərdə və Android tətbiqində işləyir. Bəzi funksiyalar (kamera, mikrofon, internetsiz təlim) qurğudan və İstifadəçinin verdiyi icazələrdən asılıdır.
 3.4. Xidmət təlim vasitəsidir. Təlimin keçilməsi insan səhvi riskini azaldır, lakin Təşkilatın heç vaxt kiberinsidentlə üzləşməyəcəyinə zəmanət vermir.
@@ -73,7 +73,7 @@ Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, m
 - İstifadəçiləri işə başlamazdan əvvəl məlumatlandırmalıdır: Xidmətdən istifadə olunduğu, hansı məqsədlərlə, Administratorların hansı nəticələri gördüyü və hüquqlarını necə həyata keçirə biləcəkləri barədə; qanunvericilik tələb etdikdə yazılı razılıq almalıdır;
 - işçilərin siyahısını dəqiq saxlamalı, Təşkilatdan ayrılan şəxslərin hesablarını dayandırmalı və ya silməlidir;
 - inzibati rolları yalnız onlara ehtiyacı olan şəxslərə verməli, Administrator hesablarını qorumalı və tövsiyə olunduğu kimi onlar üçün ikiaddımlı girişi məcburi etməlidir;
-- vahid giriş, Active Directory və ya LDAP, öz poçt serveri, SIEM və ya ITSM inteqrasiyalarını təhlükəsiz ayarlamalıdır; bu sistemlərə və onun göstərişi ilə Xidmətin bu sistemlərə göndərdiyi məlumatlara Təşkilat cavabdehdir;
+- vahid giriş, öz poçt serveri, SIEM və ya ITSM inteqrasiyalarını təhlükəsiz ayarlamalıdır; bu sistemlərə və onun göstərişi ilə Xidmətin bu sistemlərə göndərdiyi məlumatlara Təşkilat cavabdehdir;
 - yüklədiyi siyasətlərin, loqoların, mətnlərin və digər materialların qanuni olmasını və onlardan istifadə hüququnun olmasını təmin etməlidir;
 - İstifadəçilərin fərdi məlumatlarla bağlı sorğuları (məsələn, silinmə sorğuları) barədə əsassız gecikdirmədən qərar verməli, imtina etdikdə səbəbini göstərməlidir;
 - dövlət orqanıdırsa və ya informasiya sistemləri, məlumatların yerləşməsi və ya informasiya təhlükəsizliyi üzrə xüsusi qaydalara tabedirsə, həmin qaydalara cavab verən versiyanı (Bulud və ya Lokal) və ayarları seçməlidir.

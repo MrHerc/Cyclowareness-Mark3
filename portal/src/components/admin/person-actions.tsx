@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
+import { CreatedLinkDialog, writeClipboard } from "@/components/admin/created-link";
 import { LOCALES, LOCALE_NAMES } from "@/i18n/config";
 
 const ROLES = ["learner", "department_head", "executive", "analyst", "campaign_manager", "content_creator", "tenant_admin"] as const;
@@ -71,17 +72,14 @@ export function PersonActions({
     close();
     router.refresh();
   };
+  const [createdLink, setCreatedLink] = useState<string | null>(null);
   const copy = (kind: "invite" | "reset") =>
     start(async () => {
       const res = await createLinkAction(person.id, kind, password);
       if (res.ok && res.url) {
         close();
-        try {
-          await navigator.clipboard.writeText(res.url);
-          toast(tp("linkCopied"));
-        } catch {
-          window.prompt(tp("linkCreated"), res.url);
-        }
+        if (await writeClipboard(res.url)) toast(tp("linkCopied"));
+        else setCreatedLink(res.url);
       } else setPwError(stepUpError(res.error));
     });
 
@@ -280,6 +278,7 @@ export function PersonActions({
           </Button>
         </form>
       </Dialog>
+      <CreatedLinkDialog url={createdLink} onClose={() => setCreatedLink(null)} />
     </div>
   );
 }

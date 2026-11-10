@@ -21,7 +21,7 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 
 | Kategori | Örnekler | Kaynak |
 |---|---|---|
-| Hesap ve iş verileri | ad, e-posta adresi, unvan, departman, bağlı olduğunuz yönetici, rol, arayüz dili, hesap durumu | Kuruluşunuz (elle, dosyadan içe aktarma yoluyla, Active Directory veya LDAP üzerinden ya da tek oturum açma aracılığıyla) |
+| Hesap ve iş verileri | ad, e-posta adresi, unvan, departman, bağlı olduğunuz yönetici, rol, arayüz dili, hesap durumu | Kuruluşunuz (elle, dosyadan içe aktarma yoluyla ya da tek oturum açma aracılığıyla) |
 | Giriş verileri | yalnızca tek yönlü özet (hash) olarak saklanan parola, iki adımlı doğrulama ayarları ve yedek kodlar, giriş oturumları | siz ve Hizmet |
 | Profil fotoğrafı (isteğe bağlı) | yüklediğiniz veya kamerayla çektiğiniz fotoğraf | siz |
 | Eğitim verileri | başlatılan ve tamamlanan dersler, simülasyonlardaki yanıtlar, sonuçlar, puanlar (XP), seriler, rozetler, risk puanı, tekrar takvimi, harcanan süre | Hizmet, kullanımınıza dayalı olarak |
@@ -64,7 +64,7 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 ## 6. Verilerinizi kimler görebilir
 
 6.1. Kuruluşunuz içinde: Yöneticiler verilerinizi rollerine uygun olarak görür. Örneğin bir departman yöneticisi yalnızca kendisine atanan departmanları görür. Diğer katılımcılar sonuçlarınızı görmez.
-6.2. Kuruluşunuzun bağladığı sistemler: Kuruluşun e-posta sunucusu (Hizmetin e-postaları Kuruluşun e-posta sunucusu üzerinden gönderilir), kimlik sağlayıcısı veya dizini (giriş ve çalışanların eşitlenmesi için) ve kullanıcı tanımlayıcınız, e-posta adresiniz ve departmanınız dâhil güvenlik olay kayıtlarını alabilen SIEM veya ITSM sistemleri.
+6.2. Kuruluşunuzun bağladığı sistemler: Kuruluşun e-posta sunucusu (Hizmetin Kuruluş kullanıcılarına gönderdiği e-postalar Kuruluşun e-posta sunucusu üzerinden gönderilir; hiçbir Kuruluşa ait olmayan e-postalar, örneğin herkese açık web sitesinden gelen bir demo talebi için Sağlayıcının satış ekibine giden bildirim (3.3. madde), Sağlayıcının kendi e-posta sunucusu üzerinden gönderilir), kimlik sağlayıcısı (giriş için) ve kullanıcı tanımlayıcınız, e-posta adresiniz ve departmanınız dâhil güvenlik olay kayıtlarını alabilen SIEM veya ITSM sistemleri.
 6.3. Sağlayıcının alt veri işleyenleri (Bulut Sürümü):
 - UpCloud (Finlandiya merkezli UpCloud Ltd ve bağlı ortaklıkları): Birleşik Krallık'ın Londra şehrinde bulunan bir veri merkezinde sunucular, dosya depolama ve yedek kopyalar;
 - Anthropic (Anthropic PBC, ABD): 5. bölüm uyarınca AI Sel'in yanıtları, yapay zekâ ile çevrilen altyazılar ve Eğitim stüdyosundaki ders taslakları için Anthropic API;
@@ -87,7 +87,7 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 - Giriş oturumu: Kuruluşun kurulumunda farklı bir değer belirlenmemişse 8 saat hareketsizlikten sonra sona erer.
 - İki adımlı doğrulama ve tek oturum açma adımları: 10 dakika. İndirme bağlantıları: 5 dakika.
 - AI Sel kullanım sayaçları: 24 saat.
-- AI Sel'in saklanan soruları ve yanıtları (hiçbir hesapla bağlantısı olmadan): Kuruluşunuzun Hizmetteki hesabı var olduğu sürece.
+- AI Sel'in saklanan soruları ve yanıtları (hiçbir hesapla bağlantısı olmadan): en fazla 12 ay; bu sürenin sonunda otomatik olarak silinir.
 - Herkese açık web sitesinden gelen demo talepleri: daha önce silinmedikçe 24 ay (3.3. madde).
 - E-posta teslim kayıtları: teslimin tamamlanmasından sonra 90 gün.
 - Dizin eşitleme raporları: 180 gün.
@@ -100,7 +100,7 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 
 - tüm bağlantılar şifrelenir (HTTPS/TLS);
 - parolalar yalnızca tek yönlü özet (hash) olarak saklanır; bağlı e-posta sunucularının parolaları, tek oturum açma anahtarları ve entegrasyon anahtarları şifrelenir;
-- her Kuruluşun verileri veritabanı düzeyinde satır düzeyinde güvenlik (row-level security) ile ayrılır; böylece bir Kuruluş başka bir Kuruluşun verilerini göremez;
+- her Kuruluşun verilerini Hizmetin kendisi ayırır: her sunucu eylemi ve rota, istenen verinin oturum açmış kullanıcının Kuruluşuna ait olduğunu denetler; otomatik bir test paketi de bir Kuruluşun başka bir Kuruluşun verilerini göremediğini veya değiştiremediğini doğrular;
 - Kuruluşun Yöneticiler için zorunlu kılabileceği iki adımlı doğrulama, giriş denemesi sayısına ilişkin sınırlar ve cihaz sınırları;
 - rol tabanlı erişim: her Yönetici yalnızca rolünün ve yetki kapsamının izin verdiği bilgileri görür;
 - girişlerin ve yönetim işlemlerinin, yalnızca ekleme yapılabilen bir denetim günlüğü;

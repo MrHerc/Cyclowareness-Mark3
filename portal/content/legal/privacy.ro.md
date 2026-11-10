@@ -21,7 +21,7 @@ Ce date cu caracter personal sunt prelucrate pe platformă, în ce scop și pe c
 
 | Categorie | Exemple | Sursă |
 |---|---|---|
-| Datele contului și datele profesionale | numele, adresa de e-mail, funcția, departamentul, superiorul ierarhic, rolul, limba interfeței, starea contului | Organizația dumneavoastră (manual, prin import din fișier, prin Active Directory sau LDAP ori prin autentificare unică) |
+| Datele contului și datele profesionale | numele, adresa de e-mail, funcția, departamentul, superiorul ierarhic, rolul, limba interfeței, starea contului | Organizația dumneavoastră (manual, prin import din fișier sau prin autentificare unică) |
 | Datele de conectare | parola, stocată numai sub formă de hash unidirecțional, setările verificării în doi pași și codurile de rezervă, sesiunile de conectare | dumneavoastră și Serviciul |
 | Fotografia de profil (opțională) | o fotografie pe care o încărcați sau o faceți cu camera | dumneavoastră |
 | Datele privind instruirea | lecțiile începute și finalizate, răspunsurile din simulări, rezultatele, punctele (XP), seriile de zile consecutive, insignele, scorul de risc, programul de recapitulare, timpul petrecut | Serviciul, pe baza modului în care îl utilizați |
@@ -64,7 +64,7 @@ Ce date cu caracter personal sunt prelucrate pe platformă, în ce scop și pe c
 ## 6. Cine vă poate vedea datele
 
 6.1. În cadrul Organizației dumneavoastră: Administratorii vă văd datele în funcție de rolurile lor. De exemplu, un șef de departament vede numai departamentele care i-au fost atribuite. Ceilalți participanți nu vă văd rezultatele.
-6.2. Sistemele conectate de Organizația dumneavoastră: serverul său de e-mail (e-mailurile Serviciului sunt trimise prin serverul de e-mail al Organizației), furnizorul său de identitate sau serviciul său de director (pentru conectare și pentru sincronizarea angajaților), precum și sistemele SIEM sau ITSM care pot primi evenimente de securitate, inclusiv identificatorul dumneavoastră de utilizator, adresa de e-mail și departamentul.
+6.2. Sistemele conectate de Organizația dumneavoastră: serverul său de e-mail (e-mailurile trimise de Serviciu utilizatorilor Organizației trec prin serverul de e-mail al Organizației; mesajele care nu aparțin niciunei Organizații, cum ar fi notificarea către echipa de vânzări a Furnizorului privind o solicitare de demonstrație transmisă prin site-ul public (punctul 3.3), sunt trimise prin propriul server de e-mail al Furnizorului), furnizorul său de identitate (pentru conectare), precum și sistemele SIEM sau ITSM care pot primi evenimente de securitate, inclusiv identificatorul dumneavoastră de utilizator, adresa de e-mail și departamentul.
 6.3. Subprocesatorii Furnizorului (Versiunea cloud):
 - UpCloud (UpCloud Ltd, Finlanda, și filialele sale): servere, stocare de fișiere și copii de rezervă într-un centru de date situat la Londra, Regatul Unit;
 - Anthropic (Anthropic PBC, Statele Unite ale Americii): Anthropic API pentru răspunsurile oferite de AI Sel, subtitrările traduse cu ajutorul AI și proiectele de lecții din Studioul de instruire, în conformitate cu secțiunea 5;
@@ -87,7 +87,7 @@ Ce date cu caracter personal sunt prelucrate pe platformă, în ce scop și pe c
 - Sesiunea de conectare: se încheie după 8 ore de inactivitate, cu excepția cazului în care în instalarea Organizației este stabilită o altă valoare.
 - Etapele verificării în doi pași și ale autentificării unice: 10 minute. Linkurile de descărcare: 5 minute.
 - Contoarele de utilizare a AI Sel: 24 de ore.
-- Întrebările și răspunsurile stocate ale lui AI Sel (fără legătură cu vreun cont): cât timp există contul Organizației dumneavoastră în Serviciu.
+- Întrebările și răspunsurile stocate ale lui AI Sel (fără legătură cu vreun cont): până la 12 luni, după care sunt șterse automat.
 - Solicitările de demonstrație transmise prin site-ul public: 24 de luni, cu excepția cazului în care sunt șterse mai devreme (punctul 3.3).
 - Evidențele privind livrarea e-mailurilor: 90 de zile de la finalizarea livrării.
 - Rapoartele de sincronizare cu serviciul de director: 180 de zile.
@@ -100,7 +100,7 @@ Ce date cu caracter personal sunt prelucrate pe platformă, în ce scop și pe c
 
 - toate conexiunile sunt criptate (HTTPS/TLS);
 - parolele sunt stocate numai sub formă de hash unidirecțional; parolele serverelor de e-mail conectate, cheile de autentificare unică și cheile de integrare sunt criptate;
-- datele fiecărei Organizații sunt separate la nivelul bazei de date prin securitate la nivel de rând (row-level security), astfel încât o Organizație nu poate vedea datele altei Organizații;
+- datele fiecărei Organizații sunt separate de Serviciul însuși: fiecare acțiune de server și fiecare rută verifică faptul că datele solicitate aparțin Organizației utilizatorului conectat, iar o suită de teste automate verifică faptul că o Organizație nu poate vedea sau modifica datele altei Organizații;
 - verificarea în doi pași, pe care Organizația o poate face obligatorie pentru Administratori, limitarea numărului de încercări de conectare și limitele de dispozitive;
 - accesul pe bază de roluri: fiecare Administrator vede numai ceea ce îi permit rolul și sfera sa de competență;
 - un jurnal de audit al conectărilor și al acțiunilor administrative, în care înregistrările pot fi doar adăugate;

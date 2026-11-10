@@ -21,7 +21,7 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 
 | Catégorie | Exemples | Source |
 |---|---|---|
-| Données de compte et données professionnelles | nom, adresse e-mail, fonction, service, responsable hiérarchique, rôle, langue de l’interface, statut du compte | votre Organisation (manuellement, par import de fichier, via Active Directory ou LDAP, ou via l’authentification unique) |
+| Données de compte et données professionnelles | nom, adresse e-mail, fonction, service, responsable hiérarchique, rôle, langue de l’interface, statut du compte | votre Organisation (manuellement, par import de fichier ou via l’authentification unique) |
 | Données de connexion | mot de passe conservé uniquement sous forme de hachage irréversible, paramètres de double authentification et codes de secours, sessions de connexion | vous et le Service |
 | Photo de profil (facultative) | une photo que vous téléversez ou que vous prenez avec la caméra | vous |
 | Données de formation | leçons commencées et terminées, réponses dans les simulations, résultats, points (XP), séries, badges, score de risque, calendrier de révision, temps passé | le Service, sur la base de votre utilisation |
@@ -64,7 +64,7 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 ## 6. Qui peut voir vos données
 
 6.1. Au sein de votre Organisation : les Administrateurs voient vos données en fonction de leurs rôles. Par exemple, un chef de service ne voit que les services qui lui sont attribués. Les autres participants ne voient pas vos résultats.
-6.2. Les systèmes connectés par votre Organisation : son serveur de messagerie (les e-mails du Service sont envoyés par l’intermédiaire du serveur de messagerie de l’Organisation), son fournisseur d’identité ou son annuaire (pour la connexion et la synchronisation des employés), ainsi que les systèmes SIEM ou ITSM susceptibles de recevoir des événements de sécurité, y compris votre identifiant d’utilisateur, votre adresse e-mail et votre service.
+6.2. Les systèmes connectés par votre Organisation : son serveur de messagerie (les e-mails du Service adressés aux utilisateurs de l’Organisation sont envoyés par l’intermédiaire du serveur de messagerie de l’Organisation ; les messages qui ne relèvent d’aucune Organisation, comme la notification à l’équipe commerciale du Prestataire d’une demande de démonstration envoyée depuis le site public (point 3.3), sont envoyés par le propre serveur de messagerie du Prestataire), son fournisseur d’identité (pour la connexion), ainsi que les systèmes SIEM ou ITSM susceptibles de recevoir des événements de sécurité, y compris votre identifiant d’utilisateur, votre adresse e-mail et votre service.
 6.3. Les sous-traitants ultérieurs du Prestataire (Version cloud) :
 - UpCloud (UpCloud Ltd, Finlande, et ses filiales) : serveurs, stockage de fichiers et sauvegardes dans un centre de données situé à Londres (Royaume-Uni) ;
 - Anthropic (Anthropic PBC, États-Unis) : l’API d’Anthropic pour les réponses d’AI Sel, les sous-titres traduits par l’IA et les brouillons de leçons du Studio de formation, conformément à la section 5 ;
@@ -87,7 +87,7 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 - Session de connexion : prend fin après 8 heures d’inactivité, sauf si une autre valeur est définie dans l’installation de l’Organisation.
 - Étapes de double authentification et d’authentification unique : 10 minutes. Liens de téléchargement : 5 minutes.
 - Compteurs d’utilisation d’AI Sel : 24 heures.
-- Questions et réponses conservées d’AI Sel (sans lien avec un compte) : tant que le compte de votre Organisation existe dans le Service.
+- Questions et réponses conservées d’AI Sel (sans lien avec un compte) : jusqu’à 12 mois, puis elles sont supprimées automatiquement.
 - Demandes de démonstration envoyées depuis le site public : 24 mois, sauf suppression anticipée (point 3.3).
 - Enregistrements de remise des e-mails : 90 jours après l’achèvement de la remise.
 - Rapports de synchronisation de l’annuaire : 180 jours.
@@ -100,7 +100,7 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 
 - toutes les connexions sont chiffrées (HTTPS/TLS) ;
 - les mots de passe sont conservés uniquement sous forme de hachages irréversibles ; les mots de passe des serveurs de messagerie connectés, les clés d’authentification unique et les clés d’intégration sont chiffrés ;
-- les données de chaque Organisation sont cloisonnées au niveau de la base de données par une sécurité au niveau des lignes (row-level security), de sorte qu’une Organisation ne peut pas voir les données d’une autre Organisation ;
+- les données de chaque Organisation sont cloisonnées par le Service lui-même : chaque action serveur et chaque route vérifient que les données demandées appartiennent à l’Organisation de l’utilisateur connecté, et une suite de tests automatisés vérifie qu’une Organisation ne peut ni voir ni modifier les données d’une autre Organisation ;
 - la double authentification, que l’Organisation peut rendre obligatoire pour les Administrateurs, la limitation du nombre de tentatives de connexion et les limites d’appareils ;
 - un accès fondé sur les rôles : chaque Administrateur ne voit que ce que son rôle et son périmètre d’habilitation permettent ;
 - un journal d’audit des connexions et des actions d’administration, dans lequel il est seulement possible d’ajouter des entrées ;

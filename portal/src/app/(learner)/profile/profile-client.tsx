@@ -447,6 +447,13 @@ export function OtherDevices() {
 
 const PASSWORD_MIN = 10;
 
+/** The change-password field a refusal of changePasswordAction belongs to; null for one about no field (generic). */
+export function passwordErrorField(error: string): "pw-current" | "pw-next" | "pw-confirm" | null {
+  if (error === "wrongPassword") return "pw-current";
+  if (error === "mismatch") return "pw-confirm";
+  return ["required", "tooShort", "tooLong", "sameAsEmail", "weak"].includes(error) ? "pw-next" : null;
+}
+
 /** Profile → Security: replace the password (current one first), as setting it from a link, with the same rules. */
 export function ChangePassword({ email, name }: { email: string; name: string }) {
   const t = useTranslations("learner.profile");
@@ -474,6 +481,10 @@ export function ChangePassword({ email, name }: { email: string; name: string })
     setError(null);
   };
   const errText = (e: string) => (e === "wrongPassword" ? t2("errors.wrongPassword") : ["required", "tooShort", "tooLong", "sameAsEmail", "mismatch", "weak"].includes(e) ? ta(`errors.${e as "weak"}`, { min: PASSWORD_MIN }) : tc("errors.generic"));
+  // Each refusal is shown on, and announced with, the field it is about; one without a field goes below the form.
+  const errorField = error ? passwordErrorField(error) : null;
+  const fieldError = (id: string) => (errorField === id ? errText(error!) : null);
+  const describe = (id: string, extra?: string) => ({ "aria-invalid": errorField === id || undefined, "aria-describedby": [errorField === id ? `${id}-error` : null, extra].filter(Boolean).join(" ") || undefined });
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-start gap-3">
@@ -495,23 +506,23 @@ export function ChangePassword({ email, name }: { email: string; name: string })
             e.preventDefault();
             start(async () => {
               const res = await changePasswordAction(current, next, confirm);
-              if (!res.ok) return setError(errText(res.error ?? "generic"));
+              if (!res.ok) return setError(res.error ?? "generic");
               toast(t("passwordChanged"), "success");
               close();
             });
           }}
         >
           <input type="text" name="username" autoComplete="username" value={email} readOnly hidden />
-          <Field label={t("currentPassword")} htmlFor="pw-current" error={error === errText("wrongPassword") ? error : null}>
-            <Input id="pw-current" type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} autoFocus />
+          <Field label={t("currentPassword")} htmlFor="pw-current" error={fieldError("pw-current")}>
+            <Input id="pw-current" type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} autoFocus {...describe("pw-current")} />
           </Field>
-          <Field label={ta("passwordLabel")} htmlFor="pw-next">
-            <Input id="pw-next" type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} />
+          <Field label={ta("passwordLabel")} htmlFor="pw-next" error={fieldError("pw-next")}>
+            <Input id="pw-next" type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} {...describe("pw-next", "pw-rules")} />
           </Field>
-          <Field label={ta("confirmLabel")} htmlFor="pw-confirm" error={error && error !== errText("wrongPassword") ? error : null}>
-            <Input id="pw-confirm" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} aria-invalid={!!error && error !== errText("wrongPassword")} />
+          <Field label={ta("confirmLabel")} htmlFor="pw-confirm" error={fieldError("pw-confirm")}>
+            <Input id="pw-confirm" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} {...describe("pw-confirm")} />
           </Field>
-          <ul aria-label={ta("rules.label")} className="grid gap-1.5 text-caption">
+          <ul id="pw-rules" aria-label={ta("rules.label")} className="grid gap-1.5 text-caption">
             {rules.map((r) => (
               <li key={r.label} className={cn("flex items-center gap-2", r.ok ? "text-safe-700" : "text-ink-muted")}>
                 <Check aria-hidden className={cn("size-3.5", r.ok ? "" : "opacity-30")} />
@@ -519,6 +530,11 @@ export function ChangePassword({ email, name }: { email: string; name: string })
               </li>
             ))}
           </ul>
+          {error && !errorField ? (
+            <p role="alert" className="text-caption text-risk-600">
+              {errText(error)}
+            </p>
+          ) : null}
           <Button type="submit" disabled={!current || !next || !confirm || pending}>
             {t("changePassword")}
           </Button>

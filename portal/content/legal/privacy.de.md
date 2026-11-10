@@ -21,7 +21,7 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 
 | Kategorie | Beispiele | Quelle |
 |---|---|---|
-| Konto- und Arbeitsdaten | Name, E-Mail-Adresse, Stellenbezeichnung, Abteilung, Führungskraft, Rolle, Sprache der Benutzeroberfläche, Kontostatus | Ihre Organisation (manuell, per Dateiimport, über Active Directory oder LDAP oder über Single Sign-on) |
+| Konto- und Arbeitsdaten | Name, E-Mail-Adresse, Stellenbezeichnung, Abteilung, Führungskraft, Rolle, Sprache der Benutzeroberfläche, Kontostatus | Ihre Organisation (manuell, per Dateiimport oder über Single Sign-on) |
 | Anmeldedaten | ausschließlich als Einweg-Hash gespeichertes Passwort, Einstellungen der Zwei-Faktor-Authentisierung und Backup-Codes, Anmeldesitzungen | Sie und der Dienst |
 | Profilbild (freiwillig) | ein Bild, das Sie hochladen oder mit der Kamera aufnehmen | Sie |
 | Schulungsdaten | begonnene und abgeschlossene Lektionen, Antworten in Simulationen, Ergebnisse, Punkte (XP), Lernserien, Abzeichen, Risikowert, Wiederholungsplan, aufgewendete Zeit | der Dienst, auf Grundlage Ihrer Nutzung |
@@ -64,7 +64,7 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 ## 6. Wer Ihre Daten sehen kann
 
 6.1. Innerhalb Ihrer Organisation: Administratoren sehen Ihre Daten entsprechend ihren Rollen. Eine Abteilungsleitung sieht zum Beispiel nur die ihr zugewiesenen Abteilungen. Andere Teilnehmende sehen Ihre Ergebnisse nicht.
-6.2. Von Ihrer Organisation angebundene Systeme: ihr Mailserver (die E-Mails des Dienstes werden über den Mailserver der Organisation versendet), ihr Identitätsanbieter oder Verzeichnisdienst (für die Anmeldung und die Synchronisierung der Mitarbeitenden) sowie SIEM- oder ITSM-Systeme, die Sicherheitsereignisse einschließlich Ihrer Benutzerkennung, Ihrer E-Mail-Adresse und Ihrer Abteilung empfangen können.
+6.2. Von Ihrer Organisation angebundene Systeme: ihr Mailserver (die E-Mails des Dienstes an die Nutzenden der Organisation werden über den Mailserver der Organisation versendet; E-Mails, die zu keiner Organisation gehören, etwa die Benachrichtigung des Vertriebsteams des Anbieters über eine Demo-Anfrage über die öffentliche Website (Ziffer 3.3), werden über den eigenen Mailserver des Anbieters versendet), ihr Identitätsanbieter (für die Anmeldung) sowie SIEM- oder ITSM-Systeme, die Sicherheitsereignisse einschließlich Ihrer Benutzerkennung, Ihrer E-Mail-Adresse und Ihrer Abteilung empfangen können.
 6.3. Unterauftragsverarbeiter des Anbieters (Cloud-Version):
 - UpCloud (UpCloud Ltd, Finnland, und ihre Tochtergesellschaften): Server, Dateispeicher und Backups in einem Rechenzentrum in London, Vereinigtes Königreich;
 - Anthropic (Anthropic PBC, USA): die Anthropic API für die Antworten von AI Sel, von KI übersetzte Untertitel und Lektionsentwürfe im Schulungsstudio gemäß Abschnitt 5;
@@ -87,7 +87,7 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 - Anmeldesitzung: endet nach 8 Stunden Inaktivität, sofern in der Installation der Organisation kein anderer Wert festgelegt ist.
 - Schritte der Zwei-Faktor-Authentisierung und des Single Sign-on: 10 Minuten. Download-Links: 5 Minuten.
 - Nutzungszähler von AI Sel: 24 Stunden.
-- Gespeicherte Fragen und Antworten von AI Sel (ohne Verknüpfung mit einem Konto): solange das Konto Ihrer Organisation im Dienst besteht.
+- Gespeicherte Fragen und Antworten von AI Sel (ohne Verknüpfung mit einem Konto): bis zu 12 Monate, danach werden sie automatisch gelöscht.
 - Demo-Anfragen über die öffentliche Website: 24 Monate, sofern sie nicht früher gelöscht werden (Ziffer 3.3).
 - Zustellprotokolle für E-Mails: 90 Tage nach Abschluss der Zustellung.
 - Berichte zur Verzeichnissynchronisierung: 180 Tage.
@@ -100,7 +100,7 @@ Welche personenbezogenen Daten auf der Plattform zu welchem Zweck und auf welche
 
 - alle Verbindungen sind verschlüsselt (HTTPS/TLS);
 - Passwörter werden ausschließlich als Einweg-Hashes gespeichert; die Passwörter angebundener Mailserver, Single-Sign-on-Schlüssel und Integrationsschlüssel werden verschlüsselt;
-- die Daten jeder Organisation sind auf Datenbankebene durch Sicherheit auf Zeilenebene (Row-Level Security) getrennt, sodass eine Organisation die Daten einer anderen Organisation nicht sehen kann;
+- die Daten jeder Organisation werden vom Dienst selbst getrennt: Jede Serveraktion und jede Route prüft, dass die angeforderten Daten zur Organisation der angemeldeten Person gehören, und eine automatisierte Testsuite prüft, dass eine Organisation die Daten einer anderen Organisation weder sehen noch ändern kann;
 - Zwei-Faktor-Authentisierung, die die Organisation für Administratoren verbindlich vorschreiben kann, Begrenzungen der Anzahl der Anmeldeversuche sowie Gerätelimits;
 - rollenbasierter Zugriff: Jeder Administrator sieht nur das, was seine Rolle und sein Zuständigkeitsbereich zulassen;
 - ein Audit-Protokoll der Anmeldungen und administrativen Handlungen, das nur um neue Einträge ergänzt werden kann;

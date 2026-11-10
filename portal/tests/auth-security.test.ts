@@ -5,7 +5,7 @@ import { migrate } from "drizzle-orm/pglite/migrator";
 import { and, eq } from "drizzle-orm";
 import { generateTOTP } from "@oslojs/otp";
 import { decodeBase32IgnorePadding } from "@oslojs/encoding";
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { DB } from "../src/server/db/client";
 import { defaultSettings } from "../src/lib/tenant-defaults";
@@ -297,6 +297,10 @@ describe("two-step setup", () => {
 });
 
 describe("time-based codes", () => {
+  // Only Date is frozen (mid-step), so the code, its check and the stored step share one 30-second step; PGlite's timers keep running.
+  beforeEach(() => void vi.useFakeTimers({ toFake: ["Date"], now: Math.floor(Date.now() / 30_000) * 30_000 + 15_000 }));
+  afterEach(() => void vi.useRealTimers());
+
   it("takes a code once: the same code is refused on reuse", async () => {
     const key = newTotpKey();
     const u = await person({ email: "replay@acme.test", totpEnabled: true, totpSecret: key.encrypted, totpRecovery: [] });
