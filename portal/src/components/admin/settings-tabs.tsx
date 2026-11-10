@@ -1613,6 +1613,8 @@ function ApiTokensCard({ tokens, canMint }: { tokens: ApiTokenView[]; canMint: b
   const revoke = (id: string) =>
     start(async () => {
       const res = await revokeApiTokenAction(id);
+      // The secret on show may belong to the token just revoked; it is never shown again anyway.
+      if (res.ok) setToken(null);
       toast(res.ok ? t("tokenRevoked") : tc("errors.generic"), res.ok ? "success" : "error");
     });
   return (
