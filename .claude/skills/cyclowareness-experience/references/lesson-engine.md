@@ -120,7 +120,7 @@ Inside `tutor`: `{ id, say, mood, gesture?, visual, highlight?, checkpoint?, sta
 - `visual.kind`: `illustration` (by id) | `artifact` (section 1.5) | `stat` (`value` + `label`, e.g. `"3-2-1"`, `"15+ characters"`; 9 in the library).
 - `highlight`: a `spot` id in the beat's artifact; that part lights up while the beat is spoken (screenshot `lesson-05-highlight-narration.jpg`: the urgency sentence on a red background while the mascot says "A deadline and a threat").
 - `checkpoint`: `{ prompt, options[{id,label,correct,feedback}] }`, a question asked right after the beat (11 beats in the library, e.g. `spot-the-phish#meet-the-phish/sender`).
-- `stage`: one beat in the library (`passwords-mfa/passphrases`, beat `phrase`, value `"back"`). Meaning not documented in the spec.
+- `stage`: one beat in the library (`passwords-mfa/passphrases`, beat `phrase`, value `"back"`). Meaning not documented in the spec; the schema accepts only `"back"`.
 - Illustration ids (29): `shield, eye, lock, alarm, phone-lock, handshake, browser, badge-id, key, mfa-phone, inbox, folder, social, mask, download, deepfake, hook, cloud, usb, desk, update, wifi, ceo, ransomware, travel, certificate, vpn, flag, qr`. The spec says they were two-tone (brand + accent) SVG scenes on a circular background and "must be redrawn".
 
 ### 1.4 Rich text spans and spots
@@ -264,12 +264,13 @@ export type Visual =
   | { kind: "artifact"; artifact: Artifact }
   | { kind: "stat"; value: string; label: string };
 
-export type Beat = { id: string; say: string; mood: Mood; gesture?: Gesture; visual?: Visual; highlight?: string; checkpoint?: unknown; stage?: unknown };
+export type Checkpoint = z.infer<typeof checkpointSchema>;   // { prompt, options[{id,label,correct,feedback}] }, from validate.ts
+export type Beat = { id: string; say: string; mood: Mood; gesture?: Gesture; visual?: Visual; highlight?: string; checkpoint?: Checkpoint; stage?: "back" };
 export type Outcome = "safe" | "risky" | "compromised";
 export type SimAction = { id: string; label: string; kind: string; outcome: Outcome; feedback: string; next?: string };
 export type SimStep = { id: string; label?: string; say?: string; spoken?: string; artifact: Artifact; actions: SimAction[] };
 export type ScenarioChoice = { label: string; next?: string; outcome?: Outcome; feedback: string };
-export type ScenarioNode = { id: string; text: string; speaker?: string; voice?: string; channel?: string; character?: string; spoken?: string; choices?: ScenarioChoice[]; outcome?: Outcome };
+export type ScenarioNode = { id: string; text: string; speaker?: string; voice?: string; channel?: string; character?: string; spoken?: string; manner?: string; visual?: Visual; choices?: ScenarioChoice[]; outcome?: Outcome };
 ```
 
 The scene union (same file):
@@ -290,15 +291,16 @@ export type Scene =
   | { type: "password"; id: string; prompt: string; targetScore: number; tips: string[] }
   | { type: "recap"; id: string; points: string[]; mood?: Mood };
 export type SceneType = Scene["type"];
-export type LessonFile = { id: string; title: string; minutes: number; scenes: Scene[] };
+export type LessonFile = { formatVersion: 1; id: string; title: string; minutes: number; scenes: Scene[] };
 export type Brand = { id: string; name: string; kind: string; color: string; glyph: string; monogram?: string; fake?: boolean; imitates?: string };
 export type ModuleFile = { slug: string; category: string; audience: string[]; title: string; subtitle: string; minutes: number; lessonCount: number; xp: number; difficulty: "Easy" | "Medium" | "Hard"; lessons: { id: string; title: string; minutes: number }[] };
 ```
 
 Helpers in the same file: `plain(rich)` flattens rich text to a string (paragraphs joined by `\n`);
-`paragraphs(rich)` normalises to `Span[][]`. Note `Beat.checkpoint` and `Beat.stage` are typed `unknown`;
-`TutorScene` casts `checkpoint` to `{ prompt, options[] }`. `ScenarioNode` has no `visual` field in the
-type although 22 library nodes carry one (passes through validation, ignored by the renderer).
+`paragraphs(rich)` normalises to `Span[][]`. `formatVersion: 1` is required and is the FIRST key of every
+lesson file (English and translations; `scripts/add-format-version.ts` adds it, idempotent); a translation
+or Studio writer must write it too. `ScenarioNode.manner` and `ScenarioNode.visual` are in the type and
+the schema but not read by the renderer yet.
 
 ### 2.2 Files, naming, locales
 
@@ -374,13 +376,17 @@ keep the page's `lang`.
 
 ### 2.3 Validation
 
-`src/lib/content/validate.ts`: a zod `lessonFileSchema` (`id`, `title`, `minutes` positive int,
-`scenes` min 1) with a `discriminatedUnion("type", ...)` per scene, and `lessonIntegrityErrors(lesson)`
+`src/lib/content/validate.ts`: a zod `lessonFileSchema` (`formatVersion: z.literal(1)`, `id`, `title`,
+`minutes` positive int, `scenes` min 1) with a `discriminatedUnion("type", ...)` per scene, and `lessonIntegrityErrors(lesson)`
 for cross references. Rules the schema enforces:
 
-- artifact `kind` ∈ `email, chat, sms, dialog, login, url, notification, permission, call, file, qr, wifi` (passthrough for the rest of the object);
+- artifact `kind` ∈ `email, chat, sms, dialog, login, url, notification, permission, call, file, qr, wifi` (passthrough for the rest of the object: the only passthrough left);
 - `visual` ∈ illustration `{id}` | artifact | stat `{value,label}`;
-- `tutor.beats` min 1, each with `say` non-empty, `mood` string, optional `gesture`, `visual`, `highlight` (passthrough keeps `checkpoint`/`stage`);
+- `tutor.beats` min 1, each with `say` non-empty, `mood` string, optional `gesture`, `visual`, `highlight`, `checkpoint` (`checkpointSchema`: `prompt`, options min 2) and `stage` (`"back"` only);
+- every scene schema except artifacts drops unknown keys, so a new key must be added to the schema (and
+  `types.ts`) or it is lost on import; `tests/content.test.ts` checks that parsing a library file returns
+  the file unchanged (one known gap: `question.multi`/`question.visual` in choice scenes are dropped, the
+  player reads `multi`/`visual` on the scene);
 - `simulation.environment` enum, `steps` min 1, each `actions` min 1 with `outcome` enum;
 - `choice.question.options` min 2; `hotspot.spots` min 1 and `minToFind` int ≥ 1; `swipe.cards` min 1; `match.pairs` min 2; `order.items` min 2; `scenario.nodes` min 1; `password.targetScore` 0..4; `recap.points` min 1.
 
