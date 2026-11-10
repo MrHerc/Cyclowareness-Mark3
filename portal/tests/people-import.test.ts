@@ -247,6 +247,8 @@ describe("Existence oracle and limits", () => {
     for (let i = 0; i < 20; i++) await rateLimit("people-import:00000000-0000-4000-8000-000000000001", 1000, 60 * 60_000);
     expect(await importPeopleAction("name,email\nX,x@acme.test", false)).toMatchObject({ ok: false, error: "rateLimited" });
     expect(await importPeopleAction("name,email\nX,x@acme.test", true)).toMatchObject({ ok: true, imported: 1 });
+    // A commit with problems would answer the same lookups as a check, unlimited: it is refused once the budget is used.
+    expect(await importPeopleAction("name,email,role\nX,x@acme.test,zzz", true)).toEqual({ ok: false, rows: 0, problems: [], newDepartments: [], error: "rateLimited" });
     for (let i = 0; i < 60; i++) await rateLimit("people-add:00000000-0000-4000-8000-000000000001", 1000, 60 * 60_000);
     expect(await addPersonAction(undefined, add({ email: "y@acme.test" }))).toEqual({ error: "rateLimited" });
     const [ours] = await db.select({ id: t.users.id }).from(t.users).where(eq(t.users.email, "ours@acme.test"));
