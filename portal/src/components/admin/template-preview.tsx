@@ -13,7 +13,7 @@ export function TemplatePreview({ tpl, locale, compact = false }: { tpl: Campaig
       <div className="rounded-xl bg-sunken p-3">
         <p className="mb-1.5 flex items-center gap-1.5 text-tab font-semibold text-ink-muted">
           <MessageSquare className="size-3.5" />
-          {tpl.sender.address}
+          {templateText(tpl.sender.name, locale)}
         </p>
         <p className={cn("rounded-2xl rounded-es-sm bg-surface px-3 py-2 text-caption shadow-xs", compact && "line-clamp-3")}>
           {body} <span className="text-brand-600 underline">sk-kargo.info/a7K</span>

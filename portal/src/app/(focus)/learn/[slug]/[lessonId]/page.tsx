@@ -59,7 +59,7 @@ export default async function LessonPage({ params }: PageProps<"/learn/[slug]/[l
       clips={clips}
       completedBefore={lesson.completed}
       next={next ? { key: next.key, title: next.title } : null}
-      brands={brandsFor(scenes)}
+      brands={brandsFor(scenes, fallback.locale)}
       timeLimitSeconds={timeLimitSeconds}
       soundOn={v.user.soundOn}
       motion={v.user.motion}

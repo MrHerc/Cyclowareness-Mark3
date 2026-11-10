@@ -4,13 +4,28 @@
  *   npx tsx scripts/check-lesson-locales.ts <file.az.json> ...    only these files
  *   npx tsx scripts/check-lesson-locales.ts --coverage           also: every English lesson has a translation in every interface locale
  * Each file must pass the lesson schema, the integrity rules and the locale parity rules
- * (src/lib/content/locale-parity.ts). Exit code 1 when anything fails (or, with --coverage, is missing).
+ * (src/lib/content/locale-parity.ts); a language with a ready market pack (content/market/<lang>.json) must
+ * also hold no token of the Azerbaijani world (src/lib/content/market.ts, scripts/apply-market.ts).
+ * Exit code 1 when anything fails (or, with --coverage, is missing).
  */
 import fs from "node:fs";
 import path from "node:path";
 import { lessonFileSchema, lessonIntegrityErrors } from "../src/lib/content/validate";
 import { localeParityErrors } from "../src/lib/content/locale-parity";
 import { LOCALES } from "../src/i18n/config";
+import { azWorldSchema, marketPackSchema, marketTokenErrors } from "../src/lib/content/market";
+
+// A language with a ready market pack (content/market/<lang>.json) must hold no token of the Azerbaijani world.
+const MARKET = path.join(process.cwd(), "content", "market");
+const world = azWorldSchema.parse(JSON.parse(fs.readFileSync(path.join(MARKET, "az-world.json"), "utf8")));
+const marketLocales = new Set(
+  fs
+    .readdirSync(MARKET)
+    .filter((f) => /^[a-z]{2}\.json$/.test(f))
+    .map((f) => marketPackSchema.parse(JSON.parse(fs.readFileSync(path.join(MARKET, f), "utf8"))))
+    .filter((p) => p.status === "ready")
+    .map((p) => p.lang),
+);
 
 const TRANSLATION = /\.(?!en\.)[a-z]{2}\.json$/;
 
@@ -46,6 +61,7 @@ for (const file of files) {
     else errors.push(...lessonIntegrityErrors(parsed.data).map((e) => `integrity: ${e}`));
     if (!fs.existsSync(enFile)) errors.push(`no English original ${path.relative(process.cwd(), enFile)}`);
     else errors.push(...localeParityErrors(JSON.parse(fs.readFileSync(enFile, "utf8")), doc));
+    if (marketLocales.has(file.slice(-7, -5))) errors.push(...marketTokenErrors(doc, world).map((e) => `market ${e}`));
   }
   if (errors.length) {
     failed++;

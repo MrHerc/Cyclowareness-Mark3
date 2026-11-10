@@ -38,7 +38,7 @@ export async function scormData(db: DB, tenantId: string, moduleId: string, loca
     locale,
     module: { slug: mod.slug, title: pick(mod.title, locale), topic: CATEGORY_TOPIC[mod.category as Category] },
     lessons: out,
-    brands: brandsFor(out.map((l) => l.scenes)),
+    brands: brandsFor(out.map((l) => l.scenes), locale),
     // Only what the player reads: the rest of the learner app's strings would weigh as much as the lessons.
     messages: { common, player, learner: { profile: learner.profile, attest: learner.attest, problem: learner.problem } },
   };
