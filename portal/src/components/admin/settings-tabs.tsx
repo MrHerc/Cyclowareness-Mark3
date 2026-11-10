@@ -32,6 +32,7 @@ import {
   Zap,
 } from "lucide-react";
 import {
+  createApiTokenAction,
   domainProofRecordAction,
   grantSupportAccessAction,
   lookupWatermarkAction,
@@ -50,13 +51,14 @@ import {
   saveRetentionAction,
   saveTimeZoneAction,
   resendFailedMailAction,
+  revokeApiTokenAction,
   sendTestEventAction,
   setLogoAction,
   testEmailAction,
   verifyDomainAction,
   verifySimulationDomainAction,
 } from "@/server/actions/settings";
-import type { TemplateKind, TenantSettings } from "@/server/db/schema";
+import { API_TOKEN_PERMISSIONS, MAX_API_TOKENS, type ApiTokenPermission, type TemplateKind, type TenantSettings } from "@/server/db/schema";
 import { DESTINATION_PORTS, SYSLOG_DEFAULT_PORT } from "@/lib/destination-ports";
 import { Card, CardBody, CardHeader, Divider } from "@/components/ui/card";
 import { Button, ButtonAnchor, TextButton, textButtonClass } from "@/components/ui/button";
@@ -1579,6 +1581,94 @@ export function SecurityTab({ allowedUntil }: { allowedUntil: string | null }) {
 
 /* ───────── integrations ───────── */
 
+/** Reporting-API tokens (docs/API.md): minted here, the secret shown once, revocable. */
+function ApiTokensCard({ tokens }: { tokens: ApiTokenView[] }) {
+  const t = useTranslations("settings.integrations");
+  const tc = useTranslations("common");
+  const [name, setName] = useState("");
+  const [permissions, setPermissions] = useState<ApiTokenPermission[]>(["reports.read"]);
+  const [token, setToken] = useState<string | null>(null);
+  const [busy, start] = useTransition();
+  const full = tokens.length >= MAX_API_TOKENS;
+  const permKey = (p: ApiTokenPermission) => p.replace(".", "_") as "reports_read";
+  const toggle = (p: ApiTokenPermission) => setPermissions(permissions.includes(p) ? permissions.filter((x) => x !== p) : [...permissions, p]);
+  const copy = (v: string) => navigator.clipboard.writeText(v).then(() => toast(tc("copied")));
+  const create = () =>
+    start(async () => {
+      const res = await createApiTokenAction({ name: name.trim(), permissions });
+      if (!res.ok) {
+        toast(res.error === "limit" ? t("tokenLimit", { max: MAX_API_TOKENS }) : tc("errors.invalid"), "error");
+        if (!res.error) markInvalid("k-name");
+        return;
+      }
+      setToken(res.token ?? null);
+      setName("");
+      toast(t("tokenCreated"), "success");
+    });
+  const revoke = (id: string) =>
+    start(async () => {
+      const res = await revokeApiTokenAction(id);
+      toast(res.ok ? t("tokenRevoked") : tc("errors.generic"), res.ok ? "success" : "error");
+    });
+  return (
+    <Card>
+      <CardHeader icon={<KeyRound />} title={t("apiTokens")} description={t("apiTokensBody", { max: MAX_API_TOKENS })} />
+      <CardBody className="grid gap-4">
+        {tokens.length ? (
+          <ul className="divide-y divide-line">
+            {tokens.map((k) => (
+              <li key={k.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-caption">
+                <span className="font-semibold text-ink">{k.name}</span>
+                <span className="flex flex-wrap gap-1">
+                  {k.permissions.map((p) => (
+                    <Pill key={p} tone="neutral">
+                      {t(`tokenPermissions.${permKey(p)}`)}
+                    </Pill>
+                  ))}
+                </span>
+                <span className="text-ink-subtle">
+                  {t("tokenLastUsed")}: {k.lastUsedAt ? <RelativeTime date={k.lastUsedAt} /> : tc("time.never")}
+                </span>
+                <Button size="sm" variant="secondary" icon={<Trash2 />} className="ms-auto" disabled={busy} onClick={() => revoke(k.id)} aria-label={`${t("revokeToken")}: ${k.name}`}>
+                  {t("revokeToken")}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-caption text-ink-muted">{t("tokensEmpty")}</p>
+        )}
+        {token ? (
+          <Notice tone="warn" title={t("tokenShown")}>
+            <div className="mt-2 flex gap-2">
+              <Input value={token} readOnly dir="ltr" aria-label={t("apiTokens")} className="font-mono text-caption" />
+              <Button variant="secondary" size="icon" aria-label={tc("copy")} onClick={() => copy(token)}>
+                <Copy />
+              </Button>
+            </div>
+          </Notice>
+        ) : null}
+        <Divider />
+        <Field label={t("tokenName")} htmlFor="k-name" hint={t("tokenNameHint")}>
+          <Input id="k-name" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} />
+        </Field>
+        <fieldset className="grid gap-2 sm:grid-cols-3">
+          <legend className="mb-2 text-body-sm font-medium text-ink">{t("tokenReads")}</legend>
+          {API_TOKEN_PERMISSIONS.map((p) => (
+            <Checkbox key={p} label={t(`tokenPermissions.${permKey(p)}`)} description={<code className="font-mono text-tab">{p}</code>} checked={permissions.includes(p)} onChange={() => toggle(p)} />
+          ))}
+        </fieldset>
+        {full ? <Notice tone="info">{t("tokenLimit", { max: MAX_API_TOKENS })}</Notice> : null}
+        <div className="flex justify-end">
+          <Button disabled={busy || full || !name.trim() || !permissions.length} onClick={create}>
+            {t("createToken")}
+          </Button>
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
 const RECEIVER_HEADERS = [
   ["X-Cyclowareness-Signature", "hdrSignature"],
   ["X-Cyclowareness-Signature-Timestamped", "hdrTimestamped"],
@@ -1587,7 +1677,17 @@ const RECEIVER_HEADERS = [
   ["X-Cyclowareness-Delivery", "hdrDelivery"],
 ] as const;
 
-export function IntegrationsTab({ integrations, deliveries }: { integrations: IntegrationsView; deliveries: { id: string; event: string; target: string; status: string; responseCode: number | null; createdAt: string }[] }) {
+export type ApiTokenView = { id: string; name: string; permissions: ApiTokenPermission[]; createdAt: string; lastUsedAt: string | null };
+
+export function IntegrationsTab({
+  integrations,
+  deliveries,
+  apiTokens,
+}: {
+  integrations: IntegrationsView;
+  deliveries: { id: string; event: string; target: string; status: string; responseCode: number | null; createdAt: string }[];
+  apiTokens: ApiTokenView[];
+}) {
   const t = useTranslations("settings.integrations");
   const tc = useTranslations("common");
   const { pending, save } = useSave();
@@ -1721,6 +1821,7 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: In
             )}
           </CardBody>
         </Card>
+        <ApiTokensCard tokens={apiTokens} />
       </div>
       <aside className="xl:sticky xl:top-24 xl:self-start">
         <Card>

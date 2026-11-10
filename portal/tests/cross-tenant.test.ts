@@ -155,6 +155,7 @@ async function org() {
   const [mail] = await db.insert(t.outbox).values({ tenantId, to: learnerUser.email, subject: "Welcome", html: "<p>Welcome</p>", text: "Welcome", kind: "welcome", status: "failed" }).returning();
   const watermark = `AAAA-${String(n).padStart(4, "0")}`;
   await db.insert(t.watermarkCodes).values({ code: watermark, tenantId, userId: learnerUser.id });
+  const [apiToken] = await db.insert(t.apiTokens).values({ id: String(n).padStart(64, "0"), tenantId, name: "HR sync", permissions: ["reports.read"], createdBy: adminUser.id }).returning();
   await db.insert(t.moduleProgress).values({ userId: learnerUser.id, moduleId: mod.id, status: "awaiting_attestation", percent: 100 });
   await db.insert(t.notifications).values({ tenantId, userId: learnerUser.id, kind: "assignment", title: "Module assigned" });
   return {
@@ -185,6 +186,7 @@ async function org() {
     sandbox,
     mail,
     watermark,
+    apiToken,
   };
 }
 
@@ -381,10 +383,12 @@ const ROWS: Record<string, Row> = {
   "server/actions/security.analyzeAction": { na: SELF },
   "server/actions/security.escalateAnalysisAction": { run: (_, b) => security.escalateAnalysisAction(b.sandbox.id) },
   "server/actions/security.reportThreatAction": { na: SELF },
+  "server/actions/settings.createApiTokenAction": { lower: () => settings.createApiTokenAction({ name: "HR sync", permissions: ["reports.read"] }) },
   "server/actions/settings.domainProofRecordAction": { lower: () => settings.domainProofRecordAction() },
   "server/actions/settings.grantSupportAccessAction": { lower: () => settings.grantSupportAccessAction() },
   "server/actions/settings.lookupWatermarkAction": { run: (_, b) => settings.lookupWatermarkAction(b.watermark) },
   "server/actions/settings.resendFailedMailAction": { run: (_, b) => settings.resendFailedMailAction(b.mail.id) },
+  "server/actions/settings.revokeApiTokenAction": { run: (_, b) => settings.revokeApiTokenAction(b.apiToken.id) },
   "server/actions/settings.revokeSupportAccessAction": { lower: () => settings.revokeSupportAccessAction() },
   "server/actions/settings.rotateWebhookSecretAction": { lower: () => settings.rotateWebhookSecretAction() },
   "server/actions/settings.saveAttestationAction": { lower: () => settings.saveAttestationAction("en", "I confirm that I completed this module.") },

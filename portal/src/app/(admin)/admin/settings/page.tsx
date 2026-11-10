@@ -1,4 +1,4 @@
-import { count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Award, Bell, Fingerprint, GraduationCap, Languages, LifeBuoy, Mail, Palette, PenLine, ShieldCheck, Webhook, type LucideIcon } from "lucide-react";
 import { requirePermission } from "@/server/auth/viewer";
@@ -149,7 +149,18 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
         .where(eq(t.webhookDeliveries.tenantId, v.tenant.id))
         .orderBy(desc(t.webhookDeliveries.createdAt))
         .limit(20);
-      body = <IntegrationsTab integrations={integrationsView(s.integrations)} deliveries={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))} />;
+      const tokens = await db()
+        .select({ id: t.apiTokens.id, name: t.apiTokens.name, permissions: t.apiTokens.permissions, createdAt: t.apiTokens.createdAt, lastUsedAt: t.apiTokens.lastUsedAt })
+        .from(t.apiTokens)
+        .where(and(eq(t.apiTokens.tenantId, v.tenant.id), isNull(t.apiTokens.revokedAt)))
+        .orderBy(desc(t.apiTokens.createdAt));
+      body = (
+        <IntegrationsTab
+          integrations={integrationsView(s.integrations)}
+          deliveries={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))}
+          apiTokens={tokens.map((k) => ({ ...k, createdAt: k.createdAt.toISOString(), lastUsedAt: k.lastUsedAt?.toISOString() ?? null }))}
+        />
+      );
       break;
     }
   }

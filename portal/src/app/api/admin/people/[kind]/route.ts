@@ -1,8 +1,7 @@
 import { and, eq, ne } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db, t } from "@/server/db";
-import { allowed, getViewer, twoFactorGap } from "@/server/auth/viewer";
-import { apiViewer, deniedResponse, rscProbe } from "@/server/auth/api";
+import { apiCaller, apiViewer } from "@/server/auth/api";
 import { issueAccountLink } from "@/server/auth/links";
 import { listPeople } from "@/server/queries/admin";
 import { audit } from "@/server/services/audit";
@@ -27,17 +26,13 @@ const TEMPLATE_SAMPLE: Record<Locale, string[]> = {
 
 /** People list export and bulk invite links, as CSV. */
 export async function GET(request: Request, { params }: RouteContext<"/api/admin/people/[kind]">) {
-  const probe = rscProbe(request);
-  if (probe) return probe;
   const { kind } = await params;
-  const v = await getViewer();
-  if (!v) return deniedResponse(request, 401);
-  if (twoFactorGap(v)) return deniedResponse(request, 403, "/profile?section=security&required=1");
+  const v = kind === "export" ? await apiViewer("people.read", request) : await apiCaller(request);
+  if (v instanceof Response) return v;
   const tz = v.tenant.settings.timeZone;
   const date = todayIn(tz);
 
   if (kind === "export") {
-    if (!allowed(v, "people.read")) return deniedResponse(request, 403);
     if (!(await rateLimit(`people-export:${v.user.id}`, 20, 60 * 60_000)).ok) return new Response("Too many requests", { status: 429 });
     const tc = await getTranslations("common");
     const people = await listPeople(v);
@@ -46,7 +41,7 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
       people.map((p) => [p.name, p.email, p.departmentName ?? "", p.jobTitle ?? "", tc(`roles.${p.role}`), tc(`userStatus.${p.status}`), p.riskScore, p.xp, p.lastActiveAt ?? null, p.createdAt]),
       tz,
     );
-    await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "people.exported", meta: { count: people.length } });
+    await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "people.exported", meta: { count: people.length, ...(v.apiToken ? { apiToken: v.apiToken.id } : {}) } });
     return new Response(csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="people-${date}.csv"`, "cache-control": "no-store" } });
   }
 

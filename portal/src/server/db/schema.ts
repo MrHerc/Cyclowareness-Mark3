@@ -237,6 +237,29 @@ export const sessions = pgTable(
   (t) => [index("sessions_user_idx").on(t.userId), index("sessions_expires_idx").on(t.expiresAt)],
 );
 
+/** What a reporting-API token may read (docs/API.md "Reporting API"); never a write. */
+export const API_TOKEN_PERMISSIONS = ["reports.read", "people.read", "audit.read"] as const;
+export type ApiTokenPermission = (typeof API_TOKEN_PERMISSIONS)[number];
+/** Active tokens an organisation may hold at once. */
+export const MAX_API_TOKENS = 20;
+
+export const apiTokens = pgTable(
+  "api_tokens",
+  {
+    id: text("id").primaryKey(), // sha256(token), hex
+    tenantId: tenantRef(),
+    name: text("name").notNull(),
+    permissions: jsonb("permissions").$type<ApiTokenPermission[]>().notNull(),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: createdAt(),
+    lastUsedAt: ts("last_used_at"),
+    revokedAt: ts("revoked_at"),
+  },
+  (t) => [index("api_tokens_tenant_idx").on(t.tenantId)],
+);
+
 export const AUTH_TOKEN_KINDS = ["invite", "reset", "phone_otp"] as const;
 
 export const authTokens = pgTable(
