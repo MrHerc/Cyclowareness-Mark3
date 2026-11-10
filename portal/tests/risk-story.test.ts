@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
+import { eq, sql } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import * as t from "../src/server/db/schema";
 import type { Viewer } from "../src/server/auth/viewer";
@@ -23,6 +24,7 @@ vi.mock("next-intl/server", () => ({
 }));
 
 const { riskStory, storySentences, STORY_MIN_DAYS } = await import("../src/server/queries/risk-story");
+const { overviewData } = await import("../src/server/queries/admin");
 const { buildRiskStory } = await import("../src/server/reports/build");
 
 beforeAll(ready, DB_SETUP_TIMEOUT);
@@ -95,8 +97,14 @@ describe("riskStory", () => {
 
     const s = await riskStory(as(o.tenant.id, o.admin), "en");
     if (s.empty) throw new Error("expected a story");
-    // Finance and IT fall from (score + 7) to score: averages 52 → 45 over the eight snapshot days.
-    expect(s.trend).toMatchObject({ from: 52, to: 45 });
+    // Finance and IT score 7 more on the first of the eight snapshot days; Tiny's 95 and the administrator's 0 have no
+    // snapshot and count with today's score at both ends: 407 / 8 = 51 then 365 / 8 = 46, the chart header's number.
+    expect(s.trend).toMatchObject({ from: 51, to: 46 });
+    // Today's organisation snapshot was written before a recompute: the chart's last point still shows the header's number.
+    await db.insert(t.riskSnapshots).values({ tenantId: o.tenant.id, day: dayPlus(0, tz), avgRisk: 47, completion: 0, reportRate: 0, clickRate: 0 });
+    const live = await overviewData(as(o.tenant.id, o.admin), "en", null);
+    expect(live.kpis.avgRisk).toBe(46);
+    expect(live.charts.at(-1)).toMatchObject({ avgRisk: 46 });
     expect(s.weakest).toEqual({ id: o.finance.id, name: "Finance", risk: 70, category: "email", inCategory: 2, module: { id: email.id, title: "Phishing basics" } });
     expect(s.campaign).toEqual({ name: "Parcel lure", from: 50, to: 25 });
     expect(s.training).toEqual({ title: "Phishing basics", people: 2 });
@@ -105,7 +113,7 @@ describe("riskStory", () => {
     const sentences = await storySentences(s, "en");
     expect(sentences).toHaveLength(6);
     expect(sentences[0]).toBe("Finance is the most exposed department, with an average risk score of 70; its weakest area is “Email”, with 2 open risks.");
-    expect(sentences[1]).toMatch(/^Since .+, the average risk score has fallen by 7 points to 45\.$/);
+    expect(sentences[1]).toMatch(/^Since .+, the average risk score has fallen by 5 points to 46\.$/);
     expect(sentences[5]).toBe("Recommended next step: assign “Phishing basics” to Finance.");
 
     // A department filter narrows the story to that department's people.
@@ -124,6 +132,15 @@ describe("riskStory", () => {
     expect(await riskStory(as(o.tenant.id, head), "en", o.finance.id)).toEqual({ empty: true, days: 0 });
     const foreign = await addDepartment(db, (await addTenant(db)).id, "Elsewhere");
     expect(await riskStory(as(o.tenant.id, o.admin), "en", foreign.id)).toEqual({ empty: true, days: 0 });
+    // The overview reads the same narrowed scope: a foreign filter is nobody, not the whole organisation.
+    const overview = await overviewData(as(o.tenant.id, o.admin), "en", foreign.id);
+    expect(overview.kpis.learners).toBe(0);
+    expect(overview.deptRows).toEqual([]);
+
+    // A draft module is never recommended, however many open risks point at it.
+    await db.update(t.modules).set({ status: "draft" }).where(eq(t.modules.id, email.id));
+    expect(await riskStory(as(o.tenant.id, o.admin), "en")).toMatchObject({ weakest: { name: "Finance", category: "email", module: null } });
+    await db.update(t.modules).set({ status: "published" }).where(eq(t.modules.id, email.id));
 
     // The next step skips a module already assigned to that department; another department's assignment does not count.
     const assign = (departmentId: string) => db.insert(t.assignments).values({ tenantId: o.tenant.id, moduleId: email.id, scope: "department", departmentId });
@@ -132,6 +149,22 @@ describe("riskStory", () => {
     await assign(o.finance.id);
     expect(await riskStory(as(o.tenant.id, o.admin), "en")).toMatchObject({ weakest: { name: "Finance", category: "email", module: null } });
   });
+});
+
+describe("riskStory at scale", () => {
+  it("reads a scope larger than PostgreSQL's 65 535 parameters per statement", async () => {
+    const tenant = await addTenant(db);
+    const dept = await addDepartment(db, tenant.id, "Operations");
+    const admin = await addUser(db, tenant.id, { role: "tenant_admin", riskScore: 0 });
+    await db.execute(
+      sql`insert into users (tenant_id, email, name, locale, department_id, risk_score) select ${tenant.id}, 'bulk' || g || '@test.example', 'Bulk ' || g, 'en', ${dept.id}, 40 from generate_series(1, 70000) g`,
+    );
+    await snapshots(tenant.id, [admin], STORY_MIN_DAYS);
+    const s = await riskStory(as(tenant.id, admin), "en");
+    if (s.empty) throw new Error("expected a story");
+    expect(s.certified.total).toBe(70_001);
+    expect(s.weakest).toMatchObject({ name: "Operations", risk: 40 });
+  }, 120_000);
 });
 
 describe("storySentences", () => {
@@ -146,6 +179,20 @@ describe("storySentences", () => {
   };
   const sparse = { ...full, trend: { since, from: 40, to: 41 }, weakest: { ...full.weakest, category: null, inCategory: 0, module: null }, campaign: null, training: null };
   const steady = { ...sparse, trend: { since, from: 41, to: 41 }, weakest: null };
+
+  it("agrees the German verb with one person", async () => {
+    const [one, many] = await Promise.all([storySentences({ ...full, training: { title: "CEO fraud", people: 1 } }, "de"), storySentences(full, "de")]);
+    expect(one[3]).toMatch(/ hat sie 1 Person abgeschlossen\.$/);
+    expect(many[3]).toMatch(/ haben sie 21 Personen abgeschlossen\.$/);
+  });
+
+  it("isolates the organisation's names inside right-to-left sentences only", async () => {
+    const [ar, en] = await Promise.all([storySentences(full, "ar"), storySentences(full, "en")]);
+    expect(ar[0]).toContain("⁨Finance⁩");
+    expect(ar[2]).toContain("⁨Parcel lure⁩");
+    expect(ar[5]).toContain("⁨CEO fraud⁩");
+    expect(en.join(" ")).not.toMatch(/[⁨⁩]/);
+  });
 
   for (const locale of LOCALES) {
     it(`renders every sentence and tile in ${locale} without a missing argument`, async () => {

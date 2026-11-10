@@ -10,9 +10,11 @@ import { rateLimit } from "../rate-limit";
 export type StepUpError = "wrongPassword" | "rateLimited";
 
 /**
- * Step-up before account-takeover tooling (2FA reset, reset links, role changes): the actor types
- * their own password again, 10 tries per actor per 15 minutes (per actor, so one administrator
- * cannot lock the others out), and every refusal is in the audit log.
+ * Step-up before actions that could take over an account: 2FA reset, password reset links (including the
+ * operator's support access link), role, phone and SSO-link changes, and the identity settings. The actor
+ * types their own password again. Every attempt counts, successful ones too: 10 per actor per 15 minutes,
+ * checked before hashing (per actor, so one administrator cannot lock the others out). Every refusal is in
+ * the audit log.
  */
 export async function stepUp(v: Viewer, password: unknown, action: string, targetId?: string): Promise<StepUpError | null> {
   const limited = !(await rateLimit(`step-up:${v.user.id}`, 10, 15 * 60_000)).ok;

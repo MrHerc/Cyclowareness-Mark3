@@ -35,6 +35,7 @@ export function TeachableMoment({
   qr: boolean;
 }) {
   const t = useTranslations("site.teach");
+  const tc = useTranslations("common");
   const [stage, setStage] = useState<"beacon" | "login" | "teach">(harvest && !alreadySubmitted ? "beacon" : "teach");
   const [submitted, setSubmitted] = useState(alreadySubmitted);
   const { run: submit, pending } = useAction(simulationSubmitAction, {
@@ -52,13 +53,17 @@ export function TeachableMoment({
 
   if (stage === "beacon") {
     return (
-      <div aria-busy="true" className="min-h-dvh bg-[#f3f2f1]">
-        {/* Without JavaScript the beacon never runs: the lesson is still one click away (the click itself is not counted). */}
-        <noscript>
-          <p className="p-6 text-body text-[#1b1b1b]">
-            {t("title")} <Link href={`/learn/${moduleSlug}`} className="underline">{t("learnCta")}</Link>
-          </p>
-        </noscript>
+      <div className="min-h-dvh bg-[#f3f2f1]">
+        {/* Outside the busy block: screen readers hold back announcements inside an aria-busy region. */}
+        <p role="status" className="sr-only">{tc("loading")}</p>
+        <div aria-busy="true">
+          {/* Without JavaScript the beacon never runs: the lesson is still one click away (the click itself is not counted). */}
+          <noscript>
+            <p className="p-6 text-body text-[#1b1b1b]">
+              {t("title")} <Link href={`/learn/${moduleSlug}`} className="underline">{t("learnCta")}</Link>
+            </p>
+          </noscript>
+        </div>
       </div>
     );
   }

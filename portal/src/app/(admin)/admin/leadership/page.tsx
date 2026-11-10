@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
-import { and, desc, eq, gte, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { ArrowDownRight, ArrowUpRight, Printer, Sparkles } from "lucide-react";
 import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { overviewData } from "@/server/queries/admin";
 import { peopleById } from "@/server/queries/secops";
+import { formOptions } from "@/server/queries/secops-options";
+import { pick } from "@/i18n/config";
 import { riskStory, storySentences } from "@/server/queries/risk-story";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
@@ -63,6 +65,10 @@ export default async function LeadershipPage() {
   const people = await peopleById(tid, risks.map((r) => r.userId));
   const sentences = await storySentences(story, locale);
   const recommended = !story.empty && story.weakest?.module && allowed(v, "assignments.write") ? { module: story.weakest.module, department: story.weakest } : null;
+  // The dialog lets the reader change the recommendation, so it gets the same lists as the assignments page.
+  const [options, paths] = recommended
+    ? await Promise.all([formOptions(tid, locale), db().select().from(t.learningPaths).where(or(isNull(t.learningPaths.tenantId), eq(t.learningPaths.tenantId, tid)))])
+    : [null, []];
   const storyTiles = story.empty
     ? []
     : [
@@ -93,13 +99,13 @@ export default async function LeadershipPage() {
               <p key={i}>{s}</p>
             ))}
           </div>
-          {recommended ? (
+          {recommended && options ? (
             <div className="print:hidden">
               <AssignDialog
-                modules={[{ id: recommended.module.id, title: recommended.module.title, meta: "" }]}
-                paths={[]}
-                departments={[{ id: recommended.department.id, name: recommended.department.name }]}
-                people={[]}
+                modules={options.modules.map((m) => ({ id: m.id, title: m.label, meta: "" }))}
+                paths={paths.map((p) => ({ id: p.id, title: pick(p.title, locale), meta: tc("units.modules", { count: p.moduleSlugs.length }) }))}
+                departments={options.departments.map((x) => ({ id: x.id, name: x.label }))}
+                people={options.people.map((p) => ({ id: p.id, name: p.name }))}
                 preset={{ target: "module", targetId: recommended.module.id, departmentId: recommended.department.id }}
                 label={ts("assign")}
               />
