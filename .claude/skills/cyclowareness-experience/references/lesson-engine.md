@@ -1352,8 +1352,7 @@ first. Ask the user before adding one (ADR-025 replaced Italian with Arabic on r
    `src/lib/campaigns/templates.ts`; `riskTitles` in `src/lib/risk-title.ts`; `localizeStandard` in
    `src/lib/standards.ts`; the lab games `INBOX`, `LINKS`, `MFA` in `src/server/lab/games.ts`;
    `TUTOR_LANGUAGE`, `LANGUAGE_STYLE` and `tutorRequestSchema` in `src/server/tutor.ts`). Still grep
-   `grep -rnE "[{ ]az: " src` for maps outside the test (`REFRESHER_TITLE` in `src/server/jobs.ts`,
-   `BLOCKED_TITLE` and `BLOCKED_REASON` in `src/server/services/campaigns.ts`, `ROLE_NAMES` in
+   `grep -rnE "[{ ]az: " src` for maps outside the test (`ROLE_NAMES` in
    `src/server/actions/people.ts`, `TEMPLATE_SAMPLE` in `src/app/api/admin/people/[kind]/route.ts`,
    `PREVIEW_VARS` in `src/components/admin/settings-tabs.tsx`, `TEXT` in `src/app/global-error.tsx`;
    the ones typed by `Locale` make `npm run typecheck` fail),

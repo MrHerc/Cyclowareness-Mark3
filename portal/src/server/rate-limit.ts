@@ -37,21 +37,6 @@ export async function rateLimitIn(database: DB, key: string, limit: number, wind
   return verdict(row.count, limit, windowStart, windowMs, now);
 }
 
-/**
- * Unit tests only: under Vitest (process.env.VITEST) the counters are kept in this process's memory,
- * so tests that run actions with a stubbed database need none. A server never takes this path.
- */
-const memory = new Map<string, number>();
-
-function rateLimitInMemory(key: string, limit: number, windowMs: number, now = Date.now()): RateLimitResult {
-  const windowStart = windowOf(windowMs, now);
-  const bucket = `${key}\u0000${windowStart}`;
-  const count = (memory.get(bucket) ?? 0) + 1;
-  memory.set(bucket, count);
-  return verdict(count, limit, windowStart, windowMs, now);
-}
-
 export async function rateLimit(key: string, limit: number, windowMs: number): Promise<RateLimitResult> {
-  if (process.env.VITEST) return rateLimitInMemory(key, limit, windowMs);
   return rateLimitIn(db(), key, limit, windowMs);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useMemo, useRef, useState, useSyncExternalStore, useTransition } from "react";
+import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -290,26 +290,49 @@ export function LessonPlayer(p: PlayerProps) {
     }
   };
 
-  const env: SceneEnv = {
-    narrator: { ...narrator, speak, stop },
-    uiLocale: locale,
-    soundOn: soundOn && !voiceMissing,
-    still: motion === "still",
-    topic: p.topic,
-    timer: p.timeLimitSeconds,
-    onAnswer: (a) => {
-      // Going back and replaying a scene must not record the same answer twice.
-      if (answers.current.some((x) => x.sceneId === a.sceneId && (x.itemId ?? null) === (a.itemId ?? null))) return;
-      answers.current.push(a);
-      savePosition(index, inner);
-    },
-    onDone: nextScene,
-    onProgress: (fraction) => {
-      setInner(fraction);
-      savePosition(index, fraction);
-    },
-    resumeProgress: resumeInner ?? undefined,
+  const onAnswer = (a: PlayerAnswer) => {
+    // Going back and replaying a scene must not record the same answer twice.
+    if (answers.current.some((x) => x.sceneId === a.sceneId && (x.itemId ?? null) === (a.itemId ?? null))) return;
+    answers.current.push(a);
+    savePosition(index, inner);
   };
+  const onProgress = (fraction: number) => {
+    setInner(fraction);
+    savePosition(index, fraction);
+  };
+  // The scenes' callbacks keep one identity and call this render's functions through `live` (useEffectEvent's
+  // functions may not leave an effect), so a scene effect that lists them re-runs only on its own inputs.
+  const live = useRef({ speak, stop, narrator, onAnswer, nextScene, onProgress });
+  useLayoutEffect(() => {
+    live.current = { speak, stop, narrator, onAnswer, nextScene, onProgress };
+  });
+  const [calls] = useState(() => ({
+    speak: (text: string, opts?: SpeakOpts) => live.current.speak(text, opts),
+    stop: () => live.current.stop(),
+    pause: () => live.current.narrator.pause(),
+    resume: () => live.current.narrator.resume(),
+    onAnswer: (a: PlayerAnswer) => live.current.onAnswer(a),
+    onDone: () => live.current.nextScene(),
+    onProgress: (fraction: number) => live.current.onProgress(fraction),
+  }));
+  const { speaking, paused } = narrator;
+  const sceneSound = soundOn && !voiceMissing;
+  const resumeProgress = resumeInner ?? undefined;
+  const env = useMemo<SceneEnv>(
+    () => ({
+      narrator: { speak: calls.speak, stop: calls.stop, pause: calls.pause, resume: calls.resume, speaking, paused },
+      uiLocale: locale,
+      soundOn: sceneSound,
+      still: motion === "still",
+      topic: p.topic,
+      timer: p.timeLimitSeconds,
+      onAnswer: calls.onAnswer,
+      onDone: calls.onDone,
+      onProgress: calls.onProgress,
+      resumeProgress,
+    }),
+    [calls, speaking, paused, locale, sceneSound, motion, p.topic, p.timeLimitSeconds, resumeProgress],
+  );
 
   const toggleSound = () => {
     const v = !soundOn;

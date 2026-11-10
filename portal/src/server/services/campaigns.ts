@@ -13,7 +13,9 @@ import { TEMPLATE_BY_KEY, clickRiskTitle, templateOnPlan, templateText, type Cam
 import { featuresFor, withDefaults } from "../../lib/tenant-defaults";
 import { dayPlus } from "../../lib/time";
 import { tenantTimeZone } from "./tenants";
-import { dirOf, type Locale } from "../../i18n/config";
+import { createTranslator } from "next-intl";
+import { dirOf, isLocale } from "../../i18n/config";
+import { messagesFor } from "../../i18n/translator";
 
 const DAY = 86_400_000;
 
@@ -202,31 +204,6 @@ export async function recordSubmit(db: DB, token: string) {
   await recomputeRisk(db, row.c.tenantId, [row.r.userId]);
 }
 
-const BLOCKED_TITLE: Record<string, (name: string) => string> = {
-  az: (name) => `«${name}» kampaniyası planlaşdırılmış vaxtda başlamadı və qaralamalara qaytarıldı.`,
-  en: (name) => `The campaign “${name}” did not start at its scheduled time and is back in drafts.`,
-  ru: (name) => `Кампания «${name}» не запустилась в запланированное время и возвращена в черновики.`,
-  tr: (name) => `“${name}” kampanyası planlanan saatte başlamadı ve taslaklara geri döndü.`,
-  ro: (name) => `Campania „${name}” nu a pornit la ora programată și a revenit la ciorne.`,
-  ka: (name) => `კამპანია „${name}“ დაგეგმილ დროს არ დაიწყო და მონახაზებში დაბრუნდა.`,
-  uk: (name) => `Кампанія «${name}» не запустилася в запланований час і повернулася до чернеток.`,
-  de: (name) => `Die Kampagne „${name}“ ist nicht zur geplanten Zeit gestartet und wieder ein Entwurf.`,
-  fr: (name) => `La campagne « ${name} » n’a pas démarré à l’heure prévue et est revenue dans les brouillons.`,
-  ar: (name) => `لم تبدأ الحملة «${name}» في موعدها المجدول وأعيدت إلى المسودات.`,
-} satisfies Record<Locale, (name: string) => string>;
-const BLOCKED_REASON: Record<string, Record<LaunchBlock, string>> = {
-  az: { empty: "Auditoriyada aktiv əməkdaş yoxdur.", mail: "E-poçt göndərişi qurulmayıb (Tənzimləmələr → E-poçt).", sms: "SMS provayderi qurulmayıb.", voice: "Səsli zənglər üçün telefoniya provayderi lazımdır.", plan: "Bu kanal və ya şablon təşkilatınızın planına daxil deyil.", launched: "Kampaniya artıq başladılıb." },
-  en: { empty: "The audience has no active people.", mail: "Email sending is not set up (Settings → Email).", sms: "No SMS provider is configured.", voice: "Voice calls need a telephony provider.", plan: "This channel or template is not part of your organisation's plan.", launched: "The campaign has already been launched." },
-  ru: { empty: "В аудитории нет активных сотрудников.", mail: "Отправка почты не настроена (Настройки → Почта).", sms: "Не настроен SMS-провайдер.", voice: "Для звонков нужен провайдер телефонии.", plan: "Этот канал или шаблон не входит в тариф вашей организации.", launched: "Кампания уже запущена." },
-  tr: { empty: "Hedef kitlede aktif çalışan yok.", mail: "E-posta gönderimi ayarlanmamış (Ayarlar → E-posta).", sms: "SMS sağlayıcısı yapılandırılmamış.", voice: "Sesli aramalar için bir telefon hizmeti sağlayıcısı gerekir.", plan: "Bu kanal veya şablon kuruluşunuzun planına dahil değil.", launched: "Kampanya zaten başlatıldı." },
-  ro: { empty: "Publicul țintă nu are persoane active.", mail: "Trimiterea e-mailurilor nu este configurată (Setări → E-mail).", sms: "Nu este configurat niciun furnizor de SMS.", voice: "Apelurile vocale necesită un furnizor de telefonie.", plan: "Acest canal sau șablon nu este inclus în planul organizației dumneavoastră.", launched: "Campania a fost deja lansată." },
-  ka: { empty: "აუდიტორიაში აქტიური თანამშრომელი არ არის.", mail: "ელფოსტით გაგზავნა არ არის გამართული (პარამეტრები → ელფოსტა).", sms: "SMS-პროვაიდერი არ არის გამართული.", voice: "ზარებისთვის საჭიროა სატელეფონო პროვაიდერი.", plan: "ეს არხი ან შაბლონი თქვენი ორგანიზაციის პაკეტში არ შედის.", launched: "კამპანია უკვე გაშვებულია." },
-  uk: { empty: "В аудиторії немає активних працівників.", mail: "Надсилання пошти не налаштовано (Налаштування → Пошта).", sms: "SMS-провайдера не налаштовано.", voice: "Для дзвінків потрібен провайдер телефонії.", plan: "Цей канал або шаблон не входить до тарифу вашої організації.", launched: "Кампанію вже запущено." },
-  de: { empty: "Die Zielgruppe enthält keine aktiven Personen.", mail: "Der E-Mail-Versand ist nicht eingerichtet (Einstellungen → E-Mail).", sms: "Es ist kein SMS-Anbieter konfiguriert.", voice: "Für Anrufe ist ein Telefonie-Anbieter erforderlich.", plan: "Dieser Kanal oder diese Vorlage ist nicht im Tarif Ihrer Organisation enthalten.", launched: "Die Kampagne wurde bereits gestartet." },
-  fr: { empty: "Le public cible ne compte aucune personne active.", mail: "L’envoi d’e-mails n’est pas configuré (Paramètres → E-mail).", sms: "Aucun fournisseur SMS n’est configuré.", voice: "Les appels vocaux nécessitent un fournisseur de téléphonie.", plan: "Ce canal ou ce modèle ne fait pas partie de l’offre de votre organisation.", launched: "La campagne a déjà été lancée." },
-  ar: { empty: "لا يوجد موظفون نشطون في الجمهور المستهدف.", mail: "لم يتم إعداد إرسال البريد الإلكتروني (الإعدادات ← البريد الإلكتروني).", sms: "لم يتم إعداد مزود خدمة الرسائل النصية.", voice: "تتطلب المكالمات الصوتية مزود خدمة اتصالات هاتفية.", plan: "هذه القناة أو هذا القالب غير مشمول في باقة جهتك.", launched: "تم إطلاق الحملة بالفعل." },
-} satisfies Record<Locale, Record<LaunchBlock, string>>;
-
 /**
  * A scheduled campaign that cannot launch goes back to draft (the launch_blocked audit entry
  * written by launchCampaign keeps the reason and the missed time), so it is not retried every
@@ -248,10 +225,16 @@ async function returnToDraft(db: DB, campaignId: string, reason: LaunchBlock) {
   const direct = people.filter((p) => p.id === c.createdBy || p.role === "campaign_manager");
   const targets = direct.length ? direct : people;
   if (!targets.length) return;
+  // Each notice in its reader's language (admin.campaigns.blocked).
+  const texts = new Map<string, { title: string; body: string }>();
+  for (const lang of new Set(targets.map((p) => (isLocale(p.locale) ? p.locale : "en")))) {
+    const tr = createTranslator({ ...(await messagesFor(lang)), namespace: "admin.campaigns.blocked" });
+    texts.set(lang, { title: tr("title", { name: c.name }), body: tr(`reason.${reason}`) });
+  }
   await db.insert(t.notifications).values(
     targets.map((p) => {
-      const lang = p.locale in BLOCKED_TITLE ? p.locale : "en";
-      return { tenantId: c.tenantId, userId: p.id, kind: "campaign", title: BLOCKED_TITLE[lang](c.name), body: BLOCKED_REASON[lang][reason], href: `/admin/campaigns/${c.id}` };
+      const text = texts.get(isLocale(p.locale) ? p.locale : "en")!;
+      return { tenantId: c.tenantId, userId: p.id, kind: "campaign", title: text.title, body: text.body, href: `/admin/campaigns/${c.id}` };
     }),
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useEffectEvent, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import {
   AlertTriangle,
@@ -152,21 +152,22 @@ export function FeedbackCard({ tone, title, text, uiText = false, extra, onConti
   const n = text ? wordsOf(text).length : 0;
   const auto = autoAdvance && n > 0 && env.soundOn;
 
+  const { speak } = env.narrator;
+  const lang = uiText ? env.uiLocale : undefined;
   useEffect(() => {
     ref.current?.focus();
-    if (text) env.narrator.speak(text, { lang: uiText ? env.uiLocale : undefined, onWord: setWord, onEnd: () => setEnded(true) });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (text) speak(text, { lang, onWord: setWord, onEnd: () => setEnded(true) });
+  }, [speak, text, lang]);
 
-  // Same pause as the tutor beats before moving on by itself.
+  // Same pause as the tutor beats before moving on by itself; it starts when the explanation ends, not when the sound is switched on later.
+  const continueLater = useEffectEvent(() => (auto ? window.setTimeout(onContinue, 700) : null));
   useEffect(() => {
-    if (!ended || !auto) return;
-    timer.current = window.setTimeout(onContinue, 700);
+    if (!ended) return;
+    timer.current = continueLater();
     return () => {
       if (timer.current !== null) window.clearTimeout(timer.current);
       timer.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ended]);
 
   const proceed = () => {
@@ -412,17 +413,18 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
     setChecked(false);
   };
 
-  useEffect(() => {
-    env.onProgress?.(i / scene.beats.length);
+  const onBeat = useEffectEvent((at: number) => {
+    env.onProgress?.(at / scene.beats.length);
     narrate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [i]);
+  });
+  useEffect(() => onBeat(i), [i]);
 
   // The question is read aloud as soon as it shows.
+  const { speak } = env.narrator;
+  const question = checkpoint?.prompt;
   useEffect(() => {
-    if (asking && checkpoint) env.narrator.speak(checkpoint.prompt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [asking]);
+    if (asking && question) speak(question);
+  }, [asking, question, speak]);
 
   const advance = () => {
     env.narrator.stop();
@@ -449,12 +451,15 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
   };
 
   // After the narration the beat moves on by itself: to its question, or to the next beat.
+  // Like the feedback card, it is armed when the narration ends (or the question closes), not when the sound is switched on later.
+  const advanceLater = useEffectEvent(() => {
+    if (!env.soundOn || (checkpoint && asking)) return undefined;
+    return window.setTimeout(checkpoint ? () => setAsking(true) : advance, 700);
+  });
   useEffect(() => {
-    if (!ended || !env.soundOn) return;
-    if (checkpoint && asking) return;
-    const id = window.setTimeout(checkpoint ? () => setAsking(true) : advance, 700);
+    if (!ended) return;
+    const id = advanceLater();
     return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ended, asking]);
 
   const mood: MascotMood = env.narrator.speaking ? MOODS[beat.mood] ?? "talk" : beat.mood === "celebrate" ? "celebrate" : "idle";
@@ -557,10 +562,10 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
 export function IntroScene({ scene, env }: { scene: Extract<Scene, { type: "intro" }>; env: SceneEnv }) {
   const t = useTranslations("player");
   const contentLang = useContentLang();
+  const { speak } = env.narrator;
   useEffect(() => {
-    env.narrator.speak(`${scene.title}. ${scene.body}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    speak(`${scene.title}. ${scene.body}`);
+  }, [speak, scene.title, scene.body]);
   return (
     <div className="mx-auto grid max-w-3xl items-center gap-8 py-6 md:grid-cols-[1fr_1.2fr]">
       <VisualView visual={scene.visual} />
@@ -634,24 +639,25 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
   };
 
   // The intro card is read aloud (karaoke) until the learner starts.
+  const { speak } = env.narrator;
   useEffect(() => {
-    env.narrator.speak(scene.intro, { onWord: setIntroWord });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    speak(scene.intro, { onWord: setIntroWord });
+  }, [speak, scene.intro]);
 
   // The step's line is narrated, then any voice messages in a chat artifact, each in its own voice.
-  useEffect(() => {
+  // Keyed on the step's id: a server refresh (a motion change) hands new scene objects for the same step.
+  const narrateStep = useEffectEvent(() => {
     if (!started || !step) return;
     const line = step.spoken ?? step.say;
     const voices = step.artifact.kind === "chat" ? ((step.artifact as ChatArtifact).messages ?? []).filter((m) => m.voice) : [];
     const speakVoices = (k: number) => {
       const m = voices[k];
-      if (m) env.narrator.speak(m.spoken ?? plain(m.body), { voice: m.voice as Voice, onEnd: () => speakVoices(k + 1) });
+      if (m) speak(m.spoken ?? plain(m.body), { voice: m.voice as Voice, onEnd: () => speakVoices(k + 1) });
     };
-    if (line) env.narrator.speak(line, { voice: scene.environment === "call" && step.spoken ? (callVoice ?? "man") : "tutor", onWord: line === step.say ? setTipWord : undefined, onEnd: () => speakVoices(0) });
+    if (line) speak(line, { voice: scene.environment === "call" && step.spoken ? (callVoice ?? "man") : "tutor", onWord: line === step.say ? setTipWord : undefined, onEnd: () => speakVoices(0) });
     else speakVoices(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [started, stepId]);
+  });
+  useEffect(() => narrateStep(), [started, stepId]);
 
   const begin = () => {
     env.narrator.stop();
@@ -977,10 +983,8 @@ export function ChoiceScene({ scene, env }: { scene: Extract<Scene, { type: "cho
     else env.narrator.speak(prompt, { onEnd: () => env.narrator.speak(`${t("multiHint")}.`, { lang: env.uiLocale }) });
   };
 
-  useEffect(() => {
-    speakPrompt();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const speakPromptOnce = useEffectEvent(() => speakPrompt());
+  useEffect(() => speakPromptOnce(), []);
 
   const pick = (id: string) =>
     setPicked((p) => {
@@ -1084,10 +1088,10 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
   const valid = useMemo(() => new Set(scene.spots.map((s) => s.id)), [scene]);
   const need = Math.min(scene.minToFind, scene.spots.length);
 
+  const { speak } = env.narrator;
   useEffect(() => {
-    env.narrator.speak(scene.prompt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    speak(scene.prompt);
+  }, [speak, scene.prompt]);
 
   const missed = () => {
     if (!finished && !clicks.current.includes(MISS)) clicks.current.push(MISS);
@@ -1179,10 +1183,10 @@ export function SwipeScene({ scene, env }: { scene: Extract<Scene, { type: "swip
   const along = drag * sign;
   const card = scene.cards[i];
 
+  const { speak } = env.narrator;
   useEffect(() => {
-    if (i === 0) env.narrator.speak(scene.prompt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    speak(scene.prompt);
+  }, [speak, scene.prompt]);
 
   const decide = (v: "threat" | "safe") => {
     if (answer) return;
@@ -1285,16 +1289,16 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
   const attempts = useRef<string[]>([]);
   const complete = matched.size === scene.pairs.length;
 
+  const { speak } = env.narrator;
   useEffect(() => {
-    env.narrator.speak(scene.prompt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    speak(scene.prompt);
+  }, [speak, scene.prompt]);
+  const { onAnswer } = env;
   useEffect(() => {
     if (complete) {
-      env.onAnswer({ sceneId: scene.id, picked: attempts.current });
+      onAnswer({ sceneId: scene.id, picked: attempts.current });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [complete]);
+  }, [complete, onAnswer, scene.id]);
 
   const pickRight = (id: string) => {
     if (!left || matched.has(id)) return;
@@ -1375,10 +1379,10 @@ export function OrderScene({ scene, env }: { scene: Extract<Scene, { type: "orde
   const [result, setResult] = useState<"ok" | "wrong" | null>(null);
   const [checkedOnce, setCheckedOnce] = useState(false);
 
+  const { speak } = env.narrator;
   useEffect(() => {
-    env.narrator.speak(scene.prompt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    speak(scene.prompt);
+  }, [speak, scene.prompt]);
 
   const move = (i: number, d: -1 | 1) => {
     const j = i + d;
@@ -1450,11 +1454,11 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
   const current = history[history.length - 1].node;
   const endRef = useRef<HTMLDivElement>(null);
 
+  const { speak } = env.narrator;
   useEffect(() => {
-    env.narrator.speak(current.spoken ?? current.text, { voice: (current.voice as Voice | undefined) ?? "man" });
+    speak(current.spoken ?? current.text, { voice: (current.voice as Voice | undefined) ?? "man" });
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current]);
+  }, [current, speak]);
 
   const choose = (c: NonNullable<ScenarioNode["choices"]>[number], k: number) => {
     env.narrator.stop();
@@ -1602,10 +1606,10 @@ export function PasswordScene({ scene, env }: { scene: Extract<Scene, { type: "p
   const [reached, setReached] = useState(false);
   const levels = t.raw("levels") as string[];
 
+  const { speak } = env.narrator;
   useEffect(() => {
-    env.narrator.speak(scene.prompt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    speak(scene.prompt);
+  }, [speak, scene.prompt]);
   // Scored where the input changes; reaching the target the first time counts as the answer.
   const onChange = (v: string) => {
     const s = v ? checkPassword(v).score : 0;
@@ -1667,10 +1671,11 @@ export function PasswordScene({ scene, env }: { scene: Extract<Scene, { type: "p
 export function RecapScene({ scene, env, saving, onFinish }: { scene: Extract<Scene, { type: "recap" }>; env: SceneEnv; saving: boolean; onFinish: () => void }) {
   const t = useTranslations("player.recap");
   const contentLang = useContentLang();
+  const { speak } = env.narrator;
+  const summary = scene.points.join(". ");
   useEffect(() => {
-    env.narrator.speak(scene.points.join(". "));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    speak(summary);
+  }, [speak, summary]);
   return (
     <div className="mx-auto grid w-full max-w-3xl items-center gap-8 py-4 md:grid-cols-[14rem_1fr]">
       <Mascot mood="celebrate" gesture="cheer" fire={{ name: "bounce", key: 0 }} talking={env.narrator.speaking} className="mx-auto size-48 md:size-56" topic={env.topic as never} still={env.still} />

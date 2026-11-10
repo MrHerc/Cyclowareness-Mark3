@@ -23,6 +23,16 @@ export function testDb() {
   return { pglite, db, ready };
 }
 
+/**
+ * rate-limit.ts for a test whose server database is a stub: rateLimit() counts in an in-memory PGlite of its own
+ * through rateLimitIn. `vi.mock("../src/server/rate-limit", async (original) => (await import("./helpers/db")).rateLimitOnPglite(await original()))`.
+ */
+export async function rateLimitOnPglite<M extends typeof import("../../src/server/rate-limit")>(original: M): Promise<M> {
+  const { db, ready } = testDb();
+  await ready();
+  return { ...original, rateLimit: (key: string, limit: number, windowMs: number) => original.rateLimitIn(db, key, limit, windowMs) };
+}
+
 let seq = 0;
 const next = () => ++seq;
 

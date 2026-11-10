@@ -18,6 +18,7 @@ vi.mock("../src/server/db", async () => {
   const fake = { select: () => query(() => h.selects.shift() ?? []), insert: () => query(() => []), update: () => query(() => [{ id: "row" }]), delete: () => query(() => []) };
   return { db: () => fake, t: await import("../src/server/db/schema") };
 });
+vi.mock("../src/server/rate-limit", async (original) => (await import("./helpers/db")).rateLimitOnPglite(await original()));
 vi.mock("../src/server/env", () => ({ env: { TRUST_PROXY: 0, showOtp: false } }));
 vi.mock("../src/server/request", async (original) => ({ ...(await original<typeof import("../src/server/request")>()), clientIp: async () => null, userAgent: async () => null }));
 vi.mock("../src/server/auth/session", () => ({ createSession: async () => ({ token: "tok", id: "sid", expiresAt: new Date(Date.now() + 86_400_000) }), setSessionCookie: h.setSessionCookie }));
