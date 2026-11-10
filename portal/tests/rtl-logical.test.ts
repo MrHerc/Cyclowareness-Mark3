@@ -104,3 +104,56 @@ describe("dirOf / langAttrs", () => {
     expect(langAttrs("en")).toEqual({ lang: "en", dir: "ltr" });
   });
 });
+
+const tsxFiles = () =>
+  fs
+    .readdirSync(path.join(process.cwd(), "src"), { recursive: true, encoding: "utf8" })
+    .filter((f) => f.endsWith(".tsx"))
+    .map((f) => `src/${f.split(path.sep).join("/")}`);
+
+/** Opening tags of HTML elements (lowercase names) in TSX; `{…}` values are skipped whole, so an arrow's ">" does not end a tag. */
+function htmlTags(source: string): string[] {
+  return [...source.matchAll(/<[a-z][a-z0-9]*\s/g)].map((m) => {
+    let depth = 0;
+    let i = m.index + m[0].length;
+    for (; i < source.length; i++) {
+      if (source[i] === "{") depth++;
+      else if (source[i] === "}") depth--;
+      else if (source[i] === ">" && depth === 0) break;
+    }
+    return source.slice(m.index, i + 1);
+  });
+}
+/** `lang` alone keeps the page's direction: English text on an Arabic page would be laid out right to left. */
+const langWithoutDir = (tag: string) => /\slang=[{"]/.test(tag) && !/\sdir=/.test(tag);
+
+describe("direction of text in another language, and mirrored icons", () => {
+  it("finds an element that sets lang without dir", () => {
+    const tags = htmlTags(`<p lang={lang} onClick={() => a > b}>x</p><bdi lang={lang} dir="ltr">y</bdi><span {...langAttrs(lang)}>z</span><MiniRun lang={lang} />`);
+    expect(tags.filter(langWithoutDir)).toEqual(["<p lang={lang} onClick={() => a > b}>"]);
+  });
+
+  it("gives every element that sets a content language its direction too (langAttrs, langProps or dir)", () => {
+    const offenders = tsxFiles().flatMap((file) =>
+      htmlTags(fs.readFileSync(path.join(process.cwd(), file), "utf8"))
+        .filter(langWithoutDir)
+        .map((tag) => `${file}: ${tag.slice(0, 80)}`),
+    );
+    expect(offenders).toEqual([]);
+  }, 60_000);
+
+  it("does not turn again an icon that globals.css already mirrors in right-to-left pages", () => {
+    const css = fs.readFileSync(path.join(process.cwd(), "src", "app", "globals.css"), "utf8");
+    const block = css.match(/:is\(([^)]*)\):dir\(rtl\)/)?.[1] ?? "";
+    const mirrored = [...block.matchAll(/\.lucide-([a-z-]+)/g)].map((m) => m[1].replace(/(?:^|-)([a-z])/g, (_, c: string) => c.toUpperCase()));
+    expect(mirrored).toContain("ChevronRight");
+    const twice = new RegExp(String.raw`<(?:${mirrored.join("|")})\b[^>]*\brtl:-?(?:rotate|scale-x)-`);
+    const offenders = tsxFiles().flatMap((file) =>
+      fs
+        .readFileSync(path.join(process.cwd(), file), "utf8")
+        .split("\n")
+        .flatMap((line, i) => (twice.test(line) ? [`${file}:${i + 1}`] : [])),
+    );
+    expect(offenders).toEqual([]);
+  }, 60_000);
+});

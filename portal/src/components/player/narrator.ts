@@ -141,6 +141,16 @@ export function clipFor(clips: NarrationClips | null | undefined, clean: string,
   return clips && sameLanguage(textLang, clipsLang) && Object.hasOwn(clips, clean) ? clips[clean] : undefined;
 }
 
+/**
+ * What a clip that failed leads to; `errorName` is the play() rejection's DOMException name, null for the element's
+ * "error" event (a missing or undecodable file). Paused or replaced before it started: nothing. Blocked by the
+ * browser: reported, since the speech engine would be blocked too. Anything else: the line is spoken by the engine.
+ */
+export function clipFailure(errorName: string | null): "ignore" | "engine" | "not-allowed" {
+  if (errorName === "AbortError") return "ignore";
+  return errorName === "NotAllowedError" ? "not-allowed" : "engine";
+}
+
 /** The clip after `clean` in the manifest, which lists the lesson's texts in reading order: the one to fetch ahead. */
 export function nextClipUrl(clips: NarrationClips, clean: string): string | undefined {
   const keys = Object.keys(clips);
@@ -383,7 +393,7 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
         opts.onWord?.(words.length);
         opts.onEnd?.();
       };
-      const onFailed = () => fail("network", true);
+      const onFailed = () => fail(clipFailure(null));
       // Detaches this clip: stop() and a newer speak() call it, so its events can no longer fire.
       const halt = () => {
         endClip.current = null;
@@ -394,14 +404,14 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
         el.removeEventListener("error", onFailed);
         el.pause();
       };
-      const fail = (error: string, fallback: boolean) => {
-        if (my !== token.current || endClip.current !== halt) return;
+      const fail = (to: ReturnType<typeof clipFailure>) => {
+        if (to === "ignore" || my !== token.current || endClip.current !== halt) return;
         halt();
         setSpeaking(false);
-        if (fallback) viaEngine();
+        if (to === "engine") viaEngine();
         else {
           opts.onWord?.(words.length);
-          opts.onError?.(error);
+          opts.onError?.(to);
         }
       };
       el.addEventListener("playing", onPlaying);
@@ -416,9 +426,7 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
       el.playbackRate = clampRate(rate);
       el.volume = clampVolume(volume);
       el.play().catch((e: unknown) => {
-        const name = e instanceof DOMException ? e.name : "";
-        // AbortError: paused or replaced before it started.
-        if (name !== "AbortError") fail(name === "NotAllowedError" ? "not-allowed" : "network", name !== "NotAllowedError");
+        fail(clipFailure(e instanceof DOMException ? e.name : ""));
       });
       // Warm the cache with the next line's clip, so the swap after this one starts at once (one element: no second Audio on iOS).
       const next = clips && nextClipUrl(clips, clean);

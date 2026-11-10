@@ -3,11 +3,14 @@ import path from "node:path";
 import { labScenarioErrors, labScenarioSchema, type LabScenario } from "../../lib/content/lab-scenario";
 
 const DIR = path.join(process.cwd(), "content", "library", "labs");
-// One read per file and server process, like the brand registry (content/ ships with the server).
+// One read per file and server process, like the brand registry (content/ ships with the server). Only shipped
+// files are looked up: slugs come from requests, and caching every unknown one would grow without bound.
+const FILES: ReadonlySet<string> = new Set(fs.existsSync(DIR) ? fs.readdirSync(DIR) : []);
 const cache = new Map<string, LabScenario | null>();
 
 function read(slug: string, locale: string): LabScenario | null {
   const key = `${slug}.${locale}`;
+  if (!FILES.has(`${key}.json`)) return null;
   if (!cache.has(key)) {
     let found: LabScenario | null = null;
     try {

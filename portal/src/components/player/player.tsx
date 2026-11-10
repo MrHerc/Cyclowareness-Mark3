@@ -20,6 +20,7 @@ import { Burst } from "@/components/ui/light";
 import { toast } from "@/components/ui/toast";
 import { ProblemForm } from "@/components/learner/problem-form";
 import { BrandsProvider } from "./artifacts";
+import { attemptReports } from "./attempt";
 import { CaptionBar, CaptionsProvider, createLineStore, useCaptionMap, type Captions } from "./captions";
 import { captionLangPref, captionsPref, isCharacterKey, leavesKeyAlone, letterShortcutsPref, shortcutOf, speedPref, syllabusPref, transcriptOf, usePref, volumePref, type Shortcut } from "./controls";
 import { Drawer } from "./drawer";
@@ -168,6 +169,7 @@ export function LessonPlayer(p: PlayerProps) {
   const sceneIds = useMemo(() => scenes.map((s) => s.id), [scenes]);
   const answerIds = useMemo(() => answerIdsOf(scenes), [scenes]);
   const transcript = useMemo(() => transcriptOf(scenes), [scenes]);
+  const reports = useMemo(() => attemptReports(() => startLessonAction(p.slug, p.lesson.key), (n) => reachSceneAction(p.slug, p.lesson.key, n)), [p.slug, p.lesson.key]);
   const storageKey = lessonStateKey(p.viewerId, p.slug, p.lesson.key);
   const savedRaw = useSyncExternalStore(noSubscribe, () => readSaved(storageKey), () => null);
   const saved = useMemo(() => parseLesson(savedRaw, sceneIds, answerIds), [savedRaw, sceneIds, answerIds]);
@@ -237,7 +239,7 @@ export function LessonPlayer(p: PlayerProps) {
     if (doneParam) setDoneParam(false);
     if (offline) return;
     // The attempt's start, then its furthest scene, are the server's: a resumed one tells it where it already was.
-    void startLessonAction(p.slug, p.lesson.key).then(() => (reach > 0 ? reachSceneAction(p.slug, p.lesson.key, reach) : undefined));
+    void reports.begin(reach);
   };
 
   /** Opens a scene: any one up to `reach`, the furthest reached (the next one only through the current scene's own end). */
@@ -249,7 +251,7 @@ export function LessonPlayer(p: PlayerProps) {
     setIndex(at);
     setMaxIndex(reach);
     savePosition(at, 0, reach);
-    if (reach > maxIndex && !offline) void reachSceneAction(p.slug, p.lesson.key, reach);
+    if (reach > maxIndex && !offline) void reports.reach(reach);
   };
   const nextScene = () => {
     if (index + 1 < scenes.length) goTo(index + 1, Math.max(maxIndex, index + 1));
@@ -271,7 +273,7 @@ export function LessonPlayer(p: PlayerProps) {
       if (!res.ok) {
         // A refused attempt may have no start any more (used up by another tab, or opened before the
         // server kept starts): open one again, so that pressing Finish later can succeed. A valid start is kept.
-        if (res.error && !offline) void startLessonAction(p.slug, p.lesson.key);
+        if (res.error && !offline) void startLessonAction(p.slug, p.lesson.key).catch(() => undefined);
         toast(t(res.error ? "recap.unverified" : "recap.saveError"), "error");
         return;
       }

@@ -5,6 +5,7 @@ import { CheckCircle2, CircleDashed, Lightbulb, Loader2, RotateCcw, ShieldAlert,
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Ring } from "@/components/ui/progress";
+import { langProps } from "@/components/player/rich";
 import type { VmLabResult } from "@/server/lab/vm-action";
 import { HINT_COST, type LabDef, type LabScore } from "../model/labs";
 
@@ -83,10 +84,10 @@ export function Debrief<S>({ def, score, hints, texts, notes, result, pending, e
               {found.map((o) => (
                 <li key={o.id} className="rounded-lg border border-safe-100 bg-safe-50/60 p-3.5">
                   <p className="flex items-start justify-between gap-3 text-body-sm font-semibold">
-                    <span lang={texts.lang}>{texts.objective(o.id)}</span>
+                    <span {...langProps(texts.lang)}>{texts.objective(o.id)}</span>
                     <span className="shrink-0 text-safe-700 tabular-nums">+{o.points}</span>
                   </p>
-                  <p lang={texts.lang} className="mt-1 text-caption text-ink-muted">
+                  <p {...langProps(texts.lang)} className="mt-1 text-caption text-ink-muted">
                     {texts.why(o.id)}
                   </p>
                 </li>
@@ -106,10 +107,10 @@ export function Debrief<S>({ def, score, hints, texts, notes, result, pending, e
               {missed.map((o) => (
                 <li key={o.id} className="rounded-lg border border-warn-100 bg-warn-50/60 p-3.5">
                   <p className="flex items-start justify-between gap-3 text-body-sm font-semibold">
-                    <span lang={texts.lang}>{texts.objective(o.id)}</span>
+                    <span {...langProps(texts.lang)}>{texts.objective(o.id)}</span>
                     <span className="shrink-0 text-ink-subtle tabular-nums">+{o.points}</span>
                   </p>
-                  <p lang={texts.lang} className="mt-1 text-caption text-ink-muted">
+                  <p {...langProps(texts.lang)} className="mt-1 text-caption text-ink-muted">
                     {texts.why(o.id)}
                   </p>
                 </li>

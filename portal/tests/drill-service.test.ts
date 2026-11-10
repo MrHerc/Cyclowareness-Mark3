@@ -3,15 +3,22 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { and, eq, inArray, isNull } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { PgDatabase } from "drizzle-orm/pg-core";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { DB } from "../src/server/db/client";
 import { ALL_FEATURES, defaultSettings } from "../src/lib/tenant-defaults";
-import { advanceDrill, drillHistory, drillView, skipDrill, startDrill } from "../src/server/services/drill";
+import { advanceDrill, drillHistory, drillView, dueCount, skipDrill, startDrill } from "../src/server/services/drill";
 import { sendQueuedSms } from "../src/server/services/campaigns";
 import { submitThreatReport } from "../src/server/services/threats";
 import { drillProgress } from "../src/lib/drill/plan";
 import { runJobs } from "../src/server/jobs";
+
+// Every drill plays the same plan: a seed from the campaign's random id would test another plan on each run, and a failure could not be replayed.
+vi.mock("../src/lib/drill/plan", async (importOriginal) => {
+  const plan = await importOriginal<typeof import("../src/lib/drill/plan")>();
+  return { ...plan, planDrill: (...[people, tpl, opts]: Parameters<typeof plan.planDrill>) => plan.planDrill(people, tpl, { ...opts, seed: 20261105 }) };
+});
 
 const pglite = new PGlite();
 const db = drizzle(pglite, { schema: t }) as unknown as DB;
@@ -21,23 +28,26 @@ let plainTenantId = "";
 
 const RISKS = [72, 64, 58, 51, 47, 44, 39, 35, 31, 28, 25, 22];
 
-beforeAll(async () => {
-  await migrate(drizzle(pglite), { migrationsFolder: path.join(__dirname, "..", "drizzle") });
-  const settings = defaultSettings("en");
+/** An organisation with the drill switched on: an administrator and the twelve RISKS learners in one department. */
+async function seedOrg(slug: string) {
   const [tenant] = await db
     .insert(t.tenants)
-    .values({ slug: "demo", name: "Demo Org", plan: "enterprise_hrm", branding: { primary: "#4f46e5", accent: "#ff7a1a" }, settings, features: { live_drill: true } })
+    .values({ slug, name: "Demo Org", plan: "enterprise_hrm", branding: { primary: "#4f46e5", accent: "#ff7a1a" }, settings: defaultSettings("en"), features: { live_drill: true } })
     .returning();
-  tenantId = tenant.id;
-  const [plain] = await db.insert(t.tenants).values({ slug: "real", name: "Real Org", plan: "enterprise_hrm", branding: { primary: "#4f46e5", accent: "#ff7a1a" }, settings }).returning();
+  const [dept] = await db.insert(t.departments).values({ tenantId: tenant.id, name: "Finance", nameKey: "finance" }).returning();
+  const [admin] = await db.insert(t.users).values({ tenantId: tenant.id, email: `admin@${slug}.test`, name: "Ada Admin", role: "tenant_admin", locale: "en", riskScore: 20 }).returning();
+  await db.insert(t.users).values(RISKS.map((risk, i) => ({ tenantId: tenant.id, email: `p${i}@${slug}.test`, name: `Person ${i} Test`, role: "learner" as const, locale: i % 3 === 0 ? "az" : "en", riskScore: risk, departmentId: dept.id })));
+  return { tenantId: tenant.id, adminId: admin.id };
+}
+
+beforeAll(async () => {
+  await migrate(drizzle(pglite), { migrationsFolder: path.join(__dirname, "..", "drizzle") });
+  ({ tenantId, adminId } = await seedOrg("demo"));
+  const [plain] = await db.insert(t.tenants).values({ slug: "real", name: "Real Org", plan: "enterprise_hrm", branding: { primary: "#4f46e5", accent: "#ff7a1a" }, settings: defaultSettings("en") }).returning();
   plainTenantId = plain.id;
-  const [dept] = await db.insert(t.departments).values({ tenantId, name: "Finance", nameKey: "finance" }).returning();
-  const [admin] = await db.insert(t.users).values({ tenantId, email: "admin@demo.test", name: "Ada Admin", role: "tenant_admin", locale: "en", riskScore: 20 }).returning();
-  adminId = admin.id;
-  await db.insert(t.users).values(RISKS.map((risk, i) => ({ tenantId, email: `p${i}@demo.test`, name: `Person ${i} Test`, role: "learner" as const, locale: i % 3 === 0 ? "az" : "en", riskScore: risk, departmentId: dept.id })));
   const [mod] = await db
     .insert(t.modules)
-    .values({ slug: "phishing-email", category: "email", audiences: ["all"], title: { en: "Phishing email", az: "Fişinq məktubu" }, subtitle: { en: "" }, minutes: 6, xp: 40, difficulty: "Easy" })
+    .values({ slug: "phishing-email", category: "email", audiences: ["all"], title: { en: "Phishing email", az: "FiÅŸinq mÉ™ktubu" }, subtitle: { en: "" }, minutes: 6, xp: 40, difficulty: "Easy" })
     .returning();
   await db.insert(t.lessons).values([
     { moduleId: mod.id, key: "phishing-email-1", title: { en: "One" }, minutes: 3, position: 1 },
@@ -55,6 +65,8 @@ describe("live drill", () => {
   });
 
   it("plays a whole drill through the real services and closes risks by training", async () => {
+    // Its own organisation: the counts below are organisation-wide, so no other test's drill may be in them.
+    const { tenantId, adminId } = await seedOrg("whole-drill");
     const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "payslip", audience: "all", departmentId: null, speed: "quick", campaignName: "Live drill: payslip" });
     if (!started.ok) throw new Error(started.reason);
     // The person running the drill watches it: everyone else is in the audience.
@@ -65,9 +77,10 @@ describe("live drill", () => {
     const [campaign0] = await db.select().from(t.campaigns).where(eq(t.campaigns.id, run0.campaignId));
     expect(campaign0.status).toBe("running");
 
-    // Halfway: some events are applied, not all, and the drill is still running.
+    // Halfway: exactly the events due by then are applied, not all, and the drill is still running.
     const half = await advanceDrill(db, tenantId, started.id, new Date(run0.startedAt.getTime() + run0.durationMs / 2));
     expect(half!.appliedUntil).toBeGreaterThan(0);
+    expect(half!.appliedUntil).toBe(dueCount(run0.events, run0.durationMs / 2));
     expect(half!.appliedUntil).toBeLessThan(run0.events.length);
     expect(half!.finishedAt).toBeNull();
 
@@ -165,6 +178,26 @@ describe("live drill", () => {
     expect(await counts()).toEqual(before);
   }, 120_000);
 
+  it("files one report when two lease holders apply the same report step (a takeover after a stalled request)", async () => {
+    const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "keynote", audience: "all", departmentId: null, speed: "quick", campaignName: "Takeover" });
+    if (!started.ok) throw new Error(started.reason);
+    const done = (await skipDrill(db, tenantId, started.id))!;
+    const reportAt = done.events.findIndex((e) => e.kind === "report");
+    expect(reportAt).toBeGreaterThanOrEqual(0);
+    const { recipientId } = done.events[reportAt];
+    // Back to just before the report step, as if it had never been applied.
+    await db.delete(t.threatReports).where(eq(t.threatReports.campaignRecipientId, recipientId));
+    await db.update(t.campaignRecipients).set({ reportedAt: null }).where(eq(t.campaignRecipients.id, recipientId));
+    await db.update(t.drillRuns).set({ appliedUntil: reportAt, finishedAt: null, leaseUntil: null }).where(eq(t.drillRuns.id, done.id));
+    await db.update(t.campaigns).set({ status: "running", completedAt: null }).where(eq(t.campaigns.id, done.campaignId));
+    // The second request polls after the first one's lease (20 s) has run out, so both claim the drill and apply the same step.
+    const now = Date.now();
+    await Promise.all([advanceDrill(db, tenantId, done.id, new Date(now)), advanceDrill(db, tenantId, done.id, new Date(now + 21_000))]);
+    expect(await db.select().from(t.threatReports).where(eq(t.threatReports.campaignRecipientId, recipientId))).toHaveLength(1);
+    const [run] = await db.select().from(t.drillRuns).where(eq(t.drillRuns.id, done.id));
+    expect(run.appliedUntil).toBe(run.events.length);
+  }, 120_000);
+
   it("is played to its end by the job runner when no dashboard polls it", async () => {
     const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "invoice", audience: "all", departmentId: null, speed: "quick", campaignName: "Unwatched" });
     if (!started.ok) throw new Error(started.reason);
@@ -208,6 +241,27 @@ describe("live drill", () => {
     const unsent = await db.select().from(t.campaignRecipients).where(and(eq(t.campaignRecipients.campaignId, run.campaignId), isNull(t.campaignRecipients.sentAt)));
     expect(unsent).toHaveLength(4);
     await skipDrill(db, tenantId, started.id);
+  }, 120_000);
+
+  it("leaves no campaign or recipients behind when the drill row cannot be written", async () => {
+    const people = await db.select({ id: t.users.id }).from(t.users).where(and(eq(t.users.tenantId, tenantId), eq(t.users.role, "learner")));
+    for (const [i, p] of people.slice(0, 4).entries()) await db.update(t.users).set({ phone: `+99450000030${i}` }).where(eq(t.users.id, p.id));
+    const campaigns = async () => (await db.select({ id: t.campaigns.id }).from(t.campaigns).where(eq(t.campaigns.tenantId, tenantId))).length;
+    const recipients = async () => (await db.select({ id: t.campaignRecipients.id }).from(t.campaignRecipients).innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId)).where(eq(t.campaigns.tenantId, tenantId))).length;
+    const before = { campaigns: await campaigns(), recipients: await recipients() };
+    const insert = PgDatabase.prototype.insert;
+    const failing = vi.spyOn(PgDatabase.prototype, "insert").mockImplementation(function (this: PgDatabase<never>, table: Parameters<typeof insert>[0]) {
+      if (table === t.drillRuns) throw new Error("drill_runs insert failed");
+      return insert.call(this, table);
+    } as typeof insert);
+    try {
+      await expect(startDrill(db, { tenantId, actorId: adminId, templateKey: "bank-sms", audience: "all", departmentId: null, speed: "quick", campaignName: "Broken" })).rejects.toThrow("drill_runs insert failed");
+    } finally {
+      failing.mockRestore();
+    }
+    // Without its drill row a running SMS campaign would be an ordinary one, and the job runner would text the audience.
+    expect({ campaigns: await campaigns(), recipients: await recipients() }).toEqual(before);
+    expect(await sendQueuedSms(db, { budgetMs: 5_000 })).toBe(0);
   }, 120_000);
 
   it("ends where it is when its campaign is cancelled", async () => {

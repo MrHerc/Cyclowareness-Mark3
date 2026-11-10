@@ -198,25 +198,26 @@ export async function completeLessonAction(input: z.infer<typeof completeSchema>
     await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "learning.completion_refused", targetType: "lesson", targetId: lesson.id, meta: { module: mod.slug, lesson: lesson.key, reason } });
     return { ok: false, xp: 0, error: "unverified" };
   }
-  // The attempt is used up by one statement before anything is written: the same completion sent
-  // twice at once would otherwise store its answer rows twice (they feed the risk score).
-  const consumed = await db()
-    .update(t.lessonProgress)
-    .set({ startedAt: null, reached: 0 })
-    .where(and(eq(t.lessonProgress.userId, v.user.id), eq(t.lessonProgress.lessonId, lesson.id), eq(t.lessonProgress.startedAt, attempt!.startedAt!)))
-    .returning({ userId: t.lessonProgress.userId });
-  if (!consumed.length) return { ok: false, xp: 0, error: "unverified" };
-
-  if (scored.answers.length) {
-    await db()
-      .insert(t.answers)
-      .values(scored.answers.map((a) => ({ tenantId: v.tenant.id, userId: v.user.id, lessonId: lesson.id, ...a, category: mod.category })));
-    const risky = scored.answers.filter((a) => a.outcome && a.outcome !== "safe").length;
-    if (risky) await emitEvent(db(), v.tenant.id, "simulation.risky", { module: mod.slug, lesson: lesson.key, choices: risky });
-  }
   // Time trained: at most three times the lesson's nominal length, so a lesson left open adds no more.
   const secondsSpent = Math.min(lesson.minutes * 180, Math.round((now - started) / 1000));
-  const res = await completeLesson(db(), { tenantId: v.tenant.id, userId: v.user.id, lessonId: lesson.id, secondsSpent });
+  // One transaction: a completion that fails part-way keeps the attempt and stores no answers.
+  const res = await db().transaction(async (tx) => {
+    // The attempt is used up by one statement before anything is written: the same completion sent
+    // twice at once would otherwise store its answer rows twice (they feed the risk score).
+    const consumed = await tx
+      .update(t.lessonProgress)
+      .set({ startedAt: null, reached: 0 })
+      .where(and(eq(t.lessonProgress.userId, v.user.id), eq(t.lessonProgress.lessonId, lesson.id), eq(t.lessonProgress.startedAt, attempt!.startedAt!)))
+      .returning({ userId: t.lessonProgress.userId });
+    if (!consumed.length) return null;
+    if (scored.answers.length) {
+      await tx.insert(t.answers).values(scored.answers.map((a) => ({ tenantId: v.tenant.id, userId: v.user.id, lessonId: lesson.id, ...a, category: mod.category })));
+    }
+    return completeLesson(tx, { tenantId: v.tenant.id, userId: v.user.id, lessonId: lesson.id, secondsSpent });
+  });
+  if (!res) return { ok: false, xp: 0, error: "unverified" };
+  const risky = scored.answers.filter((a) => a.outcome && a.outcome !== "safe").length;
+  if (risky) await emitEvent(db(), v.tenant.id, "simulation.risky", { module: mod.slug, lesson: lesson.key, choices: risky });
   await recomputeRisk(db(), v.tenant.id, [v.user.id]);
   const sorted = lessons.sort((a, b) => a.position - b.position);
   const next = sorted.find((l) => l.position > lesson.position);

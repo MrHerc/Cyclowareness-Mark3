@@ -24,6 +24,19 @@ vi.mock("../src/server/auth/viewer", () => ({
   allowed: (v: V, p: Permission) => can(v.user.role, p) && (!PERMISSION_FEATURE[p] || v.tenant.features.has(PERMISSION_FEATURE[p]!)),
   privileged: (v: V, p: Permission) => can(v.user.role, p) && (!PERMISSION_FEATURE[p] || v.tenant.features.has(PERMISSION_FEATURE[p]!)),
 }));
+// completeLesson as it is, except that it can be made to fail after its own writes (a database error part-way).
+const completion = vi.hoisted(() => ({ fail: false }));
+vi.mock("../src/server/services/progress", async (importOriginal) => {
+  const real = await importOriginal<typeof import("../src/server/services/progress")>();
+  return {
+    ...real,
+    completeLesson: async (...a: Parameters<typeof real.completeLesson>) => {
+      const res = await real.completeLesson(...a);
+      if (completion.fail) throw new Error("completion failed");
+      return res;
+    },
+  };
+});
 const queueEmail = vi.fn();
 vi.mock("../src/server/mail", () => ({ queueEmail: (...a: unknown[]) => queueEmail(...a), renderEmailHtml: (text: string) => `<p>${text}</p>` }));
 
@@ -132,6 +145,24 @@ describe("completing lessons", () => {
     expect(results.filter((r) => r.ok)).toMatchObject([{ xp: 33 }]);
     expect(results.filter((r) => !r.ok)).toEqual([{ ok: false, xp: 0, error: "unverified" }]);
     expect(await db.select().from(t.xpEvents).where(eq(t.xpEvents.userId, user.id))).toHaveLength(1);
+    expect(await db.select().from(t.answers).where(eq(t.answers.userId, user.id))).toHaveLength(RIGHT.length);
+  });
+
+  it("keeps the attempt and stores nothing when the completion fails part-way, so the same attempt can finish", async () => {
+    const { user } = await setup();
+    const mod = await addModule(db);
+    completion.fail = true;
+    try {
+      await expect(play(mod.slug, "lesson-1")).rejects.toThrow("completion failed");
+    } finally {
+      completion.fail = false;
+    }
+    expect(await db.select().from(t.answers).where(eq(t.answers.userId, user.id))).toEqual([]);
+    expect(await db.select().from(t.xpEvents).where(eq(t.xpEvents.userId, user.id))).toEqual([]);
+    const [row] = await db.select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, user.id));
+    expect(row).toMatchObject({ completedAt: null, reached: LAST_SCENE });
+    expect(row.startedAt).not.toBeNull();
+    expect(await finish(mod.slug, "lesson-1", RIGHT)).toMatchObject({ ok: true, xp: 33 });
     expect(await db.select().from(t.answers).where(eq(t.answers.userId, user.id))).toHaveLength(RIGHT.length);
   });
 
