@@ -44,7 +44,7 @@ export async function confirmTotpAction(code: string): Promise<ActionResult<{ co
   await db().update(t.users).set({ totpEnabled: true, totpRecovery: backup.hashes }).where(eq(t.users.id, v.user.id));
   // The current session already proved the second factor; every other one (perhaps someone else's) has to sign in again.
   await db().update(t.sessions).set({ twoFactorVerified: true }).where(eq(t.sessions.id, v.sessionId));
-  await invalidateUserSessions(v.user.id, v.sessionId);
+  await invalidateUserSessions(v.user.id, v.sessionId, null);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.2fa_on", ip: await clientIp() });
   return { ok: true, codes: backup.codes };
 }
@@ -60,7 +60,7 @@ export async function changePasswordAction(current: string, next: string, confir
   if (problem) return { ok: false, error: problem === "short" ? "tooShort" : problem === "long" ? "tooLong" : "weak" };
   await db().update(t.users).set({ passwordHash: await hashPassword(next) }).where(eq(t.users.id, v.user.id));
   // Whoever knew the old password is signed out everywhere else.
-  await invalidateUserSessions(v.user.id, v.sessionId);
+  await invalidateUserSessions(v.user.id, v.sessionId, "password_change");
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.password_set", ip: await clientIp(), meta: { kind: "change" } });
   return { ok: true };
 }
@@ -87,7 +87,7 @@ export async function regenerateBackupCodesAction(password: string): Promise<Act
 
 export async function signOutOtherDevicesAction(): Promise<{ ok: boolean }> {
   const v = await actionViewer();
-  await invalidateUserSessions(v.user.id, v.sessionId);
+  await invalidateUserSessions(v.user.id, v.sessionId, "other_devices_signed_out");
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.other_devices_signed_out", ip: await clientIp() });
   return { ok: true };
 }

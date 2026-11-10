@@ -6,11 +6,23 @@ import { ARTIFACT_APP, miniLabDef, miniLabId, miniLabSlug, modulePractice, repla
 import { lessonsDone } from "../src/lib/domain/labs";
 import { localeParityErrors } from "../src/lib/content/locale-parity";
 
-const state = vi.hoisted(() => ({ features: new Set(["lab"]), catalog: ["phishing-email", "quishing"], attempts: [] as { exercise: string; score: number; max: number; fullXp: number }[] }));
+const state = vi.hoisted(() => ({
+  features: new Set(["lab"]),
+  catalog: ["phishing-email", "quishing"],
+  // Modules the catalog lists only with drafts included (an author's unpublished ones).
+  drafts: [] as string[],
+  user: { id: "u1", role: "learner", totpEnabled: false },
+  attempts: [] as { exercise: string; score: number; max: number; fullXp: number }[],
+}));
 vi.mock("next/cache", () => ({ refresh: () => {} }));
-vi.mock("../src/server/db", () => ({ db: () => ({}) }));
-vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => ({ tenant: { id: "t1", features: state.features }, user: { id: "u1" } }), allowed: () => false }));
-vi.mock("../src/server/queries/catalog", () => ({ getCatalog: async () => state.catalog.map((slug) => ({ slug })) }));
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock("../src/server/db", async () => ({ db: () => ({}), t: await import("../src/server/db/schema") }));
+// The real permission and two-step gates (privileged); only the signed-in viewer is stubbed.
+vi.mock("../src/server/auth/viewer", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  actionViewer: async () => ({ tenant: { id: "t1", features: state.features, settings: { identity: { requireAdmin2fa: true } } }, user: state.user }),
+}));
+vi.mock("../src/server/queries/catalog", () => ({ getCatalog: async (_v: unknown, _locale: string, drafts = false) => [...state.catalog, ...(drafts ? state.drafts : [])].map((slug) => ({ slug })) }));
 vi.mock("../src/server/rate-limit", () => ({ rateLimit: async () => ({ ok: true }) }));
 vi.mock("../src/server/lab/attempts", () => ({
   recordLabAttempt: async (_db: unknown, p: { exercise: string; score: number; max: number; fullXp: number }) => {
@@ -149,6 +161,8 @@ describe("mini-lab result on the server", () => {
   beforeEach(() => {
     state.features = new Set(["lab"]);
     state.catalog = ["phishing-email", "quishing"];
+    state.drafts = [];
+    state.user = { id: "u1", role: "learner", totpEnabled: false };
     state.attempts = [];
   });
 
@@ -176,6 +190,16 @@ describe("mini-lab result on the server", () => {
     state.catalog = ["quishing"];
     expect(await completeVmLabAction("mini:phishing-email", [])).toEqual({ error: "forbidden" });
     expect(state.attempts).toEqual([]);
+  });
+
+  it("counts a draft module's mini-lab only for an author who meets the administrators' two-step rule", async () => {
+    state.catalog = ["quishing"];
+    state.drafts = ["phishing-email"];
+    state.features = new Set(["lab", "studio"]);
+    state.user = { id: "u1", role: "content_creator", totpEnabled: false };
+    expect(await completeVmLabAction("mini:phishing-email", [])).toEqual({ error: "forbidden" });
+    state.user = { ...state.user, totpEnabled: true };
+    expect(await completeVmLabAction("mini:phishing-email", [])).toMatchObject({ max: 100 });
   });
 });
 

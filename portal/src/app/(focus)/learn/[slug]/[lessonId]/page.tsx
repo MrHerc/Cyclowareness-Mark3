@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { eq } from "drizzle-orm";
 import { db, t } from "@/server/db";
-import { allowed, requireViewer } from "@/server/auth/viewer";
+import { privileged, requireViewer } from "@/server/auth/viewer";
 import { getCatalog } from "@/server/queries/catalog";
 import { loadNarrationClips } from "@/server/narration";
 import { LessonPlayer } from "@/components/player/player";
@@ -18,7 +18,7 @@ import { loadCaptionsAction } from "./actions";
 export async function generateMetadata({ params }: PageProps<"/learn/[slug]/[lessonId]">) {
   const { slug, lessonId } = await params;
   const v = await requireViewer();
-  const m = (await getCatalog(v, await getLocale(), allowed(v, "studio.write"))).find((x) => x.slug === slug);
+  const m = (await getCatalog(v, await getLocale(), privileged(v, "studio.write"))).find((x) => x.slug === slug);
   return { title: m?.lessons.find((l) => l.key === lessonId)?.title ?? m?.title ?? "" };
 }
 
@@ -26,7 +26,7 @@ export default async function LessonPage({ params }: PageProps<"/learn/[slug]/[l
   const { slug, lessonId } = await params;
   const v = await requireViewer();
   const locale = await getLocale();
-  const m = (await getCatalog(v, locale, allowed(v, "studio.write"))).find((x) => x.slug === slug);
+  const m = (await getCatalog(v, locale, privileged(v, "studio.write"))).find((x) => x.slug === slug);
   const lesson = m?.lessons.find((l) => l.key === lessonId);
   if (!m || !lesson) notFound();
   // The viewer's language, then English, then whatever the lesson was written in (own studio lessons).

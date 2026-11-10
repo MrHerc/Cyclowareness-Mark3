@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { db } from "../db";
-import { actionViewer, allowed } from "../auth/viewer";
+import { actionViewer, privileged } from "../auth/viewer";
 import { getCatalog } from "../queries/catalog";
 import { rateLimit } from "../rate-limit";
 import { recordLabAttempt } from "./attempts";
@@ -27,7 +27,7 @@ export async function completeVmLabAction(lab: string, log: unknown): Promise<Vm
   const mini = slug === null ? null : (labScenario(slug)?.scenario ?? null);
   if (!v.tenant.features.has("lab") || !(mini || isVmLab(lab))) return { error: "forbidden" };
   // A mini-lab counts only for a module in the viewer's catalog, as the page checks.
-  if (mini && !(await getCatalog(v, "en", allowed(v, "studio.write"))).some((m) => m.slug === slug)) return { error: "forbidden" };
+  if (mini && !(await getCatalog(v, "en", privileged(v, "studio.write"))).some((m) => m.slug === slug)) return { error: "forbidden" };
   const parsed = events.safeParse(log);
   if (!parsed.success) return { error: "invalid" };
   if (!(await rateLimit(`lab:${v.user.id}`, 60, 10 * 60_000)).ok) return { error: "rateLimited" };

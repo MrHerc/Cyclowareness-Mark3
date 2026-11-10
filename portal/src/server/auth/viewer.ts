@@ -160,7 +160,7 @@ function toViewer(user: ViewerUser, tenant: typeof t.tenants.$inferSelect, who: 
   };
 }
 
-export type ApiTokenLookup = { ok: true; viewer: Viewer } | { ok: false; reason: "unknown" } | { ok: false; reason: "revoked" | "creator_inactive"; id: string; tenantId: string };
+export type ApiTokenLookup = { ok: true; viewer: Viewer } | { ok: false; reason: "unknown" } | { ok: false; reason: "revoked" | "expired" | "creator_inactive"; id: string; tenantId: string };
 
 /**
  * The viewer a reporting-API bearer token stands for: its creator, limited to the token's permissions
@@ -178,9 +178,10 @@ export async function apiTokenViewer(token: string): Promise<ApiTokenLookup> {
   if (!row) return { ok: false, reason: "unknown" };
   const { token: apiToken, user, tenant } = row;
   if (apiToken.revokedAt) return { ok: false, reason: "revoked", id, tenantId: tenant.id };
+  const now = new Date();
+  if (apiToken.expiresAt <= now) return { ok: false, reason: "expired", id, tenantId: tenant.id };
   if (user.status !== "active") return { ok: false, reason: "creator_inactive", id, tenantId: tenant.id };
   // Stamped before the rate limit and plan checks on purpose: "last used" also shows a revoked-plan or throttled client still calling.
-  const now = new Date();
   if (!apiToken.lastUsedAt || now.getTime() - apiToken.lastUsedAt.getTime() > SEEN_THROTTLE_MS) {
     await db().update(t.apiTokens).set({ lastUsedAt: now }).where(eq(t.apiTokens.id, id));
   }

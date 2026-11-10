@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { and, eq, isNull, or } from "drizzle-orm";
 import { db, t } from "@/server/db";
-import { allowed, getViewer } from "@/server/auth/viewer";
+import { privileged, getViewer } from "@/server/auth/viewer";
 import { rateLimit } from "@/server/rate-limit";
 import { sameOrigin } from "@/server/request";
 import { readBodyCapped } from "@/server/request-body";
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         eq(t.modules.slug, slug),
         or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)),
         // Drafts are reachable only by studio authors previewing them.
-        allowed(v, "studio.write") ? undefined : eq(t.modules.status, "published"),
+        privileged(v, "studio.write") ? undefined : eq(t.modules.status, "published"),
       ),
     );
   const mod = mods.find((m) => m.tenantId) ?? mods[0];

@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "@/server/db";
-import { actionViewer, allowed } from "@/server/auth/viewer";
+import { actionViewer, privileged } from "@/server/auth/viewer";
 import { reachableModules } from "@/server/queries/catalog";
 import { rateLimit } from "@/server/rate-limit";
 import { pickLessonContent } from "@/lib/content/lesson-locale";
@@ -29,7 +29,7 @@ export async function loadCaptionsAction(lessonId: string, locale: string): Prom
     .from(t.lessonContents)
     .innerJoin(t.lessons, eq(t.lessons.id, t.lessonContents.lessonId))
     .innerJoin(t.modules, eq(t.modules.id, t.lessons.moduleId))
-    .where(and(eq(t.lessonContents.lessonId, p.data.lessonId), reachableModules(v, allowed(v, "studio.write"))));
+    .where(and(eq(t.lessonContents.lessonId, p.data.lessonId), reachableModules(v, privileged(v, "studio.write"))));
   const narrated = pickLessonContent(contents, await getLocale());
   const other = contents.find((c) => c.locale === p.data.locale);
   if (!narrated || !other || other.locale === narrated.locale) return null;

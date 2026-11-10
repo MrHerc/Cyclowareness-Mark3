@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import type { Role } from "../src/server/db/schema";
 import { featuresFor, type Feature } from "../src/lib/tenant-defaults";
@@ -33,6 +35,16 @@ describe("two-step rule on admin pages and actions", () => {
     expect(privileged(viewer("analyst"), "secops.read")).toBe(true);
     expect(privileged(viewer("content_creator", { requireAdmin2fa: true }), "studio.write")).toBe(false);
     expect(privileged(viewer("learner", { totpEnabled: true }), "secops.read")).toBe(false);
+  });
+});
+
+describe("drafts outside the console", () => {
+  it("open in learner pages, actions and routes only through privileged(), never allowed()", () => {
+    const src = path.join(__dirname, "..", "src");
+    const offenders = readdirSync(src, { recursive: true, encoding: "utf8" })
+      .filter((f) => /\.tsx?$/.test(f) && !/^app[\\/]\(admin\)|^app[\\/]api[\\/]admin/.test(f))
+      .filter((f) => /\ballowed\([^)]*"studio\.write"\)/.test(readFileSync(path.join(src, f), "utf8")));
+    expect(offenders).toEqual([]);
   });
 });
 

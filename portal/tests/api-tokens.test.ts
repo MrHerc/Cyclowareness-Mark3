@@ -5,6 +5,8 @@
  */
 import { createFormatter, createTranslator } from "next-intl";
 import { and, eq, isNull } from "drizzle-orm";
+import { generateTOTP } from "@oslojs/otp";
+import { decodeBase32IgnorePadding } from "@oslojs/encoding";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { Viewer } from "../src/server/auth/viewer";
@@ -28,8 +30,16 @@ vi.mock("../src/server/request", () => ({ clientIp: async () => null, currentPat
 let session: Viewer | null = null;
 // The real gates (allowed, twoFactorGap, apiTokenViewer); only the signed-in administrator (minting tokens, or downloading from the console) is stubbed.
 vi.mock("../src/server/auth/viewer", async (importOriginal) => ({ ...(await importOriginal<object>()), actionViewer: async () => actor, getViewer: async () => session }));
+// Minting takes the actor's password; the step-up itself (attempt limit, audit) is covered in step-up.test.ts.
+const PW = "Correct-Horse-Battery-9";
+vi.mock("../src/server/auth/step-up", async (importOriginal) => ({ ...(await importOriginal<object>()), stepUp: async (_v: unknown, password: unknown) => (password === PW ? null : "wrongPassword") }));
 
 const { createApiTokenAction, revokeApiTokenAction } = await import("../src/server/actions/settings");
+const { changePasswordAction, confirmTotpAction, signOutOtherDevicesAction } = await import("../src/server/actions/profile");
+const { newTotpKey } = await import("../src/server/auth/totp");
+const { setPasswordAction } = await import("../src/server/actions/auth");
+const { resetTwoFactorAction, setStatusAction } = await import("../src/server/actions/people");
+const { hashPassword } = await import("../src/server/auth/password");
 const { API_TOKEN_RATE_LIMIT } = await import("../src/server/auth/api");
 const { rateLimit } = await import("../src/server/rate-limit");
 const { sha256Hex } = await import("../src/server/crypto");
@@ -41,11 +51,11 @@ let admin: typeof t.users.$inferSelect;
 let other: typeof t.tenants.$inferSelect;
 
 const viewerFor = (user: typeof t.users.$inferSelect, org: typeof t.tenants.$inferSelect): Viewer => ({ sessionId: "s", twoFactorVerified: true, user, tenant: { ...org, settings: withDefaults(org.settings), features: featuresFor(org.plan, org.features) } });
-const audited = (action: string) => db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenant.id), eq(t.auditLog.action, action)));
+const audited = (action: string, tenantId = tenant.id) => db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenantId), eq(t.auditLog.action, action)));
 const bearer = (path: string, token: string, init?: RequestInit) => new Request(`http://localhost:3000${path}`, { ...init, headers: { authorization: `Bearer ${token}` } });
 const ctx = (kind: string) => ({ params: Promise.resolve({ kind }) });
 const mint = async (permissions: t.ApiTokenPermission[], name = "HR sync") => {
-  const res = await createApiTokenAction({ name, permissions });
+  const res = await createApiTokenAction({ name, permissions }, PW);
   if (!res.ok || !res.token) throw new Error(`mint failed: ${JSON.stringify(res)}`);
   return { token: res.token, id: sha256Hex(res.token) };
 };
@@ -61,13 +71,35 @@ beforeAll(async () => {
 
 describe("minting", () => {
   it("stores only the hash, returns the secret once and audits the creation", async () => {
-    const res = await createApiTokenAction({ name: " BI tool ", permissions: ["reports.read", "reports.read", "people.read"] });
+    const res = await createApiTokenAction({ name: " BI tool ", permissions: ["reports.read", "reports.read", "people.read"] }, PW);
     expect(res.ok).toBe(true);
     expect(res.token).toMatch(/^cyk_[A-Za-z0-9_-]{32}$/);
     const [row] = await db.select().from(t.apiTokens).where(eq(t.apiTokens.id, sha256Hex(res.token!)));
     expect(row).toMatchObject({ tenantId: tenant.id, name: "BI tool", permissions: ["reports.read", "people.read"], createdBy: admin.id, lastUsedAt: null, revokedAt: null });
     expect(JSON.stringify(row)).not.toContain(res.token);
-    expect(await audited("api_token.created")).toMatchObject([{ actorId: admin.id, targetType: "api_token", targetId: row.id, meta: { name: "BI tool", permissions: ["reports.read", "people.read"] } }]);
+    expect(await audited("api_token.created")).toMatchObject([{ actorId: admin.id, targetType: "api_token", targetId: row.id, meta: { name: "BI tool", permissions: ["reports.read", "people.read"], expiresAt: row.expiresAt.toISOString() } }]);
+  });
+
+  it("takes the actor's password and tells the other administrators", async () => {
+    const peer = await addUser(db, tenant.id, { role: "tenant_admin" });
+    const before = (await db.select().from(t.apiTokens)).length;
+    expect(await createApiTokenAction({ name: "Stolen session", permissions: ["people.read"] })).toEqual({ ok: false, error: "wrongPassword" });
+    expect(await createApiTokenAction({ name: "Stolen session", permissions: ["people.read"] }, "guess")).toEqual({ ok: false, error: "wrongPassword" });
+    expect(await db.select().from(t.apiTokens)).toHaveLength(before);
+    await mint(["people.read"], "Payroll export");
+    const notices = await db.select().from(t.notifications).where(eq(t.notifications.userId, peer.id));
+    expect(notices).toMatchObject([{ kind: "security", title: `${admin.name} created the API token “Payroll export”.`, href: "/admin/settings?tab=integrations" }]);
+    expect(await db.select().from(t.notifications).where(eq(t.notifications.userId, admin.id))).toEqual([]);
+  });
+
+  it("expires after the lifetime picked at minting: 90 days unless chosen, a year at most", async () => {
+    const day = 86_400_000;
+    const expiry = async (res: Awaited<ReturnType<typeof createApiTokenAction>>) => (await db.select().from(t.apiTokens).where(eq(t.apiTokens.id, sha256Hex(res.token!))))[0].expiresAt.getTime();
+    const plain = await createApiTokenAction({ name: "default", permissions: ["reports.read"] }, PW);
+    expect(Math.round((await expiry(plain)) / day - Date.now() / day)).toBe(90);
+    const year = await createApiTokenAction({ name: "year", permissions: ["reports.read"], expiresInDays: 365 }, PW);
+    expect(Math.round((await expiry(year)) / day - Date.now() / day)).toBe(365);
+    for (const expiresInDays of [0, 366, 1.5]) expect(await createApiTokenAction({ name: "x", permissions: ["reports.read"], expiresInDays }, PW)).toEqual({ ok: false, field: "expiresInDays" });
   });
 
   it("refuses an empty name, no permission and a write permission", async () => {
@@ -85,12 +117,16 @@ describe("minting", () => {
       let last = "";
       for (let i = 0; i < t.MAX_API_TOKENS - 1; i++) last = (await mint(["reports.read"], `t${i}`)).id;
       // Guards the behaviour only: PGlite runs one transaction at a time, so this passes without the FOR UPDATE lock too.
-      const race = await Promise.all([1, 2, 3].map((i) => createApiTokenAction({ name: `race${i}`, permissions: ["reports.read"] })));
+      const race = await Promise.all([1, 2, 3].map((i) => createApiTokenAction({ name: `race${i}`, permissions: ["reports.read"] }, PW)));
       expect(race.filter((r) => r.ok)).toHaveLength(1);
       expect(await db.select().from(t.apiTokens).where(and(eq(t.apiTokens.tenantId, org.id), isNull(t.apiTokens.revokedAt)))).toHaveLength(t.MAX_API_TOKENS);
-      expect(await createApiTokenAction({ name: "one more", permissions: ["reports.read"] })).toEqual({ ok: false, error: "limit" });
+      expect(await createApiTokenAction({ name: "one more", permissions: ["reports.read"] }, PW)).toEqual({ ok: false, error: "limit" });
       expect(await revokeApiTokenAction(last)).toEqual({ ok: true });
-      expect((await createApiTokenAction({ name: "one more", permissions: ["reports.read"] })).ok).toBe(true);
+      expect((await createApiTokenAction({ name: "one more", permissions: ["reports.read"] }, PW)).ok).toBe(true);
+      // An expired token, still unrevoked, frees its slot too.
+      await db.update(t.apiTokens).set({ expiresAt: new Date(Date.now() - 1000) }).where(eq(t.apiTokens.name, "t0"));
+      expect((await createApiTokenAction({ name: "after expiry", permissions: ["reports.read"] }, PW)).ok).toBe(true);
+      expect(await createApiTokenAction({ name: "over", permissions: ["reports.read"] }, PW)).toEqual({ ok: false, error: "limit" });
     } finally {
       actor = viewerFor(admin, tenant);
     }
@@ -155,6 +191,13 @@ describe("bearer access", () => {
     const before = (await audited("api_token.refused")).length;
     expect((await reports.GET(bearer("/api/admin/reports/completion", "cyk_nobody"), ctx("completion"))).status).toBe(401);
     expect((await audited("api_token.refused")).length).toBe(before);
+  });
+
+  it("refuses an expired token with 401 and audits the reason", async () => {
+    const { token, id } = await mint(["reports.read"], "expiring");
+    await db.update(t.apiTokens).set({ expiresAt: new Date(Date.now() - 1000) }).where(eq(t.apiTokens.id, id));
+    expect((await reports.GET(bearer("/api/admin/reports/completion", token), ctx("completion"))).status).toBe(401);
+    expect(await audited("api_token.refused")).toContainEqual(expect.objectContaining({ targetId: id, meta: { reason: "expired" } }));
   });
 
   it("loses a permission, then all access, when its creator is demoted, then suspended, after minting", async () => {
@@ -233,6 +276,71 @@ describe("bearer access", () => {
       expect((await reports.GET(new Request("http://localhost:3000/api/admin/reports/completion"), ctx("completion"))).status).toBe(200);
     } finally {
       session = null;
+    }
+  });
+});
+
+describe("a credential recovery of the creator", () => {
+  // Its own organisation: its audit entries, sign-in links and endpoint quota stay apart from the tests above.
+  let org: typeof t.tenants.$inferSelect;
+  let boss: typeof t.users.$inferSelect;
+  beforeAll(async () => {
+    org = await addTenant(db, { plan: "professional" });
+    boss = await addUser(db, org.id, { role: "tenant_admin" });
+  });
+  const form = (o: Record<string, string>) => {
+    const f = new FormData();
+    for (const [k, v] of Object.entries(o)) f.set(k, v);
+    return f;
+  };
+  // Each way the creator's sessions end for a security reason, run with the actor who would run it.
+  const recoveries: [string, (creator: typeof t.users.$inferSelect) => Promise<unknown>][] = [
+    ["password_change", (c) => ((actor = viewerFor(c, org)), changePasswordAction(PW, "An0ther-long-passphrase", "An0ther-long-passphrase"))],
+    [
+      "password_reset",
+      async (c) => {
+        await db.insert(t.authTokens).values({ id: sha256Hex(`reset-${c.id}`), userId: c.id, kind: "reset", expiresAt: new Date(Date.now() + 60_000) });
+        return setPasswordAction(undefined, form({ token: `reset-${c.id}`, kind: "reset", password: "An0ther-long-passphrase", confirm: "An0ther-long-passphrase" }));
+      },
+    ],
+    ["other_devices_signed_out", (c) => ((actor = viewerFor(c, org)), signOutOtherDevicesAction())],
+    ["sessions_ended", (c) => resetTwoFactorAction(c.id, PW)],
+    ["sessions_ended", (c) => setStatusAction([c.id], "suspended")],
+  ];
+
+  it.each(recoveries)("revokes the creator's live tokens (%s), audited once each with the reason, and leaves other tokens working", async (reason, recover) => {
+    const creator = await addUser(db, org.id, { role: "tenant_admin", passwordHash: await hashPassword(PW) });
+    actor = viewerFor(creator, org);
+    const mine = await mint(["reports.read"], "creator's");
+    const expired = await mint(["reports.read"], "already expired");
+    await db.update(t.apiTokens).set({ expiresAt: new Date(Date.now() - 1000) }).where(eq(t.apiTokens.id, expired.id));
+    actor = viewerFor(boss, org);
+    const others = await mint(["reports.read"], "someone else's");
+    try {
+      expect(await recover(creator)).toMatchObject(reason === "password_reset" ? { done: true } : { ok: true });
+    } finally {
+      actor = viewerFor(admin, tenant);
+    }
+    // A suspension refuses as creator_inactive anyway; the revocation is what keeps a reactivation from reviving it.
+    await db.update(t.users).set({ status: "active" }).where(eq(t.users.id, creator.id));
+    expect((await reports.GET(bearer("/api/admin/reports/completion", mine.token), ctx("completion"))).status).toBe(401);
+    expect(await audited("api_token.refused", org.id)).toContainEqual(expect.objectContaining({ targetId: mine.id, meta: { reason: "revoked" } }));
+    const revoked = (await audited("api_token.revoked", org.id)).filter((e) => e.targetId === mine.id || e.targetId === expired.id);
+    expect(revoked).toMatchObject([{ actorId: null, targetId: mine.id, meta: { name: "creator's", reason } }]);
+    expect((await reports.GET(bearer("/api/admin/reports/completion", others.token), ctx("completion"))).status).toBe(200);
+  });
+
+  it("keeps the creator's tokens when they turn on two-step verification, which signs other sessions out without a compromise", async () => {
+    const key = newTotpKey();
+    const creator = await addUser(db, org.id, { role: "tenant_admin", totpSecret: key.encrypted });
+    actor = viewerFor(creator, org);
+    try {
+      const mine = await mint(["reports.read"], "kept on enrolment");
+      expect(await confirmTotpAction(generateTOTP(decodeBase32IgnorePadding(key.base32), 30, 6))).toMatchObject({ ok: true });
+      expect((await reports.GET(bearer("/api/admin/reports/completion", mine.token), ctx("completion"))).status).toBe(200);
+      expect((await audited("api_token.revoked", org.id)).filter((e) => e.targetId === mine.id)).toEqual([]);
+    } finally {
+      actor = viewerFor(admin, tenant);
     }
   });
 });

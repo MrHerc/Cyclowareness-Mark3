@@ -1,6 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { and, asc, eq, ne } from "drizzle-orm";
+import { and, asc, eq, gt, isNull, ne } from "drizzle-orm";
 import { db, t } from "../db";
 import { randomToken } from "../services/progress";
 import { sha256Hex } from "../crypto";
@@ -83,10 +83,28 @@ export async function invalidateSession(id: string): Promise<void> {
   await db().delete(t.sessions).where(eq(t.sessions.id, id));
 }
 
-export async function invalidateUserSessions(userId: string, exceptId?: string): Promise<void> {
+/**
+ * Signs the person out (everywhere but `exceptId`) and revokes the reporting-API tokens they created, so a token
+ * minted from a stolen session does not outlive the account's recovery (a changed or reset password, an
+ * administrator's 2FA reset, signing out other devices, a suspension). `reason` goes into each token's
+ * api_token.revoked entry; null keeps the tokens where sessions end for no compromise (turning on two-step
+ * verification, a role change: ADR-064, the token follows the role).
+ */
+export async function invalidateUserSessions(userId: string, exceptId?: string, reason: string | null = "sessions_ended"): Promise<void> {
   await db()
     .delete(t.sessions)
     .where(exceptId ? and(eq(t.sessions.userId, userId), ne(t.sessions.id, exceptId)) : eq(t.sessions.userId, userId));
+  if (reason) await revokeUserApiTokens(userId, reason);
+}
+
+/** Revokes the live (not revoked, not expired) reporting-API tokens the person created, one audit entry per token. */
+export async function revokeUserApiTokens(userId: string, reason: string): Promise<void> {
+  const revoked = await db()
+    .update(t.apiTokens)
+    .set({ revokedAt: new Date() })
+    .where(and(eq(t.apiTokens.createdBy, userId), isNull(t.apiTokens.revokedAt), gt(t.apiTokens.expiresAt, new Date())))
+    .returning({ id: t.apiTokens.id, tenantId: t.apiTokens.tenantId, name: t.apiTokens.name });
+  for (const k of revoked) await audit(db(), { tenantId: k.tenantId, actorId: null, action: "api_token.revoked", targetType: "api_token", targetId: k.id, meta: { name: k.name, reason } });
 }
 
 /** Absolute lifetime: a session ends this long after sign-in at the latest, however often it is used. */

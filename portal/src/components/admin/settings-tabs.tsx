@@ -60,7 +60,7 @@ import {
   verifySimulationDomainAction,
 } from "@/server/actions/settings";
 import type { TemplateKind, TenantSettings } from "@/server/db/schema";
-import { API_TOKEN_PERMISSIONS, MAX_API_TOKENS, type ApiTokenPermission } from "@/lib/api-tokens";
+import { API_TOKEN_PERMISSIONS, DEFAULT_API_TOKEN_DAYS, MAX_API_TOKENS, MAX_API_TOKEN_DAYS, type ApiTokenPermission } from "@/lib/api-tokens";
 import { DESTINATION_PORTS, SYSLOG_DEFAULT_PORT } from "@/lib/destination-ports";
 import { Card, CardBody, CardHeader, Divider } from "@/components/ui/card";
 import { Button, ButtonAnchor, TextButton, textButtonClass } from "@/components/ui/button";
@@ -69,6 +69,7 @@ import { Dot, Pill } from "@/components/ui/pill";
 import { Notice } from "@/components/ui/layout";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { toast } from "@/components/ui/toast";
+import { settle, useAction } from "@/components/ui/use-action";
 import { BRAND_PALETTE, DEFAULT_ATTESTATION, DEFAULT_CERTIFICATE_TEXT, DEFAULT_TEMPLATES, TEACHABLE_DAYS, WEBHOOK_EVENTS, emailButtonLabel } from "@/lib/tenant-defaults";
 import { parseEmailMarkup } from "@/lib/email-markup";
 import { LOCALES, LOCALE_NAMES, langAttrs } from "@/i18n/config";
@@ -107,18 +108,24 @@ function useSave() {
   const t = useTranslations("settings");
   const tc = useTranslations("common");
   const [pending, start] = useTransition();
-  const save = (fn: () => Promise<{ ok: boolean; field?: string; message?: string }>, fields?: Record<string, string>) =>
-    start(async () => {
-      const res = await fn();
-      if (res.ok) {
-        toast(t("saved"), "success");
-        return;
-      }
-      const id = res.field ? fields?.[res.field] : undefined;
-      const label = id ? document.querySelector(`label[for="${id}"]`)?.textContent?.trim() || document.getElementById(id)?.getAttribute("aria-label") || undefined : undefined;
-      toast(res.message ?? (label ? tc("errors.invalidField", { field: label }) : tc("errors.invalid")), "error");
-      if (id) markInvalid(id);
-    });
+  // Through settle (use-action.ts): a call that throws (server unreachable) gets the generic toast with a retry, not the error boundary.
+  const save = (fn: () => Promise<{ ok: boolean; field?: string; message?: string }>, fields?: Record<string, string>): void =>
+    start(() =>
+      settle(
+        fn,
+        {
+          successToast: t("saved"),
+          errorMap: (res) => {
+            const id = res.field ? fields?.[res.field] : undefined;
+            const label = id ? document.querySelector(`label[for="${id}"]`)?.textContent?.trim() || document.getElementById(id)?.getAttribute("aria-label") || undefined : undefined;
+            if (id) markInvalid(id);
+            return res.message ?? (label ? tc("errors.invalidField", { field: label }) : tc("errors.invalid"));
+          },
+        },
+        tc,
+        () => save(fn, fields),
+      ),
+    );
   return { pending, save };
 }
 
@@ -174,7 +181,6 @@ export function BrandingTab({
   const [proofDomain, setProofDomain] = useState(domain ?? branding.senderDomain ?? "");
   const [proof, setProof] = useState(domain && verifiedOn ? { domain, verifiedOn } : null);
   const [record, setRecord] = useState("");
-  const [checking, startCheck] = useTransition();
   useEffect(() => {
     domainProofRecordAction().then(
       (r) => setRecord(r.record),
@@ -185,13 +191,10 @@ export function BrandingTab({
     if (await writeClipboard(v)) toast(tc("copied"));
     else toast(tc("errors.generic"), "error");
   };
-  const checkDomain = () =>
-    startCheck(async () => {
-      const res = await verifyDomainAction(proofDomain);
-      if (!res.ok) {
-        toast(res.error === "rateLimited" ? tc("errors.rateLimited") : res.error === "domainTaken" ? t("domainTaken") : t("checkInvalid"), "error");
-        return;
-      }
+  const checkDomain = useAction(verifyDomainAction, {
+    // rateLimited falls through to common.errors.
+    errorMap: (res) => (res.error === "domainTaken" ? t("domainTaken") : res.error ? undefined : t("checkInvalid")),
+    onSuccess: (res) => {
       if (res.verified && res.verifiedOn) {
         setProof({ domain: proofDomain.trim().toLowerCase(), verifiedOn: res.verifiedOn });
         toast(t("checkOk"), "success");
@@ -200,7 +203,8 @@ export function BrandingTab({
         if (!res.kept) setProof(null);
         toast(res.kept ? t("checkKept") : t("checkMissing"), "error");
       }
-    });
+    },
+  });
 
   const upload = (f: File) => {
     if (!["image/png", "image/jpeg", "image/svg+xml"].includes(f.type) || f.size > 512 * 1024) return toast(t("logoError"), "error");
@@ -330,7 +334,7 @@ export function BrandingTab({
                 </div>
               </Field>
             </div>
-            <Button variant="secondary" className="w-fit" disabled={checking || !proofDomain.trim()} onClick={checkDomain}>
+            <Button variant="secondary" className="w-fit" disabled={checkDomain.pending || !proofDomain.trim()} onClick={() => checkDomain.run(proofDomain)}>
               {t("check")}
             </Button>
           </CardBody>
@@ -709,32 +713,29 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
   const tb = useTranslations("settings.branding");
   const tc = useTranslations("common");
   const { pending, save } = useSave();
-  const [resending, startResend] = useTransition();
-  const resend = (id?: string) =>
-    startResend(async () => {
-      const res = await resendFailedMailAction(id);
-      toast(res.ok ? t("resent", { count: res.count }) : t("resendFailed"), res.ok ? "success" : "error");
-    });
+  const resend = useAction(resendFailedMailAction, { successToast: (res) => t("resent", { count: res.count }), errorMap: () => t("resendFailed") });
   const [s, setS] = useState({ host: email.host ?? "", port: email.port ?? 587, secure: email.secure ?? false, user: email.user ?? "", password: "", fromName: email.fromName ?? "", fromAddress: email.fromAddress ?? "", replyTo: email.replyTo ?? "", helpdesk: email.helpdesk ?? "", simulationFromAddress: email.simulationFromAddress ?? "", enabled: email.enabled });
   const [to, setTo] = useState(viewerEmail);
-  const [testing, startTest] = useTransition();
+  const testEmail = useAction(testEmailAction, {
+    successToast: t("testOk"),
+    errorMap: (res) => (res.error === "rateLimited" ? undefined : t("testFailed", { error: t(`testErrors.${(res.error ?? "send_failed") as "send_failed"}`) })),
+  });
   // Look-alike domain of the simulation sender: proven with the same TXT record as the organisation's domain (Branding).
   const [simDomain, setSimDomain] = useState(email.simulationDomain ?? "");
   const [record, setRecord] = useState("");
-  const [checking, startCheck] = useTransition();
   useEffect(() => {
     domainProofRecordAction().then(
       (r) => setRecord(r.record),
       () => setRecord(""),
     );
   }, []);
-  const checkSimulationDomain = () =>
-    startCheck(async () => {
-      const res = await verifySimulationDomainAction(s.simulationFromAddress);
-      if (!res.ok) return toast(res.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.invalidField", { field: t("simulationFrom") }), "error");
+  const checkSimulationDomain = useAction(verifySimulationDomainAction, {
+    errorMap: (res) => (res.error ? undefined : tc("errors.invalidField", { field: t("simulationFrom") })),
+    onSuccess: (res) => {
       if (res.found && res.domain) setSimDomain(res.domain);
       toast(res.found ? tb("checkOk") : tb("checkMissing"), res.found ? "success" : "error");
-    });
+    },
+  });
   // The stored password is not kept for a different host or port (saveEmailAction); 587 is the default port.
   const passwordReenter = email.hasPassword && !s.password && endpointKey(email.host, email.port ?? 587) !== endpointKey(s.host, s.port || 587);
   return (
@@ -806,7 +807,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
                 </div>
               </Field>
             </div>
-            <Button variant="secondary" className="w-fit" disabled={checking || !s.simulationFromAddress.includes("@")} onClick={checkSimulationDomain}>
+            <Button variant="secondary" className="w-fit" disabled={checkSimulationDomain.pending || !s.simulationFromAddress.includes("@")} onClick={() => checkSimulationDomain.run(s.simulationFromAddress)}>
               {tb("check")}
             </Button>
           </CardBody>
@@ -834,7 +835,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
             description={t("outboxBody")}
             action={
               failedCount ? (
-                <Button size="sm" variant="secondary" icon={<Send />} disabled={resending} onClick={() => resend()}>
+                <Button size="sm" variant="secondary" icon={<Send />} disabled={resend.pending} onClick={() => resend.run()}>
                   {t("resendAll", { count: failedCount })}
                 </Button>
               ) : undefined
@@ -853,7 +854,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
                     {m.cancelled ? (
                       <span className="text-ink-subtle">{t("campaignCancelled")}</span>
                     ) : m.resendable ? (
-                      <Button size="sm" variant="ghost" disabled={resending} onClick={() => resend(m.id)} title={m.error && t.has(`testErrors.${m.error as "send_failed"}`) ? t(`testErrors.${m.error as "send_failed"}`) : undefined}>
+                      <Button size="sm" variant="ghost" disabled={resend.pending} onClick={() => resend.run(m.id)} title={m.error && t.has(`testErrors.${m.error as "send_failed"}`) ? t(`testErrors.${m.error as "send_failed"}`) : undefined}>
                         {t("resend")}
                       </Button>
                     ) : null}
@@ -877,13 +878,8 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
               <Button
                 className="w-full"
                 icon={<Send />}
-                disabled={!email.host || !to || testing}
-                onClick={() =>
-                  startTest(async () => {
-                    const res = await testEmailAction(to);
-                    toast(res.ok ? t("testOk") : res.error === "rateLimited" ? tc("errors.rateLimited") : t("testFailed", { error: t(`testErrors.${(res.error ?? "send_failed") as "send_failed"}`) }), res.ok ? "success" : "error");
-                  })
-                }
+                disabled={!email.host || !to || testEmail.pending}
+                onClick={() => testEmail.run(to)}
               >
                 {t("sendTest")}
               </Button>
@@ -1479,7 +1475,11 @@ export function ProtectionTab({ protection, retention }: { protection: TenantSet
   const [img, setImg] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [result, setResult] = useState<string | null>(null);
-  const [checking, startCheck] = useTransition();
+  // A code nobody holds is a refusal without an error key: its message comes from errorMap, not the generic failure.
+  const lookup = useAction(lookupWatermarkAction, {
+    onSuccess: (res) => setResult(t("found", { name: res.name ?? "", email: res.email ?? "", date: format.dateTime(new Date(res.at!), { dateStyle: "medium", timeStyle: "short" }) })),
+    errorMap: () => t("notFound"),
+  });
 
   // A picture pasted anywhere on the tab goes straight to the leak check.
   useEffect(() => {
@@ -1552,13 +1552,8 @@ export function ProtectionTab({ protection, retention }: { protection: TenantSet
             </Field>
             <Button
               className="w-fit"
-              disabled={checking || code.replace(/[^A-Z0-9]/g, "").length !== 8}
-              onClick={() =>
-                startCheck(async () => {
-                  const res = await lookupWatermarkAction(code);
-                  setResult(res.ok ? t("found", { name: res.name ?? "", email: res.email ?? "", date: format.dateTime(new Date(res.at!), { dateStyle: "medium", timeStyle: "short" }) }) : t("notFound"));
-                })
-              }
+              disabled={lookup.pending || code.replace(/[^A-Z0-9]/g, "").length !== 8}
+              onClick={() => (setResult(null), lookup.run(code))}
             >
               {t("check")}
             </Button>
@@ -1587,17 +1582,18 @@ export function ProtectionTab({ protection, retention }: { protection: TenantSet
 /** `allowedUntil`: the live grant's end, formatted on the server (null when there is none or it has passed). */
 export function SecurityTab({ allowedUntil }: { allowedUntil: string | null }) {
   const t = useTranslations("settings.security");
-  const [pending, start] = useTransition();
-  const run = (fn: () => Promise<{ ok: boolean }>, message: string) => start(async () => void ((await fn()).ok && toast(message, "success")));
+  const grant = useAction(grantSupportAccessAction, { successToast: t("granted") });
+  const revoke = useAction(revokeSupportAccessAction, { successToast: t("revoked") });
+  const pending = grant.pending || revoke.pending;
   return (
     <Card>
       <CardHeader title={t("title")} description={t("body")} icon={<LifeBuoy />} action={<Pill tone={allowedUntil ? "safe" : "neutral"}>{allowedUntil ? t("activeUntil", { date: allowedUntil }) : t("inactive")}</Pill>} />
       <CardBody className="flex flex-wrap gap-2">
-        <Button disabled={pending} onClick={() => run(grantSupportAccessAction, t("granted"))}>
+        <Button disabled={pending} onClick={() => grant.run()}>
           {t("grant")}
         </Button>
         {allowedUntil ? (
-          <Button variant="secondary" disabled={pending} onClick={() => run(revokeSupportAccessAction, t("revoked"))}>
+          <Button variant="secondary" disabled={pending} onClick={() => revoke.run()}>
             {t("revoke")}
           </Button>
         ) : null}
@@ -1612,40 +1608,45 @@ export function SecurityTab({ allowedUntil }: { allowedUntil: string | null }) {
 function ApiTokensCard({ tokens, canMint }: { tokens: ApiTokenView[]; canMint: boolean }) {
   const t = useTranslations("settings.integrations");
   const tc = useTranslations("common");
+  const tp = useTranslations("admin.person");
+  const stepUpError = useStepUpError();
   const [name, setName] = useState("");
   const [permissions, setPermissions] = useState<ApiTokenPermission[]>(["reports.read"]);
+  const [days, setDays] = useState(DEFAULT_API_TOKEN_DAYS);
+  // A token outlives every session, so minting it takes the actor's password (createApiTokenAction).
+  const [password, setPassword] = useState("");
+  const [pwError, setPwError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [busy, start] = useTransition();
+  const create = useAction(createApiTokenAction, {
+    successToast: t("tokenCreated"),
+    onSuccess: (res) => {
+      setToken(res.token ?? null);
+      setName("");
+      setPassword("");
+      setPwError(null);
+    },
+    errorMap: (res) => {
+      const refused = stepUpError(res.error);
+      setPwError(refused);
+      if (res.field === "name") markInvalid("k-name");
+      return refused ?? (res.error === "limit" ? t("tokenLimit", { max: MAX_API_TOKENS }) : tc("errors.invalid"));
+    },
+  });
+  // The secret on show may belong to the token just revoked; it is never shown again anyway.
+  const revoke = useAction(revokeApiTokenAction, { successToast: t("tokenRevoked"), onSuccess: () => setToken(null) });
+  const busy = create.pending || revoke.pending;
   // Shown once: focus it, so it is announced and ready to copy (the Create button is disabled by then).
   useEffect(() => {
     if (token) document.getElementById("k-token")?.focus();
   }, [token]);
-  const full = tokens.length >= MAX_API_TOKENS;
+  // An expired token stays listed until it is revoked but no longer holds a slot.
+  const full = tokens.filter((k) => !k.expired).length >= MAX_API_TOKENS;
   const permKey = (p: ApiTokenPermission) => p.replace(".", "_") as "reports_read";
   const toggle = (p: ApiTokenPermission) => setPermissions(permissions.includes(p) ? permissions.filter((x) => x !== p) : [...permissions, p]);
   const copy = async (v: string) => {
     if (await writeClipboard(v)) toast(tc("copied"));
     else toast(tc("errors.generic"), "error");
   };
-  const create = () =>
-    start(async () => {
-      const res = await createApiTokenAction({ name: name.trim(), permissions });
-      if (!res.ok) {
-        toast(res.error === "limit" ? t("tokenLimit", { max: MAX_API_TOKENS }) : tc("errors.invalid"), "error");
-        if (res.field === "name") markInvalid("k-name");
-        return;
-      }
-      setToken(res.token ?? null);
-      setName("");
-      toast(t("tokenCreated"), "success");
-    });
-  const revoke = (id: string) =>
-    start(async () => {
-      const res = await revokeApiTokenAction(id);
-      // The secret on show may belong to the token just revoked; it is never shown again anyway.
-      if (res.ok) setToken(null);
-      toast(res.ok ? t("tokenRevoked") : tc("errors.generic"), res.ok ? "success" : "error");
-    });
   return (
     <Card>
       <CardHeader icon={<KeyRound />} title={t("apiTokens")} description={t("apiTokensBody", { max: MAX_API_TOKENS })} />
@@ -1665,7 +1666,14 @@ function ApiTokensCard({ tokens, canMint }: { tokens: ApiTokenView[]; canMint: b
                 <span className="text-ink-subtle">
                   {t("tokenLastUsed")}: {k.lastUsedAt ? <RelativeTime date={k.lastUsedAt} /> : tc("time.never")}
                 </span>
-                <Button size="sm" variant="secondary" icon={<Trash2 />} className="ms-auto" disabled={busy} onClick={() => revoke(k.id)} aria-label={`${t("revokeToken")}: ${k.name}`}>
+                {k.expired ? (
+                  <Pill tone="risk">{t("tokenExpired")}</Pill>
+                ) : (
+                  <span className="text-ink-subtle">
+                    {t("tokenExpires")}: <RelativeTime date={k.expiresAt} />
+                  </span>
+                )}
+                <Button size="sm" variant="secondary" icon={<Trash2 />} className="ms-auto" disabled={busy} onClick={() => revoke.run(k.id)} aria-label={`${t("revokeToken")}: ${k.name}`}>
                   {t("revokeToken")}
                 </Button>
               </li>
@@ -1697,9 +1705,23 @@ function ApiTokensCard({ tokens, canMint }: { tokens: ApiTokenView[]; canMint: b
                 <Checkbox key={p} label={t(`tokenPermissions.${permKey(p)}`)} description={<code className="font-mono text-tab">{p}</code>} checked={permissions.includes(p)} onChange={() => toggle(p)} />
               ))}
             </fieldset>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label={t("tokenLifetime")} htmlFor="k-days" hint={t("tokenLifetimeHint")}>
+                <Select id="k-days" className="max-w-48" value={days} onChange={(e) => setDays(Number(e.target.value))} aria-describedby="k-days-hint">
+                  {[30, DEFAULT_API_TOKEN_DAYS, 180, MAX_API_TOKEN_DAYS].map((n) => (
+                    <option key={n} value={n}>
+                      {t("tokenDays", { days: n })}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label={tp("confirmPassword")} htmlFor="k-password" hint={t("tokenPasswordHint")} error={pwError}>
+                <Input id="k-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} aria-invalid={pwError ? true : undefined} aria-describedby={pwError ? "k-password-error" : "k-password-hint"} />
+              </Field>
+            </div>
             {full ? <Notice tone="info">{t("tokenLimit", { max: MAX_API_TOKENS })}</Notice> : null}
             <div className="flex justify-end">
-              <Button disabled={busy || full || !name.trim() || !permissions.length} onClick={create}>
+              <Button disabled={busy || full || !name.trim() || !permissions.length || !password} onClick={() => create.run({ name: name.trim(), permissions, expiresInDays: days }, password)}>
                 {t("createToken")}
               </Button>
             </div>
@@ -1720,7 +1742,7 @@ const RECEIVER_HEADERS = [
   ["X-Cyclowareness-Delivery", "hdrDelivery"],
 ] as const;
 
-export type ApiTokenView = { id: string; name: string; permissions: ApiTokenPermission[]; createdAt: string; lastUsedAt: string | null };
+export type ApiTokenView = { id: string; name: string; permissions: ApiTokenPermission[]; createdAt: string; lastUsedAt: string | null; expiresAt: string; expired: boolean };
 
 export function IntegrationsTab({
   integrations,
@@ -1759,7 +1781,10 @@ export function IntegrationsTab({
     if (await writeClipboard(v)) toast(tc("copied"));
     else toast(tc("errors.generic"), "error");
   };
-  const [busy, start] = useTransition();
+  const rotateWebhook = useAction(rotateWebhookSecretAction, { onSuccess: (r) => setSecret(r.secret ?? null) });
+  const rotateInbound = useAction(rotateInboundSecretAction, { onSuccess: (r) => setInboundSecret(r.secret ?? null) });
+  const testEvent = useAction(sendTestEventAction, { successToast: t("testQueued"), errorMap: { no_target: t("testNoTarget") } });
+  const busy = rotateWebhook.pending || rotateInbound.pending || testEvent.pending;
   const hasSecret = Boolean(integrations.hasWebhookSecret || secret);
   const toggleEvent = (e: string) => setS({ ...s, webhookEvents: s.webhookEvents.includes(e) ? s.webhookEvents.filter((x) => x !== e) : [...s.webhookEvents, e] });
   return (
@@ -1789,7 +1814,7 @@ export function IntegrationsTab({
                 </p>
                 <p className="mt-0.5 text-caption text-ink-muted">{t("secretBody")}</p>
               </div>
-              <Button size="sm" variant="secondary" disabled={busy} onClick={() => start(async () => setSecret((await rotateWebhookSecretAction()).secret ?? null))}>
+              <Button size="sm" variant="secondary" disabled={busy} onClick={() => rotateWebhook.run()}>
                 {t("createSecret")}
               </Button>
             </div>
@@ -1822,7 +1847,7 @@ export function IntegrationsTab({
                 </p>
                 <p className="mt-0.5 text-caption text-ink-muted">{t("inboundSecretBody")}</p>
               </div>
-              <Button size="sm" variant="secondary" disabled={busy} onClick={() => start(async () => setInboundSecret((await rotateInboundSecretAction()).secret ?? null))}>
+              <Button size="sm" variant="secondary" disabled={busy} onClick={() => rotateInbound.run()}>
                 {hasInboundSecret ? t("regenerateSecret") : t("createSecret")}
               </Button>
             </div>
@@ -1877,12 +1902,7 @@ export function IntegrationsTab({
             variant="secondary"
             icon={<Send />}
             disabled={busy || (!s.webhookUrl && !s.syslogHost)}
-            onClick={() =>
-              start(async () => {
-                const res = await sendTestEventAction();
-                toast(res.ok ? t("testQueued") : res.error === "no_target" ? t("testNoTarget") : tc("errors.generic"), res.ok ? "success" : "error");
-              })
-            }
+            onClick={() => testEvent.run()}
           >
             {t("sendTest")}
           </Button>
