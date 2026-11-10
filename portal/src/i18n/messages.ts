@@ -21,10 +21,10 @@ type Namespace = (typeof NAMESPACES)[number];
 export const CLIENT_NAMESPACES = {
   root: ["common"],
   admin: ["admin", "auth", "common", "learner", "player", "secops", "security", "settings"],
-  auth: ["auth"],
+  auth: ["auth", "common"],
   focus: ["common", "learner", "player"],
   learner: ["auth", "common", "learner", "player", "secops", "security"],
-  public: ["site"],
+  public: ["common", "site"],
   site: ["auth", "common"],
 } as const satisfies Record<string, readonly Namespace[]>;
 export type Surface = keyof typeof CLIENT_NAMESPACES;
