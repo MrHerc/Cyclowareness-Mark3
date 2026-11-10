@@ -574,7 +574,7 @@ describe("Studio lessons", () => {
     const { scenes } = await lessonOf(tenant.id, res.slug!);
     const en = scenes("en")!;
     expect(en.map((s) => s.id)).toEqual(["intro", "steps", "swipe", "hotspot", "check", "recap"]);
-    const lesson = { id: "lesson-1", title: LESSON.title, minutes: LESSON.minutes, scenes: en };
+    const lesson = { formatVersion: 1 as const, id: "lesson-1", title: LESSON.title, minutes: LESSON.minutes, scenes: en };
     expect(lessonFileSchema.safeParse(lesson).success).toBe(true);
     expect(lessonIntegrityErrors(lessonFileSchema.parse(lesson))).toEqual([]);
     // The AI trainer's checks too: every spot is marked in the e-mail, the swipe has a threat.
