@@ -112,6 +112,32 @@ describe("launchCampaign", () => {
     expect(log.meta).toEqual({ recipients: 3, channel: "email" });
   });
 
+  it("creates every recipient and mail of a large audience in INSERTs of 500", async () => {
+    const tenant = await addTenant(db, { plan: "enterprise_hrm", settings: settings() });
+    const people = await db
+      .insert(t.users)
+      .values(Array.from({ length: 1_201 }, (_, i) => ({ tenantId: tenant.id, email: `bulk${i}-${tenant.id}@test.example`, name: `P ${i}`, locale: "en" })))
+      .returning({ id: t.users.id });
+    const campaign = await draft(tenant.id);
+    const insert = vi.spyOn(db, "insert");
+    try {
+      expect(await c.launchCampaign(db, campaign.id, null)).toEqual({ ok: true, count: 1_201 });
+      expect(insert.mock.calls.filter(([table]) => table === t.campaignRecipients)).toHaveLength(3);
+      expect(insert.mock.calls.filter(([table]) => table === t.outbox)).toHaveLength(3);
+    } finally {
+      insert.mockRestore();
+    }
+    const rows = await recipients(campaign.id);
+    expect(new Set(rows.map((r) => r.userId))).toEqual(new Set(people.map((p) => p.id)));
+    expect(new Set(rows.map((r) => r.token)).size).toBe(1_201);
+    const mail = await db.select({ to: t.outbox.to, text: t.outbox.text }).from(t.outbox).where(eq(t.outbox.tenantId, tenant.id));
+    expect(mail).toHaveLength(1_201);
+    // Each message carries its own recipient's link.
+    const tokenOf = new Map(rows.map((r) => [r.userId, r.token]));
+    const [last] = await db.select({ id: t.users.id, email: t.users.email }).from(t.users).where(eq(t.users.id, people[1_200].id));
+    expect(mail.find((m) => m.to === last.email)!.text).toContain(`/t/${tokenOf.get(last.id)}`);
+  }, 60_000);
+
   it("escapes the template's text in the HTML of the message", async () => {
     const { tenant } = await org({ people: 1 });
     const campaign = await draft(tenant.id, { templateKey: "invoice" });

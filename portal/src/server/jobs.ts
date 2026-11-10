@@ -4,7 +4,7 @@ import { connect as tlsConnect } from "node:tls";
 import { createSocket } from "node:dgram";
 import type { LookupAddress } from "node:dns";
 import { hostname } from "node:os";
-import { and, asc, eq, gte, inArray, isNotNull, isNull, lt, ne, notInArray, or, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNotNull, isNull, lt, lte, ne, notInArray, or, sql } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import type { DB } from "./db/client";
@@ -74,12 +74,30 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
   await step("domains", () => recheckDomains(db, now));
   await step("cleanup", () => cleanup(db, now));
   const tenants = await db.select({ id: t.tenants.id, name: t.tenants.name, settings: t.tenants.settings, branding: t.tenants.branding }).from(t.tenants);
+  const lastRuns = await db.select().from(t.jobRuns);
+  const lastRun = new Map(lastRuns.map((r) => [`${r.job}:${r.tenantId}`, r.ranAt]));
+  /**
+   * At most once an hour per organisation, each resolving its whole assignment graph. The hour counts from the
+   * tick's own start (`now`), so a tick that overruns does not push the next run back.
+   */
+  const hourly = async (job: string, tenantId: string, fn: () => Promise<number>) => {
+    const elapsed = now.getTime() - (lastRun.get(`${job}:${tenantId}`)?.getTime() ?? -Infinity);
+    if (elapsed >= 0 && elapsed < HOUR) return;
+    // Recorded inside the step: a failed run is tried again on the next tick, and a failing write stops nothing else.
+    await step(`${job}:${tenantId}`, async () => {
+      const n = await fn();
+      await db.insert(t.jobRuns).values({ job, tenantId, ranAt: now }).onConflictDoUpdate({ target: [t.jobRuns.job, t.jobRuns.tenantId], set: { ranAt: now } });
+      return n;
+    });
+  };
   for (const row of tenants) {
     const tenant = { ...row, settings: withDefaults(row.settings) };
     await step(`snapshot:${tenant.id}`, () => dailySnapshot(db, tenant.id, tenant.settings.timeZone, now));
-    await step(`reminders:${tenant.id}`, () => reminders(db, tenant, now));
-    await step(`managers:${tenant.id}`, () => managerAlerts(db, tenant, now));
-    await step(`refreshers:${tenant.id}`, () => refreshers(db, tenant, now));
+    const riskAsked = lastRun.get(`risk:${tenant.id}`);
+    if (riskAsked) await step(`risk:${tenant.id}`, () => deferredRisk(db, tenant.id, riskAsked, now));
+    await hourly("reminders", tenant.id, () => reminders(db, tenant, now));
+    await hourly("managers", tenant.id, () => managerAlerts(db, tenant, now));
+    await hourly("refreshers", tenant.id, () => refreshers(db, tenant, now));
     await step(`reports:${tenant.id}`, () => scheduledReports(db, tenant, now));
   }
   await step("tick", async () => {
@@ -455,6 +473,13 @@ async function dailySnapshot(db: DB, tenantId: string, timeZone: string, now: Da
       .onConflictDoNothing();
   }
   await snapshotTenant(db, tenantId, now);
+  return 1;
+}
+
+/** The whole-organisation rescoring an assignment change left to the tick (recomputeChanged); one asked for meanwhile stays. */
+async function deferredRisk(db: DB, tenantId: string, askedAt: Date, now: Date): Promise<number> {
+  await recomputeRisk(db, tenantId, undefined, now);
+  await db.delete(t.jobRuns).where(and(eq(t.jobRuns.job, "risk"), eq(t.jobRuns.tenantId, tenantId), lte(t.jobRuns.ranAt, askedAt)));
   return 1;
 }
 

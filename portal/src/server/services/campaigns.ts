@@ -5,7 +5,7 @@ import { departmentClosure } from "./assignments";
 import { randomToken } from "./progress";
 import { audit } from "./audit";
 import { emitEvent } from "./events";
-import { queueEmail } from "../mail";
+import { queueEmails } from "../mail";
 import { sendSms, smsAvailable } from "../sms";
 import { recomputeRisk } from "./risk";
 import { appUrl, env } from "../env";
@@ -16,6 +16,8 @@ import { tenantTimeZone } from "./tenants";
 import { dirOf, type Locale } from "../../i18n/config";
 
 const DAY = 86_400_000;
+/** Recipients (and their mail) per INSERT at launch. */
+const LAUNCH_CHUNK = 500;
 
 export async function campaignAudience(db: DB, c: { tenantId: string; audience: "all" | "department"; departmentId: string | null }) {
   const users = await db
@@ -96,22 +98,26 @@ export async function launchCampaign(db: DB, campaignId: string, actorId: string
     .where(and(eq(t.campaigns.id, c.id), inArray(t.campaigns.status, ["draft", "scheduled"])))
     .returning({ id: t.campaigns.id });
   if (!claimed) return { ok: false, reason: "launched" };
+  // An SMS recipient waits with an empty sentAt: sendQueuedSms (job runner) sends it and sets the time.
+  const sms = tpl.channel === "sms";
   let count = 0;
-  for (const u of audience) {
-    const token = randomToken(16);
-    // An SMS recipient waits with an empty sentAt: sendQueuedSms (job runner) sends it and sets the time.
-    const sms = tpl.channel === "sms";
-    const [rec] = await db.insert(t.campaignRecipients).values({ campaignId: c.id, userId: u.id, token, sentAt: sms ? null : now }).returning({ id: t.campaignRecipients.id });
-    if (!rec) continue;
+  // Two INSERTs per 500 people (recipients, then their mail) instead of two per person.
+  for (let i = 0; i < audience.length; i += LAUNCH_CHUNK) {
+    const batch = audience.slice(i, i + LAUNCH_CHUNK).map((u) => ({ u, token: randomToken(16) }));
+    await db.insert(t.campaignRecipients).values(batch.map(({ u, token }) => ({ campaignId: c.id, userId: u.id, token, sentAt: sms ? null : now })));
     if (tpl.channel === "email") {
-      const m = emailHtml(tpl, u.locale, token);
-      // Display name is the template's; the address is the organisation's own sending domain.
-      // Deferred: the job runner sends the batch, so Launch does not wait for one SMTP round-trip per person.
-      await queueEmail(db, c.tenantId, { to: u.email, kind: "simulation", subject: m.subject, text: m.text, html: m.html, fromName: templateText(tpl.sender.name, u.locale), lang: m.lang }, { defer: true });
-    } else if (sms && !u.phone) {
-      continue;
+      // Deferred: the job runner sends the batch (with the template's display name, see simulationInfo), so Launch does not wait for SMTP.
+      await queueEmails(
+        db,
+        c.tenantId,
+        batch.map(({ u, token }) => {
+          const m = emailHtml(tpl, u.locale, token);
+          return { to: u.email, kind: "simulation", subject: m.subject, text: m.text, html: m.html, lang: m.lang };
+        }),
+        { defer: true },
+      );
     }
-    count++;
+    count += batch.filter(({ u }) => !sms || u.phone).length;
   }
   await audit(db, { tenantId: c.tenantId, actorId, action: "campaign.launched", targetType: "campaign", targetId: c.id, meta: { recipients: count, channel: tpl.channel } });
   return { ok: true, count };

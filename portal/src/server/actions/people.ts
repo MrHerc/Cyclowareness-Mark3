@@ -18,6 +18,7 @@ import { notifyTakeover, notifyUsers } from "../services/notify";
 import { coveringAssignments, departmentClosure, gainsCoverage, resolveAssignments } from "../services/assignments";
 import { recomputeRisk } from "../services/risk";
 import { scopeDepartmentIds } from "../queries/admin";
+import { tenantModules } from "../queries/catalog";
 import { clientIp } from "../request";
 import { rateLimit } from "../rate-limit";
 import { importTooBig, parseCsv } from "../../lib/csv";
@@ -421,7 +422,7 @@ export async function remindPeopleAction(userIds: string[]): Promise<{ count: nu
     .where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids), eq(t.users.status, "active")));
   const allowedUsers = users.filter((u) => !scope || (u.departmentId && scope.has(u.departmentId)));
   const assigned = await resolveAssignments(db(), v.tenant.id, allowedUsers.map((u) => u.id));
-  const mods = await db().select({ id: t.modules.id, slug: t.modules.slug, title: t.modules.title }).from(t.modules);
+  const mods = await db().select({ id: t.modules.id, slug: t.modules.slug, title: t.modules.title }).from(t.modules).where(tenantModules(v));
   const modMap = new Map(mods.map((m) => [m.id, m]));
   const done = allowedUsers.length
     ? await db()

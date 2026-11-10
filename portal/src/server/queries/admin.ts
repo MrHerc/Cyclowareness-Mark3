@@ -5,6 +5,7 @@ import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { departmentClosure, resolveAssignments } from "../services/assignments";
 import { departmentLeague } from "../services/league";
+import { tenantModules } from "./catalog";
 import { riskBand } from "../../lib/domain/risk";
 import { pick } from "../../i18n/config";
 import { dayPlus } from "../../lib/time";
@@ -116,11 +117,11 @@ export async function overviewData(v: Viewer, locale: string, departmentFilter: 
           .from(t.campaignRecipients)
           .where(and(inArray(t.campaignRecipients.userId, ids), gte(t.campaignRecipients.sentAt, new Date(now.getTime() - 90 * DAY))))
       : Promise.resolve([{ sent: 0, reported: 0, clicked: 0 }]),
-    db().select({ id: t.lessons.id, moduleId: t.lessons.moduleId }).from(t.lessons),
+    db().select({ id: t.lessons.id, moduleId: t.lessons.moduleId }).from(t.lessons).innerJoin(t.modules, eq(t.modules.id, t.lessons.moduleId)).where(tenantModules(v)),
     ids.length
       ? db().select({ userId: t.lessonProgress.userId, lessonId: t.lessonProgress.lessonId }).from(t.lessonProgress).where(and(inArray(t.lessonProgress.userId, ids), isNotNull(t.lessonProgress.completedAt)))
       : Promise.resolve([]),
-    db().select({ id: t.modules.id, slug: t.modules.slug, title: t.modules.title, category: t.modules.category }).from(t.modules),
+    db().select({ id: t.modules.id, slug: t.modules.slug, title: t.modules.title, category: t.modules.category }).from(t.modules).where(tenantModules(v)),
     db().select({ moduleId: t.feedback.moduleId, r: avg(t.feedback.rating), n: count() }).from(t.feedback).where(and(eq(t.feedback.tenantId, v.tenant.id), isNotNull(t.feedback.moduleId))).groupBy(t.feedback.moduleId),
     ids.length
       ? db()
