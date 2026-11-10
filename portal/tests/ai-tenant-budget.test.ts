@@ -40,7 +40,7 @@ vi.mock("../src/server/env", () => ({
   env: { APP_URL: "http://localhost:3000", TRUST_PROXY: 0, isProd: false, ANTHROPIC_API_KEY: "test-key", ANTHROPIC_TUTOR_MODEL: "claude-haiku-5-5" },
   appUrl: () => "http://localhost:3000",
 }));
-vi.mock("../src/server/auth/viewer", () => ({ getViewer: async () => state.viewer, actionViewer: async () => state.viewer, allowed: () => false }));
+vi.mock("../src/server/auth/viewer", () => ({ getViewer: async () => state.viewer, actionViewer: async () => state.viewer, privileged: () => false }));
 vi.mock("../src/server/rate-limit", () => ({ rateLimit: state.limit }));
 vi.mock("next-intl/server", () => ({ getLocale: async () => "en", getTranslations: async () => (key: string) => key }));
 vi.mock("next/cache", () => ({ refresh: vi.fn() }));

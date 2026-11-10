@@ -150,7 +150,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
         .orderBy(desc(t.webhookDeliveries.createdAt))
         .limit(20);
       const tokens = await db()
-        .select({ id: t.apiTokens.id, name: t.apiTokens.name, permissions: t.apiTokens.permissions, createdAt: t.apiTokens.createdAt, lastUsedAt: t.apiTokens.lastUsedAt })
+        .select({ id: t.apiTokens.id, name: t.apiTokens.name, permissions: t.apiTokens.permissions, createdAt: t.apiTokens.createdAt, lastUsedAt: t.apiTokens.lastUsedAt, expiresAt: t.apiTokens.expiresAt })
         .from(t.apiTokens)
         .where(and(eq(t.apiTokens.tenantId, v.tenant.id), isNull(t.apiTokens.revokedAt)))
         .orderBy(desc(t.apiTokens.createdAt));
@@ -159,7 +159,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
           integrations={integrationsView(s.integrations)}
           inboundEndpoint={`${base}/api/inbound/${v.tenant.slug}`}
           deliveries={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))}
-          apiTokens={tokens.map((k) => ({ ...k, createdAt: k.createdAt.toISOString(), lastUsedAt: k.lastUsedAt?.toISOString() ?? null }))}
+          apiTokens={tokens.map((k) => ({ ...k, createdAt: k.createdAt.toISOString(), lastUsedAt: k.lastUsedAt?.toISOString() ?? null, expiresAt: k.expiresAt.toISOString(), expired: k.expiresAt <= requestNow() }))}
           canMintTokens={hasFeature(v, "integrations")}
         />
       );

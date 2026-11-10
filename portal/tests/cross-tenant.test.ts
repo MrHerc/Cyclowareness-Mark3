@@ -156,7 +156,7 @@ async function org() {
   const [mail] = await db.insert(t.outbox).values({ tenantId, to: learnerUser.email, subject: "Welcome", html: "<p>Welcome</p>", text: "Welcome", kind: "welcome", status: "failed" }).returning();
   const watermark = `AAAA-${String(n).padStart(4, "0")}`;
   await db.insert(t.watermarkCodes).values({ code: watermark, tenantId, userId: learnerUser.id });
-  const [apiToken] = await db.insert(t.apiTokens).values({ id: String(n).padStart(64, "0"), tenantId, name: "HR sync", permissions: ["reports.read"], createdBy: adminUser.id }).returning();
+  const [apiToken] = await db.insert(t.apiTokens).values({ id: String(n).padStart(64, "0"), tenantId, name: "HR sync", permissions: ["reports.read"], createdBy: adminUser.id, expiresAt: new Date(Date.now() + 86_400_000) }).returning();
   await db.insert(t.moduleProgress).values({ userId: learnerUser.id, moduleId: mod.id, status: "awaiting_attestation", percent: 100 });
   await db.insert(t.notifications).values({ tenantId, userId: learnerUser.id, kind: "assignment", title: "Module assigned" });
   return {

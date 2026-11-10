@@ -408,6 +408,21 @@ describe("inbound report address (/api/inbound/[tenant])", () => {
     expect(await db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenant.id), eq(t.auditLog.action, "settings.inbound_secret")))).toHaveLength(1);
   });
 
+  it("audits where the event stream goes now: each changed destination from and to, a webhook by its origin only", async () => {
+    const { tenant } = await inboundOrg();
+    const form = { webhookEnabled: true, webhookEvents: [], syslogEnabled: true, syslogTransport: "tls" as const, syslogFormat: "cef" as const, syslogPort: 6514 };
+    const saved = () => db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenant.id), eq(t.auditLog.action, "settings.integrations")));
+    expect(await saveIntegrationsAction({ ...form, webhookUrl: "https://8.8.8.8/hooks/T0KEN-ONE?sig=s3cret", syslogHost: "9.9.9.9" })).toEqual({ ok: true });
+    expect(await saveIntegrationsAction({ ...form, webhookUrl: "https://1.1.1.1/hooks/T0KEN-TWO", syslogHost: "1.0.0.1" })).toEqual({ ok: true });
+    expect((await saved()).map((l) => l.meta)).toContainEqual({ webhookUrl: { from: "https://8.8.8.8", to: "https://1.1.1.1" }, syslogHost: { from: "9.9.9.9", to: "1.0.0.1" } });
+    // Another token on the same receiver: changed, without the URL.
+    expect(await saveIntegrationsAction({ ...form, webhookUrl: "https://1.1.1.1/hooks/T0KEN-THREE", syslogHost: "1.0.0.1" })).toEqual({ ok: true });
+    const logs = await saved();
+    expect(logs).toHaveLength(3);
+    expect(logs.map((l) => l.meta)).toContainEqual({ webhookUrl: { changed: true } });
+    expect(JSON.stringify(logs.map((l) => l.meta))).not.toMatch(/T0KEN|s3cret|hooks/);
+  });
+
   it("files a forwarded simulation mail as a matched report of the person who forwarded it", async () => {
     const { tenant, auth } = await inboundOrg();
     // Saving the form keeps the secret (it has no field) and stores the address the learners see.

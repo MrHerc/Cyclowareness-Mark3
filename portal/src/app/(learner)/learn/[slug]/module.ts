@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
-import { allowed, requireViewer } from "@/server/auth/viewer";
+import { privileged, requireViewer } from "@/server/auth/viewer";
 import { getCatalog } from "@/server/queries/catalog";
 
 /**
@@ -13,7 +13,7 @@ import { getCatalog } from "@/server/queries/catalog";
 export const moduleForPage = cache(async (slug: string) => {
   const v = await requireViewer();
   const locale = await getLocale();
-  const m = (await getCatalog(v, locale, allowed(v, "studio.write"))).find((x) => x.slug === slug);
+  const m = (await getCatalog(v, locale, privileged(v, "studio.write"))).find((x) => x.slug === slug);
   if (!m) notFound();
   return { v, locale, m };
 });

@@ -4,8 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // holds, and indicators under an xn-- top-level domain are recognised as addresses.
 let saved: { branding?: { senderDomain?: string } } | undefined;
 const fakeDb = {
-  select: () => ({ from: () => ({ where: async () => [{ branding: { primary: "#112233", accent: "#445566" } }] }) }),
+  // The branding row is read under a row lock (select … for update) inside a transaction.
+  select: () => ({ from: () => ({ where: () => ({ for: async () => [{ branding: { primary: "#112233", accent: "#445566" } }] }) }) }),
   update: () => ({ set: (v: typeof saved) => ((saved = v), { where: async () => undefined }) }),
+  transaction: async (fn: (tx: unknown) => Promise<unknown>) => fn(fakeDb),
 };
 vi.mock("../src/server/db", async () => ({ db: () => fakeDb, t: await import("../src/server/db/schema") }));
 vi.mock("next/cache", () => ({ refresh: vi.fn() }));

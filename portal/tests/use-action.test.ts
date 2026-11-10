@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { createElement, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { NextIntlClientProvider } from "next-intl";
@@ -124,5 +126,24 @@ describe("a migrated dialog form shows the error useAction hands it", () => {
   it("shows a rate limit or a failed call above the form", async () => {
     expect(await render("rateLimited")).toContain(`<span role="alert">${common.errors.rateLimited}</span>`);
     expect(await render("generic")).toContain(`<span role="alert">${common.errors.generic}</span>`);
+  });
+});
+
+describe("Settings calls that cannot reach the error boundary", () => {
+  // The server renderer cannot click, so this reads the source: a direct `await action()` inside a transition
+  // sends a failed call (server unreachable) to the error boundary, and the tab's unsaved edits are lost.
+  const source = readFileSync(path.join(__dirname, "..", "src", "components", "admin", "settings-tabs.tsx"), "utf8");
+
+  it("runs the token, support-access, secret rotation and test-event calls through useAction", () => {
+    for (const action of ["createApiTokenAction", "revokeApiTokenAction", "grantSupportAccessAction", "revokeSupportAccessAction", "rotateWebhookSecretAction", "rotateInboundSecretAction", "sendTestEventAction"]) {
+      expect(source, action).toContain(`useAction(${action}`);
+      expect(source, action).not.toMatch(new RegExp(`await ${action}\\(`));
+    }
+  });
+
+  it("settles every Save through settle()", () => {
+    const useSave = source.slice(source.indexOf("function useSave()"), source.indexOf("function SaveBar("));
+    expect(useSave).toContain("settle(");
+    expect(useSave).not.toContain("await fn()");
   });
 });

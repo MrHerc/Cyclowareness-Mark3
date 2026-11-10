@@ -134,15 +134,34 @@ export type TakeoverKind = "twoFactorReset" | "resetLinkIssued" | "roleChanged" 
 export async function notifyTakeover(db: DB, tenantId: string, actor: { id: string; name: string }, target: { id: string; name: string; role: string }, kind: TakeoverKind, reason?: Localized): Promise<void> {
   await notifyUsers(db, tenantId, [target.id], kind, { reason, link: "/profile" }, { href: "/profile" }, { statuses: ["active", "invited", "suspended"] });
   if (target.role !== "tenant_admin") return;
+  await notifyAdminPeers(
+    db,
+    tenantId,
+    [target.id, actor.id],
+    async (locale) => createTranslator({ ...(await messagesFor(locale)), namespace: "admin.person" })(`${kind}Peer`, { actor: actor.name, name: target.name }),
+    `/admin/users/${target.id}`,
+  );
+}
+
+/** A new reporting-API token reads people and reports without a session: the other administrators hear of it, so one minted from a hijacked session is seen. */
+export async function notifyApiTokenCreated(db: DB, tenantId: string, actor: { id: string; name: string }, name: string): Promise<void> {
+  await notifyAdminPeers(
+    db,
+    tenantId,
+    [actor.id],
+    async (locale) => createTranslator({ ...(await messagesFor(locale)), namespace: "settings.integrations" })("tokenCreatedPeer", { actor: actor.name, name }),
+    "/admin/settings?tab=integrations",
+  );
+}
+
+/** An in-app security notice to every active administrator except `exclude`, titled in each one's language. */
+async function notifyAdminPeers(db: DB, tenantId: string, exclude: string[], title: (locale: string) => Promise<string>, href: string): Promise<void> {
   const peers = await db
     .select({ id: t.users.id, locale: t.users.locale })
     .from(t.users)
-    .where(and(eq(t.users.tenantId, tenantId), eq(t.users.role, "tenant_admin"), eq(t.users.status, "active"), notInArray(t.users.id, [target.id, actor.id])));
+    .where(and(eq(t.users.tenantId, tenantId), eq(t.users.role, "tenant_admin"), eq(t.users.status, "active"), notInArray(t.users.id, exclude)));
   if (!peers.length) return;
-  const title = new Map<string, string>();
-  for (const locale of new Set(peers.map((p) => p.locale))) {
-    const tr = createTranslator({ ...(await messagesFor(locale)), namespace: "admin.person" });
-    title.set(locale, tr(`${kind}Peer`, { actor: actor.name, name: target.name }));
-  }
-  await db.insert(t.notifications).values(peers.map((p) => ({ tenantId, userId: p.id, kind: "security", title: title.get(p.locale) ?? "", href: `/admin/users/${target.id}` })));
+  const titles = new Map<string, string>();
+  for (const locale of new Set(peers.map((p) => p.locale))) titles.set(locale, await title(locale));
+  await db.insert(t.notifications).values(peers.map((p) => ({ tenantId, userId: p.id, kind: "security", title: titles.get(p.locale) ?? "", href })));
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { and, count, eq, isNull } from "drizzle-orm";
+import { and, count, eq, gt, isNull } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { randomBytes } from "node:crypto";
@@ -24,7 +24,9 @@ import { svgLogoProblem } from "../svg-safety";
 import { isUuid } from "../../lib/ids";
 import { endpointKey, storedSecretOutcome } from "../../lib/stored-secret";
 import { API_TOKEN_PERMISSIONS, MAX_API_TOKENS, type TenantSettings } from "../db/schema";
+import { DEFAULT_API_TOKEN_DAYS, MAX_API_TOKEN_DAYS } from "../../lib/api-tokens";
 import { notificationsSchema } from "../schemas/notifications";
+import { notifyApiTokenCreated } from "../services/notify";
 
 /**
  * `field` is the zod path of the first rejected value (e.g. "sso.issuer"); the form marks that input.
@@ -73,11 +75,14 @@ export async function saveBrandingAction(input: z.infer<typeof brandingSchema>):
   const v = await actionViewer("settings.write");
   const p = brandingSchema.safeParse(input);
   if (!p.success) return invalid(p);
-  const [tenant] = await db().select({ branding: t.tenants.branding }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id));
-  await db()
-    .update(t.tenants)
-    .set({ name: p.data.name, branding: { ...tenant.branding, primary: p.data.primary.toLowerCase(), accent: p.data.accent.toLowerCase(), senderName: p.data.senderName || undefined, senderDomain: p.data.senderDomain || undefined } })
-    .where(eq(t.tenants.id, v.tenant.id));
+  // Under the row lock, as saveSettings: a logo uploaded at the same moment is not overwritten with the stale branding.
+  await db().transaction(async (tx) => {
+    const [tenant] = await tx.select({ branding: t.tenants.branding }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id)).for("update");
+    await tx
+      .update(t.tenants)
+      .set({ name: p.data.name, branding: { ...tenant.branding, primary: p.data.primary.toLowerCase(), accent: p.data.accent.toLowerCase(), senderName: p.data.senderName || undefined, senderDomain: p.data.senderDomain || undefined } })
+      .where(eq(t.tenants.id, v.tenant.id));
+  });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "settings.branding", ip: await clientIp() });
   refresh();
   return { ok: true };
@@ -88,21 +93,25 @@ const LOGO = /^data:(image\/(png|jpeg|svg\+xml));base64,([A-Za-z0-9+/=]+)$/;
 /** Logos are stored as assets and served from /api/assets/{id}; SVGs are sanitised. */
 export async function setLogoAction(dataUrl: string | null): Promise<{ ok: boolean; error?: "invalid" | "unsafeSvg" }> {
   const v = await actionViewer("settings.write");
-  const [tenant] = await db().select({ branding: t.tenants.branding }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id));
-  if (dataUrl === null) {
-    await db().delete(t.assets).where(and(eq(t.assets.tenantId, v.tenant.id), eq(t.assets.kind, "logo")));
-    await db().update(t.tenants).set({ branding: { ...tenant.branding, logoUrl: null } }).where(eq(t.tenants.id, v.tenant.id));
-  } else {
-    const m = LOGO.exec(dataUrl);
+  const m = dataUrl === null ? null : LOGO.exec(dataUrl);
+  if (dataUrl !== null) {
     if (!m) return { ok: false, error: "invalid" };
     const bytes = Buffer.from(m[3], "base64");
     if (bytes.length > 512 * 1024) return { ok: false, error: "invalid" };
     // No scripts, event handlers, external references or foreign objects in an SVG logo; #id references are fine.
     if (m[1] === "image/svg+xml" && svgLogoProblem(bytes.toString("utf8"))) return { ok: false, error: "unsafeSvg" };
-    await db().delete(t.assets).where(and(eq(t.assets.tenantId, v.tenant.id), eq(t.assets.kind, "logo")));
-    const [row] = await db().insert(t.assets).values({ tenantId: v.tenant.id, kind: "logo", mime: m[1], dataBase64: m[3], sha256: sha256Hex(m[3]) }).returning({ id: t.assets.id, sha: t.assets.sha256 });
-    await db().update(t.tenants).set({ branding: { ...tenant.branding, logoUrl: `/api/assets/${row.id}?v=${row.sha.slice(0, 8)}` } }).where(eq(t.tenants.id, v.tenant.id));
   }
+  // One transaction under the row lock (as saveBrandingAction): the swap leaves exactly one logo asset and keeps a concurrent branding save.
+  await db().transaction(async (tx) => {
+    const [tenant] = await tx.select({ branding: t.tenants.branding }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id)).for("update");
+    await tx.delete(t.assets).where(and(eq(t.assets.tenantId, v.tenant.id), eq(t.assets.kind, "logo")));
+    let logoUrl: string | null = null;
+    if (m) {
+      const [row] = await tx.insert(t.assets).values({ tenantId: v.tenant.id, kind: "logo", mime: m[1], dataBase64: m[3], sha256: sha256Hex(m[3]) }).returning({ id: t.assets.id, sha: t.assets.sha256 });
+      logoUrl = `/api/assets/${row.id}?v=${row.sha.slice(0, 8)}`;
+    }
+    await tx.update(t.tenants).set({ branding: { ...tenant.branding, logoUrl } }).where(eq(t.tenants.id, v.tenant.id));
+  });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "branding.logo", meta: { logo: dataUrl ? "changed" : "removed" } });
   refresh();
   return { ok: true };
@@ -329,7 +338,7 @@ export async function verifySimulationDomainAction(address: string): Promise<{ o
   if (!host) return { ok: false, found: false };
   // Shares the organisation's domain-check budget: two DNS lookups per check.
   if (!(await rateLimit(`domain-check:${v.tenant.id}`, 20, 60 * 60_000)).ok) return { ok: false, found: false, error: "rateLimited" };
-  const found = await domainProofFound(host, domainProofRecord(v.tenant.id, env.secret));
+  const found = await domainProofFound(host, domainProofRecords(v.tenant.id));
   if (found) {
     await saveSettings(
       v,
@@ -570,6 +579,13 @@ export async function saveIntegrationsAction(input: z.infer<typeof integrationsS
     const problem = await destinationProblem(p.data.syslogHost, p.data.syslogPort ?? 6514, "syslog");
     if (problem) return { ok: false, field: problem === "port_not_allowed" ? "syslogPort" : "syslogHost" };
   }
+  // The audit entry says where the event stream and the reported mail go now: each changed destination, from and to.
+  const before = (await currentSettings(v)).integrations;
+  const from = destinations(before);
+  const to = destinations(p.data);
+  const meta: Record<string, unknown> = Object.fromEntries(Object.entries(to).flatMap(([k, val]) => (from[k as keyof typeof from] === val ? [] : [[k, { from: from[k as keyof typeof from], to: val }]])));
+  // Same origin, another path or query (a hook's token): recorded as changed, without the URL.
+  if (!meta.webhookUrl && (before.webhookUrl ?? "") !== (p.data.webhookUrl ?? "")) meta.webhookUrl = { changed: true };
   // Built from the form alone (plus the stored secrets, which have no field): an emptied
   // address or server is removed instead of the previous value surviving through a spread.
   await saveSettings(
@@ -586,8 +602,22 @@ export async function saveIntegrationsAction(input: z.infer<typeof integrationsS
       },
     }),
     "settings.integrations",
+    Object.keys(meta).length ? meta : undefined,
   );
   return { ok: true };
+}
+
+/** The integration destinations as the audit log keeps them: a webhook by its origin only, since hook URLs often carry a token in the path or query. */
+function destinations(i: Pick<TenantSettings["integrations"], "webhookUrl" | "webhookEnabled" | "syslogEnabled" | "syslogHost" | "syslogPort" | "syslogTransport" | "inboundAddress">) {
+  return {
+    webhookUrl: i.webhookUrl ? new URL(i.webhookUrl).origin : null,
+    webhookEnabled: i.webhookEnabled,
+    syslogEnabled: i.syslogEnabled,
+    syslogHost: i.syslogHost || null,
+    syslogPort: i.syslogPort ?? null,
+    syslogTransport: i.syslogTransport ?? null,
+    inboundAddress: i.inboundAddress || null,
+  };
 }
 
 export async function rotateWebhookSecretAction(): Promise<{ ok: boolean; secret?: string }> {
@@ -623,33 +653,44 @@ export async function sendTestEventAction(): Promise<{ ok: boolean; error?: "no_
   return { ok: true };
 }
 
-const apiTokenSchema = z.object({ name: z.string().trim().min(1).max(80), permissions: z.array(z.enum(API_TOKEN_PERMISSIONS)).min(1).max(API_TOKEN_PERMISSIONS.length) });
+const apiTokenSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  permissions: z.array(z.enum(API_TOKEN_PERMISSIONS)).min(1).max(API_TOKEN_PERMISSIONS.length),
+  expiresInDays: z.number().int().min(1).max(MAX_API_TOKEN_DAYS).default(DEFAULT_API_TOKEN_DAYS),
+});
 
 /**
  * Mints a reporting-API token (docs/API.md "Reporting API"). The secret is returned once and never
  * stored: the row keeps its SHA-256 as the id, like sessions. `limit`: MAX_API_TOKENS are active already.
+ * A credential that outlives every session takes the actor's password (auth/step-up.ts), expires, and the
+ * other administrators are told of it.
  */
-export async function createApiTokenAction(input: z.infer<typeof apiTokenSchema>): Promise<{ ok: boolean; field?: string; error?: "limit"; token?: string }> {
+export async function createApiTokenAction(input: z.input<typeof apiTokenSchema>, password?: string): Promise<{ ok: boolean; field?: string; error?: "limit" | StepUpError; token?: string }> {
   const v = await actionViewer("settings.write");
   if (!hasFeature(v, "integrations")) return { ok: false };
   const p = apiTokenSchema.safeParse(input);
   if (!p.success) return { ok: false, field: invalid(p).field };
+  const refused = await stepUp(v, password, "api_token.created");
+  if (refused) return { ok: false, error: refused };
   const permissions = [...new Set(p.data.permissions)];
   const token = `cyk_${randomBytes(24).toString("base64url")}`;
   const id = sha256Hex(token);
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + p.data.expiresInDays * 86_400_000);
   // The tenant row lock serialises the count with the insert, so two saves at once cannot both pass the cap.
   const full = await db().transaction(async (tx) => {
     await tx.select({ id: t.tenants.id }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id)).for("update");
     const [{ n }] = await tx
       .select({ n: count() })
       .from(t.apiTokens)
-      .where(and(eq(t.apiTokens.tenantId, v.tenant.id), isNull(t.apiTokens.revokedAt)));
+      .where(and(eq(t.apiTokens.tenantId, v.tenant.id), isNull(t.apiTokens.revokedAt), gt(t.apiTokens.expiresAt, now)));
     if (n >= MAX_API_TOKENS) return true;
-    await tx.insert(t.apiTokens).values({ id, tenantId: v.tenant.id, name: p.data.name, permissions, createdBy: v.user.id });
+    await tx.insert(t.apiTokens).values({ id, tenantId: v.tenant.id, name: p.data.name, permissions, createdBy: v.user.id, expiresAt });
     return false;
   });
   if (full) return { ok: false, error: "limit" };
-  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "api_token.created", targetType: "api_token", targetId: id, ip: await clientIp(), meta: { name: p.data.name, permissions } });
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "api_token.created", targetType: "api_token", targetId: id, ip: await clientIp(), meta: { name: p.data.name, permissions, expiresAt: expiresAt.toISOString() } });
+  await notifyApiTokenCreated(db(), v.tenant.id, v.user, p.data.name);
   refresh();
   return { ok: true, token };
 }

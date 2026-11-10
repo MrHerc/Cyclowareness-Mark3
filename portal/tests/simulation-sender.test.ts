@@ -12,9 +12,14 @@ const sendMail = vi.fn(async () => ({}));
 vi.mock("nodemailer", () => ({ default: { createTransport: () => ({ sendMail }) } }));
 // The mail server resolves to a public address (net-guard); the TXT resolver is replaced below.
 vi.mock("node:dns/promises", () => ({ lookup: async () => [{ address: "8.8.4.4", family: 4 }], Resolver: class {} }));
-const proven = new Set<string>();
-vi.mock("../src/server/auth/domain-proof", async (original) => ({ ...(await original<typeof import("../src/server/auth/domain-proof")>()), domainProofFound: async (host: string) => proven.has(host) }));
-vi.mock("../src/server/env", () => ({ env: { isProd: false, secret: "test-only-secret-0123456789-abcdefghij-0123456789" }, appUrl: () => "http://localhost:3000" }));
+// The TXT record published on each domain; a domain is found only when the action looks for that record.
+const published = new Map<string, string>();
+vi.mock("../src/server/auth/domain-proof", async (original) => ({
+  ...(await original<typeof import("../src/server/auth/domain-proof")>()),
+  domainProofFound: async (host: string, expected: string | readonly string[]) => [expected].flat().includes(published.get(host) ?? "-"),
+}));
+// A separate domain-proof secret, as the rotation runbook leaves it: the proof must not be keyed on APP_SECRET.
+vi.mock("../src/server/env", () => ({ env: { isProd: false, secret: "test-only-secret-0123456789-abcdefghij-0123456789", domainProofSecret: "proof-only-secret-0123456789-abcdefghij-012345" }, appUrl: () => "http://localhost:3000" }));
 vi.mock("../src/server/services/audit", () => ({ audit: vi.fn() }));
 vi.mock("../src/server/request", () => ({ clientIp: async () => null }));
 vi.mock("next/cache", () => ({ refresh: vi.fn() }));
@@ -26,8 +31,12 @@ vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src
 let tenantId = "";
 vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => ({ user: { id: "00000000-0000-4000-8000-000000000001", locale: "en" }, tenant: { id: tenantId, name: "Acme" } }), hasFeature: () => true }));
 
-const { saveEmailAction, verifySimulationDomainAction } = await import("../src/server/actions/settings");
+const { domainProofRecordAction, saveEmailAction, verifySimulationDomainAction } = await import("../src/server/actions/settings");
+const { domainProofRecord } = await import("../src/server/auth/domain-proof");
+const { env } = await import("../src/server/env");
 const { queueEmail } = await import("../src/server/mail");
+/** Publishes the record Branding → Domain proof shows. */
+const prove = async (host: string) => published.set(host, (await domainProofRecordAction()).record);
 
 const SERVER = { host: "smtp.acme.example", port: 587, secure: false, fromAddress: "training@acme.example", enabled: true };
 const email = async () => (await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId)))[0].settings.email;
@@ -44,7 +53,10 @@ describe("simulation sender address", () => {
     expect(await verifySimulationDomainAction("not an address")).toEqual({ ok: false, found: false });
     expect(await verifySimulationDomainAction("accounts@ofis-techizat.example")).toEqual({ ok: true, found: false, domain: "ofis-techizat.example" });
     expect((await email()).simulationDomain).toBeUndefined();
-    proven.add("ofis-techizat.example");
+    // A record keyed on APP_SECRET is not the one the organisation was told to publish.
+    published.set("ofis-techizat.example", domainProofRecord(tenantId, env.secret));
+    expect((await verifySimulationDomainAction("accounts@ofis-techizat.example")).found).toBe(false);
+    await prove("ofis-techizat.example");
     expect(await verifySimulationDomainAction("accounts@Ofis-Techizat.example")).toEqual({ ok: true, found: true, domain: "ofis-techizat.example" });
     expect((await email()).simulationDomain).toBe("ofis-techizat.example");
     expect(await saveEmailAction({ ...SERVER, simulationFromAddress: "accounts@ofis-techizat.example" })).toEqual({ ok: true });
@@ -63,7 +75,7 @@ describe("simulation sender address", () => {
   });
 
   it("drops the address when a different domain is proven", async () => {
-    proven.add("other.example");
+    await prove("other.example");
     expect((await verifySimulationDomainAction("x@other.example")).found).toBe(true);
     const e = await email();
     expect(e.simulationDomain).toBe("other.example");

@@ -10,7 +10,7 @@ let viewer: Viewer;
 
 vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src/server/db/schema") }));
 vi.mock("../src/server/env", () => ({ env: { TRUST_PROXY: 0, ANTHROPIC_API_KEY: "test-key", ANTHROPIC_TUTOR_MODEL: "claude-test" }, appUrl: () => "http://localhost:3000" }));
-vi.mock("../src/server/auth/viewer", () => ({ getViewer: async () => viewer, allowed: () => false }));
+vi.mock("../src/server/auth/viewer", () => ({ getViewer: async () => viewer, privileged: () => false }));
 // A model that answers every question with the same words and finishes cleanly, so the answer is cached.
 vi.mock("@anthropic-ai/sdk", () => ({
   default: class {

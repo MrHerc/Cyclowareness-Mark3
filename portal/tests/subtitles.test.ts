@@ -46,7 +46,7 @@ const pglite = new PGlite();
 const db = drizzle(pglite, { schema: t }) as unknown as DB;
 vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src/server/db/schema") }));
 vi.mock("../src/server/env", () => ({ env: state.env, appUrl: () => state.env.APP_URL }));
-vi.mock("../src/server/auth/viewer", () => ({ getViewer: async () => state.viewer, actionViewer: async () => state.viewer, allowed: () => state.studio }));
+vi.mock("../src/server/auth/viewer", () => ({ getViewer: async () => state.viewer, actionViewer: async () => state.viewer, privileged: () => state.studio }));
 vi.mock("next-intl/server", () => ({ getLocale: async () => state.locale }));
 vi.mock("../src/server/rate-limit", () => ({ rateLimit: limit }));
 

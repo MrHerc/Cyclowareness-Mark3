@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
-import { allowed, requireFeature } from "@/server/auth/viewer";
+import { privileged, requireFeature } from "@/server/auth/viewer";
 import { getCatalog } from "@/server/queries/catalog";
 import { labScenario } from "@/server/lab/scenarios";
 import { MiniLab } from "@/components/lab/labs/mini-lab";
@@ -17,7 +17,7 @@ export default async function MiniLabPage({ params }: PageProps<"/lab/mini/[slug
   const { slug } = await params;
   const [v, locale] = await Promise.all([requireFeature("lab"), getLocale()]);
   const found = labScenario(slug, locale);
-  const m = found && (await getCatalog(v, locale, allowed(v, "studio.write"))).find((x) => x.slug === slug);
+  const m = found && (await getCatalog(v, locale, privileged(v, "studio.write"))).find((x) => x.slug === slug);
   if (!found || !m) notFound();
   return (
     <div className="grid gap-2">

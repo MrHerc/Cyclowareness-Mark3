@@ -498,7 +498,7 @@ async function setPassword(_: AuthState, form: FormData): Promise<AuthState> {
   await db().update(t.authTokens).set({ usedAt: new Date() }).where(eq(t.authTokens.id, row.token.id));
   // Several invite links may be out there (emailed, copied, CSV); the account activates once.
   await db().delete(t.authTokens).where(and(eq(t.authTokens.userId, row.user.id), eq(t.authTokens.kind, "invite"), ne(t.authTokens.id, row.token.id)));
-  await invalidateUserSessions(row.user.id);
+  await invalidateUserSessions(row.user.id, undefined, `password_${kind}`);
   await auditDone({ tenantId: row.user.tenantId, actorId: row.user.id, action: "auth.password_set", ip: await clientIp(), meta: { kind } });
   return { done: true };
 }

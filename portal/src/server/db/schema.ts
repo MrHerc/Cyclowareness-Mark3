@@ -258,6 +258,7 @@ export const apiTokens = pgTable(
     createdAt: createdAt(),
     lastUsedAt: ts("last_used_at"),
     revokedAt: ts("revoked_at"),
+    expiresAt: ts("expires_at").notNull(),
   },
   (t) => [index("api_tokens_tenant_idx").on(t.tenantId)],
 );

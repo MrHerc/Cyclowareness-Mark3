@@ -3,7 +3,7 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { Award, Check, ChevronLeft, ChevronRight, Clock, Gauge, Layers, Lock, MousePointerClick, Play, RotateCcw, Route, Zap } from "lucide-react";
 import { db, t } from "@/server/db";
-import { allowed, hasFeature } from "@/server/auth/viewer";
+import { privileged, hasFeature } from "@/server/auth/viewer";
 import { nextLesson } from "@/server/queries/catalog";
 import { getPaths, labBestShares } from "@/server/queries/paths";
 import { Card } from "@/components/ui/card";
@@ -58,7 +58,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
           .from(t.lessonContents)
           .where(inArray(t.lessonContents.lessonId, m.lessons.map((l) => l.id)))
       : [],
-    hasFeature(v, "paths") ? getPaths(v, locale, allowed(v, "studio.write")) : [],
+    hasFeature(v, "paths") ? getPaths(v, locale, privileged(v, "studio.write")) : [],
     practice.length || mini ? labBestShares(v.user.id) : new Map<string, number>(),
   ]);
   const cert = certs[0];

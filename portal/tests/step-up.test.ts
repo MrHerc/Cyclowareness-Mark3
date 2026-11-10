@@ -220,6 +220,19 @@ describe("step-up before re-pointing the organisation's sign-in", () => {
   });
 });
 
+describe("step-up before minting a reporting-API token", () => {
+  it("mints nothing on a wrong password and records the refusal; the right password mints it", async () => {
+    const minter = await addUser(db, org.id, { name: "Token Minter", role: "tenant_admin", passwordHash: await hashPassword(PW), totpEnabled: true, totpSecret: "secret" });
+    as(minter);
+    expect(await settings.createApiTokenAction({ name: "HR sync", permissions: ["reports.read"] }, "not-it")).toEqual({ ok: false, error: "wrongPassword" });
+    expect(await db.select().from(t.apiTokens).where(eq(t.apiTokens.createdBy, minter.id))).toEqual([]);
+    const failed = (await audits(org.id, "security.step_up_failed")).filter((e) => e.actorId === minter.id);
+    expect(failed).toMatchObject([{ meta: { action: "api_token.created", error: "wrongPassword" } }]);
+    expect((await settings.createApiTokenAction({ name: "HR sync", permissions: ["reports.read"] }, PW)).ok).toBe(true);
+    expect(await db.select().from(t.apiTokens).where(eq(t.apiTokens.createdBy, minter.id))).toHaveLength(1);
+  });
+});
+
 describe("the operator's support link", () => {
   it("is refused without the operator's password and without the organisation's grant", async () => {
     as(operator);
