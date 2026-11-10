@@ -5,6 +5,7 @@ import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { dayKey } from "../../lib/domain/gamification";
 import { dayPlus } from "../../lib/time";
+import { TEACHABLE_DAYS } from "../../lib/tenant-defaults";
 import { departmentLeague } from "../services/league";
 import { computeTenantRisk } from "../services/risk";
 
@@ -79,6 +80,18 @@ export async function openRiskCount(v: Viewer): Promise<number> {
     .from(t.behaviorRisks)
     .where(and(eq(t.behaviorRisks.userId, v.user.id), eq(t.behaviorRisks.status, "open")));
   return Number(r.n);
+}
+
+/** The newest teachable-moment lesson this person still has to take (services/teachable.ts), with its due day. */
+export async function openTeachable(v: Viewer) {
+  const [row] = await db()
+    .select({ slug: t.modules.slug, title: t.modules.title, assignedAt: t.teachableLoops.assignedAt })
+    .from(t.teachableLoops)
+    .innerJoin(t.modules, eq(t.modules.id, t.teachableLoops.microModuleId))
+    .where(and(eq(t.teachableLoops.userId, v.user.id), eq(t.teachableLoops.status, "assigned")))
+    .orderBy(desc(t.teachableLoops.assignedAt))
+    .limit(1);
+  return row ? { slug: row.slug, title: row.title, due: dayPlus(TEACHABLE_DAYS.lesson, v.tenant.settings.timeZone, row.assignedAt) } : null;
 }
 
 export async function nextLiveSession(v: Viewer) {

@@ -21,11 +21,12 @@ const DAY = 86_400_000;
 /** Recipients (and their mail) per INSERT at launch. */
 const LAUNCH_CHUNK = 500;
 
-export async function campaignAudience(db: DB, c: { tenantId: string; audience: "all" | "department"; departmentId: string | null }) {
+export async function campaignAudience(db: DB, c: { tenantId: string; audience: "all" | "department" | "person"; departmentId: string | null; userId?: string | null }) {
   const users = await db
     .select({ id: t.users.id, email: t.users.email, phone: t.users.phone, name: t.users.name, locale: t.users.locale, departmentId: t.users.departmentId })
     .from(t.users)
     .where(and(eq(t.users.tenantId, c.tenantId), eq(t.users.status, "active"), ne(t.users.role, "super_admin")));
+  if (c.audience === "person") return users.filter((u) => u.id === c.userId);
   if (c.audience === "all") return users;
   // A department audience whose department is gone reaches nobody (never the whole organisation).
   if (!c.departmentId) return [];

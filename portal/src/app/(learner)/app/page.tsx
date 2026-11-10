@@ -6,7 +6,8 @@ import { requireViewer } from "@/server/auth/viewer";
 import { db, t as schema } from "@/server/db";
 import { pickLessonContent } from "@/lib/content/lesson-locale";
 import { getCatalog, continueModule, yourPath, nextLesson } from "@/server/queries/catalog";
-import { getPolicies, myLeagueRow, nextLiveSession, openRiskCount, todayXp } from "@/server/queries/learner";
+import { getPolicies, myLeagueRow, nextLiveSession, openRiskCount, openTeachable, todayXp } from "@/server/queries/learner";
+import { TEACHABLE_LESSON } from "@/server/services/teachable";
 import { Card } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { ProgressBar, Ring } from "@/components/ui/progress";
@@ -16,7 +17,8 @@ import { HomeMascot } from "@/components/learner/home-mascot";
 import { PathTimeline } from "@/components/learner/path-timeline";
 import { levelFor, dayKey, liveStreak } from "@/lib/domain/gamification";
 import { riskBand } from "@/lib/domain/risk";
-import { todayIn } from "@/lib/time";
+import { dayAt, todayIn } from "@/lib/time";
+import { pick } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 import { TrendMark } from "../league/trend";
 
@@ -28,14 +30,15 @@ export async function generateMetadata() {
 export default async function HomePage() {
   const v = await requireViewer();
   const locale = await getLocale();
-  const [t, tc, tl, format] = await Promise.all([getTranslations("learner.home"), getTranslations("common"), getTranslations("learner.league"), getFormatter()]);
-  const [catalog, policies, league, xpToday, risks, session] = await Promise.all([
+  const [t, tc, tl, tt, format] = await Promise.all([getTranslations("learner.home"), getTranslations("common"), getTranslations("learner.league"), getTranslations("learner.teachable"), getFormatter()]);
+  const [catalog, policies, league, xpToday, risks, session, teachable] = await Promise.all([
     getCatalog(v, locale),
     getPolicies(v, locale),
     v.tenant.features.has("league") ? myLeagueRow(v) : Promise.resolve({ rows: [], mine: null }),
     todayXp(v),
     openRiskCount(v),
     v.tenant.features.has("live_sessions") ? nextLiveSession(v) : Promise.resolve(null),
+    openTeachable(v),
   ]);
   const toSign = policies.filter((p) => !p.signedAt);
   const current = continueModule(catalog);
@@ -97,6 +100,23 @@ export default async function HomePage() {
               ))}
             </ul>
           </Card>
+        ) : null}
+
+        {teachable ? (
+          <Link href={`/learn/${teachable.slug}/${TEACHABLE_LESSON}`} className="flex items-center gap-4 rounded-xl border border-risk-100 bg-risk-50 p-4 hover:bg-risk-100">
+            <span className="grid size-10 shrink-0 place-items-center rounded-sm bg-risk-600 text-white">
+              <ShieldAlert className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-body-sm font-semibold">
+                {tt("homeTitle")}: {pick(teachable.title, locale)}
+              </span>
+              <span className="block text-caption text-ink-muted">
+                {tt("homeBody")} {tc("time.due", { date: format.dateTime(dayAt(teachable.due, v.tenant.settings.timeZone), { dateStyle: "medium" }) })}
+              </span>
+            </span>
+            <ChevronRight className="size-5 text-risk-700" />
+          </Link>
         ) : null}
 
         {awaiting ? (

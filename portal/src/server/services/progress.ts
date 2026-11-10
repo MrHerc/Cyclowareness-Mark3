@@ -8,7 +8,7 @@ import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { dayKey, lessonXp, nextStreak } from "../../lib/domain/gamification";
 import { isUniqueViolation } from "../db/errors";
-import { withDefaults } from "../../lib/tenant-defaults";
+import { TEACHABLE_PREFIX, withDefaults } from "../../lib/tenant-defaults";
 import { tenantTimeZone } from "./tenants";
 
 export function randomToken(bytes = 20): string {
@@ -63,7 +63,7 @@ export async function completeLesson(
     .from(t.lessons)
     .where(eq(t.lessons.id, p.lessonId));
   if (!lesson) throw new Error("Lesson not found");
-  const [mod] = await db.select({ xp: t.modules.xp }).from(t.modules).where(eq(t.modules.id, lesson.moduleId));
+  const [mod] = await db.select({ xp: t.modules.xp, slug: t.modules.slug }).from(t.modules).where(eq(t.modules.id, lesson.moduleId));
   const siblings = await db.select({ id: t.lessons.id }).from(t.lessons).where(eq(t.lessons.moduleId, lesson.moduleId)).orderBy(asc(t.lessons.position));
 
   // The first completion is claimed by a single statement: the row is created, or an uncompleted one
@@ -114,15 +114,24 @@ export async function completeLesson(
     .select({ status: t.moduleProgress.status })
     .from(t.moduleProgress)
     .where(and(eq(t.moduleProgress.userId, p.userId), eq(t.moduleProgress.moduleId, lesson.moduleId)));
+  // A teachable-moment lesson (services/teachable.ts) is a nudge after a click, not a module to certify: it completes without attestation.
+  const teachable = mod.slug.startsWith(TEACHABLE_PREFIX) && percent >= 100;
   const status: LessonCompletion["moduleStatus"] =
-    mp?.status === "completed" ? "completed" : percent >= 100 ? "awaiting_attestation" : "in_progress";
+    mp?.status === "completed" || teachable ? "completed" : percent >= 100 ? "awaiting_attestation" : "in_progress";
   await db
     .insert(t.moduleProgress)
-    .values({ userId: p.userId, moduleId: lesson.moduleId, status, percent, lastLessonKey: lesson.key, startedAt: at })
+    .values({ userId: p.userId, moduleId: lesson.moduleId, status, percent, lastLessonKey: lesson.key, startedAt: at, completedAt: teachable ? at : null })
     .onConflictDoUpdate({
       target: [t.moduleProgress.userId, t.moduleProgress.moduleId],
-      set: { status, percent, lastLessonKey: lesson.key },
+      set: { status, percent, lastLessonKey: lesson.key, ...(teachable ? { completedAt: sql`coalesce(${t.moduleProgress.completedAt}, ${at.toISOString()}::timestamptz)` } : {}) },
     });
+  // Every loop waiting for this lesson is done (a person who clicked twice has one per click).
+  if (teachable) {
+    await db
+      .update(t.teachableLoops)
+      .set({ completedAt: at, status: "completed" })
+      .where(and(eq(t.teachableLoops.userId, p.userId), eq(t.teachableLoops.microModuleId, lesson.moduleId), eq(t.teachableLoops.status, "assigned")));
+  }
   // A completed module stays completed when it is replayed, so no attestation follows. A risk
   // linked to it since then (a click in a simulation) asks for the training again: it closes once
   // every lesson of the module has been completed again after the risk opened (each lesson's

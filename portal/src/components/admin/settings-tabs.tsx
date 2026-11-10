@@ -69,7 +69,7 @@ import { Dot, Pill } from "@/components/ui/pill";
 import { Notice } from "@/components/ui/layout";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { toast } from "@/components/ui/toast";
-import { BRAND_PALETTE, DEFAULT_ATTESTATION, DEFAULT_CERTIFICATE_TEXT, DEFAULT_TEMPLATES, WEBHOOK_EVENTS, emailButtonLabel } from "@/lib/tenant-defaults";
+import { BRAND_PALETTE, DEFAULT_ATTESTATION, DEFAULT_CERTIFICATE_TEXT, DEFAULT_TEMPLATES, TEACHABLE_DAYS, WEBHOOK_EVENTS, emailButtonLabel } from "@/lib/tenant-defaults";
 import { parseEmailMarkup } from "@/lib/email-markup";
 import { LOCALES, LOCALE_NAMES, langAttrs } from "@/i18n/config";
 import { readableOn } from "@/lib/color";
@@ -1368,6 +1368,7 @@ export function CertificateTab({ cert, orgName, logoUrl, locale, locales, verify
 
 export function LearningTab({ learning }: { learning: TenantSettings["learning"] }) {
   const t = useTranslations("settings.learning");
+  const tc = useTranslations("common");
   const { pending, save } = useSave();
   const [s, setS] = useState(learning);
   return (
@@ -1414,6 +1415,20 @@ export function LearningTab({ learning }: { learning: TenantSettings["learning"]
           <Field label={t("dailyGoal")} htmlFor="l-goal" hint={t("dailyGoalBody")}>
             <Input id="l-goal" type="number" min={10} max={500} value={s.dailyGoalXp} onChange={(e) => setS({ ...s, dailyGoalXp: Number(e.target.value) })} className="max-w-40" />
           </Field>
+        </CardBody>
+      </Card>
+      <Card>
+        <CardHeader title={t("teachableTitle")} />
+        <CardBody className="grid gap-5">
+          <Switch label={t("teachable")} description={t("teachableBody")} checked={s.teachable} onChange={(e) => setS({ ...s, teachable: e.target.checked })} />
+          <dl className="grid gap-x-4 gap-y-2 text-body-sm sm:grid-cols-[auto_1fr]">
+            <dt className="text-ink-muted">{t("teachableLessonDue")}</dt>
+            <dd className="font-semibold">{tc("units.days", { count: TEACHABLE_DAYS.lesson })}</dd>
+            <dt className="text-ink-muted">{t("teachableResim")}</dt>
+            <dd className="font-semibold">{tc("units.days", { count: TEACHABLE_DAYS.resim })}</dd>
+            <dt className="text-ink-muted">{t("teachableFallback")}</dt>
+            <dd className="font-semibold">{tc("units.days", { count: TEACHABLE_DAYS.fallback })}</dd>
+          </dl>
         </CardBody>
       </Card>
       <SaveBar pending={pending} onSave={() => save(() => saveLearningAction(s), { riskThreshold: "l-threshold", dailyGoalXp: "l-goal" })} />
