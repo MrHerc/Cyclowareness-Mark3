@@ -554,6 +554,7 @@ const integrationsSchema = z.object({
   syslogPort: z.number().int().min(1).max(65535).optional(),
   syslogTransport: z.enum(["tls", "tcp", "udp"]),
   syslogFormat: z.enum(["cef", "json"]),
+  inboundAddress: z.email().max(254).or(z.literal("")).optional(),
 });
 
 export async function saveIntegrationsAction(input: z.infer<typeof integrationsSchema>): Promise<SaveResult> {
@@ -570,13 +571,20 @@ export async function saveIntegrationsAction(input: z.infer<typeof integrationsS
     const problem = await destinationProblem(p.data.syslogHost, p.data.syslogPort ?? 6514, "syslog");
     if (problem) return { ok: false, field: problem === "port_not_allowed" ? "syslogPort" : "syslogHost" };
   }
-  // Built from the form alone (plus the stored signing secret, which has no field): an emptied
+  // Built from the form alone (plus the stored secrets, which have no field): an emptied
   // address or server is removed instead of the previous value surviving through a spread.
   await saveSettings(
     v,
     (s) => ({
       ...s,
-      integrations: { webhookSecretEnc: s.integrations.webhookSecretEnc, ...p.data, webhookUrl: p.data.webhookUrl || undefined, syslogHost: p.data.syslogHost || undefined },
+      integrations: {
+        webhookSecretEnc: s.integrations.webhookSecretEnc,
+        inboundSecretHash: s.integrations.inboundSecretHash,
+        ...p.data,
+        webhookUrl: p.data.webhookUrl || undefined,
+        syslogHost: p.data.syslogHost || undefined,
+        inboundAddress: p.data.inboundAddress || undefined,
+      },
     }),
     "settings.integrations",
   );
@@ -588,6 +596,15 @@ export async function rotateWebhookSecretAction(): Promise<{ ok: boolean; secret
   if (!hasFeature(v, "integrations")) return { ok: false };
   const secret = `whsec_${randomBytes(24).toString("base64url")}`;
   await saveSettings(v, (s) => ({ ...s, integrations: { ...s.integrations, webhookSecretEnc: encryptSecret(secret) } }), "settings.webhook_secret");
+  return { ok: true, secret };
+}
+
+/** A new bearer secret for the inbound report address (/api/inbound/<slug>); only its hash is kept, so it is shown once. */
+export async function rotateInboundSecretAction(): Promise<{ ok: boolean; secret?: string }> {
+  const v = await actionViewer("settings.write");
+  if (!hasFeature(v, "integrations")) return { ok: false };
+  const secret = `inb_${randomBytes(24).toString("base64url")}`;
+  await saveSettings(v, (s) => ({ ...s, integrations: { ...s.integrations, inboundSecretHash: sha256Hex(secret) } }), "settings.inbound_secret");
   return { ok: true, secret };
 }
 

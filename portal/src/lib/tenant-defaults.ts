@@ -384,3 +384,8 @@ export function featuresFor(plan: "essentials" | "professional" | "enterprise_hr
   }
   return set;
 }
+
+/** The report address learners may forward suspicious mail to; none while the plan has no integrations or no secret exists (/api/inbound refuses then). */
+export function reportAddress(tenant: { features: ReadonlySet<Feature>; settings: TenantSettings }): string | undefined {
+  return tenant.features.has("integrations") && tenant.settings.integrations.inboundSecretHash ? tenant.settings.integrations.inboundAddress : undefined;
+}

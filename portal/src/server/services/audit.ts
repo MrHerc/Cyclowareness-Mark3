@@ -91,6 +91,7 @@ export const AUDIT_ACTIONS = [
   "retention.purged",
   "settings.integrations",
   "settings.webhook_secret",
+  "settings.inbound_secret",
   "settings.integration_test",
   "settings.setup_guide",
   "watermark.lookup",

@@ -36,6 +36,7 @@ import {
   grantSupportAccessAction,
   lookupWatermarkAction,
   revokeSupportAccessAction,
+  rotateInboundSecretAction,
   rotateWebhookSecretAction,
   saveAttestationAction,
   saveBrandingAction,
@@ -83,7 +84,7 @@ export type IdentityView = Omit<Identity, "sso" | "ldap"> & {
   ldap?: Omit<NonNullable<Identity["ldap"]>, "passwordEnc"> & { hasPassword: boolean };
 };
 export type EmailView = Omit<TenantSettings["email"], "passwordEnc"> & { hasPassword: boolean };
-export type IntegrationsView = Omit<TenantSettings["integrations"], "webhookSecretEnc"> & { hasWebhookSecret: boolean };
+export type IntegrationsView = Omit<TenantSettings["integrations"], "webhookSecretEnc" | "inboundSecretHash"> & { hasWebhookSecret: boolean; hasInboundSecret: boolean };
 
 /** Marks the control the server rejected until it is edited again, and moves focus to it. */
 function markInvalid(id: string) {
@@ -1587,7 +1588,14 @@ const RECEIVER_HEADERS = [
   ["X-Cyclowareness-Delivery", "hdrDelivery"],
 ] as const;
 
-export function IntegrationsTab({ integrations, deliveries }: { integrations: IntegrationsView; deliveries: { id: string; event: string; target: string; status: string; responseCode: number | null; createdAt: string }[] }) {
+export function IntegrationsTab({
+  integrations,
+  inboundEndpoint,
+  deliveries,
+}: {
+  integrations: IntegrationsView;
+  inboundEndpoint: string;
+  deliveries: { id: string; event: string; target: string; status: string; responseCode: number | null; createdAt: string }[] }) {
   const t = useTranslations("settings.integrations");
   const tc = useTranslations("common");
   const { pending, save } = useSave();
@@ -1600,8 +1608,12 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: In
     syslogPort: integrations.syslogPort ?? SYSLOG_DEFAULT_PORT.tls,
     syslogTransport: integrations.syslogTransport ?? "tls",
     syslogFormat: integrations.syslogFormat ?? "cef",
+    inboundAddress: integrations.inboundAddress ?? "",
   });
   const [secret, setSecret] = useState<string | null>(null);
+  const [inboundSecret, setInboundSecret] = useState<string | null>(null);
+  const hasInboundSecret = Boolean(integrations.hasInboundSecret || inboundSecret);
+  const copy = (v: string) => navigator.clipboard.writeText(v).then(() => toast(tc("copied")));
   const [busy, start] = useTransition();
   const hasSecret = Boolean(integrations.hasWebhookSecret || secret);
   const toggleEvent = (e: string) => setS({ ...s, webhookEvents: s.webhookEvents.includes(e) ? s.webhookEvents.filter((x) => x !== e) : [...s.webhookEvents, e] });
@@ -1639,6 +1651,44 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: In
             {secret ? (
               <Notice tone="warn">
                 {t("secretShown")} <code className="font-mono break-all">{secret}</code>
+              </Notice>
+            ) : null}
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader icon={<Mail />} title={t("inbound")} description={t("inboundBody")} />
+          <CardBody className="grid gap-4">
+            <Field label={t("inboundAddress")} htmlFor="in-address" hint={t("inboundAddressHint")}>
+              <Input id="in-address" type="email" dir="ltr" value={s.inboundAddress} onChange={(e) => setS({ ...s, inboundAddress: e.target.value })} placeholder="report@bank.example.az" />
+            </Field>
+            <Field label={t("inboundEndpoint")} htmlFor="in-endpoint" hint={t("inboundEndpointHint")}>
+              <div className="flex gap-2">
+                <Input id="in-endpoint" dir="ltr" value={inboundEndpoint} readOnly className="font-mono text-caption" />
+                <Button variant="secondary" size="icon" aria-label={tc("copy")} onClick={() => copy(inboundEndpoint)}>
+                  <Copy />
+                </Button>
+              </div>
+            </Field>
+            <div className="flex flex-wrap items-start gap-3 rounded-xl border border-line p-4">
+              <KeyRound className="mt-0.5 size-5 shrink-0 text-ink-muted" />
+              <div className="min-w-48 flex-1">
+                <p className="flex flex-wrap items-center gap-2 text-body-sm font-semibold">
+                  {t("inboundSecret")} <Pill tone={hasInboundSecret ? "safe" : "neutral"}>{hasInboundSecret ? t("secretSaved") : tc("notSet")}</Pill>
+                </p>
+                <p className="mt-0.5 text-caption text-ink-muted">{t("inboundSecretBody")}</p>
+              </div>
+              <Button size="sm" variant="secondary" disabled={busy} onClick={() => start(async () => setInboundSecret((await rotateInboundSecretAction()).secret ?? null))}>
+                {hasInboundSecret ? t("regenerateSecret") : t("createSecret")}
+              </Button>
+            </div>
+            {inboundSecret ? (
+              <Notice tone="warn" title={t("secretShown")}>
+                <div className="mt-2 flex gap-2">
+                  <Input aria-label={t("inboundSecret")} dir="ltr" value={inboundSecret} readOnly className="font-mono text-caption" />
+                  <Button variant="secondary" size="icon" aria-label={tc("copy")} onClick={() => copy(inboundSecret)}>
+                    <Copy />
+                  </Button>
+                </div>
               </Notice>
             ) : null}
           </CardBody>
@@ -1695,7 +1745,7 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: In
             disabled={pending}
             onClick={() =>
               // Emptied fields go out as "", which tells the server to remove the stored value.
-              save(() => saveIntegrationsAction({ ...s, webhookUrl: s.webhookUrl.trim(), syslogHost: s.syslogHost.trim(), webhookEvents: s.webhookEvents as never }), { webhookUrl: "w-url", syslogHost: "s-host", syslogPort: "s-port" })
+              save(() => saveIntegrationsAction({ ...s, webhookUrl: s.webhookUrl.trim(), syslogHost: s.syslogHost.trim(), inboundAddress: s.inboundAddress.trim(), webhookEvents: s.webhookEvents as never }), { webhookUrl: "w-url", syslogHost: "s-host", syslogPort: "s-port", inboundAddress: "in-address" })
             }
           >
             {tc("save")}

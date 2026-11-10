@@ -54,8 +54,8 @@ function identityView({ sso, ldap, ...rest }: TenantSettings["identity"]): Ident
 function emailView({ passwordEnc, ...rest }: TenantSettings["email"]): EmailView {
   return { ...rest, hasPassword: !!passwordEnc };
 }
-function integrationsView({ webhookSecretEnc, ...rest }: TenantSettings["integrations"]): IntegrationsView {
-  return { ...rest, hasWebhookSecret: !!webhookSecretEnc };
+function integrationsView({ webhookSecretEnc, inboundSecretHash, ...rest }: TenantSettings["integrations"]): IntegrationsView {
+  return { ...rest, hasWebhookSecret: !!webhookSecretEnc, hasInboundSecret: !!inboundSecretHash };
 }
 
 export async function generateMetadata() {
@@ -149,7 +149,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
         .where(eq(t.webhookDeliveries.tenantId, v.tenant.id))
         .orderBy(desc(t.webhookDeliveries.createdAt))
         .limit(20);
-      body = <IntegrationsTab integrations={integrationsView(s.integrations)} deliveries={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))} />;
+      body = <IntegrationsTab integrations={integrationsView(s.integrations)} inboundEndpoint={`${base}/api/inbound/${v.tenant.slug}`} deliveries={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))} />;
       break;
     }
   }

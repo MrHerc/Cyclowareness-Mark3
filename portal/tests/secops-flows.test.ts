@@ -1,17 +1,27 @@
 import { and, eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
-import { withDefaults } from "../src/lib/tenant-defaults";
+import { reportAddress, withDefaults } from "../src/lib/tenant-defaults";
 import { TEMPLATE_BY_KEY } from "../src/lib/campaigns/templates";
 import { riskTitle } from "../src/lib/risk-title";
 import { bakuDayPlus } from "../src/lib/time";
 import { DB_SETUP_TIMEOUT, addModule, addTenant, addUser, testDb } from "./helpers/db";
 
 vi.mock("../src/server/env", () => ({ env: { isProd: false }, appUrl: () => "https://portal.example" }));
+// The inbound route and the settings actions reach the database through db(); the administrator is a plain object.
+vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src/server/db/schema") }));
+let viewer: { user: { id: string }; tenant: { id: string } } | null = null;
+vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => viewer, hasFeature: () => true }));
+vi.mock("../src/server/request", () => ({ clientIp: async () => null }));
+vi.mock("next/cache", () => ({ refresh: () => {} }));
 
 const { db, ready } = testDb();
 const { submitThreatReport, insertNumbered } = await import("../src/server/services/threats");
 const { advanceLoop, assignIncidentTraining, closeLoop, createIncident, createLoop, moduleScores, targetTraining } = await import("../src/server/services/secops");
+const { rotateInboundSecretAction, saveIntegrationsAction } = await import("../src/server/actions/settings");
+const inbound = await import("../src/app/api/inbound/[tenant]/route");
+const { rateLimit } = await import("../src/server/rate-limit");
+const { randomToken } = await import("../src/server/services/progress");
 
 beforeAll(ready, DB_SETUP_TIMEOUT);
 
@@ -332,5 +342,146 @@ describe("moduleScores", () => {
     const scores = await moduleScores(db, mod.id, [a.id, b.id]);
     expect(Object.fromEntries(scores)).toEqual({ [a.id]: 67, [b.id]: 0 });
     expect((await moduleScores(db, mod.id, [])).size).toBe(0);
+  });
+});
+
+describe("inbound report address (/api/inbound/[tenant])", () => {
+  const post = (slug: string, body: unknown, authorization?: string) =>
+    inbound.POST(
+      new Request(`https://portal.example/api/inbound/${slug}`, {
+        method: "POST",
+        headers: { "content-type": "application/json", ...(authorization ? { authorization } : {}) },
+        body: typeof body === "string" ? body : JSON.stringify(body),
+      }),
+      { params: Promise.resolve({ tenant: slug }) },
+    );
+  /** An organisation whose administrator created the inbound secret in Settings → Integrations. */
+  async function inboundOrg() {
+    const tenant = await addTenant(db, { settings: integrations });
+    const admin = await addUser(db, tenant.id, { role: "tenant_admin" });
+    viewer = { user: { id: admin.id }, tenant: { id: tenant.id } };
+    const { secret } = await rotateInboundSecretAction();
+    return { tenant, auth: `Bearer ${secret}` };
+  }
+  const reports = (tenantId: string) => db.select().from(t.threatReports).where(eq(t.threatReports.tenantId, tenantId));
+
+  it("files a forwarded simulation mail as a matched report of the person who forwarded it", async () => {
+    const { tenant, auth } = await inboundOrg();
+    // Saving the form keeps the secret (it has no field) and stores the address the learners see.
+    const form = { webhookEnabled: false, webhookEvents: [], syslogEnabled: false, syslogTransport: "tls" as const, syslogFormat: "cef" as const };
+    expect(await saveIntegrationsAction({ ...form, inboundAddress: "report@bank.example" })).toEqual({ ok: true });
+    const [{ settings }] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenant.id));
+    expect(reportAddress({ features: new Set(["integrations"]), settings: withDefaults(settings) })).toBe("report@bank.example");
+    expect(reportAddress({ features: new Set(), settings: withDefaults(settings) })).toBeUndefined();
+    // An address typed before the secret exists is not shown: the endpoint would refuse every forwarded mail.
+    const noSecret = withDefaults(settings);
+    expect(reportAddress({ features: new Set(["integrations"]), settings: { ...noSecret, integrations: { ...noSecret.integrations, inboundSecretHash: undefined } } })).toBeUndefined();
+
+    const reporter = await addUser(db, tenant.id, { email: `aysel${++tok}@bank.example`, riskScore: 99 });
+    const { recipient } = await simulation(tenant.id, reporter.id);
+    const token = randomToken(16);
+    await db.update(t.campaignRecipients).set({ token }).where(eq(t.campaignRecipients.id, recipient.id));
+    const res = await post(
+      tenant.slug,
+      {
+        from: `Aysel <${reporter.email.toUpperCase()}>`,
+        to: "report@bank.example",
+        subject: "Fwd: Your payslip is ready",
+        text: `---------- Forwarded message ----------\nOpen <https://portal.example/t/${token}> to see it.\nhttps://portal.example/t/${randomToken(16)}`,
+      },
+      auth,
+    );
+    expect(res.status).toBe(202);
+    const [report] = await reports(tenant.id);
+    expect(report).toMatchObject({ reporterId: reporter.id, channel: "email", status: "triaged", campaignRecipientId: recipient.id, subject: "Fwd: Your payslip is ready", url: `https://portal.example/t/${token}` });
+    const [r] = await db.select().from(t.campaignRecipients).where(eq(t.campaignRecipients.id, recipient.id));
+    expect(r.reportedAt).toBeInstanceOf(Date);
+    const logs = await db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenant.id), eq(t.auditLog.action, "threat.reported")));
+    expect(logs).toMatchObject([{ actorId: reporter.id, meta: { channel: "email", simulation: true } }]);
+    const [u] = await db.select({ xp: t.users.xp, risk: t.users.riskScore }).from(t.users).where(eq(t.users.id, reporter.id));
+    expect(u.xp).toBe(5);
+    expect(u.risk).not.toBe(99);
+  });
+
+  it("skips a foreign /t/ link and finds the simulation link inside a percent-encoded Safe Links wrapper", async () => {
+    const { tenant, auth } = await inboundOrg();
+    const reporter = await addUser(db, tenant.id);
+    const { recipient } = await simulation(tenant.id, reporter.id);
+    const token = randomToken(16);
+    await db.update(t.campaignRecipients).set({ token }).where(eq(t.campaignRecipients.id, recipient.id));
+    const wrapped = `https://eur01.safelinks.protection.outlook.com/?url=${encodeURIComponent(`https://portal.example/t/${token}`)}&data=05`;
+    const text = `Sent via https://short.example/t/abcdefghijklmnop (50% off)\n---------- Forwarded message ----------\nOpen ${wrapped}`;
+    expect((await post(tenant.slug, { from: reporter.email, subject: "Fwd: something else", text }, auth)).status).toBe(202);
+    const [report] = await reports(tenant.id);
+    expect(report).toMatchObject({ reporterId: reporter.id, campaignRecipientId: recipient.id, url: `https://portal.example/t/${token}` });
+  });
+
+  it("ignores unknown and suspended senders with the same answer, filing nothing", async () => {
+    const { tenant, auth } = await inboundOrg();
+    const suspended = await addUser(db, tenant.id, { status: "suspended" });
+    const other = await addUser(db, (await addTenant(db)).id);
+    for (const from of ["stranger@evil.example", suspended.email, other.email]) {
+      expect((await post(tenant.slug, { from, subject: "Invoice", text: "Pay now" }, auth)).status).toBe(202);
+    }
+    expect(await reports(tenant.id)).toEqual([]);
+    expect(await db.select().from(t.xpEvents).where(eq(t.xpEvents.tenantId, tenant.id))).toEqual([]);
+  });
+
+  it("refuses a wrong, missing or another organisation's secret, a plan without integrations and a malformed body", async () => {
+    const a = await inboundOrg();
+    const b = await inboundOrg();
+    const person = await addUser(db, a.tenant.id);
+    const mail = { from: person.email, subject: "Invoice", text: "Pay now" };
+    expect((await post(a.tenant.slug, mail, "Bearer inb_wrong")).status).toBe(401);
+    expect((await post(a.tenant.slug, mail)).status).toBe(401);
+    expect((await post(a.tenant.slug, mail, b.auth)).status).toBe(401);
+    expect((await post("no-such-org", mail, a.auth)).status).toBe(401);
+    await db.update(t.tenants).set({ plan: "essentials" }).where(eq(t.tenants.id, a.tenant.id));
+    expect((await post(a.tenant.slug, mail, a.auth)).status).toBe(401);
+    await db.update(t.tenants).set({ plan: "professional" }).where(eq(t.tenants.id, a.tenant.id));
+    expect((await post(a.tenant.slug, "{not json", a.auth)).status).toBe(400);
+    expect((await post(a.tenant.slug, { subject: "no sender" }, a.auth)).status).toBe(400);
+    expect(await reports(a.tenant.id)).toEqual([]);
+  });
+
+  it("refuses a flood per organisation", async () => {
+    const { tenant, auth } = await inboundOrg();
+    const person = await addUser(db, tenant.id);
+    // Pinned clock: a minute boundary between filling the window and the post would open a fresh one.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-10T10:00:30Z"));
+    try {
+      // The route's window: 120 messages per organisation and minute.
+      for (let i = 0; i < 120; i++) await rateLimit(`inbound:${tenant.id}`, 120, 60_000);
+      const res = await post(tenant.slug, { from: person.email, subject: "Invoice", text: "Pay now" }, auth);
+      expect(res.status).toBe(429);
+      expect(res.headers.get("retry-after")).toBe("60");
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(await reports(tenant.id)).toEqual([]);
+  });
+
+  it("answers quickly for a forwarded mail with a large embedded image and refuses a declared oversize body unread", async () => {
+    const { tenant, auth } = await inboundOrg();
+    const person = await addUser(db, tenant.id);
+    // A base64 data URI is a long run with "/" and no spaces: the tracking-link search must stay linear on it.
+    const image = Array.from({ length: 600_000 }, (_, i) => "AB/c+9xY"[i % 8]).join("");
+    const started = Date.now();
+    const res = await post(tenant.slug, { from: person.email, subject: "Fwd: Invoice", text: "Pay now", html: `<img src="data:image/png;base64,${image}">` }, auth);
+    expect(res.status).toBe(202);
+    expect(Date.now() - started).toBeLessThan(2000);
+    const [report] = await reports(tenant.id);
+    expect(report).toMatchObject({ reporterId: person.id, url: null });
+
+    const big = inbound.POST(
+      new Request(`https://portal.example/api/inbound/${tenant.slug}`, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: auth, "content-length": "2000000" },
+        body: "{}",
+      }),
+      { params: Promise.resolve({ tenant: tenant.slug }) },
+    );
+    expect((await big).status).toBe(413);
   });
 });

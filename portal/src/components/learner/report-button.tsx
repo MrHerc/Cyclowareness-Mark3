@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Mail, ShieldAlert } from "lucide-react";
 import { reportThreatAction, type ReportState } from "@/server/actions/security";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
@@ -14,7 +14,8 @@ import { cn } from "@/lib/cn";
 
 const CHANNELS = ["email", "sms", "call", "link", "file", "in_person", "other"] as const;
 
-export function ReportForm({ onDone }: { onDone?: () => void }) {
+/** `forwardTo`: the organisation's report address (Settings → Integrations), offered for suspicious mail when set. */
+export function ReportForm({ onDone, forwardTo }: { onDone?: () => void; forwardTo?: string }) {
   const t = useTranslations("security.report");
   const tc = useTranslations("common");
   // A thrown action (server unreachable) becomes the generic form error instead of unmounting the form.
@@ -44,6 +45,14 @@ export function ReportForm({ onDone }: { onDone?: () => void }) {
         startSubmit(() => action(data));
       }}
     >
+      {forwardTo ? (
+        <Notice icon={<Mail />}>
+          {t("forwardHint")}{" "}
+          <bdi dir="ltr" className="font-semibold break-all">
+            {forwardTo}
+          </bdi>
+        </Notice>
+      ) : null}
       {formError ? (
         <Notice tone="risk" icon={<AlertTriangle />}>
           <span role="alert">{formError}</span>
@@ -81,7 +90,7 @@ export function ReportForm({ onDone }: { onDone?: () => void }) {
   );
 }
 
-export function ReportButton({ className, variant = "compact" }: { className?: string; variant?: "compact" | "full" }) {
+export function ReportButton({ className, variant = "compact", forwardTo }: { className?: string; variant?: "compact" | "full"; forwardTo?: string }) {
   const t = useTranslations("security.report");
   const tn = useTranslations("common.nav");
   const [open, setOpen] = useState(false);
@@ -101,8 +110,8 @@ export function ReportButton({ className, variant = "compact" }: { className?: s
         <span className={variant === "compact" ? "hidden sm:inline" : undefined}>{variant === "compact" ? tn("reportShort") : t("cta")}</span>
         {variant === "compact" ? <span className="sr-only sm:hidden">{tn("report")}</span> : null}
       </button>
-      <Dialog open={open} onClose={() => setOpen(false)} title={t("title")} description={t("description")}>
-        {open ? <ReportForm onDone={() => setOpen(false)} /> : null}
+      <Dialog open={open} onClose={() => setOpen(false)} title={t("title")} description={forwardTo ? t("descriptionForward") : t("description")}>
+        {open ? <ReportForm onDone={() => setOpen(false)} forwardTo={forwardTo} /> : null}
       </Dialog>
     </>
   );
