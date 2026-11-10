@@ -1,17 +1,53 @@
 import { and, eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
-import { withDefaults } from "../src/lib/tenant-defaults";
+import { featuresFor, withDefaults } from "../src/lib/tenant-defaults";
+import type { Scene } from "../src/lib/content/types";
+import { lessonFileSchema, lessonIntegrityErrors } from "../src/lib/content/validate";
+import { localeParityErrors } from "../src/lib/content/locale-parity";
+import { studioDraft } from "../src/lib/content/studio";
+import { schemaCheck } from "../src/server/ai-verify";
 import { TEMPLATE_BY_KEY } from "../src/lib/campaigns/templates";
 import { riskTitle } from "../src/lib/risk-title";
 import { bakuDayPlus } from "../src/lib/time";
 import { DB_SETUP_TIMEOUT, addModule, addTenant, addUser, testDb } from "./helpers/db";
 
-vi.mock("../src/server/env", () => ({ env: { isProd: false }, appUrl: () => "https://portal.example" }));
+/** The model the Studio translations call: it prefixes every line with the target language, or fails for `fail`. */
+const ai = vi.hoisted(() => ({ key: undefined as string | undefined, fail: "", calls: [] as string[], viewer: null as unknown }));
+vi.mock("../src/server/env", () => ({
+  env: {
+    isProd: false,
+    ANTHROPIC_MODEL: "test-model",
+    get ANTHROPIC_API_KEY() {
+      return ai.key;
+    },
+  },
+  appUrl: () => "https://portal.example",
+}));
+vi.mock("@anthropic-ai/sdk", () => ({
+  default: class {
+    messages = {
+      stream: (req: { system: string; messages: { content: string }[] }) => ({
+        finalMessage: async () => {
+          const to = /\(([a-z]{2})\)\./.exec(req.system)![1];
+          ai.calls.push(to);
+          const content = req.messages[0].content;
+          const lines = JSON.parse(content.slice(content.indexOf("\n") + 1)) as string[];
+          return to === ai.fail ? { stop_reason: "end_turn", content: [] } : { stop_reason: "tool_use", content: [{ type: "tool_use", input: { lines: lines.map((l) => `${to}: ${l}`) } }] };
+        },
+      }),
+    };
+  },
+}));
+vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src/server/db/schema") }));
+vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => ai.viewer, allowed: () => true }));
+vi.mock("next/cache", () => ({ refresh: vi.fn() }));
+vi.mock("next-intl/server", () => ({ getLocale: async () => "en", getTranslations: async () => (key: string) => key }));
 
 const { db, ready } = testDb();
 const { submitThreatReport, insertNumbered } = await import("../src/server/services/threats");
 const { advanceLoop, assignIncidentTraining, closeLoop, createIncident, createLoop, moduleScores, targetTraining } = await import("../src/server/services/secops");
+const { saveStudioLessonAction, setModuleStatusAction, updateStudioLessonAction } = await import("../src/server/actions/secops");
 
 beforeAll(ready, DB_SETUP_TIMEOUT);
 
@@ -332,5 +368,147 @@ describe("moduleScores", () => {
     const scores = await moduleScores(db, mod.id, [a.id, b.id]);
     expect(Object.fromEntries(scores)).toEqual({ [a.id]: 67, [b.id]: 0 });
     expect((await moduleScores(db, mod.id, [])).size).toBe(0);
+  });
+});
+
+describe("Studio lessons", () => {
+  const LESSON = {
+    locale: "en" as const,
+    title: "Courier SMS",
+    subtitle: "Spot a fake parcel text.",
+    category: "email" as const,
+    difficulty: "Easy" as const,
+    minutes: 3,
+    intro: "A text about a parcel arrives on your phone.",
+    points: ["Check who sent it.", "Open the courier's app yourself."],
+    question: { prompt: "What do you do first?", options: [{ label: "Open the app myself", correct: true, feedback: "Right." }, { label: "Tap the link", correct: false, feedback: "That is the trap." }] },
+    recap: ["Check the sender.", "Use the official app."],
+    ai: false,
+  };
+  const SWIPE = {
+    prompt: "Sort these messages.",
+    cards: [
+      { from: "Parcel", text: "Pay 1 AZN at parcel-fee.example", verdict: "threat" as const, explain: "A fee link from an unknown sender." },
+      { from: "Bank", text: "Your statement is ready in the app.", verdict: "safe" as const, explain: "No link, the app you know." },
+    ],
+  };
+  const HOTSPOT = {
+    prompt: "Find the two signs.",
+    from: "support@pay-portal.example",
+    subject: "Account locked",
+    body: "Dear customer,\nVerify within 1 hour at pay-portal.example/login or lose access.",
+    targets: [
+      { text: "within 1 hour", label: "Pressure", explain: "Urgency stops you from checking." },
+      { text: "pay-portal.example/login", label: "Odd link", explain: "Not your bank's address." },
+    ],
+  };
+  type Viewer = import("../src/server/auth/viewer").Viewer;
+
+  async function studio(locales: string[]) {
+    const tenant = await addTenant(db, { plan: "professional", settings: withDefaults({ defaultLocale: "en", locales }) });
+    const admin = await addUser(db, tenant.id, { role: "tenant_admin" });
+    ai.viewer = { sessionId: "s", twoFactorVerified: true, user: admin, tenant: { ...tenant, settings: withDefaults(tenant.settings), features: featuresFor(tenant.plan, tenant.features) } } as Viewer;
+    return tenant;
+  }
+  async function lessonOf(tenantId: string, slug: string) {
+    const [mod] = await db.select().from(t.modules).where(and(eq(t.modules.tenantId, tenantId), eq(t.modules.slug, slug)));
+    const [lesson] = await db.select().from(t.lessons).where(eq(t.lessons.moduleId, mod.id));
+    const rows = await db.select().from(t.lessonContents).where(eq(t.lessonContents.lessonId, lesson.id));
+    const scenes = (locale: string) => rows.find((r) => r.locale === locale)?.scenes as Scene[] | undefined;
+    return { mod, lesson, locales: rows.map((r) => r.locale).sort(), scenes };
+  }
+  const ids = (scenes: Scene[]) => JSON.stringify(scenes, (k, v: unknown) => (typeof v === "string" && k !== "id" && k !== "type" && k !== "spot" ? "" : v));
+
+  it("authors swipe and hotspot exercises as valid scenes of the lesson format, and refuses broken ones", async () => {
+    const tenant = await studio(["en"]);
+    const res = await saveStudioLessonAction({ ...LESSON, swipe: SWIPE, hotspot: HOTSPOT });
+    expect(res.ok).toBe(true);
+    const { scenes } = await lessonOf(tenant.id, res.slug!);
+    const en = scenes("en")!;
+    expect(en.map((s) => s.id)).toEqual(["intro", "steps", "swipe", "hotspot", "check", "recap"]);
+    const lesson = { id: "lesson-1", title: LESSON.title, minutes: LESSON.minutes, scenes: en };
+    expect(lessonFileSchema.safeParse(lesson).success).toBe(true);
+    expect(lessonIntegrityErrors(lessonFileSchema.parse(lesson))).toEqual([]);
+    // The AI trainer's checks too: every spot is marked in the e-mail, the swipe has a threat.
+    expect(schemaCheck({ title: LESSON.title, subtitle: LESSON.subtitle, lessons: [lesson] }).issues).toEqual([]);
+    expect(en[3]).toMatchObject({
+      type: "hotspot",
+      minToFind: 2,
+      artifact: { kind: "email", from: { address: HOTSPOT.from }, body: [[{ text: "Dear customer," }], [{ text: "Verify " }, { text: "within 1 hour", spot: "s1" }, { text: " at " }, { text: "pay-portal.example/login", spot: "s2" }, { text: " or lose access." }]] },
+    });
+    expect(en[2]).toMatchObject({ type: "swipe", cards: [{ id: "c1", verdict: "threat", artifact: { kind: "sms" } }, { id: "c2", verdict: "safe" }] });
+    // The Studio form reads it back as it was written.
+    const { title, subtitle, intro, points, question, recap } = LESSON;
+    expect(studioDraft(en, subtitle)).toEqual({ title, subtitle, intro, points, question, recap, swipe: SWIPE, hotspot: HOTSPOT });
+
+    const safeOnly = { ...SWIPE, cards: SWIPE.cards.map((c) => ({ ...c, verdict: "safe" as const })) };
+    expect(await saveStudioLessonAction({ ...LESSON, swipe: safeOnly })).toEqual({ ok: false, error: "invalid" });
+    const missing = { ...HOTSPOT, targets: [{ ...HOTSPOT.targets[0], text: "within 2 hours" }] };
+    expect(await saveStudioLessonAction({ ...LESSON, hotspot: missing })).toEqual({ ok: false, error: "invalid" });
+  });
+
+  it("edits a saved lesson in place: the same scene ids, a published module stays published and is translated again", async () => {
+    const tenant = await studio(["en", "ru"]);
+    ai.key = undefined;
+    const { slug } = await saveStudioLessonAction(LESSON);
+    const before = await lessonOf(tenant.id, slug!);
+    expect(await setModuleStatusAction(before.mod.id, "published")).toEqual({ ok: true, offline: true, untranslated: ["ru"] });
+    const learner = await addUser(db, tenant.id);
+    await db.insert(t.answers).values({ tenantId: tenant.id, userId: learner.id, lessonId: before.lesson.id, sceneId: "check", correct: true, firstTry: true });
+
+    ai.key = "test-key";
+    const edited = { ...LESSON, title: "Courier texts", points: ["Check who sent it.", "Open the app yourself.", "Report the text."], recap: ["Check.", "Report."], hotspot: HOTSPOT };
+    expect(await updateStudioLessonAction(before.mod.id, edited)).toEqual({ ok: true, translated: ["ru"] });
+    const after = await lessonOf(tenant.id, slug!);
+    expect(after.mod).toMatchObject({ status: "published", title: { en: "Courier texts", ru: "ru: Courier texts" } });
+    expect(after.lesson.id).toBe(before.lesson.id);
+    const en = after.scenes("en")!;
+    expect(en.map((s) => s.id)).toEqual(["intro", "steps", "hotspot", "check", "recap"]);
+    expect(ids(en.filter((s) => s.id !== "hotspot" && s.id !== "steps"))).toBe(ids(before.scenes("en")!.filter((s) => s.id !== "steps")));
+    expect(en[1]).toMatchObject({ beats: [{ id: "b1" }, { id: "b2" }, { id: "b3", say: "Report the text." }] });
+    // The translation is of the new text, and the answers stay.
+    expect(after.scenes("ru")![0]).toMatchObject({ id: "intro", title: "ru: Courier texts" });
+    expect(await db.select().from(t.answers).where(eq(t.answers.lessonId, before.lesson.id))).toHaveLength(1);
+    const [log] = await db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenant.id), eq(t.auditLog.action, "module.updated")));
+    expect(log).toMatchObject({ targetId: before.mod.id, meta: { title: "Courier texts", translated: ["ru"] } });
+
+    // A draft keeps no stale translation, and an AI training's lessons are not the form's to rewrite.
+    await setModuleStatusAction(before.mod.id, "draft");
+    expect(await updateStudioLessonAction(before.mod.id, LESSON)).toEqual({ ok: true });
+    expect((await lessonOf(tenant.id, slug!)).locales).toEqual(["en"]);
+    const training = await addModule(db, { tenantId: tenant.id, origin: "ai", status: "draft", lessons: 1 });
+    expect(await updateStudioLessonAction(training.id, LESSON)).toEqual({ ok: false, error: "invalid" });
+  });
+
+  it("translates on publish into each of the organisation's languages the lesson lacks, and says which it could not", async () => {
+    const tenant = await studio(["en", "ru", "az"]);
+    ai.key = undefined;
+    const { slug } = await saveStudioLessonAction({ ...LESSON, swipe: SWIPE, hotspot: HOTSPOT });
+    const { mod } = await lessonOf(tenant.id, slug!);
+    // Without a key the module is published in its own language, and the author is told so.
+    expect(await setModuleStatusAction(mod.id, "published")).toEqual({ ok: true, offline: true, untranslated: ["ru", "az"] });
+    expect((await lessonOf(tenant.id, slug!)).locales).toEqual(["en"]);
+
+    ai.key = "test-key";
+    ai.fail = "az";
+    ai.calls = [];
+    await setModuleStatusAction(mod.id, "draft");
+    expect(await setModuleStatusAction(mod.id, "published")).toEqual({ ok: true, translated: ["ru"], untranslated: ["az"] });
+    const after = await lessonOf(tenant.id, slug!);
+    expect(after.locales).toEqual(["en", "ru"]);
+    expect(after.mod).toMatchObject({ status: "published", title: { en: LESSON.title, ru: `ru: ${LESSON.title}` }, subtitle: { ru: `ru: ${LESSON.subtitle}` } });
+    const en = after.scenes("en")!;
+    const ru = after.scenes("ru")!;
+    // Same ids, answers, spots and addresses; only the text is the model's.
+    expect(localeParityErrors(en, ru)).toEqual([]);
+    expect(ids(ru)).toBe(ids(en));
+    expect(ru[3]).toMatchObject({ artifact: { from: { address: HOTSPOT.from } }, spots: [{ id: "s1", label: "ru: Pressure" }, { id: "s2" }] });
+
+    ai.fail = "";
+    ai.calls = [];
+    await setModuleStatusAction(mod.id, "draft");
+    expect(await setModuleStatusAction(mod.id, "published")).toEqual({ ok: true, translated: ["az"] });
+    expect(ai.calls).toEqual(["az"]);
+    expect((await lessonOf(tenant.id, slug!)).locales).toEqual(["az", "en", "ru"]);
   });
 });

@@ -10,7 +10,9 @@ import { formOptions } from "@/server/queries/secops-options";
 import { Card, CardBody } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState, PageHeader, TabsNav } from "@/components/ui/layout";
-import { MaterialForm, ModuleRowActions, StudioLessonForm } from "@/components/secops/studio";
+import { MaterialForm, ModuleRowActions, StudioLessonForm, type StudioLessonInitial } from "@/components/secops/studio";
+import { studioDraft } from "@/lib/content/studio";
+import type { Scene } from "@/lib/content/types";
 import { AiTrainer } from "@/components/admin/ai-trainer/ai-trainer";
 import { ScormExport } from "@/components/admin/scorm-export";
 import { TRAINING_LOCALES } from "@/server/ai-verify";
@@ -51,10 +53,26 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
   for (const m of exportable) if (!bySlug.has(m.slug) || m.tenantId) bySlug.set(m.slug, m);
   const scormModules = [...bySlug.values()].map((m) => ({ id: m.id, title: m.status === "draft" ? `${pick(m.title, locale)} (${tr("status.draft")})` : pick(m.title, locale) }));
   const lessons = own.length
-    ? await db().select({ moduleId: t.lessons.moduleId, key: t.lessons.key }).from(t.lessons).where(inArray(t.lessons.moduleId, own.map((m) => m.id))).orderBy(asc(t.lessons.position))
+    ? await db().select({ id: t.lessons.id, moduleId: t.lessons.moduleId, key: t.lessons.key, title: t.lessons.title }).from(t.lessons).where(inArray(t.lessons.moduleId, own.map((m) => m.id))).orderBy(asc(t.lessons.position))
     : [];
   const firstLesson = new Map<string, string>();
   for (const l of lessons) if (!firstLesson.has(l.moduleId)) firstLesson.set(l.moduleId, l.key);
+  // A one-lesson module the Studio form wrote can be edited in that form, from its own language (the key of lessons.title).
+  const single = lessons.filter((l) => lessons.filter((x) => x.moduleId === l.moduleId).length === 1);
+  const sources = single.length
+    ? await db()
+        .select({ lessonId: t.lessonContents.lessonId, locale: t.lessonContents.locale, scenes: t.lessonContents.scenes })
+        .from(t.lessonContents)
+        .where(inArray(t.lessonContents.lessonId, single.map((l) => l.id)))
+    : [];
+  const editable = new Map<string, StudioLessonInitial>();
+  for (const l of single) {
+    const m = own.find((x) => x.id === l.moduleId)!;
+    const locale = Object.keys(l.title)[0];
+    const row = sources.find((r) => r.lessonId === l.id && r.locale === locale);
+    const draft = row ? studioDraft(row.scenes as Scene[], m.subtitle[locale] ?? "") : null;
+    if (draft) editable.set(m.id, { ...draft, locale, category: m.category, difficulty: m.difficulty, minutes: m.minutes });
+  }
   const categories = CATEGORIES.map((c) => ({ id: c, label: tc(`categories.${c}`) }));
 
   return (
@@ -83,6 +101,7 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
           <ul className="grid gap-3">
             {own.map((m) => {
               const first = firstLesson.get(m.id);
+              const initial = editable.get(m.id);
               return (
                 <li key={m.id}>
                   <Card>
@@ -95,6 +114,7 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
                       </div>
                       <Pill tone={m.origin === "ai" ? "violet" : "brand"}>{tr(`origin.${m.origin as "custom"}`)}</Pill>
                       <Pill tone={m.status === "published" ? "safe" : "neutral"}>{tr(`status.${m.status}`)}</Pill>
+                      {initial ? <StudioLessonForm locales={v.tenant.settings.locales} defaultLocale={locale} categories={categories} aiOn={aiEnabled()} edit={{ id: m.id, initial }} /> : null}
                       <ModuleRowActions id={m.id} status={m.status} previewHref={first ? `/learn/${m.slug}/${first}` : null} />
                     </CardBody>
                   </Card>

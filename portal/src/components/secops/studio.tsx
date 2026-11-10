@@ -12,7 +12,9 @@ import {
   savePathAction,
   saveStudioLessonAction,
   setModuleStatusAction,
+  updateStudioLessonAction,
 } from "@/server/actions/secops";
+import type { LessonDraft } from "@/server/ai";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/components/ui/field";
@@ -31,7 +33,40 @@ const lines = (s: string) =>
 
 /* ───────── own lessons ───────── */
 
-export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: { locales: string[]; defaultLocale: string; categories: Option[]; aiOn: boolean }) {
+type Card = { from: string; text: string; verdict: "threat" | "safe"; explain: string };
+type Target = { text: string; label: string; explain: string };
+const card = (verdict: Card["verdict"]): Card => ({ from: "", text: "", verdict, explain: "" });
+const target = (): Target => ({ text: "", label: "", explain: "" });
+const filledCards = (cards: Card[]) => cards.filter((c) => c.from.trim() && c.text.trim().length >= 3 && c.explain.trim().length >= 3);
+const filledTargets = (targets: Target[]) => targets.filter((x) => x.text.trim() && x.label.trim() && x.explain.trim().length >= 3);
+/** Empty rows to fill in, after the given ones. */
+const slots = <T,>(given: T[], min: number, empty: () => T) => [...given, ...Array.from({ length: Math.max(0, min - given.length) }, empty)];
+
+/** A saved Studio lesson, to edit: its draft and settings. */
+export type StudioLessonInitial = LessonDraft & { locale: string; category: string; difficulty: "Easy" | "Medium" | "Hard"; minutes: number };
+
+/** After a publish, or an edit of a published lesson: which of the organisation's languages got a translation and which did not. */
+function translationToast(t: ReturnType<typeof useTranslations<"secops.studio">>, res: { translated?: string[]; untranslated?: string[]; offline?: boolean }, done: string) {
+  const names = (list: string[]) => list.map((l) => LOCALE_NAMES[l as "az"] ?? l).join(", ");
+  if (res.offline) return toast(t("sourceOnly"), "info", 8000);
+  if (res.untranslated?.length) return toast(t("untranslated", { languages: names(res.untranslated) }), "info", 8000);
+  toast(res.translated?.length ? t("translated", { languages: names(res.translated) }) : done);
+}
+
+/** Without `edit`, the "New lesson" button and an empty form; with it, an "Edit" button and the saved lesson. */
+export function StudioLessonForm({
+  locales,
+  defaultLocale,
+  categories,
+  aiOn,
+  edit,
+}: {
+  locales: string[];
+  defaultLocale: string;
+  categories: Option[];
+  aiOn: boolean;
+  edit?: { id: string; initial: StudioLessonInitial };
+}) {
   const t = useTranslations("secops.studio");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
@@ -39,6 +74,18 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
   const [drafting, startDraft] = useTransition();
   const [topic, setTopic] = useState("");
   const [fromAi, setFromAi] = useState(false);
+  const fromDraft = (d: LessonDraft) => ({
+    title: d.title,
+    subtitle: d.subtitle,
+    intro: d.intro,
+    points: d.points.join("\n"),
+    prompt: d.question.prompt,
+    options: slots(d.question.options, 3, () => ({ label: "", correct: false, feedback: "" })),
+    recap: d.recap.join("\n"),
+    // An AI draft has no exercises: the ones already written stay.
+    ...(d.swipe ? { swipeOn: true, swipe: { prompt: d.swipe.prompt, cards: slots(d.swipe.cards, 4, () => card("safe")) } } : {}),
+    ...(d.hotspot ? { hotspotOn: true, hotspot: { ...d.hotspot, targets: slots(d.hotspot.targets, 3, target) } } : {}),
+  });
   const blank = {
     locale: defaultLocale,
     title: "",
@@ -55,10 +102,27 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
       { label: "", correct: false, feedback: "" },
     ],
     recap: "",
+    swipeOn: false,
+    swipe: { prompt: "", cards: [card("threat"), card("safe"), card("threat"), card("safe")] },
+    hotspotOn: false,
+    hotspot: { prompt: "", from: "", subject: "", body: "", targets: [target(), target(), target()] },
   };
-  const [f, setF] = useState(blank);
+  const initial = edit
+    ? { ...blank, ...fromDraft(edit.initial), locale: edit.initial.locale, category: edit.initial.category, difficulty: edit.initial.difficulty, minutes: edit.initial.minutes }
+    : blank;
+  const [f, setF] = useState(initial);
   // The lesson fields are written in the lesson's language, which can differ from the console's.
   const content = langAttrs(f.locale);
+  const cards = filledCards(f.swipe.cards);
+  const targets = filledTargets(f.hotspot.targets);
+  const swipeValid = f.swipe.prompt.trim().length >= 5 && cards.length >= 2 && cards.some((c) => c.verdict === "threat");
+  const hotspotValid =
+    f.hotspot.prompt.trim().length >= 5 &&
+    f.hotspot.from.trim().length >= 3 &&
+    f.hotspot.subject.trim() !== "" &&
+    f.hotspot.body.trim().length >= 10 &&
+    targets.length >= 1 &&
+    targets.every((x) => f.hotspot.body.includes(x.text.trim()));
   const valid =
     f.title.trim().length >= 3 &&
     f.intro.trim().length >= 10 &&
@@ -66,23 +130,15 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
     f.prompt.trim().length >= 5 &&
     f.options.filter((o) => o.label.trim() && o.feedback.trim()).length >= 2 &&
     f.options.filter((o) => o.correct && o.label.trim()).length === 1 &&
-    lines(f.recap).length >= 2;
+    lines(f.recap).length >= 2 &&
+    (!f.swipeOn || swipeValid) &&
+    (!f.hotspotOn || hotspotValid);
 
   const draft = () =>
     startDraft(async () => {
       const res = await draftLessonAction(topic, f.locale);
       if (!res.ok || !res.draft) return toast(res.error === "offline" ? t("form.aiOffline") : res.error === "rateLimited" ? tc("errors.rateLimited") : t("form.aiFailed"), "error");
-      const d = res.draft;
-      setF({
-        ...f,
-        title: d.title,
-        subtitle: d.subtitle,
-        intro: d.intro,
-        points: d.points.join("\n"),
-        prompt: d.question.prompt,
-        options: [...d.question.options, { label: "", correct: false, feedback: "" }, { label: "", correct: false, feedback: "" }].slice(0, Math.max(3, d.question.options.length)),
-        recap: d.recap.join("\n"),
-      });
+      setF({ ...f, ...fromDraft(res.draft) });
       setFromAi(true);
       toast(t("form.aiDone"));
     });
@@ -90,7 +146,7 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
   const save = () =>
     start(async () => {
       const options = f.options.filter((o) => o.label.trim() && o.feedback.trim()).map((o) => ({ label: o.label.trim(), correct: o.correct, feedback: o.feedback.trim() }));
-      const res = await saveStudioLessonAction({
+      const input = {
         locale: f.locale as "az",
         title: f.title.trim(),
         subtitle: f.subtitle.trim(),
@@ -101,8 +157,26 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
         points: lines(f.points),
         question: { prompt: f.prompt.trim(), options },
         recap: lines(f.recap),
+        swipe: f.swipeOn ? { prompt: f.swipe.prompt.trim(), cards: cards.map((c) => ({ from: c.from.trim(), text: c.text.trim(), verdict: c.verdict, explain: c.explain.trim() })) } : undefined,
+        hotspot: f.hotspotOn
+          ? {
+              prompt: f.hotspot.prompt.trim(),
+              from: f.hotspot.from.trim(),
+              subject: f.hotspot.subject.trim(),
+              body: f.hotspot.body.trim(),
+              targets: targets.map((x) => ({ text: x.text.trim(), label: x.label.trim(), explain: x.explain.trim() })),
+            }
+          : undefined,
         ai: fromAi,
-      });
+      };
+      if (edit) {
+        const res = await updateStudioLessonAction(edit.id, input);
+        if (!res.ok) return toast(tc("errors.invalid"), "error");
+        translationToast(t, res, t("updated"));
+        setOpen(false);
+        return;
+      }
+      const res = await saveStudioLessonAction(input);
       if (!res.ok) return toast(tc("errors.invalid"), "error");
       toast(t("saved"));
       setOpen(false);
@@ -111,15 +185,25 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
       setFromAi(false);
     });
 
+  const setCard = (i: number, patch: Partial<Card>) => setF({ ...f, swipe: { ...f.swipe, cards: f.swipe.cards.map((c, j) => (j === i ? { ...c, ...patch } : c)) } });
+  const setTarget = (i: number, patch: Partial<Target>) => setF({ ...f, hotspot: { ...f.hotspot, targets: f.hotspot.targets.map((x, j) => (j === i ? { ...x, ...patch } : x)) } });
+  const title = edit ? t("editLesson") : t("newLesson");
+
   return (
     <>
-      <Button icon={<Plus />} onClick={() => setOpen(true)}>
-        {t("newLesson")}
-      </Button>
+      {edit ? (
+        <Button size="sm" variant="secondary" icon={<Pencil />} onClick={() => setOpen(true)}>
+          {t("edit")}
+        </Button>
+      ) : (
+        <Button icon={<Plus />} onClick={() => setOpen(true)}>
+          {t("newLesson")}
+        </Button>
+      )}
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
-        title={t("newLesson")}
+        title={title}
         size="xl"
         footer={
           <>
@@ -127,7 +211,7 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
               {tc("cancel")}
             </Button>
             <Button onClick={save} disabled={pending || !valid}>
-              {t("form.save")}
+              {edit ? t("form.update") : t("form.save")}
             </Button>
           </>
         }
@@ -190,6 +274,69 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
           <Field label={t("form.points")} htmlFor="st-points" hint={t("form.pointsHint")}>
             <Textarea id="st-points" {...content} value={f.points} onChange={(e) => setF({ ...f, points: e.target.value })} className="min-h-32" />
           </Field>
+          <div className="grid gap-3 rounded-xl border border-line p-4">
+            <Switch label={t("form.swipe")} description={t("form.swipeHint")} checked={f.swipeOn} onChange={(e) => setF({ ...f, swipeOn: e.target.checked })} />
+            {f.swipeOn ? (
+              <>
+                <Input aria-label={t("form.exercisePrompt")} placeholder={t("form.exercisePrompt")} {...content} value={f.swipe.prompt} onChange={(e) => setF({ ...f, swipe: { ...f.swipe, prompt: e.target.value } })} maxLength={400} />
+                {f.swipe.cards.map((c, i) => (
+                  <div key={i} className="grid gap-2 rounded-lg bg-sunken p-3 sm:grid-cols-[1fr_2fr_auto]">
+                    <Input aria-label={t("form.cardSender", { n: i + 1 })} placeholder={t("form.sender")} {...content} value={c.from} onChange={(e) => setCard(i, { from: e.target.value })} maxLength={120} className="bg-surface" />
+                    <Input aria-label={t("form.cardText", { n: i + 1 })} placeholder={t("form.message")} {...content} value={c.text} onChange={(e) => setCard(i, { text: e.target.value })} maxLength={600} className="bg-surface" />
+                    <Select aria-label={t("form.cardVerdict", { n: i + 1 })} value={c.verdict} onChange={(e) => setCard(i, { verdict: e.target.value as Card["verdict"] })} className="bg-surface">
+                      <option value="threat">{t("form.threat")}</option>
+                      <option value="safe">{t("form.safe")}</option>
+                    </Select>
+                    <Input aria-label={t("form.cardWhy", { n: i + 1 })} placeholder={t("form.why")} {...content} value={c.explain} onChange={(e) => setCard(i, { explain: e.target.value })} maxLength={400} className="bg-surface sm:col-span-3" />
+                  </div>
+                ))}
+              </>
+            ) : null}
+          </div>
+          <div className="grid gap-3 rounded-xl border border-line p-4">
+            <Switch label={t("form.hotspot")} description={t("form.hotspotHint")} checked={f.hotspotOn} onChange={(e) => setF({ ...f, hotspotOn: e.target.checked })} />
+            {f.hotspotOn ? (
+              <>
+                <Input aria-label={t("form.exercisePrompt")} placeholder={t("form.exercisePrompt")} {...content} value={f.hotspot.prompt} onChange={(e) => setF({ ...f, hotspot: { ...f.hotspot, prompt: e.target.value } })} maxLength={400} />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label={t("form.mailFrom")} htmlFor="st-mail-from">
+                    <Input id="st-mail-from" dir="ltr" value={f.hotspot.from} onChange={(e) => setF({ ...f, hotspot: { ...f.hotspot, from: e.target.value } })} maxLength={200} />
+                  </Field>
+                  <Field label={t("form.mailSubject")} htmlFor="st-mail-subject">
+                    <Input id="st-mail-subject" {...content} value={f.hotspot.subject} onChange={(e) => setF({ ...f, hotspot: { ...f.hotspot, subject: e.target.value } })} maxLength={200} />
+                  </Field>
+                </div>
+                <Field label={t("form.mailBody")} htmlFor="st-mail-body">
+                  <Textarea id="st-mail-body" {...content} value={f.hotspot.body} onChange={(e) => setF({ ...f, hotspot: { ...f.hotspot, body: e.target.value } })} maxLength={2000} className="min-h-32" />
+                </Field>
+                {f.hotspot.targets.map((x, i) => {
+                  const missing = x.text.trim() !== "" && !f.hotspot.body.includes(x.text.trim());
+                  return (
+                    <div key={i} className="grid gap-2 rounded-lg bg-sunken p-3 sm:grid-cols-2">
+                      <Input
+                        aria-label={t("form.targetText", { n: i + 1 })}
+                        placeholder={t("form.signText")}
+                        {...content}
+                        value={x.text}
+                        onChange={(e) => setTarget(i, { text: e.target.value })}
+                        maxLength={200}
+                        aria-invalid={missing || undefined}
+                        aria-describedby={missing ? `st-sign-${i}` : undefined}
+                        className="bg-surface"
+                      />
+                      <Input aria-label={t("form.targetName", { n: i + 1 })} placeholder={t("form.signName")} {...content} value={x.label} onChange={(e) => setTarget(i, { label: e.target.value })} maxLength={120} className="bg-surface" />
+                      <Input aria-label={t("form.targetWhy", { n: i + 1 })} placeholder={t("form.why")} {...content} value={x.explain} onChange={(e) => setTarget(i, { explain: e.target.value })} maxLength={400} className="bg-surface sm:col-span-2" />
+                      {missing ? (
+                        <p id={`st-sign-${i}`} className="text-caption text-risk-700 sm:col-span-2">
+                          {t("form.targetMissing")}
+                        </p>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </>
+            ) : null}
+          </div>
           <fieldset className="grid gap-3 rounded-xl border border-line p-4">
             <legend className="px-1 text-body-sm font-semibold">{t("form.question")}</legend>
             <Input aria-label={t("form.question")} {...content} value={f.prompt} onChange={(e) => setF({ ...f, prompt: e.target.value })} maxLength={400} />
@@ -231,7 +378,12 @@ export function ModuleRowActions({ id, status, previewHref }: { id: string; stat
         variant={status === "draft" ? "primary" : "secondary"}
         icon={status === "draft" ? <Upload /> : undefined}
         disabled={pending}
-        onClick={() => start(async () => void ((await setModuleStatusAction(id, status === "draft" ? "published" : "draft")).ok && toast(status === "draft" ? t("published") : t("unpublished"))))}
+        onClick={() =>
+          start(async () => {
+            const res = await setModuleStatusAction(id, status === "draft" ? "published" : "draft");
+            if (res.ok) translationToast(t, res, status === "draft" ? t("published") : t("unpublished"));
+          })
+        }
       >
         {status === "draft" ? t("publish") : t("unpublish")}
       </Button>

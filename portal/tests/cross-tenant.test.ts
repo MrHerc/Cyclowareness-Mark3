@@ -242,6 +242,19 @@ const form = (fields: Record<string, string>) => {
 };
 const DAY = 86_400_000;
 const SESSION = { title: "Briefing", description: "", startsAt: new Date(Date.now() + DAY).toISOString(), durationMin: 60, location: "Room 1", host: "Host", capacity: null };
+const LESSON = {
+  locale: "en" as const,
+  title: "Courier SMS",
+  subtitle: "",
+  category: "email" as const,
+  difficulty: "Easy" as const,
+  minutes: 3,
+  intro: "A text about a parcel arrives.",
+  points: ["Check the sender.", "Open the courier's app yourself."],
+  question: { prompt: "What do you do first?", options: [{ label: "Open the app", correct: true, feedback: "Yes." }, { label: "Tap the link", correct: false, feedback: "No." }] },
+  recap: ["Check the sender.", "Use the app."],
+  ai: false,
+};
 const PATH = { sourceId: null, title: "Onboarding", description: "", audience: "", recurrence: "", standards: "", mandatory: false, labIds: [] };
 const INCIDENT = { title: "Fake invoices", description: "", severity: "high" as const, source: "analyst" as const, confidential: false, live: false, iocs: "", mitre: "", moduleId: null, minScore: null, dueDate: null, departmentId: null, userIds: [], sandboxId: null, assignNow: false };
 
@@ -378,6 +391,7 @@ const ROWS: Record<string, Row> = {
   "server/actions/secops.setTicketStatusAction": { run: (_, b) => secops.setTicketStatusAction(b.ticket.id, "closed") },
   "server/actions/secops.triageReportAction": { run: (_, b) => secops.triageReportAction(b.report.id, "low") },
   "server/actions/secops.updateIncidentAction": { run: (_, b) => secops.updateIncidentAction(b.incident.id, { status: "resolved" }) },
+  "server/actions/secops.updateStudioLessonAction": { run: (_, b) => secops.updateStudioLessonAction(b.mod.id, LESSON) },
   "server/actions/security.analyzeAction": { na: SELF },
   "server/actions/security.escalateAnalysisAction": { run: (_, b) => security.escalateAnalysisAction(b.sandbox.id) },
   "server/actions/security.reportThreatAction": { na: SELF },
