@@ -72,6 +72,7 @@ function startWorker(voice: string) {
   child.on("exit", (code) => die(`exit ${code}`));
   readline.createInterface({ input: child.stdout }).on("line", (line) => pending.shift()?.resolve(line));
   return {
+    busy: () => pending.length,
     ask: (req: { text: string; wav: string }) =>
       new Promise<string>((resolve, reject) => {
         if (dead) return reject(dead);
@@ -82,16 +83,19 @@ function startWorker(voice: string) {
   };
 }
 
-export function piper(): Provider {
-  const workers = new Map<string, ReturnType<typeof startWorker>>();
+/** `workers`: processes per voice (the generator's --concurrency), each answering its own queue. */
+export function piper(workers = 1): Provider {
+  const pools = new Map<string, ReturnType<typeof startWorker>[]>();
   return {
     model: "piper",
     usdPer1kChars: 0,
     maxChars: 5000,
     voice: (locale) => envVoice("PIPER_VOICE", locale, DEFAULT_VOICE[locale]),
     async synthesize(_locale, voice, key, text) {
-      const worker = workers.get(voice) ?? startWorker(voice);
-      workers.set(voice, worker);
+      const pool = pools.get(voice) ?? [];
+      pools.set(voice, pool);
+      if (pool.length < workers) pool.push(startWorker(voice));
+      const worker = pool.reduce((a, b) => (b.busy() < a.busy() ? b : a));
       const wav = path.join(os.tmpdir(), `narration-${key}.wav`);
       try {
         const out = JSON.parse(await worker.ask({ text, wav })) as PiperResult & { error?: string };
@@ -101,6 +105,6 @@ export function piper(): Provider {
         fs.rmSync(wav, { force: true });
       }
     },
-    close: () => workers.forEach((w) => w.close()),
+    close: () => pools.forEach((pool) => pool.forEach((w) => w.close())),
   };
 }

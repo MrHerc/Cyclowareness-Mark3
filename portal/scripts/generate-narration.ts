@@ -29,7 +29,7 @@ import { Fatal, type Provider } from "./narration/provider";
 const LESSONS = path.join(process.cwd(), "content", "library", "lessons");
 const PUBLIC = path.join(process.cwd(), "public");
 const MANIFESTS = path.join(process.cwd(), ...NARRATION_DIR);
-const PROVIDERS: Record<string, () => Provider> = { piper, azure: () => azure(), elevenlabs: elevenLabs };
+const PROVIDERS: Record<string, (concurrency: number) => Provider> = { piper, azure: () => azure(), elevenlabs: elevenLabs };
 
 function fail(message: string): never {
   console.error(message);
@@ -136,7 +136,7 @@ async function pool<T>(items: readonly T[], size: number, run: (item: T) => Prom
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const provider = PROVIDERS[args.provider]();
+  const provider = PROVIDERS[args.provider](args.concurrency);
 
   type Plan = { locale: string; voice: string; lessons: Lesson[]; ready: Map<string, NarrationClip>; clips: number; chars: number; newClips: number; newChars: number };
   const plans: Plan[] = args.locales.map((locale) => {
