@@ -3,6 +3,7 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { ScrollText } from "lucide-react";
 import { db, t } from "@/server/db";
+import { avatarSrcIn } from "@/server/avatar";
 import { requirePermission } from "@/server/auth/viewer";
 import { AUDIT_ACTIONS } from "@/server/services/audit";
 import { Card } from "@/components/ui/card";
@@ -33,7 +34,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
   const page = pageParam(str("page"));
   const [tr, ta, tc, format] = await Promise.all([getTranslations("admin.audit"), getTranslations("admin.auditActions"), getTranslations("common"), getFormatter()]);
   const rows = await db()
-    .select({ a: t.auditLog, name: t.users.name, avatar: t.users.avatarUrl })
+    .select({ a: t.auditLog, name: t.users.name, avatar: avatarSrcIn(v.tenant.id) })
     .from(t.auditLog)
     .leftJoin(t.users, eq(t.users.id, t.auditLog.actorId))
     .where(

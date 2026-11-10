@@ -81,6 +81,7 @@ const scorm = await import("../src/app/api/admin/modules/[id]/scorm/route");
 const peopleRoute = await import("../src/app/api/admin/people/[kind]/route");
 const signoffs = await import("../src/app/api/admin/policies/[id]/signoffs/route");
 const reportsRoute = await import("../src/app/api/admin/reports/[kind]/route");
+const avatar = await import("../src/app/api/avatar/[userId]/route");
 const stix = await import("../src/app/api/sandbox/[id]/stix/route");
 const subtitles = await import("../src/app/api/subtitles/route");
 const demoRequests = await import("../src/app/api/super/demo-requests/route");
@@ -108,7 +109,7 @@ async function org() {
   const tenant = await addTenant(db, { plan: "enterprise_hrm", features: { live_drill: true }, settings: { ...base, email: { ...base.email, enabled: true } } });
   const tenantId = tenant.id;
   const adminUser = await addUser(db, tenantId, { role: "tenant_admin", passwordHash });
-  const learnerUser = await addUser(db, tenantId);
+  const learnerUser = await addUser(db, tenantId, { avatarUrl: "data:image/png;base64,iVBORw0KGgo=" });
   const invited = await addUser(db, tenantId, { status: "invited" });
   const department = await addDepartment(db, tenantId, `Finance ${n}`);
   const mod = await addModule(db, { tenantId, origin: "custom", lessons: 2 });
@@ -453,6 +454,7 @@ const ROWS: Record<string, Row> = {
     },
   },
   "api/assets/[id]:GET": { na: "public by design: logos appear on certificates and in emails" },
+  "api/avatar/[userId]:GET": { run: (_, b) => avatar.GET(req(`/api/avatar/${b.learner.user.id}`), ctx({ userId: b.learner.user.id })) },
   "api/health:GET": { na: PUBLIC },
   "api/inbound/[tenant]:POST": { na: "authenticated by the organisation's own inbound secret, which works only on that organisation's slug (tests/secops-flows.test.ts)" },
   "api/me/export:GET": { na: SELF },

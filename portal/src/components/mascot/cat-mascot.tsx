@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useLocale } from "next-intl";
 import { cn } from "@/lib/cn";
-// Imported statically: the engine has no side effects at module load (it may be evaluated during SSR), and
-// a separate chunk loaded after hydration left the box empty for a moment.
-import { createCat, mascotAutoWeights, type CatBehaviour, type CatInstance } from "./cat/engine";
+// Types only: the 234 KB engine is loaded after mount (below), so it stays out of the first load of the
+// sign-in and landing pages; the server renders an empty box either way.
+import type { CatBehaviour, CatInstance } from "./cat/engine";
 import { ACT_TO_CAT, BOUNCE_MS, FIRE_TO_CAT, GESTURE_TO_CAT, HOPS, HOP_MS, bounceKeyframes, catMood, fireDue, heldGesture, hopKeyframes, lookDirection, mirrorForRtl, motionOff, talkLevel } from "./cat/props";
 import type { MascotAct, MascotGesture, MascotMood, MascotTopic } from "./mapping";
 import type { MascotAim, MascotFire, MascotGuide } from "./rive-mascot";
@@ -38,8 +38,9 @@ function readMotionOff(): boolean {
   return motionOff(false, document.documentElement.dataset.motion, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 }
 
-// The acts the engine's own idle scheduler can pick (setAuto), which a narration interrupts.
-const AUTO_ACTS = new Set(Object.keys(mascotAutoWeights({ stage: true, idle: Infinity })).filter((k) => k !== "present"));
+// The acts the engine's own idle scheduler can pick (setAuto), which a narration interrupts; filled when the
+// engine loads, before any cat exists.
+let autoActs = new Set<string>();
 
 // Read in effects only (the server renders an empty box), so it cannot cause a hydration mismatch.
 const isRtl = (el: Element) => getComputedStyle(el).direction === "rtl";
@@ -115,10 +116,22 @@ export function Mascot({
   const locale = useLocale();
   // The engine draws on a canvas, so it starts after mount and is destroyed on unmount.
   useEffect(() => {
-    if (!host.current) return;
-    const made = createCat(host.current, { mode: "mascot", aria: false, facing: mirrorForRtl(facing ?? "right", isRtl(host.current)) });
-    setCat(made);
-    return () => made.destroy();
+    const el = host.current;
+    if (!el) return;
+    let made: CatInstance | null = null;
+    let gone = false;
+    void import("./cat/engine").then(({ createCat, mascotAutoWeights }) => {
+      if (gone) return;
+      autoActs = new Set(Object.keys(mascotAutoWeights({ stage: true, idle: Infinity })).filter((k) => k !== "present"));
+      made = createCat(el, { mode: "mascot", aria: false, facing: mirrorForRtl(facing ?? "right", isRtl(el)) });
+      setCat(made);
+    })
+      // The cat is decorative: an engine chunk that fails to load (stale deploy, offline) just leaves the box empty.
+      .catch(() => {});
+    return () => {
+      gone = true;
+      made?.destroy();
+    };
   }, [facing, locale]);
 
   // Kept in a ref so a new callback each render does not re-run the effect.
@@ -141,7 +154,7 @@ export function Mascot({
   useEffect(() => {
     if (!cat) return;
     cat.setAuto(auto);
-    if (wasAuto.current && !auto && !offRef.current && AUTO_ACTS.has(cat.state.behaviour ?? "")) cat.do("present");
+    if (wasAuto.current && !auto && !offRef.current && autoActs.has(cat.state.behaviour ?? "")) cat.do("present");
     wasAuto.current = auto;
   }, [cat, auto]);
 

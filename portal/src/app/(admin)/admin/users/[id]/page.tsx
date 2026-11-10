@@ -151,7 +151,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
       <BackLink href="/admin/users">{tr("back")}</BackLink>
       <Card className="p-4 sm:p-6">
         <div className="flex flex-wrap items-start gap-5">
-          <Avatar name={u.name} src={u.avatarUrl} size="xl" />
+          <Avatar name={u.name} src={person.avatar} size="xl" />
           <div className="min-w-[min(100%,14rem)] flex-1">
             <h1 className="font-display text-display font-bold text-balance wrap-break-word">{u.name}</h1>
             <p className="mt-1 text-body text-ink-muted">{u.jobTitle ?? "—"}</p>

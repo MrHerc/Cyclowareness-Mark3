@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { and, asc, avg, count, desc, eq, gte, inArray, isNotNull, ne, sql } from "drizzle-orm";
 import { db, t } from "../db";
+import { avatarSrc } from "../avatar";
 import type { Viewer } from "../auth/viewer";
 import { departmentClosure, resolveAssignments } from "../services/assignments";
 import { departmentLeague } from "../services/league";
@@ -52,6 +53,7 @@ export type PersonRow = {
   xp: number;
   lastActiveAt: Date | null;
   createdAt: Date;
+  /** The photo's address (server/avatar.ts), not the photo. */
   avatarUrl: string | null;
   awaiting: number;
   deletionRequestedAt: Date | null;
@@ -73,7 +75,7 @@ export async function listPeople(v: Viewer, opts: { departmentIds?: Set<string> 
       xp: t.users.xp,
       lastActiveAt: t.users.lastActiveAt,
       createdAt: t.users.createdAt,
-      avatarUrl: t.users.avatarUrl,
+      avatarUrl: avatarSrc,
       deletionRequestedAt: t.users.deletionRequestedAt,
     })
     .from(t.users)

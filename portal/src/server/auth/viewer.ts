@@ -3,6 +3,7 @@ import { cache } from "react";
 import { notFound, redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db, t } from "../db";
+import { avatarSrc } from "../avatar";
 import type { Role, TenantBranding, TenantSettings } from "../db/schema";
 import { can, PERMISSION_FEATURE, twoFactorRequired, type Permission } from "./permissions";
 import { invalidateSession, readSessionToken, renewedExpiry, sessionIdFromToken, shouldRenew } from "./session";
@@ -25,6 +26,7 @@ export type Viewer = {
     jobTitle: string | null;
     departmentId: string | null;
     locale: string;
+    /** The photo's address (`/api/avatar/…`, see server/avatar.ts), not the photo. */
     avatarUrl: string | null;
     xp: number;
     streakCurrent: number;
@@ -53,12 +55,40 @@ export type Viewer = {
 
 const SEEN_THROTTLE_MS = 5 * 60_000;
 
+// Listed rather than the whole row: every request looks the session up, and the photo can weigh 300 KB.
+const USER_COLUMNS = {
+  id: t.users.id,
+  tenantId: t.users.tenantId,
+  name: t.users.name,
+  email: t.users.email,
+  phone: t.users.phone,
+  role: t.users.role,
+  status: t.users.status,
+  jobTitle: t.users.jobTitle,
+  departmentId: t.users.departmentId,
+  locale: t.users.locale,
+  avatarUrl: avatarSrc,
+  xp: t.users.xp,
+  streakCurrent: t.users.streakCurrent,
+  streakLongest: t.users.streakLongest,
+  streakLastDay: t.users.streakLastDay,
+  streakFreezes: t.users.streakFreezes,
+  riskScore: t.users.riskScore,
+  soundOn: t.users.soundOn,
+  motion: t.users.motion,
+  timerPref: t.users.timerPref,
+  tourDone: t.users.tourDone,
+  totpEnabled: t.users.totpEnabled,
+  deletionRequestedAt: t.users.deletionRequestedAt,
+  createdAt: t.users.createdAt,
+};
+
 export const getSession = cache(async (): Promise<Viewer | null> => {
   const token = await readSessionToken();
   if (!token || token.length > 100) return null;
   const id = sessionIdFromToken(token);
   const [row] = await db()
-    .select({ session: t.sessions, user: t.users, tenant: t.tenants })
+    .select({ session: t.sessions, user: USER_COLUMNS, tenant: t.tenants })
     .from(t.sessions)
     .innerJoin(t.users, eq(t.users.id, t.sessions.userId))
     .innerJoin(t.tenants, eq(t.tenants.id, t.sessions.tenantId))
