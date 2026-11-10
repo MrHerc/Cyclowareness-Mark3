@@ -588,7 +588,7 @@ Authorization: Bearer {inbound secret}
 
 **Processing.**
 
-- The first simulation tracking link (`https://{host}/…/t/{token}`) in `text`, then `html`, is passed as the report's link, so a forwarded simulation is matched to that exact recipient, counted as reported and the person's risk score is recomputed.
+- The first simulation tracking link (`{APP_URL}/t/{token}`) in `text`, then `html`, is passed as the report's link, so a forwarded simulation is matched to that exact recipient, counted as reported and the person's risk score is recomputed. Links on other hosts are skipped. A link that a mail gateway wrapped percent-encoded (Microsoft Defender Safe Links) is found too; a wrapper with its own encoding (Proofpoint URL Defense v2) is not, and the report is then matched by the template subject only, without the exact recipient.
 - The report is filed exactly as from the report form: channel `email`, the daily report bonus, the `threat.reported` audit entry and the `threat.reported` or `simulation.reported` event.
 - A sender who is not an active person of this organisation is ignored: nothing is filed and no XP is given. A person over the report form's own limit is ignored the same way.
 

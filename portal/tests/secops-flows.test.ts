@@ -403,6 +403,19 @@ describe("inbound report address (/api/inbound/[tenant])", () => {
     expect(u.risk).not.toBe(99);
   });
 
+  it("skips a foreign /t/ link and finds the simulation link inside a percent-encoded Safe Links wrapper", async () => {
+    const { tenant, auth } = await inboundOrg();
+    const reporter = await addUser(db, tenant.id);
+    const { recipient } = await simulation(tenant.id, reporter.id);
+    const token = randomToken(16);
+    await db.update(t.campaignRecipients).set({ token }).where(eq(t.campaignRecipients.id, recipient.id));
+    const wrapped = `https://eur01.safelinks.protection.outlook.com/?url=${encodeURIComponent(`https://portal.example/t/${token}`)}&data=05`;
+    const text = `Sent via https://short.example/t/abcdefghijklmnop (50% off)\n---------- Forwarded message ----------\nOpen ${wrapped}`;
+    expect((await post(tenant.slug, { from: reporter.email, subject: "Fwd: something else", text }, auth)).status).toBe(202);
+    const [report] = await reports(tenant.id);
+    expect(report).toMatchObject({ reporterId: reporter.id, campaignRecipientId: recipient.id, url: `https://portal.example/t/${token}` });
+  });
+
   it("ignores unknown and suspended senders with the same answer, filing nothing", async () => {
     const { tenant, auth } = await inboundOrg();
     const suspended = await addUser(db, tenant.id, { status: "suspended" });

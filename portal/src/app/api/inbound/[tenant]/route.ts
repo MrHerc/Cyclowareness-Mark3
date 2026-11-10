@@ -3,6 +3,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db, t } from "@/server/db";
 import { sha256Hex } from "@/server/crypto";
+import { appUrl } from "@/server/env";
 import { rateLimit } from "@/server/rate-limit";
 import { recomputeRisk } from "@/server/services/risk";
 import { submitThreatReport } from "@/server/services/threats";
@@ -22,9 +23,15 @@ const messageSchema = z.object({
 const PER_MINUTE = 120;
 /**
  * The first tracking link of our own simulations, so the report is matched to that exact recipient (threats.ts).
- * Anchored on the scheme with bounded segments: an unbounded prefix backtracks quadratically on a long base64 image.
+ * Only links on APP_URL count: a foreign /t/ link (a shortener in a signature) would hide the simulation's.
+ * Safe Links and similar wrappers percent-encode the link, so the body is searched once more decoded.
  */
-const TRACKING_LINK = /https?:\/\/[^\s"'<>/]{1,253}\/(?:[^\s"'<>/]{1,200}\/){0,5}?t\/[a-z2-7]{10,40}/;
+function trackingLink(body: string): string | undefined {
+  const base = appUrl().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`${base}/t/[a-z2-7]{10,40}`);
+  // Byte-wise decoding never throws on a stray "%" (decodeURIComponent would); the link itself is ASCII.
+  return (body.match(re) ?? body.replace(/%([0-9a-f]{2})/gi, (_, h: string) => String.fromCharCode(parseInt(h, 16))).match(re))?.[0];
+}
 const MAX_BODY = 1_000_000;
 
 /** Same answer for a filed report and an ignored sender, so the endpoint never tells who works here. */
@@ -73,7 +80,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ ten
   // Unknown senders and people over the web form's own limit are dropped without a report or XP.
   if (!user || !(await rateLimit(`threat-report:${user.id}`, 20, 60 * 60_000)).ok) return accepted();
 
-  const url = `${m.text}\n${m.html ?? ""}`.match(TRACKING_LINK)?.[0];
+  const url = trackingLink(`${m.text}\n${m.html ?? ""}`);
   const res = await submitThreatReport(db(), {
     tenantId: row.id,
     userId: user.id,
