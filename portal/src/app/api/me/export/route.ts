@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     })
     .from(t.users)
     .where(eq(t.users.id, uid));
-  const [modules, lessons, answers, xp, attestations, certificates, signoffs, reports, risks, labs, tickets, ticketMessages, simulations, problems, feedback, sandbox, sessions, liveSessions, riskHistory, notifications] = await Promise.all([
+  const [modules, lessons, answers, xp, attestations, certificates, signoffs, reports, risks, labs, tickets, ticketMessages, simulations, problems, feedback, sandbox, sessions, liveSessions, riskHistory, teachableLoops, notifications] = await Promise.all([
     db().select().from(t.moduleProgress).where(eq(t.moduleProgress.userId, uid)),
     db().select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, uid)),
     db().select({ lessonId: t.answers.lessonId, sceneId: t.answers.sceneId, correct: t.answers.correct, firstTry: t.answers.firstTry, outcome: t.answers.outcome, at: t.answers.at }).from(t.answers).where(eq(t.answers.userId, uid)),
@@ -74,6 +74,7 @@ export async function GET(request: Request) {
       .innerJoin(t.liveSessions, eq(t.liveSessions.id, t.sessionRegistrations.sessionId))
       .where(eq(t.sessionRegistrations.userId, uid)),
     db().select({ day: t.userRiskSnapshots.day, score: t.userRiskSnapshots.score }).from(t.userRiskSnapshots).where(eq(t.userRiskSnapshots.userId, uid)),
+    db().select({ status: t.teachableLoops.status, assignedAt: t.teachableLoops.assignedAt, completedAt: t.teachableLoops.completedAt, resimResult: t.teachableLoops.resimResult }).from(t.teachableLoops).where(eq(t.teachableLoops.userId, uid)),
     db().select({ kind: t.notifications.kind, title: t.notifications.title, body: t.notifications.body, createdAt: t.notifications.createdAt, readAt: t.notifications.readAt }).from(t.notifications).where(eq(t.notifications.userId, uid)),
   ]);
   await audit(db(), { tenantId: v.tenant.id, actorId: uid, action: "person.data_downloaded", targetType: "user", targetId: uid });
@@ -92,6 +93,7 @@ export async function GET(request: Request) {
       reports,
       risks: risks.map((r) => ({ ...r, title: riskTitles(r.title) ?? r.title })),
       riskHistory,
+      teachableLoops,
       lab: labs,
       simulations,
       sandbox,

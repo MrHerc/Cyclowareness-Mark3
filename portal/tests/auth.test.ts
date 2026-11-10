@@ -159,7 +159,7 @@ describe("tenant defaults: defaultSettings", () => {
     expect(Object.keys(s).sort()).toEqual(["attestationText", "certificate", "defaultLocale", "email", "identity", "integrations", "learning", "locales", "notifications", "protection", "retention", "security", "timeZone"]);
     expect(s.timeZone).toBe("Asia/Baku");
     expect(s.protection).toEqual({ contentProtection: true, watermark: true });
-    expect(s.learning).toEqual({ timeLimits: true, refresher: true, riskThreshold: 67, dailyGoalXp: 50 });
+    expect(s.learning).toEqual({ timeLimits: true, refresher: true, riskThreshold: 67, dailyGoalXp: 50, teachable: true });
     expect(s.certificate).toEqual({ publicLink: true });
     expect(s.notifications).toEqual({ firstReminderDays: 3, urgentReminderHours: 24, overdueNotice: true, managerAlerts: true, failedSimulations: 2, overdueDays: 7 });
     expect(s.identity).toEqual({ requireAdmin2fa: true, maxDevices: null, ssoEnabled: false });

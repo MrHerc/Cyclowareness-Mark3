@@ -50,7 +50,7 @@ export async function microLesson(tpl: CampaignTemplate, locale: string): Promis
     },
     recap: [tr("recapPause"), tr("recapReport")],
     ...(tpl.channel === "email" && lure
-      ? { hotspot: { prompt: tr("hotspotPrompt"), from: tpl.sender.address, subject: text(tpl.subject), body: `${text(tpl.body)}\n${lure}`, targets: [{ text: lure, label: tr("spotLabel"), explain: tr("spotExplain") }] } }
+      ? { hotspot: { prompt: tr("hotspotPrompt"), from: text(tpl.sender.address), subject: text(tpl.subject), body: `${text(tpl.body)}\n${lure}`, targets: [{ text: lure, label: tr("spotLabel"), explain: tr("spotExplain") }] } }
       : {
           swipe: {
             prompt: tr("swipePrompt"),
