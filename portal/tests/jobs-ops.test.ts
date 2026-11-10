@@ -246,4 +246,21 @@ describe("monthly refresher", () => {
     expect(titles).toMatchObject({ az: "Aylıq təkrar təlim", en: "Monthly follow-up training", ar: "تدريب تنشيطي شهري" });
     expect(Object.keys(titles ?? {})).toHaveLength(10);
   }, 60_000);
+
+  it("never uses an open teachable micro-lesson as the refresher: the next regular module, else the phishing module", async () => {
+    const now = new Date("2026-11-09T10:00:00Z");
+    const settings = defaultSettings("en");
+    const tenant = await addTenant(db, { settings: { ...settings, learning: { ...settings.learning, riskThreshold: 1 } } });
+    const [withRegular, onlyMicro] = [await addUser(db, tenant.id), await addUser(db, tenant.id)];
+    const phishing = await addModule(db, { slug: "phishing-email", tenantId: tenant.id, status: "published", lessons: 1 });
+    const micro = await addModule(db, { slug: "teachable:payslip", tenantId: tenant.id, status: "published", lessons: 1 });
+    const regular = await addModule(db, { tenantId: tenant.id, status: "published", lessons: 1 });
+    // The micro-lesson is due first, as it is a week after a click.
+    for (const u of [withRegular, onlyMicro]) await db.insert(t.assignments).values({ tenantId: tenant.id, moduleId: micro.id, scope: "user", userId: u.id, dueKind: "fixed", dueDate: "2026-11-12", reason: "teachable" });
+    await db.insert(t.assignments).values({ tenantId: tenant.id, moduleId: regular.id, scope: "user", userId: withRegular.id, dueKind: "fixed", dueDate: "2026-12-01" });
+    await runJobs(db, now);
+    const refresher = async (userId: string) => (await db.select({ moduleId: t.behaviorRisks.moduleId }).from(t.behaviorRisks).where(and(eq(t.behaviorRisks.userId, userId), eq(t.behaviorRisks.sourceRef, "REFRESH-2026-11"))))[0]?.moduleId;
+    expect(await refresher(withRegular.id)).toBe(regular.id);
+    expect(await refresher(onlyMicro.id)).toBe(phishing.id);
+  }, 60_000);
 });

@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, count, countDistinct, desc, eq, gte, inArray, isNotNull } from "drizzle-orm";
+import { and, asc, count, countDistinct, desc, eq, gte, inArray, isNotNull, ne } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
@@ -99,7 +99,8 @@ export async function riskStory(v: Viewer, locale: string, departmentId?: string
       .select({ name: t.campaigns.name, launchedAt: t.campaigns.launchedAt, sent: count(t.campaignRecipients.sentAt), clicked: count(t.campaignRecipients.clickedAt) })
       .from(t.campaignRecipients)
       .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
-      .where(and(eq(t.campaigns.tenantId, tid), isNotNull(t.campaigns.launchedAt), gte(t.campaigns.launchedAt, new Date(now.getTime() - 90 * DAY)), inArray(t.campaignRecipients.userId, inScope)))
+      // Not the one-person re-simulations (teachable loop): their rate is 0 or 100%, and the story speaks of groups, never of one person.
+      .where(and(eq(t.campaigns.tenantId, tid), ne(t.campaigns.audience, "person"), isNotNull(t.campaigns.launchedAt), gte(t.campaigns.launchedAt, new Date(now.getTime() - 90 * DAY)), inArray(t.campaignRecipients.userId, inScope)))
       .groupBy(t.campaigns.id, t.campaigns.name, t.campaigns.launchedAt)
       .orderBy(asc(t.campaigns.launchedAt)),
     db()

@@ -362,7 +362,7 @@ export async function setStatusAction(userIds: string[], status: "active" | "sus
 }
 
 /** Deletion anonymises the person: learning history stays for reports, identity is removed. */
-async function anonymise(v: Viewer, u: { id: string; email: string }, action: "person.deleted" | "person.deletion_approved") {
+async function anonymise(v: Viewer, u: { id: string; email: string; name: string }, action: "person.deleted" | "person.deletion_approved") {
   const userId = u.id;
   // All or nothing: a deleted person must not stay a department head or manager, or keep sign-in links.
   await db().transaction(async (tx) => {
@@ -384,8 +384,8 @@ async function anonymise(v: Viewer, u: { id: string; email: string }, action: "p
       .update(t.auditLog)
       .set({ meta: sql`${t.auditLog.meta} - 'email'` })
       .where(and(eq(t.auditLog.tenantId, v.tenant.id), eq(t.auditLog.targetType, "user"), eq(t.auditLog.targetId, userId)));
-    // So is the name: re-simulations made for the person alone may be named after them (and so their audit entries),
-    // and manager alerts and the deletion request about them point at an account that no longer exists.
+    // Re-simulations of earlier builds named their person in free text: the campaign name, its click risk and its
+    // creation entry. Only the name goes; the rest of the label stays readable.
     const resims = (
       await tx
         .select({ id: t.campaigns.id })
@@ -393,12 +393,17 @@ async function anonymise(v: Viewer, u: { id: string; email: string }, action: "p
         .where(and(eq(t.campaigns.tenantId, v.tenant.id), eq(t.campaigns.audience, "person"), eq(t.campaigns.userId, userId)))
     ).map((c) => c.id);
     if (resims.length) {
-      await tx.update(t.campaigns).set({ name: "—" }).where(inArray(t.campaigns.id, resims));
+      await tx.update(t.campaigns).set({ name: sql`replace(${t.campaigns.name}, ${u.name}, '—')` }).where(inArray(t.campaigns.id, resims));
+      await tx
+        .update(t.behaviorRisks)
+        .set({ title: sql`replace(${t.behaviorRisks.title}, ${u.name}, '—')` })
+        .where(and(eq(t.behaviorRisks.tenantId, v.tenant.id), inArray(t.behaviorRisks.sourceRef, resims)));
       await tx
         .update(t.auditLog)
         .set({ meta: sql`${t.auditLog.meta} - 'name'` })
         .where(and(eq(t.auditLog.tenantId, v.tenant.id), eq(t.auditLog.targetType, "campaign"), inArray(t.auditLog.targetId, resims)));
     }
+    // Manager alerts and the deletion request about them point at an account that no longer exists.
     await tx
       .delete(t.notifications)
       .where(and(eq(t.notifications.tenantId, v.tenant.id), inArray(t.notifications.kind, ["manager", "deletion"]), inArray(t.notifications.href, [`/admin/users/${userId}`, `/admin/users/${userId}#training`])));

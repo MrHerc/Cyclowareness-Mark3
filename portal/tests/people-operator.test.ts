@@ -146,7 +146,7 @@ describe("deleting a person", () => {
     expect(await people.deletePersonAction(person.id)).toEqual({ ok: true });
 
     const campaigns = await db.select({ id: t.campaigns.id, name: t.campaigns.name }).from(t.campaigns);
-    expect(campaigns.find((c) => c.id === resim.id)?.name).toBe("—");
+    expect(campaigns.find((c) => c.id === resim.id)?.name).toBe("Invoice: re-simulation for —");
     expect(campaigns.find((c) => c.id === other.id)?.name).toBe("Quarterly drill");
     const entries = await db.select().from(t.auditLog);
     expect(entries.filter((e) => JSON.stringify(e.meta ?? {}).includes(name))).toEqual([]);
@@ -154,6 +154,31 @@ describe("deleting a person", () => {
     expect(entries.find((e) => e.targetId === other.id)).toMatchObject({ meta: { name: "Quarterly drill" }, ip: "198.51.100.1" });
     expect(entries.find((e) => e.actorId === person.id)?.ip).toBeNull();
     expect((await db.select({ title: t.notifications.title }).from(t.notifications)).map((n) => n.title)).toEqual(["Someone else"]);
+  });
+
+  it("removes their name from the free text of their re-simulations: campaign, click risk and creation entry", async () => {
+    actor = { id: ids.admin, role: "tenant_admin" };
+    const [jane] = await db.insert(t.users).values({ tenantId, email: "jane@platform.test", name: "Jane Clicker" }).returning();
+    const old = "Overdue invoice: re-simulation for Jane Clicker";
+    const [resim, other] = await db
+      .insert(t.campaigns)
+      .values([
+        { tenantId, name: old, channel: "email", templateKey: "invoice", audience: "person", userId: jane.id, status: "completed" },
+        { tenantId, name: "Jane Clicker's team drill", channel: "email", templateKey: "invoice", audience: "all", status: "completed" },
+      ])
+      .returning();
+    await db.insert(t.behaviorRisks).values({ tenantId, userId: jane.id, kind: "phishing_click", severity: "medium", title: `You opened the link in the “${old}” phishing simulation.`, sourceRef: resim.id });
+    await db.insert(t.auditLog).values({ tenantId, actorId: null, action: "campaign.created", targetType: "campaign", targetId: resim.id, meta: { name: old, template: "invoice", teachable: true } });
+
+    expect(await people.deletePersonAction(jane.id)).toEqual({ ok: true });
+
+    const names = await db.select({ id: t.campaigns.id, name: t.campaigns.name }).from(t.campaigns).where(eq(t.campaigns.tenantId, tenantId));
+    expect(names.find((c) => c.id === resim.id)?.name).toBe("Overdue invoice: re-simulation for —");
+    expect(names.find((c) => c.id === other.id)?.name).toBe("Jane Clicker's team drill");
+    const [risk] = await db.select({ title: t.behaviorRisks.title }).from(t.behaviorRisks).where(eq(t.behaviorRisks.userId, jane.id));
+    expect(risk.title).not.toContain("Jane Clicker");
+    const [entry] = await db.select({ meta: t.auditLog.meta }).from(t.auditLog).where(eq(t.auditLog.targetId, resim.id));
+    expect(entry.meta).toEqual({ template: "invoice", teachable: true });
   });
 });
 

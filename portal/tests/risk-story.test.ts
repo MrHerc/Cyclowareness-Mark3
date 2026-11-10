@@ -151,6 +151,31 @@ describe("riskStory", () => {
     await assign(o.finance.id);
     expect(await riskStory(as(o.tenant.id, o.admin), "en")).toMatchObject({ weakest: { name: "Finance", category: "email", module: null } });
   });
+
+  it("leaves the one-person re-simulations of the teachable loop out of the campaign comparison", async () => {
+    const o = await org();
+    const now = Date.now();
+    await snapshots(o.tenant.id, [...o.fin, ...o.itp], 8);
+    const [before, after, resim] = await db
+      .insert(t.campaigns)
+      .values([
+        { tenantId: o.tenant.id, name: "Invoice lure", channel: "email", templateKey: "invoice", audience: "all", status: "completed", launchedAt: new Date(now - 40 * DAY) },
+        { tenantId: o.tenant.id, name: "Parcel lure", channel: "email", templateKey: "parcel", audience: "all", status: "completed", launchedAt: new Date(now - 3 * DAY) },
+        // Named as an older release named re-simulations: the story must never repeat it.
+        { tenantId: o.tenant.id, name: `Overdue invoice: re-simulation for ${o.fin[0].name}`, channel: "email", templateKey: "invoice", audience: "person", userId: o.fin[0].id, status: "completed", launchedAt: new Date(now - DAY) },
+      ])
+      .returning();
+    const people = [...o.fin, o.itp[0]];
+    await db.insert(t.campaignRecipients).values([
+      ...people.map((p, i) => ({ campaignId: before.id, userId: p.id, token: `b${i}${before.id}`, sentAt: before.launchedAt, clickedAt: i < 2 ? before.launchedAt : null })),
+      ...people.map((p, i) => ({ campaignId: after.id, userId: p.id, token: `a${i}${after.id}`, sentAt: after.launchedAt, clickedAt: i < 1 ? after.launchedAt : null })),
+      { campaignId: resim.id, userId: o.fin[0].id, token: `r${resim.id}`, sentAt: resim.launchedAt, clickedAt: resim.launchedAt },
+    ]);
+    const s = await riskStory(as(o.tenant.id, o.admin), "en");
+    if (s.empty) throw new Error("expected a story");
+    expect(s.campaign).toEqual({ name: "Parcel lure", from: 50, to: 25 });
+    expect((await storySentences(s, "en")).join(" ")).not.toContain(o.fin[0].name);
+  });
 });
 
 describe("riskStory at scale", () => {

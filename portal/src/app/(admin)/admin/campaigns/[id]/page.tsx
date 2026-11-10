@@ -29,7 +29,7 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
   const locale = await getLocale();
   const [tr, tc, format] = await Promise.all([getTranslations("admin.campaigns"), getTranslations("common"), getFormatter()]);
   const tpl = TEMPLATE_BY_KEY.get(c.templateKey);
-  const [stats, audience, recipients, dept, loops] = await Promise.all([
+  const [stats, audience, recipients, dept, loops, person] = await Promise.all([
     campaignStats(db(), [c.id]),
     campaignAudience(db(), c),
     db()
@@ -46,6 +46,8 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
       .innerJoin(t.users, eq(t.users.id, t.teachableLoops.userId))
       .where(and(eq(t.teachableLoops.tenantId, v.tenant.id), eq(t.teachableLoops.sourceCampaignId, c.id)))
       .orderBy(asc(t.users.name)),
+    // Read by id, whatever their status: a re-simulation refused because its person left still names them.
+    c.audience === "person" && c.userId ? db().select({ name: t.users.name }).from(t.users).where(and(eq(t.users.id, c.userId), eq(t.users.tenantId, v.tenant.id))) : Promise.resolve([]),
   ]);
   const resimIds = loops.flatMap((l) => (l.loop.resimCampaignId ? [l.loop.resimCampaignId] : []));
   const resims = new Map(
@@ -129,7 +131,11 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
             <CardBody className="pt-3">
               <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-body-sm">
                 <dt className="text-ink-muted">{tr("audience")}</dt>
-                <dd className="font-semibold">{c.audience === "all" ? tr("wholeOrg") : c.audience === "person" ? tr("loop.person") : (dept[0]?.name ?? "—")}</dd>
+                {/* A re-simulation's name never holds its person: they are read here, through campaigns.user_id. */}
+                <dd className="font-semibold">
+                  {c.audience === "all" ? tr("wholeOrg") : c.audience === "person" ? tr("loop.person") : (dept[0]?.name ?? "—")}
+                  {person[0] ? <span className="block font-normal text-ink-muted">{person[0].name}</span> : null}
+                </dd>
                 <dt className="text-ink-muted">{tr("peopleInAudience")}</dt>
                 <dd className="font-semibold">{c.launchedAt ? recipients.length : audience.length}</dd>
                 <dt className="text-ink-muted">{tr("sendTime")}</dt>

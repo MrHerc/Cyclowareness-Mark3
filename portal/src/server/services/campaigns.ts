@@ -1,5 +1,6 @@
 import { and, asc, eq, gte, inArray, isNotNull, isNull, lte, ne, notExists, notInArray, or, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
+import { logFailure } from "../db/errors";
 import * as t from "../db/schema";
 import { departmentClosure } from "./assignments";
 import { randomToken } from "./progress";
@@ -25,8 +26,9 @@ export async function campaignAudience(db: DB, c: { tenantId: string; audience: 
   const users = await db
     .select({ id: t.users.id, email: t.users.email, phone: t.users.phone, name: t.users.name, locale: t.users.locale, departmentId: t.users.departmentId })
     .from(t.users)
-    .where(and(eq(t.users.tenantId, c.tenantId), eq(t.users.status, "active"), ne(t.users.role, "super_admin")));
-  if (c.audience === "person") return users.filter((u) => u.id === c.userId);
+    // A one-person campaign reads its one row, not the whole organisation (a re-simulation per clicker launches on the same tick); no user id matches nobody.
+    .where(and(eq(t.users.tenantId, c.tenantId), eq(t.users.status, "active"), ne(t.users.role, "super_admin"), c.audience === "person" ? eq(t.users.id, c.userId ?? sql`null`) : undefined));
+  if (c.audience === "person") return users;
   if (c.audience === "all") return users;
   // A department audience whose department is gone reaches nobody (never the whole organisation).
   if (!c.departmentId) return [];
@@ -93,36 +95,41 @@ export async function launchCampaign(db: DB, campaignId: string, actorId: string
     return { ok: false, reason: block };
   }
   const now = new Date();
-  // Only the request that moves the campaign out of draft or scheduled sends it: a second click on
-  // Launch, or the scheduler firing while someone launches by hand, must not send everyone a second copy.
-  const [claimed] = await db
-    .update(t.campaigns)
-    .set({ status: "running", launchedAt: now })
-    .where(and(eq(t.campaigns.id, c.id), inArray(t.campaigns.status, ["draft", "scheduled"])))
-    .returning({ id: t.campaigns.id });
-  if (!claimed) return { ok: false, reason: "launched" };
-  // An SMS recipient waits with an empty sentAt: sendQueuedSms (job runner) sends it and sets the time.
-  const sms = tpl.channel === "sms";
-  let count = 0;
-  // Two INSERTs per 500 people (recipients, then their mail) instead of two per person.
-  for (let i = 0; i < audience.length; i += LAUNCH_CHUNK) {
-    const batch = audience.slice(i, i + LAUNCH_CHUNK).map((u) => ({ u, token: randomToken(16) }));
-    await db.insert(t.campaignRecipients).values(batch.map(({ u, token }) => ({ campaignId: c.id, userId: u.id, token, sentAt: sms ? null : now })));
-    if (tpl.channel === "email") {
-      // Deferred: the job runner sends the batch (with the template's display name, see simulationInfo), so Launch does not wait for SMTP.
-      await queueEmails(
-        db,
-        c.tenantId,
-        batch.map(({ u, token }) => {
-          const m = emailHtml(tpl, u.locale, token);
-          return { to: u.email, kind: "simulation", subject: m.subject, text: m.text, html: m.html, lang: m.lang };
-        }),
-        { defer: true },
-      );
+  // One transaction: a chunk that fails rolls the claim back, so the campaign is never left running with part of its audience.
+  const count = await db.transaction(async (tx) => {
+    // Only the request that moves the campaign out of draft or scheduled sends it: a second click on
+    // Launch, or the scheduler firing while someone launches by hand, must not send everyone a second copy.
+    const [claimed] = await tx
+      .update(t.campaigns)
+      .set({ status: "running", launchedAt: now })
+      .where(and(eq(t.campaigns.id, c.id), inArray(t.campaigns.status, ["draft", "scheduled"])))
+      .returning({ id: t.campaigns.id });
+    if (!claimed) return null;
+    // An SMS recipient waits with an empty sentAt: sendQueuedSms (job runner) sends it and sets the time.
+    const sms = tpl.channel === "sms";
+    let n = 0;
+    // Two INSERTs per 500 people (recipients, then their mail) instead of two per person.
+    for (let i = 0; i < audience.length; i += LAUNCH_CHUNK) {
+      const batch = audience.slice(i, i + LAUNCH_CHUNK).map((u) => ({ u, token: randomToken(16) }));
+      await tx.insert(t.campaignRecipients).values(batch.map(({ u, token }) => ({ campaignId: c.id, userId: u.id, token, sentAt: sms ? null : now })));
+      if (tpl.channel === "email") {
+        // Deferred: the job runner sends the batch (with the template's display name, see simulationInfo), so Launch does not wait for SMTP.
+        await queueEmails(
+          tx,
+          c.tenantId,
+          batch.map(({ u, token }) => {
+            const m = emailHtml(tpl, u.locale, token);
+            return { to: u.email, kind: "simulation", subject: m.subject, text: m.text, html: m.html, lang: m.lang };
+          }),
+          { defer: true },
+        );
+      }
+      n += batch.filter(({ u }) => !sms || u.phone).length;
     }
-    count += batch.filter(({ u }) => !sms || u.phone).length;
-  }
-  await audit(db, { tenantId: c.tenantId, actorId, action: "campaign.launched", targetType: "campaign", targetId: c.id, meta: { recipients: count, channel: tpl.channel } });
+    await audit(tx, { tenantId: c.tenantId, actorId, action: "campaign.launched", targetType: "campaign", targetId: c.id, meta: { recipients: n, channel: tpl.channel } });
+    return n;
+  });
+  if (count === null) return { ok: false, reason: "launched" };
   return { ok: true, count };
 }
 
@@ -261,10 +268,19 @@ export async function setCampaignStatus(db: DB, tenantId: string, campaignId: st
 }
 
 export async function campaignTick(db: DB) {
-  const due = await db.select({ id: t.campaigns.id }).from(t.campaigns).where(and(eq(t.campaigns.status, "scheduled"), lte(t.campaigns.scheduledAt, new Date())));
+  const due = await db.select({ id: t.campaigns.id, audience: t.campaigns.audience }).from(t.campaigns).where(and(eq(t.campaigns.status, "scheduled"), lte(t.campaigns.scheduledAt, new Date())));
   for (const c of due) {
-    const res = await launchCampaign(db, c.id, null);
-    if (!res.ok) await returnToDraft(db, c.id, res.reason);
+    // One campaign that throws must not hold up the others or the 14-day close: it stays scheduled and is retried next tick.
+    try {
+      const res = await launchCampaign(db, c.id, null);
+      if (res.ok) continue;
+      // A refused re-simulation (automated, never edited) ends instead of waiting as a draft nobody made, so its teachable loop
+      // closes without a result; the launch_blocked audit keeps the reason. "launched" is a race with a manual launch, not a refusal.
+      if (c.audience === "person" && res.reason !== "launched") await db.update(t.campaigns).set({ status: "cancelled" }).where(and(eq(t.campaigns.id, c.id), eq(t.campaigns.status, "scheduled")));
+      else await returnToDraft(db, c.id, res.reason);
+    } catch (error) {
+      logFailure("[campaigns] launch failed", error, { campaignId: c.id });
+    }
   }
   await db
     .update(t.campaigns)

@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { can } from "../src/server/auth/permissions";
@@ -114,4 +115,19 @@ describe("GET /api/super/seats", () => {
     expect(lines).toEqual(["organisation,plan,active_people,invited_people,month", `alpha,professional,2,1,${month}`, `beta,essentials,1,0,${month}`]);
     expect(audit).toHaveBeenCalledWith(db, expect.objectContaining({ action: "seats.exported", actorId: operator }));
   });
+});
+
+// Last: its organisation would otherwise appear in the seat export above.
+describe("platformMetrics at scale", () => {
+  it("sums the funnel of more campaigns than PostgreSQL's 65 535 parameters per statement", async () => {
+    const gamma = await addTenant(db, { slug: "gamma", name: "Gamma" });
+    const person = await addUser(db, gamma.id);
+    // One-person re-simulations add a campaign per click, so the platform's campaign count keeps growing.
+    await db.execute(sql`insert into campaigns (tenant_id, name, channel, template_key, audience, status) select ${gamma.id}, 'Re-simulation ' || g, 'email', 'payroll', 'person', 'completed' from generate_series(1, 65600) g`);
+    const [one] = await db.insert(t.campaigns).values({ tenantId: gamma.id, name: "Q3", channel: "email", templateKey: "payroll", audience: "all", status: "completed" }).returning();
+    await db.insert(t.campaignRecipients).values({ campaignId: one.id, userId: person.id, token: "tok-gggggggggggggg1", sentAt: NOW, clickedAt: NOW });
+    const byId = new Map((await platformMetrics(NOW)).map((r) => [r.id, r]));
+    expect(byId.get(gamma.id)).toMatchObject({ sent: 1, opened: 0, clicked: 1, reported: 0 });
+    expect(byId.get(alpha)).toMatchObject({ sent: 3, opened: 2, clicked: 1, reported: 1 });
+  }, 120_000);
 });

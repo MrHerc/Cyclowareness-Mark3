@@ -1,6 +1,8 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/pglite";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
+import type { DB } from "../src/server/db/client";
 import { withDefaults } from "../src/lib/tenant-defaults";
 import { TEMPLATE_BY_KEY } from "../src/lib/campaigns/templates";
 import { riskTitle } from "../src/lib/risk-title";
@@ -11,8 +13,12 @@ vi.mock("../src/server/env", () => ({ env, appUrl: () => "https://portal.example
 let smsOn = true;
 vi.mock("../src/server/sms", () => ({ smsAvailable: () => smsOn, sendSms: vi.fn(async () => ({ ok: true, simulated: true })) }));
 
-const { db, ready } = testDb();
+const { db, pglite, ready } = testDb();
 const c = await import("../src/server/services/campaigns");
+/** The same database, recording every statement it runs (transactions included) in `queries`. */
+const queries: { sql: string; params: unknown[] }[] = [];
+const logged = drizzle(pglite, { schema: t, logger: { logQuery: (sql, params) => void queries.push({ sql, params }) } }) as unknown as DB;
+const statements = (prefix: string) => queries.filter((q) => q.sql.startsWith(prefix));
 
 let trainingModuleId = "";
 beforeAll(async () => {
@@ -68,6 +74,16 @@ describe("campaignAudience", () => {
     // A department audience whose department was deleted reaches nobody.
     expect(await ids("department", null)).toEqual([]);
   });
+
+  it("reads only the one person of a one-person campaign, and nobody without a person", async () => {
+    const tenant = await addTenant(db);
+    const [p] = [await addUser(db, tenant.id), await addUser(db, tenant.id), await addUser(db, tenant.id)];
+    queries.length = 0;
+    expect((await c.campaignAudience(logged, { tenantId: tenant.id, audience: "person", departmentId: null, userId: p.id })).map((u) => u.id)).toEqual([p.id]);
+    // The person is chosen in SQL, not by reading the whole organisation first.
+    expect(statements('select "id", "email"')).toMatchObject([{ params: expect.arrayContaining([p.id]) }]);
+    expect(await c.campaignAudience(db, { tenantId: tenant.id, audience: "person", departmentId: null, userId: null })).toEqual([]);
+  });
 });
 
 describe("launchBlocker", () => {
@@ -119,14 +135,10 @@ describe("launchCampaign", () => {
       .values(Array.from({ length: 1_201 }, (_, i) => ({ tenantId: tenant.id, email: `bulk${i}-${tenant.id}@test.example`, name: `P ${i}`, locale: "en" })))
       .returning({ id: t.users.id });
     const campaign = await draft(tenant.id);
-    const insert = vi.spyOn(db, "insert");
-    try {
-      expect(await c.launchCampaign(db, campaign.id, null)).toEqual({ ok: true, count: 1_201 });
-      expect(insert.mock.calls.filter(([table]) => table === t.campaignRecipients)).toHaveLength(3);
-      expect(insert.mock.calls.filter(([table]) => table === t.outbox)).toHaveLength(3);
-    } finally {
-      insert.mockRestore();
-    }
+    queries.length = 0;
+    expect(await c.launchCampaign(logged, campaign.id, null)).toEqual({ ok: true, count: 1_201 });
+    expect(statements('insert into "campaign_recipients"')).toHaveLength(3);
+    expect(statements('insert into "outbox"')).toHaveLength(3);
     const rows = await recipients(campaign.id);
     expect(new Set(rows.map((r) => r.userId))).toEqual(new Set(people.map((p) => p.id)));
     expect(new Set(rows.map((r) => r.token)).size).toBe(1_201);
@@ -173,6 +185,56 @@ describe("launchCampaign", () => {
     expect(await recipients(campaign.id)).toHaveLength(3);
     expect(await db.select().from(t.outbox).where(eq(t.outbox.tenantId, tenant.id))).toHaveLength(3);
   });
+});
+
+/** Makes the database refuse a campaign's 501st recipient, as a dropped connection mid-launch would, while `fn` runs. */
+async function failingSecondChunk(fn: () => Promise<void>) {
+  await db.execute(
+    sql.raw(`create function fail_second_chunk() returns trigger language plpgsql as $$ begin
+      if (select count(*) from campaign_recipients where campaign_id = new.campaign_id) >= 500 then raise exception 'second chunk refused'; end if;
+      return new; end $$`),
+  );
+  await db.execute(sql.raw("create trigger fail_second_chunk before insert on campaign_recipients for each row execute function fail_second_chunk()"));
+  try {
+    await fn();
+  } finally {
+    await db.execute(sql.raw("drop trigger fail_second_chunk on campaign_recipients"));
+    await db.execute(sql.raw("drop function fail_second_chunk"));
+  }
+}
+const bulkPeople = (tenantId: string, n: number) => db.insert(t.users).values(Array.from({ length: n }, (_, i) => ({ tenantId, email: `bulk${i}-${tenantId}@test.example`, name: `P ${i}`, locale: "en" })));
+
+describe("launchCampaign that fails part-way", () => {
+  it("leaves the campaign as it was, with no recipients, no mail and no launch entry, so it can be launched again", async () => {
+    const tenant = await addTenant(db, { plan: "enterprise_hrm", settings: settings() });
+    await bulkPeople(tenant.id, 501);
+    const campaign = await draft(tenant.id);
+    await failingSecondChunk(async () => {
+      await expect(c.launchCampaign(db, campaign.id, null)).rejects.toThrow();
+    });
+    expect(await campaignRow(campaign.id)).toMatchObject({ status: "draft", launchedAt: null });
+    expect(await recipients(campaign.id)).toHaveLength(0);
+    expect(await db.select().from(t.outbox).where(eq(t.outbox.tenantId, tenant.id))).toHaveLength(0);
+    expect(await db.select().from(t.auditLog).where(and(eq(t.auditLog.targetId, campaign.id), eq(t.auditLog.action, "campaign.launched")))).toHaveLength(0);
+    expect(await c.launchCampaign(db, campaign.id, null)).toEqual({ ok: true, count: 501 });
+  }, 60_000);
+
+  it("does not keep campaignTick from launching the other due campaigns or closing old ones", async () => {
+    const tenant = await addTenant(db, { plan: "enterprise_hrm", settings: settings() });
+    await bulkPeople(tenant.id, 501);
+    const small = await addDepartment(db, tenant.id, "Small");
+    await addUser(db, tenant.id, { departmentId: small.id });
+    const ago = new Date(Date.now() - 60_000);
+    const large = await draft(tenant.id, { status: "scheduled", scheduledAt: ago });
+    const other = await draft(tenant.id, { status: "scheduled", scheduledAt: ago, audience: "department", departmentId: small.id });
+    const old = await draft(tenant.id, { status: "running", launchedAt: new Date(Date.now() - 15 * 86_400_000) });
+    await failingSecondChunk(() => c.campaignTick(db));
+    // The failed one is untouched and goes out on a later tick.
+    expect(await campaignRow(large.id)).toMatchObject({ status: "scheduled" });
+    expect(await recipients(large.id)).toHaveLength(0);
+    expect((await campaignRow(other.id)).status).toBe("running");
+    expect((await campaignRow(old.id)).status).toBe("completed");
+  }, 60_000);
 });
 
 describe("setCampaignStatus", () => {

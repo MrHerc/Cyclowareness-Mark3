@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
-import { and, desc, eq, ne } from "drizzle-orm";
-import { Building2, CalendarDays, CheckCircle2, ChevronRight, Globe, Mail, Megaphone, MessageSquare, Pencil, Phone, Plus, Usb, User, Users } from "lucide-react";
+import { and, count, desc, eq, ne, sql } from "drizzle-orm";
+import { Building2, CalendarDays, CheckCircle2, ChevronRight, Globe, Mail, Megaphone, MessageSquare, Pencil, Phone, Plus, Usb, Users } from "lucide-react";
 import { db, t } from "@/server/db";
 import { allowed, requirePermission } from "@/server/auth/viewer";
 import { campaignStats } from "@/server/services/campaigns";
@@ -30,22 +30,31 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
   const status = STATUSES.includes(sp.status as (typeof STATUSES)[number]) ? (sp.status as (typeof STATUSES)[number]) : "all";
   const locale = await getLocale();
   const [tr, tc, format] = await Promise.all([getTranslations("admin.campaigns"), getTranslations("common"), getFormatter()]);
-  const [campaigns, departments, users] = await Promise.all([
-    db().select().from(t.campaigns).where(eq(t.campaigns.tenantId, v.tenant.id)).orderBy(desc(t.campaigns.createdAt)),
+  const [campaigns, [sums], departments, users] = await Promise.all([
+    // Without the one-person re-simulations: one per clicker would grow the list without end; each is listed in its source campaign's loop card.
+    db().select().from(t.campaigns).where(and(eq(t.campaigns.tenantId, v.tenant.id), ne(t.campaigns.audience, "person"))).orderBy(desc(t.campaigns.createdAt)),
+    // The organisation's funnel, re-simulations included, summed in SQL rather than over a list of campaign ids.
+    db()
+      .select({
+        campaigns: sql<number>`count(distinct ${t.campaignRecipients.campaignId}) filter (where ${t.campaignRecipients.sentAt} is not null)`,
+        sent: count(t.campaignRecipients.sentAt),
+        opened: count(t.campaignRecipients.openedAt),
+        clicked: count(t.campaignRecipients.clickedAt),
+        reported: count(t.campaignRecipients.reportedAt),
+      })
+      .from(t.campaignRecipients)
+      .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
+      .where(eq(t.campaigns.tenantId, v.tenant.id)),
     getDepartments(v.tenant.id),
     db().select({ departmentId: t.users.departmentId }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.status, "active"), ne(t.users.role, "super_admin"))),
   ]);
   const stats = await campaignStats(db(), campaigns.map((c) => c.id));
-  const withResults = campaigns.filter((c) => (stats.get(c.id)?.sent ?? 0) > 0);
-  const total = withResults.reduce((acc, c) => {
-    const s = stats.get(c.id)!;
-    return { sent: acc.sent + s.sent, opened: acc.opened + s.opened, clicked: acc.clicked + s.clicked, reported: acc.reported + s.reported };
-  }, { sent: 0, opened: 0, clicked: 0, reported: 0 });
+  const total = { sent: Number(sums.sent), opened: Number(sums.opened), clicked: Number(sums.clicked), reported: Number(sums.reported) };
   const pct = (n: number) => (total.sent ? Math.round((n / total.sent) * 100) : 0);
   const deptName = new Map(departments.map((d) => [d.id, d.name]));
   const closure = departmentClosure(departments);
   const audienceSize = (c: (typeof campaigns)[number]) =>
-    c.audience === "all" ? users.length : c.audience === "person" ? 1 : users.filter((u) => u.departmentId && c.departmentId && closure.get(c.departmentId)?.has(u.departmentId)).length;
+    c.audience === "all" ? users.length : users.filter((u) => u.departmentId && c.departmentId && closure.get(c.departmentId)?.has(u.departmentId)).length;
   const list = campaigns.filter((c) => status === "all" || c.status === status);
 
   return (
@@ -68,7 +77,7 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
               <p className="text-caption font-semibold text-ink-muted">{tr("reportRate")}</p>
               <p className="mt-1 text-display font-bold text-safe-700 tabular-nums">{tc("units.percent", { value: format.number(pct(total.reported)) })}</p>
               <p className="mt-2 text-caption text-ink-muted">{tr("reportedOf", { reported: total.reported, sent: total.sent })}</p>
-              <p className="text-tab text-ink-subtle">{tr("acrossCampaigns", { count: withResults.length })}</p>
+              <p className="text-tab text-ink-subtle">{tr("acrossCampaigns", { count: Number(sums.campaigns) })}</p>
             </div>
             <Funnel
               steps={[
@@ -102,8 +111,8 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
                     </Pill>
                     <p className="mt-1.5 grid gap-0.5 text-tab text-ink-muted">
                       <span className="inline-flex items-center gap-1">
-                        {c.audience === "all" ? <Globe className="size-3.5" /> : c.audience === "person" ? <User className="size-3.5" /> : <Building2 className="size-3.5" />}
-                        {c.audience === "all" ? tr("wholeOrg") : c.audience === "person" ? tr("loop.person") : (deptName.get(c.departmentId ?? "") ?? "—")}
+                        {c.audience === "all" ? <Globe className="size-3.5" /> : <Building2 className="size-3.5" />}
+                        {c.audience === "all" ? tr("wholeOrg") : (deptName.get(c.departmentId ?? "") ?? "—")}
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <CalendarDays className="size-3.5" />

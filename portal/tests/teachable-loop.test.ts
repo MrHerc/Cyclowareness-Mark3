@@ -26,6 +26,21 @@ vi.mock("next-intl/server", () => ({
   getTranslations: async (o: { locale: string; namespace: string }) => createTranslator({ ...(await messagesFor(o.locale)), namespace: o.namespace as never }),
 }));
 vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => viewer, allowed: () => false, privileged: () => false, hasFeature: () => true }));
+// The next `notifyFails` notices throw, as a failing write would.
+let notifyFails = 0;
+vi.mock("../src/server/services/notify", async (original) => {
+  const m = await original<typeof import("../src/server/services/notify")>();
+  return {
+    ...m,
+    notifyUsers: async (...a: Parameters<typeof m.notifyUsers>) => {
+      if (notifyFails > 0) {
+        notifyFails--;
+        throw new Error("notify failed");
+      }
+      return m.notifyUsers(...a);
+    },
+  };
+});
 
 const { campaignTick, launchCampaign, recordClick, setCampaignStatus } = await import("../src/server/services/campaigns");
 const { microLesson, resimAt, resimTemplate, teachableTick } = await import("../src/server/services/teachable");
@@ -33,6 +48,7 @@ const { getCatalog } = await import("../src/server/queries/catalog");
 const learning = await import("../src/server/actions/learning");
 const workspace = await import("../src/server/actions/workspace");
 const secops = await import("../src/server/actions/secops");
+const campaignActions = await import("../src/server/actions/campaigns");
 
 beforeAll(async () => {
   await ready();
@@ -42,6 +58,7 @@ beforeAll(async () => {
 beforeEach(() => {
   smsOn = true;
   locale = "en";
+  notifyFails = 0;
 });
 
 async function org(o: { teachable?: boolean; timeZone?: string; personLocale?: string; people?: number } = {}) {
@@ -80,6 +97,23 @@ async function finish(tenant: Awaited<ReturnType<typeof org>>["tenant"], user: t
   // intro, steps, hotspot, check, recap: the last scene is index 4.
   await learning.reachSceneAction(slug, "lesson-1", 4);
   return learning.completeLessonAction({ slug, lessonKey: "lesson-1", answers: [{ sceneId: "hotspot", picked: ["s1"] }, { sceneId: "check", picked: ["o2"] }] });
+}
+
+/** Moves every loop of the organisation past the 21-day fallback, so its re-simulation is due. */
+const backdate = (tenantId: string) => db.update(t.teachableLoops).set({ assignedAt: new Date(Date.now() - 30 * 86_400_000) }).where(eq(t.teachableLoops.tenantId, tenantId));
+
+/** A payslip click whose re-simulation (the Medium invoice) is scheduled and not launched yet. */
+async function scheduledResim(o: Parameters<typeof org>[0] = {}) {
+  const { tenant, people } = await org(o);
+  const [p] = people;
+  const { token } = await clickable(tenant.id);
+  await recordClick(db, token(p.id), "link");
+  await teachableTick(db, tenant, new Date());
+  await backdate(tenant.id);
+  await teachableTick(db, tenant, new Date());
+  const [resim] = await personCampaigns(tenant.id);
+  expect(resim).toMatchObject({ userId: p.id, status: "scheduled" });
+  return { tenant, p, resim };
 }
 
 describe("click → micro-lesson", () => {
@@ -213,6 +247,56 @@ describe("click → micro-lesson", () => {
     expect(await teachableAssignments(tenant.id)).toHaveLength(0);
     expect(await db.select().from(t.modules).where(eq(t.modules.tenantId, tenant.id))).toHaveLength(0);
   }, 60_000);
+
+  it("starts no loop for a click in a live drill campaign", async () => {
+    const { tenant, people } = await org({ people: 2 });
+    const [p, other] = people;
+    const drill = await clickable(tenant.id);
+    await db.insert(t.drillRuns).values({ tenantId: tenant.id, campaignId: drill.campaign.id, templateKey: "payslip", durationMs: 60_000, simMinutes: 60, events: [], baseline: { avgRisk: 50, scores: {} }, startedAt: new Date() });
+    await recordClick(db, drill.token(p.id), "link");
+    // The control: the same click in an ordinary campaign starts one.
+    const real = await clickable(tenant.id, "invoice");
+    await recordClick(db, real.token(other.id), "link");
+    expect(await teachableTick(db, tenant, new Date())).toBe(1);
+    expect((await loopsOf(tenant.id)).map((l) => [l.userId, l.sourceCampaignId])).toEqual([[other.id, real.campaign.id]]);
+    expect((await teachableAssignments(tenant.id)).map((a) => a.userId)).toEqual([other.id]);
+    expect(await db.select().from(t.notifications).where(and(eq(t.notifications.userId, p.id), eq(t.notifications.kind, "assignment")))).toHaveLength(0);
+  }, 60_000);
+
+  it("starts nothing for a suspended clicker or a click older than a day", async () => {
+    const { tenant, people } = await org({ people: 2 });
+    const [suspended, late] = people;
+    const { campaign, token } = await clickable(tenant.id);
+    await recordClick(db, token(suspended.id), "link");
+    await recordClick(db, token(late.id), "link");
+    await db.update(t.users).set({ status: "suspended" }).where(eq(t.users.id, suspended.id));
+    await db
+      .update(t.campaignRecipients)
+      .set({ clickedAt: new Date(Date.now() - 25 * 3_600_000) })
+      .where(and(eq(t.campaignRecipients.campaignId, campaign.id), eq(t.campaignRecipients.userId, late.id)));
+    expect(await teachableTick(db, tenant, new Date())).toBe(0);
+    expect(await loopsOf(tenant.id)).toHaveLength(0);
+  }, 60_000);
+
+  it("isolates a click that fails: the other clicks and the due re-simulations still go ahead, and the next tick retries it", async () => {
+    const { tenant, people } = await org({ people: 3 });
+    const [a, b, earlier] = people;
+    const { token } = await clickable(tenant.id);
+    await recordClick(db, token(earlier.id), "link");
+    await teachableTick(db, tenant, new Date());
+    await backdate(tenant.id);
+    await recordClick(db, token(a.id), "link");
+    await recordClick(db, token(b.id), "link");
+    notifyFails = 1;
+    expect(await teachableTick(db, tenant, new Date())).toBe(1);
+    const loops = await loopsOf(tenant.id);
+    expect(loops.find((l) => l.userId === earlier.id)).toMatchObject({ status: "resim", resimCampaignId: expect.any(String) });
+    expect(loops.filter((l) => l.userId !== earlier.id)).toHaveLength(1);
+    // The failed click's transaction left nothing behind: no assignment without its loop.
+    expect(await teachableAssignments(tenant.id)).toHaveLength(2);
+    expect(await teachableTick(db, tenant, new Date())).toBe(1);
+    expect((await loopsOf(tenant.id)).map((l) => l.userId).sort()).toEqual([a.id, b.id, earlier.id].sort());
+  }, 60_000);
 });
 
 describe("re-simulation", () => {
@@ -330,6 +414,94 @@ describe("re-simulation", () => {
     await teachableTick(db, tenant, new Date(Date.now() + 3_600_000));
     expect(await personCampaigns(tenant.id)).toHaveLength(1);
     expect((await loopsOf(tenant.id)).map((l) => l.status).sort()).toEqual(["assigned", "resim"]);
+  }, 60_000);
+
+  it("names no person: not in the campaign's name, its audit entry, the click's risk or the webhook payload", async () => {
+    const { tenant, p, resim } = await scheduledResim();
+    expect(resim.name).toBe("Overdue invoice: re-simulation");
+    const [created] = await db.select().from(t.auditLog).where(and(eq(t.auditLog.action, "campaign.created"), eq(t.auditLog.targetId, resim.id)));
+    expect(JSON.stringify(created.meta)).not.toContain(p.name);
+    const settings = { ...tenant.settings, integrations: { ...tenant.settings.integrations, webhookEnabled: true, webhookUrl: "https://siem.example/hook", webhookEvents: ["phishing.clicked"] } };
+    await db.update(t.tenants).set({ settings }).where(eq(t.tenants.id, tenant.id));
+    await campaignTick(db);
+    const [r] = await db.select().from(t.campaignRecipients).where(eq(t.campaignRecipients.campaignId, resim.id));
+    await recordClick(db, r.token, "link");
+    const [risk] = await db.select().from(t.behaviorRisks).where(eq(t.behaviorRisks.sourceRef, resim.id));
+    expect(risk.title).not.toContain(p.name);
+    const deliveries = await db.select().from(t.webhookDeliveries).where(eq(t.webhookDeliveries.tenantId, tenant.id));
+    expect(deliveries.map((d) => d.payload)).toMatchObject([{ event: "phishing.clicked", data: { campaign: "Overdue invoice: re-simulation", userId: p.id } }]);
+    expect(JSON.stringify(deliveries[0].payload)).not.toContain(p.name);
+  }, 60_000);
+
+  it("is cancelled when its launch is refused, and its loop closes without a result and without a 'did not start' notice", async () => {
+    const { tenant, p, resim } = await scheduledResim();
+    const admin = await addUser(db, tenant.id, { role: "tenant_admin" });
+    // Suspended in the minute between scheduling and launch: the audience is empty.
+    await db.update(t.users).set({ status: "suspended" }).where(eq(t.users.id, p.id));
+    await campaignTick(db);
+    expect((await db.select().from(t.campaigns).where(eq(t.campaigns.id, resim.id)))[0].status).toBe("cancelled");
+    expect((await db.select().from(t.auditLog).where(and(eq(t.auditLog.action, "campaign.launch_blocked"), eq(t.auditLog.targetId, resim.id))))[0].meta).toMatchObject({ reason: "empty" });
+    expect(await db.select().from(t.notifications).where(and(eq(t.notifications.userId, admin.id), eq(t.notifications.kind, "campaign")))).toHaveLength(0);
+    await teachableTick(db, tenant, new Date());
+    expect((await loopsOf(tenant.id))[0]).toMatchObject({ status: "closed", resimResult: null });
+  }, 60_000);
+
+  it("records a reported re-simulation as reported, also once the campaign ends, and a cancelled one closes without a result", async () => {
+    const reported = await scheduledResim();
+    await campaignTick(db);
+    await db.update(t.campaignRecipients).set({ reportedAt: new Date() }).where(eq(t.campaignRecipients.campaignId, reported.resim.id));
+    await teachableTick(db, reported.tenant, new Date());
+    expect((await loopsOf(reported.tenant.id))[0]).toMatchObject({ resimResult: "reported", status: "resim" });
+    expect(await setCampaignStatus(db, reported.tenant.id, reported.resim.id, "completed")).toBe(true);
+    await teachableTick(db, reported.tenant, new Date());
+    expect((await loopsOf(reported.tenant.id))[0]).toMatchObject({ resimResult: "reported", status: "closed" });
+
+    const cancelled = await scheduledResim();
+    expect(await setCampaignStatus(db, cancelled.tenant.id, cancelled.resim.id, "cancelled")).toBe(true);
+    await teachableTick(db, cancelled.tenant, new Date());
+    expect((await loopsOf(cancelled.tenant.id))[0]).toMatchObject({ resimResult: null, status: "closed" });
+  }, 60_000);
+
+  it("refuses an administrator's edit of a re-simulation, which stays with its one person", async () => {
+    const { tenant, p, resim } = await scheduledResim();
+    viewer = asViewer(tenant, await addUser(db, tenant.id, { role: "tenant_admin" }));
+    const edit = { name: "Org-wide", templateKey: "invoice", audience: "all" as const, departmentId: null, scheduledAt: null };
+    expect(await campaignActions.saveCampaignAction({ id: resim.id, ...edit })).toEqual({ ok: false });
+    expect((await db.select().from(t.campaigns).where(eq(t.campaigns.id, resim.id)))[0]).toMatchObject({ audience: "person", userId: p.id, status: "scheduled", name: resim.name });
+    // The control: an ordinary draft takes the same edit.
+    const [plain] = await db.insert(t.campaigns).values({ tenantId: tenant.id, name: "Plain", channel: "email", templateKey: "payslip", audience: "all", status: "draft" }).returning();
+    expect(await campaignActions.saveCampaignAction({ id: plain.id, ...edit })).toEqual({ ok: true, id: plain.id });
+  }, 60_000);
+
+  it("schedules nothing while switched off, for a suspended person, or for a voice or USB loop, which closes", async () => {
+    const off = await org({ teachable: false });
+    const onFirst = { ...off.tenant, settings: { ...off.tenant.settings, learning: { ...off.tenant.settings.learning, teachable: true } } };
+    const sim = await clickable(off.tenant.id);
+    await recordClick(db, sim.token(off.people[0].id), "link");
+    await teachableTick(db, onFirst, new Date());
+    await backdate(off.tenant.id);
+    await teachableTick(db, off.tenant, new Date());
+    expect(await personCampaigns(off.tenant.id)).toHaveLength(0);
+    expect((await loopsOf(off.tenant.id))[0].status).toBe("assigned");
+
+    const suspended = await org();
+    const s = await clickable(suspended.tenant.id);
+    await recordClick(db, s.token(suspended.people[0].id), "link");
+    await teachableTick(db, suspended.tenant, new Date());
+    await backdate(suspended.tenant.id);
+    await db.update(t.users).set({ status: "suspended" }).where(eq(t.users.id, suspended.people[0].id));
+    await teachableTick(db, suspended.tenant, new Date());
+    expect(await personCampaigns(suspended.tenant.id)).toHaveLength(0);
+    expect((await loopsOf(suspended.tenant.id))[0].status).toBe("assigned");
+
+    const usb = await org();
+    const u = await clickable(usb.tenant.id, "usb-parcel");
+    await recordClick(db, u.token(usb.people[0].id), "link");
+    await teachableTick(db, usb.tenant, new Date());
+    await backdate(usb.tenant.id);
+    await teachableTick(db, usb.tenant, new Date());
+    expect(await personCampaigns(usb.tenant.id)).toHaveLength(0);
+    expect((await loopsOf(usb.tenant.id))[0]).toMatchObject({ status: "closed", resimCampaignId: null });
   }, 60_000);
 
   it("picks the same channel at the next difficulty, staying at Hard and on the plan", () => {
