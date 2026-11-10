@@ -21,7 +21,7 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 
 | Kateqoriya | Nümunələr | Mənbə |
 |---|---|---|
-| Hesab və iş məlumatları | ad, elektron poçt ünvanı, vəzifə, şöbə, rəhbər, rol, interfeys dili, hesabın statusu | Təşkilatınız (əllə, faylla idxal, Active Directory və ya LDAP, vahid giriş) |
+| Hesab və iş məlumatları | ad, elektron poçt ünvanı, vəzifə, şöbə, rəhbər, rol, interfeys dili, hesabın statusu | Təşkilatınız (əllə, faylla idxal və ya vahid giriş) |
 | Giriş məlumatları | yalnız birtərəfli heş şəklində saxlanılan parol, ikiaddımlı giriş ayarları və ehtiyat kodlar, giriş sessiyaları | siz və Xidmət |
 | Profil şəkli (könüllü) | yüklədiyiniz və ya kamera ilə çəkdiyiniz şəkil | siz |
 | Təlim məlumatları | başlanmış və tamamlanmış dərslər, simulyasiyalardakı cavablar, nəticələr, xallar (XP), ardıcıllıq seriyaları, nişanlar, risk göstəricisi, təkrar cədvəli, sərf olunan vaxt | Xidmət, istifadəniz əsasında |
@@ -64,7 +64,7 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 ## 6. Məlumatlarınızı kim görə bilər
 
 6.1. Təşkilatınızda: Administratorlar məlumatlarınızı öz rollarına uyğun görür. Məsələn, şöbə rəhbəri yalnız ona təyin edilmiş şöbələri görür. Digər iştirakçılar nəticələrinizi görmür.
-6.2. Təşkilatınızın qoşduğu sistemlər: onun poçt serveri (Xidmətin məktubları Təşkilatın poçt serveri vasitəsilə göndərilir), identifikasiya provayderi və ya kataloqu (sistemə giriş və işçilərin sinxronlaşdırılması üçün), habelə istifadəçi identifikatorunuz, elektron poçt ünvanınız və şöbəniz daxil olmaqla təhlükəsizlik hadisələrini qəbul edə bilən SIEM və ya ITSM sistemləri.
+6.2. Təşkilatınızın qoşduğu sistemlər: onun poçt serveri (Xidmətin Təşkilat istifadəçilərinə göndərdiyi məktublar Təşkilatın poçt serveri vasitəsilə göndərilir; heç bir Təşkilata aid olmayan məktublar, məsələn, açıq saytdan gələn demo sorğusu barədə Təminatçının satış komandasına bildiriş (3.3-cü bənd), Təminatçının öz poçt serveri vasitəsilə göndərilir), identifikasiya provayderi (sistemə giriş üçün), habelə istifadəçi identifikatorunuz, elektron poçt ünvanınız və şöbəniz daxil olmaqla təhlükəsizlik hadisələrini qəbul edə bilən SIEM və ya ITSM sistemləri.
 6.3. Təminatçının subprosessorları (Bulud versiyası):
 - UpCloud (UpCloud Ltd, Finlandiya, və onun törəmə şirkətləri): London, United Kingdom ərazisindəki data mərkəzində serverlər, fayl yaddaşı və ehtiyat nüsxələr;
 - Anthropic (Anthropic PBC, ABŞ): 5-ci bölməyə uyğun olaraq AI Sel-in cavabları, Sİ ilə tərcümə olunan altyazılar və Təlim studiyasındakı dərs qaralamaları üçün Anthropic API;
@@ -87,10 +87,9 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 - Giriş sessiyası: Təşkilatın quraşdırmasında başqa dəyər müəyyən edilməyibsə, 8 saat fəaliyyət olmadıqda bitir.
 - İkiaddımlı giriş və vahid giriş mərhələləri: 10 dəqiqə. Endirmə keçidləri: 5 dəqiqə.
 - AI Sel-dən istifadə sayğacları: 24 saat.
-- AI Sel-in saxlanılan sualları və cavabları (heç bir hesabla əlaqəsi olmadan): Təşkilatınızın Xidmətdəki hesabı mövcud olduğu müddətdə.
+- AI Sel-in saxlanılan sualları və cavabları (heç bir hesabla əlaqəsi olmadan): 12 aya qədər, sonra avtomatik silinir.
 - Açıq saytdan gələn demo sorğuları: daha tez silinmədikdə 24 ay (3.3-cü bənd).
 - Məktubların çatdırılma qeydləri: çatdırılma başa çatdıqdan sonra 90 gün.
-- Kataloq sinxronlaşdırması hesabatları: 180 gün.
 - Audit jurnalı: Xidmət vasitəsilə dəyişdirilə və silinə bilməz; Təşkilatın müqaviləsi qüvvədə olduğu müddətdə və ondan sonra müqavilədə müəyyən edilmiş və ya qanunvericiliyin tələb etdiyi müddətdə saxlanılır.
 - Ehtiyat nüsxələr (Bulud versiyası): fasiləsiz dövrlə yenisi ilə əvəz olunur, hazırda 14 gün.
 - Müqaviləyə xitam verildikdən sonra: Təşkilatın məlumatları onun müqaviləsində müəyyən edildiyi kimi qaytarılır və ya silinir; ehtiyat nüsxələr öz dövrünə uyğun köhnəlir.
@@ -100,7 +99,7 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 
 - bütün bağlantılar şifrələnir (HTTPS/TLS);
 - parollar yalnız birtərəfli heş şəklində saxlanılır; qoşulmuş poçt serverlərinin parolları, vahid giriş və inteqrasiya açarları şifrələnir;
-- hər Təşkilatın məlumatları verilənlər bazası səviyyəsində sətir səviyyəli təhlükəsizlik (row-level security) ilə ayrılır, buna görə bir Təşkilat digərinin məlumatlarını görə bilmir;
+- hər Təşkilatın məlumatlarını Xidmətin özü ayırır: hər server əməliyyatı və marşrut sorğulanan məlumatın sistemə daxil olmuş istifadəçinin Təşkilatına aid olduğunu yoxlayır, avtomatlaşdırılmış testlər isə bir Təşkilatın digər Təşkilatın məlumatlarını görə və ya dəyişə bilmədiyini yoxlayır;
 - Təşkilatın Administratorlar üçün məcburi edə biləcəyi ikiaddımlı giriş, giriş cəhdlərinin sayına məhdudiyyət və qurğu hədləri;
 - rola əsaslanan çıxış: hər Administrator yalnız rolunun və səlahiyyət dairəsinin icazə verdiyini görür;
 - girişlərin və inzibati hərəkətlərin yalnız əlavə edilə bilən audit jurnalı;

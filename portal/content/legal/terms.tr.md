@@ -21,15 +21,15 @@ Platformun kullanım kuralları: taraflar, hesap güvenliği, kabul edilebilir k
 
 ## 3. Hizmet
 
-3.1. Kuruluşun seçtiği pakete bağlı olarak Hizmet; etkileşimli dersleri ve simülasyonları, yapay zekâ tabanlı bir asistanı (bundan böyle “AI Sel” olarak anılacaktır), oyunları, puanları (XP) ve departmanlar arası ligi, sertifikaları, onay işlevine sahip bir politika kütüphanesini, oltalama simülasyonu ve QR kod eğitimlerini, raporlar içeren bir yönetim panelini ve Kuruluşun sistemleriyle entegrasyonu (tek oturum açma, Active Directory veya LDAP, e-posta, SIEM ve ITSM) kapsar.
+3.1. Kuruluşun seçtiği pakete bağlı olarak Hizmet; etkileşimli dersleri ve simülasyonları, yapay zekâ tabanlı bir asistanı (bundan böyle “AI Sel” olarak anılacaktır), oyunları, puanları (XP) ve departmanlar arası ligi, sertifikaları, onay işlevine sahip bir politika kütüphanesini, oltalama simülasyonu ve QR kod eğitimlerini, raporlar içeren bir yönetim panelini ve Kuruluşun sistemleriyle entegrasyonu (tek oturum açma, e-posta, SIEM ve ITSM) kapsar.
 3.2. Kurum İçi Sürümde barındırma, yedekleme, ağ güvenliği, güncellemelerin kurulması ve bağlanan harici hizmetlerin yapılandırılması Kuruluşun sorumluluğundadır. Bu durumda Sağlayıcının yükümlülükleri yalnızca Müşteri Sözleşmesinde belirtilenlerden ibarettir.
 3.3. Hizmet, modern web tarayıcılarında ve Android uygulamasında çalışır. Bazı işlevler (kamera, mikrofon, çevrimdışı eğitim) cihaza ve Kullanıcının verdiği izinlere bağlıdır.
 3.4. Hizmet bir eğitim aracıdır. Eğitimin tamamlanması insan hatası riskini azaltır, ancak Kuruluşun hiçbir zaman siber güvenlik olayı yaşamayacağını garanti etmez.
 
 ## 4. Hesaplar ve giriş
 
-4.1. Hesaplar yalnızca Kuruluş tarafından oluşturulur: elle, dosyadan içe aktarma yoluyla veya Kuruluşun kendi dizin hizmetiyle eşitleme yoluyla. Açık kayıt imkânı yoktur.
-4.2. Kuruluşun ayarlarına bağlı olarak Kullanıcı; bir e-posta adresi ve en az 12 karakterden oluşan bir parolayla, Kuruluşun Active Directory parolasıyla ya da Kuruluşun tek oturum açma sistemi (OpenID Connect veya SAML) üzerinden giriş yapar. İki adımlı doğrulamada bir kimlik doğrulama uygulamasının ürettiği tek kullanımlık kodlar ve yedek kodlar kullanılır; Kuruluş iki adımlı doğrulamayı belirli roller için zorunlu kılabilir.
+4.1. Hesaplar yalnızca Kuruluş tarafından oluşturulur: elle, dosyadan içe aktarma yoluyla veya Kuruluşun kendi tek oturum açma sistemi aracılığıyla. Açık kayıt imkânı yoktur.
+4.2. Kuruluşun ayarlarına bağlı olarak Kullanıcı; bir e-posta adresi ve en az 10 karakterden oluşan bir parolayla ya da Kuruluşun tek oturum açma sistemi (OpenID Connect) üzerinden giriş yapar. İki adımlı doğrulamada bir kimlik doğrulama uygulamasının ürettiği tek kullanımlık kodlar ve yedek kodlar kullanılır; Kuruluş iki adımlı doğrulamayı belirli roller için zorunlu kılabilir.
 4.3. Her hesap tek bir kişiye aittir ve başka biriyle paylaşılamaz.
 4.4. Kuruluş, bir hesapta aynı anda oturum açık olabilecek cihaz sayısını sınırlayabilir. Sınıra ulaşıldığında en eski oturum kapatılır.
 4.5. Kullanıcının rolünü ve departmanını Kuruluş belirler; Kuruluş hesabı askıya alabilir veya silebilir. Kullanıcı Kuruluştan ayrıldığında erişimi genellikle sonlandırılır.
@@ -73,7 +73,7 @@ Platformun kullanım kuralları: taraflar, hesap güvenliği, kabul edilebilir k
 - Hizmetin kullanımına başlanmadan önce Kullanıcıları Hizmetin kullanıldığı, hangi amaçlarla kullanıldığı, Yöneticilerin hangi sonuçları gördüğü ve Kullanıcıların haklarını nasıl kullanabilecekleri konusunda bilgilendirmeli; mevzuatın gerektirdiği durumlarda yazılı rıza almalıdır;
 - çalışan listesini doğru tutmalı ve Kuruluştan ayrılan kişilerin hesaplarını askıya almalı veya silmelidir;
 - yönetici rollerini yalnızca bunlara ihtiyacı olan kişilere atamalı, Yönetici hesaplarını korumalı ve tavsiye edildiği üzere bu hesaplar için iki adımlı doğrulamayı zorunlu kılmalıdır;
-- tek oturum açma, Active Directory veya LDAP, kendi e-posta sunucusu, SIEM veya ITSM entegrasyonlarını güvenli şekilde yapılandırmalıdır; bu sistemlerden ve Hizmetin Kuruluşun talimatıyla bu sistemlere gönderdiği verilerden Kuruluş sorumludur;
+- tek oturum açma, kendi e-posta sunucusu, SIEM veya ITSM entegrasyonlarını güvenli şekilde yapılandırmalıdır; bu sistemlerden ve Hizmetin Kuruluşun talimatıyla bu sistemlere gönderdiği verilerden Kuruluş sorumludur;
 - yüklediği politikaların, logoların, metinlerin ve diğer materyallerin hukuka uygun olmasını ve bunları kullanma hakkına sahip olmasını sağlamalıdır;
 - Kullanıcıların kişisel verilere ilişkin talepleri (örneğin silme talepleri) hakkında gereksiz gecikme olmaksızın karar vermeli ve bir talebi reddederse gerekçesini belirtmelidir;
 - bir devlet kurumu ise veya bilgi sistemleri, verilerin saklandığı yer ya da bilgi güvenliği konusunda özel kurallara tabiyse, bu kurallara uygun sürümü (Bulut veya Kurum İçi) ve ayarları seçmelidir.
@@ -131,7 +131,7 @@ Platformun kullanım kuralları: taraflar, hesap güvenliği, kabul edilebilir k
 ## 15. Garantilerin sınırlandırılması
 
 15.1. Bu Koşullarda veya Müşteri Sözleşmesinde açıkça belirtilenler ve emredici kanun hükümlerinin gerektirdikleri dışında Sağlayıcı; Hizmetin hatasız olacağını, eğitimin her güvenlik olayını önleyeceğini veya Eğitim Materyallerinin belirli bir Kuruluşun her bir özel hukuki yükümlülüğünü karşılayacağını garanti etmez.
-15.2. Kuruluşun Hizmete bağladığı sistemler (kimlik sağlayıcısı, dizin, e-posta sunucusu, SIEM veya ITSM) Sağlayıcının kontrolü dışındadır.
+15.2. Kuruluşun Hizmete bağladığı sistemler (kimlik sağlayıcısı, e-posta sunucusu, SIEM veya ITSM) Sağlayıcının kontrolü dışındadır.
 
 ## 16. Sorumluluğun sınırlandırılması
 

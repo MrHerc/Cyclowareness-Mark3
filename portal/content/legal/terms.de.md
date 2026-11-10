@@ -21,15 +21,15 @@ Regeln für die Nutzung der Plattform: die Parteien, die Kontosicherheit, die zu
 
 ## 3. Der Dienst
 
-3.1. Je nach dem von der Organisation gewählten Paket umfasst der Dienst interaktive Lektionen und Simulationen, einen KI-gestützten Assistenten (im Folgenden „AI Sel“), Spiele, Punkte (XP) und eine abteilungsübergreifende Liga, Zertifikate, eine Richtlinienbibliothek mit Bestätigungsfunktion, simuliertes Phishing und QR-Code-Schulungen, eine Admin-Konsole mit Berichten sowie die Anbindung an die Systeme der Organisation (Single Sign-on, Active Directory oder LDAP, E-Mail, SIEM und ITSM).
+3.1. Je nach dem von der Organisation gewählten Paket umfasst der Dienst interaktive Lektionen und Simulationen, einen KI-gestützten Assistenten (im Folgenden „AI Sel“), Spiele, Punkte (XP) und eine abteilungsübergreifende Liga, Zertifikate, eine Richtlinienbibliothek mit Bestätigungsfunktion, simuliertes Phishing und QR-Code-Schulungen, eine Admin-Konsole mit Berichten sowie die Anbindung an die Systeme der Organisation (Single Sign-on, E-Mail, SIEM und ITSM).
 3.2. In der Lokalen Version ist die Organisation für Hosting, Backups, Netzwerksicherheit, die Installation von Updates und die Konfiguration angebundener externer Dienste verantwortlich. In diesem Fall hat der Anbieter nur die im Kundenvertrag festgelegten Pflichten.
 3.3. Der Dienst funktioniert in aktuellen Webbrowsern und in der Android-App. Einige Funktionen (Kamera, Mikrofon, Lernen ohne Internetverbindung) hängen vom Gerät und von den vom Nutzer erteilten Berechtigungen ab.
 3.4. Der Dienst ist ein Schulungsinstrument. Das Absolvieren von Schulungen verringert das Risiko menschlicher Fehler, garantiert jedoch nicht, dass die Organisation niemals von einem Sicherheitsvorfall betroffen sein wird.
 
 ## 4. Konten und Anmeldung
 
-4.1. Konten werden ausschließlich von der Organisation angelegt: manuell, per Dateiimport oder durch Synchronisierung mit ihrem eigenen Verzeichnisdienst. Eine offene Registrierung gibt es nicht.
-4.2. Je nach den Einstellungen der Organisation meldet sich der Nutzer mit einer E-Mail-Adresse und einem Passwort von mindestens 12 Zeichen, mit dem Active-Directory-Passwort der Organisation oder über das Single-Sign-on-System der Organisation (OpenID Connect oder SAML) an. Die Zwei-Faktor-Authentisierung verwendet Einmalcodes aus einer Authenticator-App sowie Backup-Codes; die Organisation kann sie für bestimmte Rollen verbindlich vorschreiben.
+4.1. Konten werden ausschließlich von der Organisation angelegt: manuell, per Dateiimport oder über ihr eigenes Single-Sign-on-System. Eine offene Registrierung gibt es nicht.
+4.2. Je nach den Einstellungen der Organisation meldet sich der Nutzer mit einer E-Mail-Adresse und einem Passwort von mindestens 10 Zeichen oder über das Single-Sign-on-System der Organisation (OpenID Connect) an. Die Zwei-Faktor-Authentisierung verwendet Einmalcodes aus einer Authenticator-App sowie Backup-Codes; die Organisation kann sie für bestimmte Rollen verbindlich vorschreiben.
 4.3. Jedes Konto gehört einer einzigen Person und darf nicht mit anderen geteilt werden.
 4.4. Die Organisation kann die Anzahl der Geräte begrenzen, die gleichzeitig bei einem Konto angemeldet sein können. Ist die Höchstzahl erreicht, wird die älteste Anmeldesitzung beendet.
 4.5. Die Organisation legt die Rolle und die Abteilung des Nutzers fest und kann das Konto sperren oder löschen. Scheidet ein Nutzer aus der Organisation aus, wird sein Zugang in der Regel beendet.
@@ -73,7 +73,7 @@ Regeln für die Nutzung der Plattform: die Parteien, die Kontosicherheit, die zu
 - die Nutzer vor Beginn der Nutzung des Dienstes darüber zu informieren, dass der Dienst eingesetzt wird, zu welchen Zwecken dies geschieht, welche Ergebnisse die Administratoren sehen und wie die Nutzer ihre Rechte ausüben können; soweit gesetzlich vorgeschrieben, ihre schriftliche Einwilligung einzuholen;
 - die Liste der Mitarbeitenden korrekt zu führen und die Konten von Personen, die aus der Organisation ausscheiden, zu sperren oder zu löschen;
 - Administratorrollen nur Personen zuzuweisen, die sie benötigen, Administratorkonten zu schützen und, wie empfohlen, für diese die Zwei-Faktor-Authentisierung verbindlich vorzuschreiben;
-- Single Sign-on, Active Directory oder LDAP, ihren eigenen Mailserver sowie SIEM- oder ITSM-Integrationen sicher zu konfigurieren; die Organisation ist für diese Systeme und für die Daten verantwortlich, die der Dienst auf ihre Anweisung an diese Systeme übermittelt;
+- Single Sign-on, ihren eigenen Mailserver sowie SIEM- oder ITSM-Integrationen sicher zu konfigurieren; die Organisation ist für diese Systeme und für die Daten verantwortlich, die der Dienst auf ihre Anweisung an diese Systeme übermittelt;
 - sicherzustellen, dass die von ihr hochgeladenen Richtlinien, Logos, Texte und sonstigen Materialien rechtmäßig sind und sie zu deren Nutzung berechtigt ist;
 - über Anträge der Nutzer in Bezug auf personenbezogene Daten (zum Beispiel Löschanträge) unverzüglich zu entscheiden und im Fall der Ablehnung eines Antrags den Grund anzugeben;
 - falls sie eine staatliche Stelle ist oder besonderen Vorschriften über Informationssysteme, den Speicherort von Daten oder die Informationssicherheit unterliegt, die Version (Cloud-Version oder Lokale Version) und die Einstellungen zu wählen, die diesen Vorschriften entsprechen.
@@ -131,7 +131,7 @@ Regeln für die Nutzung der Plattform: die Parteien, die Kontosicherheit, die zu
 ## 15. Beschränkung der Gewährleistung
 
 15.1. Soweit in diesen Nutzungsbedingungen oder im Kundenvertrag nicht ausdrücklich etwas anderes bestimmt ist und soweit zwingende gesetzliche Vorschriften nichts anderes verlangen, übernimmt der Anbieter keine Gewähr dafür, dass der Dienst fehlerfrei ist, dass die Schulung jeden Sicherheitsvorfall verhindert oder dass die Schulungsmaterialien jede spezifische rechtliche Verpflichtung einer bestimmten Organisation erfüllen.
-15.2. Die Systeme, die die Organisation an den Dienst anbindet (Identitätsanbieter, Verzeichnisdienst, Mailserver, SIEM oder ITSM), liegen außerhalb des Einflussbereichs des Anbieters.
+15.2. Die Systeme, die die Organisation an den Dienst anbindet (Identitätsanbieter, Mailserver, SIEM oder ITSM), liegen außerhalb des Einflussbereichs des Anbieters.
 
 ## 16. Haftungsbeschränkung
 

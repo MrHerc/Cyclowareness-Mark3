@@ -21,15 +21,15 @@ Regulile de utilizare a platformei: părțile, securitatea conturilor, utilizare
 
 ## 3. Serviciul
 
-3.1. În funcție de pachetul ales de Organizație, Serviciul include lecții și simulări interactive, un asistent bazat pe inteligență artificială (denumit în continuare „AI Sel”), jocuri, puncte (XP) și o ligă între departamente, certificate, o bibliotecă de politici cu funcție de semnare, simulări de phishing și instruiri cu coduri QR, un panou de administrare cu rapoarte, precum și integrarea cu sistemele Organizației (autentificare unică, Active Directory sau LDAP, e-mail, SIEM și ITSM).
+3.1. În funcție de pachetul ales de Organizație, Serviciul include lecții și simulări interactive, un asistent bazat pe inteligență artificială (denumit în continuare „AI Sel”), jocuri, puncte (XP) și o ligă între departamente, certificate, o bibliotecă de politici cu funcție de semnare, simulări de phishing și instruiri cu coduri QR, un panou de administrare cu rapoarte, precum și integrarea cu sistemele Organizației (autentificare unică, e-mail, SIEM și ITSM).
 3.2. În Versiunea locală, Organizația răspunde de găzduire, de copiile de rezervă, de securitatea rețelei, de instalarea actualizărilor și de configurarea serviciilor externe conectate. În acest caz, obligațiile Furnizorului sunt numai cele prevăzute în Contractul cu clientul.
 3.3. Serviciul funcționează în browserele web moderne și în aplicația Android. Unele funcții (camera, microfonul, instruirea fără conexiune la internet) depind de dispozitiv și de permisiunile acordate de Utilizator.
 3.4. Serviciul este un instrument de instruire. Parcurgerea instruirii reduce riscul de eroare umană, dar nu garantează că Organizația nu se va confrunta niciodată cu un incident cibernetic.
 
 ## 4. Conturi și conectare
 
-4.1. Conturile sunt create numai de Organizație: manual, prin import din fișier sau prin sincronizare cu propriul serviciu de director. Nu există înregistrare liberă.
-4.2. În funcție de setările Organizației, Utilizatorul se conectează cu o adresă de e-mail și o parolă de cel puțin 12 caractere, cu parola Active Directory a Organizației sau prin sistemul de autentificare unică al Organizației (OpenID Connect sau SAML). Verificarea în doi pași utilizează coduri de unică folosință generate de o aplicație de autentificare, precum și coduri de rezervă; Organizația o poate face obligatorie pentru anumite roluri.
+4.1. Conturile sunt create numai de Organizație: manual, prin import din fișier sau prin propriul sistem de autentificare unică. Nu există înregistrare liberă.
+4.2. În funcție de setările Organizației, Utilizatorul se conectează cu o adresă de e-mail și o parolă de cel puțin 10 caractere sau prin sistemul de autentificare unică al Organizației (OpenID Connect). Verificarea în doi pași utilizează coduri de unică folosință generate de o aplicație de autentificare, precum și coduri de rezervă; Organizația o poate face obligatorie pentru anumite roluri.
 4.3. Fiecare cont aparține unei singure persoane și nu poate fi partajat cu nicio altă persoană.
 4.4. Organizația poate limita numărul de dispozitive care pot fi conectate simultan la același cont. Când limita este atinsă, cea mai veche sesiune este închisă.
 4.5. Organizația stabilește rolul și departamentul Utilizatorului și poate suspenda sau șterge contul. Când Utilizatorul părăsește Organizația, accesul îi este, de regulă, retras.
@@ -73,7 +73,7 @@ Regulile de utilizare a platformei: părțile, securitatea conturilor, utilizare
 - trebuie să informeze Utilizatorii înainte de începerea utilizării Serviciului: cu privire la faptul că Serviciul este utilizat, în ce scopuri, ce rezultate văd Administratorii și cum își pot exercita drepturile; atunci când legislația o impune, trebuie să obțină consimțământul scris;
 - trebuie să mențină exactă lista angajaților și să suspende sau să șteargă conturile persoanelor care părăsesc Organizația;
 - trebuie să atribuie roluri administrative numai persoanelor care au nevoie de ele, să protejeze conturile Administratorilor și, conform recomandării, să facă obligatorie pentru aceștia verificarea în doi pași;
-- trebuie să configureze în mod securizat integrările cu autentificarea unică, Active Directory sau LDAP, cu propriul server de e-mail, cu SIEM sau ITSM; Organizația răspunde pentru aceste sisteme și pentru datele pe care Serviciul le transmite acestor sisteme conform instrucțiunilor sale;
+- trebuie să configureze în mod securizat integrările cu autentificarea unică, cu propriul server de e-mail, cu SIEM sau ITSM; Organizația răspunde pentru aceste sisteme și pentru datele pe care Serviciul le transmite acestor sisteme conform instrucțiunilor sale;
 - trebuie să se asigure că politicile, siglele, textele și celelalte materiale pe care le încarcă sunt legale și că are dreptul să le utilizeze;
 - trebuie să decidă fără întârzieri nejustificate asupra solicitărilor Utilizatorilor privind datele cu caracter personal (de exemplu, solicitările de ștergere) și, dacă refuză o solicitare, trebuie să indice motivul;
 - dacă este o autoritate de stat sau este supusă unor reguli speciale privind sistemele informatice, localizarea datelor sau securitatea informației, trebuie să aleagă versiunea (cloud sau locală) și setările care respectă aceste reguli.
@@ -131,7 +131,7 @@ Regulile de utilizare a platformei: părțile, securitatea conturilor, utilizare
 ## 15. Limitarea garanțiilor
 
 15.1. Cu excepția celor prevăzute în mod expres în prezenții Termeni sau în Contractul cu clientul și cu excepția cazurilor impuse de dispozițiile imperative ale legii, Furnizorul nu garantează că Serviciul va fi lipsit de erori, că instruirea va preveni orice incident sau că Materialele de instruire vor satisface fiecare obligație legală specifică a unei anumite Organizații.
-15.2. Sistemele pe care Organizația le conectează la Serviciu (furnizorul de identitate, serviciul de director, serverul de e-mail, SIEM sau ITSM) se află în afara controlului Furnizorului.
+15.2. Sistemele pe care Organizația le conectează la Serviciu (furnizorul de identitate, serverul de e-mail, SIEM sau ITSM) se află în afara controlului Furnizorului.
 
 ## 16. Limitarea răspunderii
 

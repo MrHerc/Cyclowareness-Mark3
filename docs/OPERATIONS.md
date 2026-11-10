@@ -209,6 +209,34 @@ everything to its right is your proxies. If `address` is a proxy's address, `TRU
 raise it; if it is something you could have sent yourself, it is too high: lower it. Only a signed-in platform operator sees
 the `client` field.
 
+## Secret scan and dependency updates
+
+**Weekly cadence.** The Security workflow (`.github/workflows/security.yml`) runs on every pull
+request, on every push to `main`, by hand (Actions > Security > Run workflow) and every Monday at
+04:23 UTC (08:23 Baku). Dependabot (`.github/dependabot.yml`) checks every Monday at 05:17 Baku time
+for npm (`portal/`), the workflow actions, the Docker base image and the compose images; npm versions
+must be 5 days old (14 for a major version) before a pull request opens, and a security update opens
+as soon as GitHub knows the advisory once "Dependabot security updates" is on in Settings > Code
+security. Each Monday the on-call person reads the Security run and the Dependabot pull requests.
+
+**What the first gitleaks run over the whole history reports.** On a pull request gitleaks scans only
+the commits the pull request adds; on a push to `main`, on the weekly run and by hand it scans every
+commit (`--log-opts=--all`). `.gitleaks.toml` adds to gitleaks' default rules:
+
+- two placeholder values that are public on purpose: `test-only-app-secret` (tests) and
+  `dev-only-secret-change-me` (the development fallback of `APP_SECRET`, refused in production);
+- five commits, allowlisted by SHA, that carried the former demo seed password, which is no longer in
+  the tree: `3c2367d` (initial commit, 2026-10-19) and `a4ed78a`, `6cd9ea3`, `97d4d94`, `f9771ee`
+  (2026-11-05).
+
+So the expected first result is no finding. A commit allowlist skips every finding in that commit,
+so those five commits are not scanned at all; and a rebase or squash that rewrites them changes their
+SHAs and brings their findings back. If the run fails, download the `gitleaks-report` artifact (a
+redacted SARIF, kept 7 days) and look at each finding: a real secret is rotated first and never
+allowlisted; a value that is not a secret is added to `.gitleaks.toml` with a comment naming the file
+(by commit SHA when it is only in old history). Never put a removed literal back into the tree to
+match a rule.
+
 ## Quarterly access review
 
 Once a quarter (`<month>` 1st week), the owner and one other person go through this list, remove what

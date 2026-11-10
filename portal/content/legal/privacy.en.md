@@ -21,7 +21,7 @@ What personal data is processed on the platform, for what purpose and on what le
 
 | Category | Examples | Source |
 |---|---|---|
-| Account and work data | name, email address, job title, department, manager, role, interface language, account status | your Organisation (manually, by file import, through Active Directory or LDAP, or through single sign-on) |
+| Account and work data | name, email address, job title, department, manager, role, interface language, account status | your Organisation (manually, by file import or through single sign-on) |
 | Sign-in data | password stored only as a one-way hash, two-step sign-in settings and backup codes, sign-in sessions | you and the Service |
 | Profile picture (optional) | a picture you upload or take with the camera | you |
 | Training data | lessons started and completed, answers in simulations, results, points (XP), streaks, badges, risk score, review schedule, time spent | the Service, based on your use |
@@ -64,7 +64,7 @@ What personal data is processed on the platform, for what purpose and on what le
 ## 6. Who Can See Your Data
 
 6.1. Within your Organisation: Administrators see your data in accordance with their roles. For example, a department head sees only the departments assigned to them. Other participants do not see your results.
-6.2. Systems connected by your Organisation: its mail server (the Service's emails are sent through the Organisation's mail server), its identity provider or directory (for sign-in and employee synchronisation), and SIEM or ITSM systems that may receive security events, including your user identifier, email address and department.
+6.2. Systems connected by your Organisation: its mail server (the Service's emails to the Organisation's users are sent through the Organisation's mail server; mail that belongs to no Organisation, such as the notice of a demo request from the public website (clause 3.3) to the Provider's sales team, is sent through the Provider's own mail server), its identity provider (for sign-in), and SIEM or ITSM systems that may receive security events, including your user identifier, email address and department.
 6.3. The Provider's sub-processors (Cloud Version):
 - UpCloud (UpCloud Ltd, Finland, and its subsidiaries): servers, file storage and backups in a data centre located in London, United Kingdom;
 - Anthropic (Anthropic PBC, United States): the Anthropic API for AI Sel's answers, subtitles translated by AI and lesson drafts in the training studio, in accordance with section 5;
@@ -87,10 +87,9 @@ What personal data is processed on the platform, for what purpose and on what le
 - Sign-in session: ends after 8 hours of inactivity, unless a different value is set in the Organisation's installation.
 - Two-step sign-in and single sign-on steps: 10 minutes. Download links: 5 minutes.
 - AI Sel usage counters: 24 hours.
-- AI Sel's stored questions and answers (without a link to any account): for as long as your Organisation's account in the Service exists.
+- AI Sel's stored questions and answers (without a link to any account): up to 12 months, after which they are deleted automatically.
 - Demo requests from the public website: 24 months, unless deleted sooner (clause 3.3).
 - Email delivery records: 90 days after delivery is completed.
-- Directory synchronisation reports: 180 days.
 - Audit log: cannot be changed or deleted through the Service; it is kept for as long as the Organisation's agreement is in force and, thereafter, for the period set out in the agreement or required by legislation.
 - Backups (Cloud Version): replaced by new ones on a continuous rolling cycle, currently 14 days.
 - After termination of the agreement: the Organisation's data is returned or deleted as set out in its agreement; backups expire in accordance with their cycle.
@@ -100,7 +99,7 @@ What personal data is processed on the platform, for what purpose and on what le
 
 - all connections are encrypted (HTTPS/TLS);
 - passwords are stored only as one-way hashes; the passwords of connected mail servers, single sign-on keys and integration keys are encrypted;
-- each Organisation's data is separated at database level by row-level security, so one Organisation cannot see another Organisation's data;
+- each Organisation's data is kept apart by the Service itself: every server action and route checks that the requested data belongs to the signed-in user's Organisation, and an automated test suite checks that one Organisation cannot see or change another Organisation's data;
 - two-step sign-in, which the Organisation can make mandatory for Administrators, limits on the number of sign-in attempts, and device limits;
 - role-based access: each Administrator sees only what their role and scope of authority permit;
 - an append-only audit log of sign-ins and administrative actions;

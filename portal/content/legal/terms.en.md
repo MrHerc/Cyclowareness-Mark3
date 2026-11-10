@@ -21,15 +21,15 @@ Rules for using the platform: the parties, account security, acceptable use, sim
 
 ## 3. The Service
 
-3.1. Depending on the package selected by the Organisation, the Service includes interactive lessons and simulations, an assistant based on artificial intelligence (hereinafter, "AI Sel"), games, points (XP) and an inter-departmental league, certificates, a policy library with an attestation feature, simulated phishing and QR code training, an administration panel with reports, and integration with the Organisation's systems (single sign-on, Active Directory or LDAP, email, SIEM and ITSM).
+3.1. Depending on the package selected by the Organisation, the Service includes interactive lessons and simulations, an assistant based on artificial intelligence (hereinafter, "AI Sel"), games, points (XP) and an inter-departmental league, certificates, a policy library with an attestation feature, simulated phishing and QR code training, an administration panel with reports, and integration with the Organisation's systems (single sign-on, email, SIEM and ITSM).
 3.2. In the Local Version, the Organisation is responsible for hosting, backups, network security, the installation of updates and the configuration of connected external services. In that case, the Provider's obligations are only those set out in the Customer Agreement.
 3.3. The Service works in modern web browsers and in the Android app. Some features (camera, microphone, offline training) depend on the device and on the permissions granted by the User.
 3.4. The Service is a training tool. Completing training reduces the risk of human error but does not guarantee that the Organisation will never experience a cyber incident.
 
 ## 4. Accounts and Sign-In
 
-4.1. Accounts are created only by the Organisation: manually, by file import or by synchronisation with its own directory. There is no open registration.
-4.2. Depending on the Organisation's settings, a User signs in with an email address and a password of at least 12 characters, with the Organisation's Active Directory password, or through the Organisation's single sign-on system (OpenID Connect or SAML). Two-step sign-in uses one-time codes from an authenticator app and backup codes; the Organisation may make it mandatory for certain roles.
+4.1. Accounts are created only by the Organisation: manually, by file import or through its single sign-on system. There is no open registration.
+4.2. Depending on the Organisation's settings, a User signs in with an email address and a password of at least 10 characters or through the Organisation's single sign-on system (OpenID Connect). Two-step sign-in uses one-time codes from an authenticator app and backup codes; the Organisation may make it mandatory for certain roles.
 4.3. Each account belongs to one person and may not be shared with anyone else.
 4.4. The Organisation may limit the number of devices that can be signed in to one account at the same time. When the limit is reached, the oldest session is closed.
 4.5. The Organisation determines the User's role and department and may suspend or delete the account. When a User leaves the Organisation, access is usually discontinued.
@@ -73,7 +73,7 @@ Rules for using the platform: the parties, account security, acceptable use, sim
 - must inform Users before use of the Service begins: that the Service is used, for what purposes, which results Administrators see and how they can exercise their rights; where required by legislation, must obtain written consent;
 - must keep the employee list accurate and must suspend or delete the accounts of persons who leave the Organisation;
 - must assign administrative roles only to persons who need them, must protect Administrator accounts and, as recommended, must make two-step sign-in mandatory for them;
-- must configure single sign-on, Active Directory or LDAP, its own mail server, SIEM or ITSM integrations securely; the Organisation is responsible for these systems and for the data that the Service sends to these systems on its instructions;
+- must configure single sign-on, its own mail server, SIEM or ITSM integrations securely; the Organisation is responsible for these systems and for the data that the Service sends to these systems on its instructions;
 - must ensure that the policies, logos, texts and other materials it uploads are lawful and that it has the right to use them;
 - must decide without undue delay on Users' requests relating to personal data (for example, erasure requests) and, if it refuses a request, must state the reason;
 - if it is a state body or is subject to special rules on information systems, data location or information security, must choose the version (Cloud or Local) and the settings that meet those rules.
@@ -131,7 +131,7 @@ Rules for using the platform: the parties, account security, acceptable use, sim
 ## 15. Limitation of Warranties
 
 15.1. Except as expressly stated in these Terms or in the Customer Agreement and except as required by mandatory provisions of law, the Provider does not warrant that the Service will be error-free, that training will prevent every incident, or that the Training Materials will meet every specific legal obligation of a particular Organisation.
-15.2. The systems that the Organisation connects to the Service (identity provider, directory, mail server, SIEM or ITSM) are outside the Provider's control.
+15.2. The systems that the Organisation connects to the Service (identity provider, mail server, SIEM or ITSM) are outside the Provider's control.
 
 ## 16. Limitation of Liability
 

@@ -2,7 +2,7 @@ import path from "node:path";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { DB } from "../src/server/db/client";
@@ -186,10 +186,9 @@ describe("live drill", () => {
     const runA = (await skipDrill(db, tenantId, a.id))!;
     const runB = (await skipDrill(db, tenantId, b.id))!;
     const recA = await db.select().from(t.campaignRecipients).where(eq(t.campaignRecipients.campaignId, runA.campaignId));
-    const recB = await db.select().from(t.campaignRecipients).where(eq(t.campaignRecipients.campaignId, runB.campaignId));
-    const person = recA.find((r) => !r.reportedAt && recB.some((x) => x.userId === r.userId && !x.reportedAt));
-    // With 12 people and about a third reporting in each drill, someone reported in neither.
-    if (!person) throw new Error("no person left who reported in neither drill");
+    // Who reports in a drill is random (seeded by the campaign id), so the test makes one person a non-reporter in both.
+    const person = recA[0];
+    await db.update(t.campaignRecipients).set({ reportedAt: null }).where(and(inArray(t.campaignRecipients.campaignId, [runA.campaignId, runB.campaignId]), eq(t.campaignRecipients.userId, person.userId)));
     await submitThreatReport(db, { tenantId, userId: person.userId, channel: "email", subject: "Unpaid fine", url: `http://localhost:3000/t/${person.token}` });
     const [afterA] = await db.select().from(t.campaignRecipients).where(eq(t.campaignRecipients.id, person.id));
     const [afterB] = await db.select().from(t.campaignRecipients).where(and(eq(t.campaignRecipients.campaignId, runB.campaignId), eq(t.campaignRecipients.userId, person.userId)));

@@ -449,6 +449,14 @@ Tenant administrators configure SMTP servers, webhook addresses, syslog servers 
 
 The test suite contains regression tests for the security fixes listed in ADR-033, such as `auth-security`, `outbound-guard`, `regex-dos` and `outbox-redact`.
 
+**Why `style-src` keeps `'unsafe-inline'`.** Scripts need the per-request nonce; styles do not, because of inline `style` attributes. Tailwind 4 is not the cause: it compiles to a static stylesheet at build time, served from `'self'`. The cause is about 55 `style={{…}}` props in 21 components that set values known only at run time (chart and spotlight sizes and positions, brand colours from Settings, animation timings), plus the root error page, which has to render without the stylesheet. React writes them into the server-rendered HTML as `style="…"` attributes, and CSP counts those as inline style. Changes made later from script through `element.style` are not covered by CSP. The accepted risk: injected markup could restyle the page (hide or imitate elements, or leak attribute values through CSS selectors) but could not run script, because `script-src` stays nonce-only. To drop `'unsafe-inline'`:
+
+1. Replace every `style` prop. Use classes or `data-*` attributes for values from a small set, and set continuous values (widths, colours) with `element.style.setProperty` in an effect after hydration.
+2. Give any remaining `<style>` element, from the app, Next.js or a library, the request nonce.
+3. Set `style-src 'self' 'nonce-…'` and `style-src-attr 'none'` in `src/proxy.ts`, and add a test that fails on a `style={{` in `src/`, like `tests/rtl-logical.test.ts`. A middle step is `style-src-elem 'self' 'nonce-…'` with `style-src-attr 'unsafe-inline'`: `<style>` elements are locked down while attributes stay allowed.
+
+Uploaded assets (`/api/assets/[id]`) send their own policy, `default-src 'none'; style-src 'unsafe-inline'; sandbox`. An SVG logo may carry its own styles, but with no scripts and the sandbox it cannot act.
+
 ## 16. Deployment
 
 ```mermaid
