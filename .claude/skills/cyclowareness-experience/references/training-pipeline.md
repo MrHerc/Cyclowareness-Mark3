@@ -284,17 +284,40 @@ header shows `StudioLessonForm` and, with feature `approvals`, `MaterialForm`
 (`src/components/secops/studio.tsx`).
 
 **What an author can create with the form**: exactly one micro-lesson per module (the AI trainer,
-§3.3, drafts up to three), in one language, with the fixed scene sequence
-`intro → tutor (beats) → choice (one correct) → recap`. Form fields
+§3.3, drafts up to three), written in one language, with the fixed scene sequence
+`intro → tutor (beats) → [swipe] → [hotspot] → choice (one correct) → recap`. Form fields
 (i18n `secops.studio.form.*`): `aiTopic`, `language`, `category`, `difficulty`, `minutes`
-(1–30), `title`, `subtitle`, `intro`, `points` (one per line, 2–8), `question` + `options`
-(2–4, radio for the correct one, per-option `feedback`), `recap` (2–5 lines).
+(1–30), `title`, `subtitle`, `intro`, `points` (one per line, 2–8), optional `swipe` (prompt +
+SMS cards `from/text/verdict/explain`, at least one `threat`), optional `hotspot` (prompt, e-mail
+`from/subject/body` + targets `text/label/explain`, each target's text found on one line of the
+body without overlapping another: `markTargets` in `src/lib/content/studio.ts`, the same check in
+the form and on the server), `question` + `options` (2–4, radio for the correct one, per-option
+`feedback`), `recap` (2–5 lines). `studioScenes(draft)` (`src/lib/content/studio.ts`) builds the
+scenes; `studioDraft(scenes, subtitle)` reads them back for the form.
 
-**What cannot be edited**: there is no edit action for an existing studio module or its scenes;
-only `setModuleStatusAction(id, "published" | "draft")` and `deleteModuleAction(id)` exist
-(`src/server/actions/secops.ts`). Library modules are not editable at all from the UI. Rich scene
-types (simulation, hotspot, swipe, …) are only authorable as JSON files in `content/library`, or
-arrive generated or copied through an AI-trainer draft (§3.3).
+**Scene ids are fixed** (`intro`, `steps`, `swipe`, `hotspot`, `check`, `recap`; items `b1…`,
+`c1…`, `s1…`, `o1…` by position), so an edited lesson keeps the ids its `answers` and progress rows
+point to.
+
+**Editing**: a one-lesson module the form wrote (its source scenes read back with `studioDraft`)
+gets an Edit button in the Studio list that prefills the form. `updateStudioLessonAction(id, input)`
+(`ownModule()` + `studioScenes`) rewrites modules/lessons title, subtitle and settings, deletes
+every `lesson_contents` row and inserts the source row again, audits `module.updated`; a published
+module stays published and is translated again at once. AI-trainer modules (other scene ids) are
+refused. Library modules are not editable from the UI. Other rich scene types (simulation, …) are
+only authorable as JSON files in `content/library`, or arrive through an AI-trainer draft (§3.3).
+
+**Translations on publish**: `setModuleStatusAction(id, "published")` (and an edit of a published
+module) runs `translateModule`: for every language in `settings.locales` a lesson has no row in, it
+calls `translateScenes()` (`src/server/ai.ts`: one streamed tool-use call per language and lesson,
+`validTranslation` + `localeParityErrors`, outer whitespace of every span kept from the source,
+2-minute timeout) and inserts the row, and merges the translated module title/subtitle and
+`lessons.title`. The **source language is the lesson's oldest `lesson_contents` row** (every writer
+inserts the source before any translation; an edit deletes and reinserts it), never the keys of
+`lessons.title`. Gated on `aiEnabled()` and a per-organisation daily cap
+(`ai-translate-day:t:<tenant>`, 200); without a key the module publishes in its source language and
+the toast says so (`secops.studio.sourceOnly`); failed languages are listed (`untranslated`). The
+call runs inside the server action (no job queue); the UI shows `secops.studio.translating` meanwhile.
 
 `saveStudioLessonAction` (`src/server/actions/secops.ts`):
 
@@ -305,19 +328,15 @@ await db().insert(t.modules).values({ tenantId: v.tenant.id, slug, category: d.c
   xp: 40 + d.minutes * 5, difficulty: d.difficulty, origin: d.ai ? "ai" : "custom",
   status: "draft", sortOrder: 1000, createdBy: v.user.id });
 await db().insert(t.lessons).values({ moduleId: mod.id, key: "lesson-1", title: label, minutes: d.minutes, position: 1 });
-const scenes = [
-  { type: "intro", id: "intro", title: d.title, body: d.intro, mood: "talk" },
-  { type: "tutor", id: "steps", beats: d.points.map((say, i) => ({ id: `b${i + 1}`, say, mood: moods[i % moods.length] })) },
-  { type: "choice", id: "check", question: { prompt, options: […{ id: `o${i + 1}`, label, correct, feedback }] } },
-  { type: "recap", id: "recap", points: d.recap, mood: "celebrate" },
-];
+const scenes = studioScenes(d); // null (→ "invalid") unless one correct option, a threat card, every target placed
 await db().insert(t.lessonContents).values({ lessonId: lesson.id, locale: d.locale, scenes });
 await audit(db(), { …, action: "module.created", targetType: "module", targetId: mod.id, meta: { title, origin } });
 ```
 
 Always saved as `status: "draft"`; XP = `40 + minutes × 5`; audience always `everyone`; preview
 link `/learn/<slug>/lesson-1` works for `studio.write` viewers (drafts are included in their
-catalog and the tutor API). Publishing audits `module.published`. Deleting is refused with
+catalog and the tutor API). Publishing audits `module.published` (meta carries `translated` /
+`untranslated` / `offline`). Deleting is refused with
 `error: "in_use"` when any `certificates`, `attestations`, `module_progress`, open
 `behavior_risks` or `incidents.training_module_id` reference the module ("unpublish instead");
 `modules.id` cascades to `lessons`/`lesson_contents` and `assignments.module_id` (cascade) but is
@@ -911,14 +930,16 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
 - **Lesson languages:** all 106 library lessons ship in the ten UI languages (one `lesson_contents`
   row per language), but every translation was made from English in this rebuild by agents, not
   taken from the original (OPEN-QUESTIONS items 6 and 7; a native speaker's final read before release
-  is still recommended, ADR-026). Studio lessons and AI-trainer drafts still have one language each
-  (lesson-engine.md §7).
+  is still recommended, ADR-026). Studio lessons and AI-trainer drafts are written in one language
+  and machine-translated on publish into the organisation's other languages when an AI key is set
+  (§3.2); without a key they stay single-language (lesson-engine.md §7).
 - **PDF:** certificates and the compliance pack are browser-print pages (ADR-006,
   OPEN-QUESTIONS item 15); scheduled report mails carry a sign-in link, not an attachment.
 - **Studio depth:** the original Studio is not in the audit (the rebuild added it). Today the
-  Studio form authors one single-locale, four-scene micro-lesson per module, and the AI trainer
-  (§3.3) saves 1–3 single-locale lessons per draft (generated, or copied from a library module);
-  there is no editing after save, no versions/revision history and no hand authoring of rich scene
+  Studio form authors one micro-lesson per module (intro, tutor, optional swipe and hotspot,
+  choice, recap), editable after save with stable scene ids, and the AI trainer (§3.3) saves 1–3
+  lessons per draft (generated, or copied from a library module); both are translated on publish
+  (§3.2). There are no versions/revision history and no hand authoring of the other rich scene
   types; publishing is a `draft | published` flag. Library modules cannot be customised per tenant
   through the UI.
 - **Materials with `origin: "ai"`** appear only in the seed; no server code generates AI

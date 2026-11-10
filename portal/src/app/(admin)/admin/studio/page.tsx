@@ -57,21 +57,21 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
     : [];
   const firstLesson = new Map<string, string>();
   for (const l of lessons) if (!firstLesson.has(l.moduleId)) firstLesson.set(l.moduleId, l.key);
-  // A one-lesson module the Studio form wrote can be edited in that form, from its own language (the key of lessons.title).
+  // A one-lesson module the Studio form wrote can be edited in that form, from its own language: its oldest text (translations come after it).
   const single = lessons.filter((l) => lessons.filter((x) => x.moduleId === l.moduleId).length === 1);
   const sources = single.length
     ? await db()
         .select({ lessonId: t.lessonContents.lessonId, locale: t.lessonContents.locale, scenes: t.lessonContents.scenes })
         .from(t.lessonContents)
         .where(inArray(t.lessonContents.lessonId, single.map((l) => l.id)))
+        .orderBy(asc(t.lessonContents.updatedAt))
     : [];
   const editable = new Map<string, StudioLessonInitial>();
   for (const l of single) {
     const m = own.find((x) => x.id === l.moduleId)!;
-    const locale = Object.keys(l.title)[0];
-    const row = sources.find((r) => r.lessonId === l.id && r.locale === locale);
-    const draft = row ? studioDraft(row.scenes as Scene[], m.subtitle[locale] ?? "") : null;
-    if (draft) editable.set(m.id, { ...draft, locale, category: m.category, difficulty: m.difficulty, minutes: m.minutes });
+    const row = sources.find((r) => r.lessonId === l.id);
+    const draft = row ? studioDraft(row.scenes as Scene[], m.subtitle[row.locale] ?? "") : null;
+    if (draft && row) editable.set(m.id, { ...draft, locale: row.locale, category: m.category, difficulty: m.difficulty, minutes: m.minutes });
   }
   const categories = CATEGORIES.map((c) => ({ id: c, label: tc(`categories.${c}`) }));
 
@@ -114,7 +114,7 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
                       </div>
                       <Pill tone={m.origin === "ai" ? "violet" : "brand"}>{tr(`origin.${m.origin as "custom"}`)}</Pill>
                       <Pill tone={m.status === "published" ? "safe" : "neutral"}>{tr(`status.${m.status}`)}</Pill>
-                      {initial ? <StudioLessonForm locales={v.tenant.settings.locales} defaultLocale={locale} categories={categories} aiOn={aiEnabled()} edit={{ id: m.id, initial }} /> : null}
+                      {initial ? <StudioLessonForm locales={v.tenant.settings.locales} defaultLocale={locale} categories={categories} aiOn={aiEnabled()} edit={{ id: m.id, initial, published: m.status === "published" }} /> : null}
                       <ModuleRowActions id={m.id} status={m.status} previewHref={first ? `/learn/${m.slug}/${first}` : null} />
                     </CardBody>
                   </Card>

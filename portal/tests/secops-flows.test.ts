@@ -5,7 +5,7 @@ import { featuresFor, withDefaults } from "../src/lib/tenant-defaults";
 import type { Scene } from "../src/lib/content/types";
 import { lessonFileSchema, lessonIntegrityErrors } from "../src/lib/content/validate";
 import { localeParityErrors } from "../src/lib/content/locale-parity";
-import { studioDraft } from "../src/lib/content/studio";
+import { markTargets, studioDraft } from "../src/lib/content/studio";
 import { schemaCheck } from "../src/server/ai-verify";
 import { TEMPLATE_BY_KEY } from "../src/lib/campaigns/templates";
 import { riskTitle } from "../src/lib/risk-title";
@@ -503,6 +503,10 @@ describe("Studio lessons", () => {
     expect(localeParityErrors(en, ru)).toEqual([]);
     expect(ids(ru)).toBe(ids(en));
     expect(ru[3]).toMatchObject({ artifact: { from: { address: HOTSPOT.from } }, spots: [{ id: "s1", label: "ru: Pressure" }, { id: "s2" }] });
+    // The spaces between spans are the source's: the player joins spans with nothing between them.
+    expect((ru[3] as { artifact: { body: { text: string }[][] } }).artifact.body[1].map((x) => x.text)).toEqual(["ru: Verify ", "ru: within 1 hour", " ru: at ", "ru: pay-portal.example/login", " ru: or lose access."]);
+    // The lesson heading the player and syllabus show is translated with the module.
+    expect(after.lesson.title).toEqual({ en: LESSON.title, ru: `ru: ${LESSON.title}` });
 
     ai.fail = "";
     ai.calls = [];
@@ -510,5 +514,32 @@ describe("Studio lessons", () => {
     expect(await setModuleStatusAction(mod.id, "published")).toEqual({ ok: true, translated: ["az"] });
     expect(ai.calls).toEqual(["az"]);
     expect((await lessonOf(tenant.id, slug!)).locales).toEqual(["az", "en", "ru"]);
+  });
+
+  it("translates from the language the lesson was written in, whatever keys its translated title has", async () => {
+    const tenant = await studio(["ru", "az", "en"]);
+    ai.key = "test-key";
+    ai.fail = "en";
+    const { slug } = await saveStudioLessonAction({ ...LESSON, locale: "ru" });
+    const { mod } = await lessonOf(tenant.id, slug!);
+    expect(await setModuleStatusAction(mod.id, "published")).toEqual({ ok: true, translated: ["az"], untranslated: ["en"] });
+    // The title now has an "az" key ahead of the source's "ru"; the English text is still made from the Russian one.
+    ai.fail = "";
+    await setModuleStatusAction(mod.id, "draft");
+    expect(await setModuleStatusAction(mod.id, "published")).toEqual({ ok: true, translated: ["en"] });
+    const after = await lessonOf(tenant.id, slug!);
+    expect(after.scenes("en")![0]).toMatchObject({ title: `en: ${LESSON.title}` });
+    expect(after.lesson.title).toEqual({ ru: LESSON.title, az: `az: ${LESSON.title}`, en: `en: ${LESSON.title}` });
+    // Editing again starts from the Russian source too, and the form's check is the server's.
+    expect(await updateStudioLessonAction(mod.id, { ...LESSON, locale: "ru", title: "Курьер" })).toEqual({ ok: true, translated: ["az", "en"] });
+    expect((await lessonOf(tenant.id, slug!)).lesson.title).toEqual({ ru: "Курьер", az: "az: Курьер", en: "en: Курьер" });
+  });
+
+  it("places hotspot signs by one rule for the form and the server: on one line, without overlap", () => {
+    const body = "Verify within 1 hour\nat pay-portal.example/login";
+    expect(markTargets(body, [{ text: "within 1 hour" }, { text: "pay-portal.example/login" }])).not.toBeNull();
+    expect(markTargets(body, [{ text: "1 hour\nat" }])).toBeNull();
+    expect(markTargets(body, [{ text: "pay-portal.example" }, { text: "pay-portal.example/login" }])).toBeNull();
+    expect(markTargets(body, [{ text: "within" }, { text: "within" }])).toBeNull();
   });
 });

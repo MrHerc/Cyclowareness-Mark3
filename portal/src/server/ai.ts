@@ -271,7 +271,7 @@ export function anthropicTrainingModel(uiLocale = "en"): TrainingModel {
 
 /* ───────── studio translations (on publish) ───────── */
 
-export type ModuleText = { title: string; subtitle: string; scenes: unknown[] };
+export type ModuleText = { title: string; subtitle: string; lesson: string; scenes: unknown[] };
 
 /** Every learner-facing string (the keys the lesson locale parity check lets a translation change), mapped through `f`. */
 function mapText(node: unknown, f: (s: string) => string, key = ""): unknown {
@@ -284,8 +284,12 @@ function mapText(node: unknown, f: (s: string) => string, key = ""): unknown {
 const mapModule = (m: ModuleText, f: (s: string) => string): ModuleText => ({
   title: mapText(m.title, f, "title") as string,
   subtitle: mapText(m.subtitle, f, "title") as string,
+  lesson: mapText(m.lesson, f, "title") as string,
   scenes: mapText(m.scenes, f) as unknown[],
 });
+
+/** A language the model has not answered by then is reported as untranslated, so a publish does not hang on it. */
+const TRANSLATION_TIMEOUT_MS = 120_000;
 
 const TRANSLATION_TOOL = {
   name: "save_translation",
@@ -300,7 +304,7 @@ const TRANSLATION_TOOL = {
 } satisfies Anthropic.Tool;
 
 /**
- * A studio module's title, subtitle and lesson scenes in another language, with one model call: ids, answers,
+ * A studio module's title, subtitle, lesson title and lesson scenes in another language, with one model call: ids, answers,
  * hotspot marks and addresses stay as they are (the parity rule of the library's translations). Null without
  * an API key or when the answer is unusable.
  */
@@ -308,7 +312,7 @@ export async function translateScenes(source: ModuleText, from: string, to: stri
   if (!env.ANTHROPIC_API_KEY) return null;
   client ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   const found: string[] = [];
-  mapModule(source, (s) => (found.push(s), s));
+  mapModule(source, (s) => (found.push(s.trim()), s));
   const lines = [...new Set(found)];
   // Streamed, as the subtitles: a long lesson in a script that takes many tokens can outlast a non-streaming request.
   const message = await client.messages
@@ -329,13 +333,14 @@ export async function translateScenes(source: ModuleText, from: string, to: stri
       tool_choice: { type: "auto" },
       output_config: { effort: "low" },
       messages: [{ role: "user", content: `Translate these ${lines.length} lines (a JSON array):\n${JSON.stringify(lines)}` }],
-    })
+    }, { signal: AbortSignal.timeout(TRANSLATION_TIMEOUT_MS) })
     .finalMessage();
   if (message.stop_reason !== "tool_use") return null;
   const block = message.content.find((b) => b.type === "tool_use");
   const parsed = z.object({ lines: z.array(z.string()) }).safeParse(block?.type === "tool_use" ? block.input : null);
   if (!parsed.success || !validTranslation(lines, parsed.data.lines)) return null;
   const of = new Map(lines.map((line, i) => [line, parsed.data.lines[i].trim()]));
-  const translated = mapModule(source, (s) => of.get(s) ?? s);
+  // Spans are joined with no separator, so the spaces around a span are the source's, never the model's.
+  const translated = mapModule(source, (s) => s.match(/^\s*/)![0] + (of.get(s.trim()) ?? s.trim()) + s.match(/\s*$/)![0]);
   return localeParityErrors(source.scenes, translated.scenes).length ? null : translated;
 }

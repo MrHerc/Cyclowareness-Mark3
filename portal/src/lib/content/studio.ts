@@ -8,8 +8,11 @@ import { plain, type EmailArtifact, type Scene, type SmsArtifact, type Span } fr
 
 const MOODS = ["talk", "think", "alert", "talk", "happy", "talk", "think", "talk"] as const;
 
-/** The body's paragraphs as spans, each target marked (`s1`, `s2`, …) where its text first appears. Null when a target is not in the text. */
-function markTargets(body: string, targets: readonly { text: string }[]): Span[][] | null {
+/**
+ * The body's paragraphs as spans, each target marked (`s1`, `s2`, …) where its text first appears within one line,
+ * without overlapping another. Null when a target cannot be placed so; the Studio form checks with it too.
+ */
+export function markTargets(body: string, targets: readonly { text: string }[]): Span[][] | null {
   const placed = new Set<number>();
   const paragraphs = body
     .split(/\r?\n/)

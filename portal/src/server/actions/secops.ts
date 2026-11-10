@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
@@ -525,9 +525,9 @@ export async function updateStudioLessonAction(id: string, input: z.infer<typeof
   const d = p.data;
   const scenes = studioScenes(d);
   const lessons = await db().select({ id: t.lessons.id }).from(t.lessons).where(eq(t.lessons.moduleId, m.id));
-  const rows = lessons.length === 1 ? await db().select({ scenes: t.lessonContents.scenes }).from(t.lessonContents).where(eq(t.lessonContents.lessonId, lessons[0].id)) : [];
+  const [source] = lessons.length === 1 ? await db().select({ scenes: t.lessonContents.scenes }).from(t.lessonContents).where(eq(t.lessonContents.lessonId, lessons[0].id)).orderBy(asc(t.lessonContents.updatedAt)).limit(1) : [];
   // Only a lesson the Studio form wrote: an AI training's scenes have other ids.
-  if (!scenes || !rows.some((r) => studioDraft(r.scenes as Scene[], ""))) return { ok: false, error: "invalid" };
+  if (!scenes || !source || !studioDraft(source.scenes as Scene[], "")) return { ok: false, error: "invalid" };
   const label = { [d.locale]: d.title };
   await db().transaction(async (tx) => {
     await tx.update(t.modules).set({ title: label, subtitle: { [d.locale]: d.subtitle }, category: d.category, minutes: d.minutes, xp: 40 + d.minutes * 5, difficulty: d.difficulty }).where(eq(t.modules.id, m.id));
@@ -545,19 +545,18 @@ export async function updateStudioLessonAction(id: string, input: z.infer<typeof
 type Translation = { translated?: string[]; untranslated?: string[]; offline?: boolean };
 
 /**
- * Translates each lesson of an own module into every language of the organisation it has no text in, from the
- * lesson's own language (the one key of lessons.title, which translations leave alone). Learners of a language
- * left out keep getting the source text, as before.
+ * Translates each lesson of an own module (scenes, lesson title, module title and subtitle) into every language of
+ * the organisation it has no text in, from the lesson's own language: that of its oldest text, since every writer
+ * inserts the source before any translation. Learners of a language left out keep getting the source text.
  */
 async function translateModule(v: Viewer, moduleId: string): Promise<Translation> {
   const [m] = await db().select({ title: t.modules.title, subtitle: t.modules.subtitle }).from(t.modules).where(eq(t.modules.id, moduleId));
   const lessons = await db().select({ id: t.lessons.id, title: t.lessons.title }).from(t.lessons).where(eq(t.lessons.moduleId, moduleId));
-  const rows = lessons.length ? await db().select().from(t.lessonContents).where(inArray(t.lessonContents.lessonId, lessons.map((l) => l.id))) : [];
+  const rows = lessons.length ? await db().select().from(t.lessonContents).where(inArray(t.lessonContents.lessonId, lessons.map((l) => l.id))).orderBy(asc(t.lessonContents.updatedAt)) : [];
   const jobs = v.tenant.settings.locales.flatMap((locale) =>
     lessons.flatMap((l) => {
-      const from = Object.keys(l.title)[0];
-      const source = rows.find((r) => r.lessonId === l.id && r.locale === from);
-      return source && !rows.some((r) => r.lessonId === l.id && r.locale === locale) ? [{ locale, lessonId: l.id, from, scenes: source.scenes }] : [];
+      const source = rows.find((r) => r.lessonId === l.id);
+      return source && !rows.some((r) => r.lessonId === l.id && r.locale === locale) ? [{ locale, lessonId: l.id, from: source.locale, lesson: pick(l.title, source.locale), scenes: source.scenes }] : [];
     }),
   );
   if (!jobs.length) return {};
@@ -567,7 +566,7 @@ async function translateModule(v: Viewer, moduleId: string): Promise<Translation
     jobs.map(async (j) => {
       // The model budget is the operator's: a day's cap per organisation, as for the drafts.
       if (!(await rateLimit(`ai-translate-day:t:${v.tenant.id}`, 200, 24 * 60 * 60_000)).ok) return null;
-      const out = await translateScenes({ title: pick(m.title, j.from), subtitle: pick(m.subtitle, j.from), scenes: j.scenes }, j.from, j.locale).catch((e: unknown) => {
+      const out = await translateScenes({ title: pick(m.title, j.from), subtitle: pick(m.subtitle, j.from), lesson: j.lesson, scenes: j.scenes }, j.from, j.locale).catch((e: unknown) => {
         log.warn(`[studio] translation into ${j.locale} failed: ${e instanceof Error ? e.name : "error"}`);
         return null;
       });
@@ -577,12 +576,15 @@ async function translateModule(v: Viewer, moduleId: string): Promise<Translation
   );
   const title = { ...m.title };
   const subtitle = { ...m.subtitle };
+  const lessonTitles = new Map(lessons.map((l) => [l.id, { ...l.title }]));
   done.forEach((out, i) => {
     if (!out) return;
     title[jobs[i].locale] = out.title;
     subtitle[jobs[i].locale] = out.subtitle;
+    lessonTitles.get(jobs[i].lessonId)![jobs[i].locale] = out.lesson;
   });
   await db().update(t.modules).set({ title, subtitle }).where(eq(t.modules.id, moduleId));
+  for (const [id, title] of lessonTitles) await db().update(t.lessons).set({ title }).where(eq(t.lessons.id, id));
   const failed = languages(jobs.filter((_, i) => !done[i]));
   return { translated: languages(jobs).filter((l) => !failed.includes(l)), ...(failed.length ? { untranslated: failed } : {}) };
 }

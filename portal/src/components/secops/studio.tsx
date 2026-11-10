@@ -15,6 +15,7 @@ import {
   updateStudioLessonAction,
 } from "@/server/actions/secops";
 import type { LessonDraft } from "@/server/ai";
+import { markTargets } from "@/lib/content/studio";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/components/ui/field";
@@ -65,7 +66,7 @@ export function StudioLessonForm({
   defaultLocale: string;
   categories: Option[];
   aiOn: boolean;
-  edit?: { id: string; initial: StudioLessonInitial };
+  edit?: { id: string; initial: StudioLessonInitial; published: boolean };
 }) {
   const t = useTranslations("secops.studio");
   const tc = useTranslations("common");
@@ -122,7 +123,7 @@ export function StudioLessonForm({
     f.hotspot.subject.trim() !== "" &&
     f.hotspot.body.trim().length >= 10 &&
     targets.length >= 1 &&
-    targets.every((x) => f.hotspot.body.includes(x.text.trim()));
+    markTargets(f.hotspot.body.trim(), targets.map((x) => ({ text: x.text.trim() }))) !== null;
   const valid =
     f.title.trim().length >= 3 &&
     f.intro.trim().length >= 10 &&
@@ -188,6 +189,12 @@ export function StudioLessonForm({
   const setCard = (i: number, patch: Partial<Card>) => setF({ ...f, swipe: { ...f.swipe, cards: f.swipe.cards.map((c, j) => (j === i ? { ...c, ...patch } : c)) } });
   const setTarget = (i: number, patch: Partial<Target>) => setF({ ...f, hotspot: { ...f.hotspot, targets: f.hotspot.targets.map((x, j) => (j === i ? { ...x, ...patch } : x)) } });
   const title = edit ? t("editLesson") : t("newLesson");
+  // Unsaved changes of an edit are dropped on close: reopening shows the saved lesson.
+  const close = () => {
+    setOpen(false);
+    if (edit) setF(initial);
+  };
+  const signs = f.hotspot.targets.map((x) => x.text.trim());
 
   return (
     <>
@@ -202,12 +209,15 @@ export function StudioLessonForm({
       )}
       <Dialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={close}
         title={title}
         size="xl"
         footer={
           <>
-            <Button variant="ghost" onClick={() => setOpen(false)}>
+            <span role="status" className="me-auto text-caption text-ink-muted">
+              {pending && edit?.published ? t("translating") : null}
+            </span>
+            <Button variant="ghost" onClick={close}>
               {tc("cancel")}
             </Button>
             <Button onClick={save} disabled={pending || !valid}>
@@ -310,7 +320,8 @@ export function StudioLessonForm({
                   <Textarea id="st-mail-body" {...content} value={f.hotspot.body} onChange={(e) => setF({ ...f, hotspot: { ...f.hotspot, body: e.target.value } })} maxLength={2000} className="min-h-32" />
                 </Field>
                 {f.hotspot.targets.map((x, i) => {
-                  const missing = x.text.trim() !== "" && !f.hotspot.body.includes(x.text.trim());
+                  // This sign cannot be placed after the ones above it: not on one line of the body, or overlapping another.
+                  const missing = signs[i] !== "" && !markTargets(f.hotspot.body.trim(), signs.slice(0, i + 1).filter(Boolean).map((text) => ({ text })));
                   return (
                     <div key={i} className="grid gap-2 rounded-lg bg-sunken p-3 sm:grid-cols-2">
                       <Input
@@ -365,6 +376,7 @@ export function ModuleRowActions({ id, status, previewHref }: { id: string; stat
   const t = useTranslations("secops.studio");
   const tc = useTranslations("common");
   const [pending, start] = useTransition();
+  const [publishing, startPublish] = useTransition();
   const [confirm, setConfirm] = useState(false);
   return (
     <div className="flex flex-wrap gap-2">
@@ -377,9 +389,9 @@ export function ModuleRowActions({ id, status, previewHref }: { id: string; stat
         size="sm"
         variant={status === "draft" ? "primary" : "secondary"}
         icon={status === "draft" ? <Upload /> : undefined}
-        disabled={pending}
+        disabled={publishing}
         onClick={() =>
-          start(async () => {
+          startPublish(async () => {
             const res = await setModuleStatusAction(id, status === "draft" ? "published" : "draft");
             if (res.ok) translationToast(t, res, status === "draft" ? t("published") : t("unpublished"));
           })
@@ -387,6 +399,9 @@ export function ModuleRowActions({ id, status, previewHref }: { id: string; stat
       >
         {status === "draft" ? t("publish") : t("unpublish")}
       </Button>
+      <span role="status" className="self-center text-caption text-ink-muted">
+        {publishing && status === "draft" ? t("translating") : null}
+      </span>
       <Button size="icon-sm" variant="ghost" aria-label={t("delete")} onClick={() => setConfirm(true)}>
         <Trash2 />
       </Button>
