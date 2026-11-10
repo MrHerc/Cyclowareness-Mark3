@@ -115,6 +115,7 @@ export const AUDIT_ACTIONS = [
   "intel.dismissed",
   "module.created",
   "module.published",
+  "module.updated",
   "module.deleted",
   "module.exported",
   "path.created",

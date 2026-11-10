@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
@@ -12,8 +12,11 @@ import { insertNumbered } from "../services/threats";
 import { analyzeUrl } from "../sandbox/analyze";
 import { emitEvent } from "../services/events";
 import { departmentClosure } from "../services/assignments";
-import { aiEnabled, draftLesson, lessonDraftSchema, type LessonDraft } from "../ai";
+import { aiEnabled, draftLesson, lessonDraftSchema, translateScenes, type LessonDraft } from "../ai";
+import { log } from "../log";
+import { sameJson, studioDraft, studioScenes } from "../../lib/content/studio";
 import { lessonFileSchema } from "../../lib/content/validate";
+import type { Scene } from "../../lib/content/types";
 import { rateLimit } from "../rate-limit";
 import { isLocale, LOCALES, pick } from "../../i18n/config";
 import { AUDIENCES, CATEGORIES } from "../../lib/domain/catalog";
@@ -484,28 +487,21 @@ function slugify(s: string): string {
   return base || "lesson";
 }
 
-/** Saves a studio lesson as a draft module with one lesson (intro, tutor steps, question, recap). */
+/** Saves a studio lesson as a draft module with one lesson (intro, tutor steps, optional swipe and hotspot, question, recap). */
+/** A Studio draft's scenes, written in the library's lesson format and checked by the schema the player's content passes; null when either check fails. */
+function checkedScenes(d: z.infer<typeof lessonSchema>): Scene[] | null {
+  const built = studioScenes(d);
+  const file = built && lessonFileSchema.safeParse({ formatVersion: 1, id: "lesson-1", title: d.title, minutes: d.minutes, scenes: built });
+  return file?.success ? (file.data.scenes as Scene[]) : null;
+}
+
 export async function saveStudioLessonAction(input: z.infer<typeof lessonSchema>): Promise<Result & { slug?: string }> {
   const v = await actionViewer("studio.write");
   const p = lessonSchema.safeParse(input);
   if (!p.success) return { ok: false, error: "invalid" };
   const d = p.data;
-  if (d.question.options.filter((o) => o.correct).length !== 1) return { ok: false, error: "invalid" };
-  const moods = ["talk", "think", "alert", "talk", "happy", "talk", "think", "talk"] as const;
-  // Written in the library's lesson format and checked by the same schema the player's content passes.
-  const lessonFile = lessonFileSchema.safeParse({
-    formatVersion: 1,
-    id: "lesson-1",
-    title: d.title,
-    minutes: d.minutes,
-    scenes: [
-      { type: "intro", id: "intro", title: d.title, body: d.intro, mood: "talk" },
-      { type: "tutor", id: "steps", beats: d.points.map((say, i) => ({ id: `b${i + 1}`, say, mood: moods[i % moods.length] })) },
-      { type: "choice", id: "check", question: { prompt: d.question.prompt, options: d.question.options.map((o, i) => ({ id: `o${i + 1}`, label: o.label, correct: o.correct, feedback: o.feedback })) } },
-      { type: "recap", id: "recap", points: d.recap, mood: "celebrate" },
-    ],
-  });
-  if (!lessonFile.success) return { ok: false, error: "invalid" };
+  const scenes = checkedScenes(d);
+  if (!scenes) return { ok: false, error: "invalid" };
   const slug = `own-${slugify(d.title)}-${Date.now().toString(36).slice(-4)}`;
   const label = { [d.locale]: d.title };
   const [mod] = await db()
@@ -513,7 +509,7 @@ export async function saveStudioLessonAction(input: z.infer<typeof lessonSchema>
     .values({ tenantId: v.tenant.id, slug, category: d.category, audiences: [AUDIENCES[0]], title: label, subtitle: { [d.locale]: d.subtitle }, minutes: d.minutes, xp: 40 + d.minutes * 5, difficulty: d.difficulty, origin: d.ai ? "ai" : "custom", status: "draft", sortOrder: 1000, createdBy: v.user.id })
     .returning({ id: t.modules.id });
   const [lesson] = await db().insert(t.lessons).values({ moduleId: mod.id, key: "lesson-1", title: label, minutes: d.minutes, position: 1 }).returning({ id: t.lessons.id });
-  await db().insert(t.lessonContents).values({ lessonId: lesson.id, locale: d.locale, scenes: lessonFile.data.scenes });
+  await db().insert(t.lessonContents).values({ lessonId: lesson.id, locale: d.locale, scenes });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "module.created", targetType: "module", targetId: mod.id, meta: { title: d.title, origin: d.ai ? "ai" : "custom" } });
   refresh();
   return { ok: true, slug };
@@ -525,14 +521,102 @@ async function ownModule(v: Viewer, id: string) {
   return m ?? null;
 }
 
-export async function setModuleStatusAction(id: string, status: "published" | "draft"): Promise<Result> {
+/**
+ * Rewrites a studio lesson in place. Its scene ids stay the same, so answers and progress stay valid; when its text
+ * changed, the old translations are dropped, and a published module, which stays published, is translated again at once.
+ */
+export async function updateStudioLessonAction(id: string, input: z.infer<typeof lessonSchema>): Promise<Result & Translation> {
+  const v = await actionViewer("studio.write");
+  const m = await ownModule(v, id);
+  const p = lessonSchema.safeParse(input);
+  if (!m || !p.success) return { ok: false, error: "invalid" };
+  const d = p.data;
+  const scenes = checkedScenes(d);
+  const lessons = await db().select({ id: t.lessons.id }).from(t.lessons).where(eq(t.lessons.moduleId, m.id));
+  const [source] = lessons.length === 1 ? await db().select({ locale: t.lessonContents.locale, scenes: t.lessonContents.scenes }).from(t.lessonContents).where(eq(t.lessonContents.lessonId, lessons[0].id)).orderBy(asc(t.lessonContents.updatedAt)).limit(1) : [];
+  // Only a lesson the Studio form wrote: an AI training's scenes have other ids.
+  if (!scenes || !source || !studioDraft(source.scenes as Scene[], "")) return { ok: false, error: "invalid" };
+  const label = { [d.locale]: d.title };
+  // Only the settings changed: the translations still match the text, and dropping them would cost model calls or, without a key, lose them.
+  const sameText = source.locale === d.locale && m.title[d.locale] === d.title && m.subtitle[d.locale] === d.subtitle && sameJson(scenes, source.scenes);
+  await db().transaction(async (tx) => {
+    await tx.update(t.modules).set({ ...(sameText ? {} : { title: label, subtitle: { [d.locale]: d.subtitle } }), category: d.category, minutes: d.minutes, xp: 40 + d.minutes * 5, difficulty: d.difficulty }).where(eq(t.modules.id, m.id));
+    await tx.update(t.lessons).set({ ...(sameText ? {} : { title: label }), minutes: d.minutes }).where(eq(t.lessons.id, lessons[0].id));
+    if (sameText) return;
+    await tx.delete(t.lessonContents).where(eq(t.lessonContents.lessonId, lessons[0].id));
+    await tx.insert(t.lessonContents).values({ lessonId: lessons[0].id, locale: d.locale, scenes });
+  });
+  const translation = m.status === "published" ? await translateModule(v, m.id) : {};
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "module.updated", targetType: "module", targetId: m.id, meta: { title: d.title, ...translation } });
+  refresh();
+  return { ok: true, ...translation };
+}
+
+/** Languages a module was translated into, or left in its own language in (`offline`: no AI key). */
+type Translation = { translated?: string[]; untranslated?: string[]; offline?: boolean };
+
+/**
+ * Translates each lesson of an own module (scenes, lesson title, module title and subtitle) into every language of
+ * the organisation it has no text in, from the lesson's own language: that of its oldest text, since every writer
+ * inserts the source before any translation. Learners of a language left out keep getting the source text.
+ */
+async function translateModule(v: Viewer, moduleId: string): Promise<Translation> {
+  const [m] = await db().select({ title: t.modules.title, subtitle: t.modules.subtitle }).from(t.modules).where(eq(t.modules.id, moduleId));
+  const lessons = await db().select({ id: t.lessons.id, title: t.lessons.title }).from(t.lessons).where(eq(t.lessons.moduleId, moduleId));
+  const rows = lessons.length ? await db().select().from(t.lessonContents).where(inArray(t.lessonContents.lessonId, lessons.map((l) => l.id))).orderBy(asc(t.lessonContents.updatedAt)) : [];
+  const jobs = v.tenant.settings.locales.flatMap((locale) =>
+    lessons.flatMap((l) => {
+      const source = rows.find((r) => r.lessonId === l.id);
+      return source && !rows.some((r) => r.lessonId === l.id && r.locale === locale) ? [{ locale, lessonId: l.id, from: source.locale, lesson: pick(l.title, source.locale), scenes: source.scenes }] : [];
+    }),
+  );
+  if (!jobs.length) return {};
+  const languages = (list: typeof jobs) => [...new Set(list.map((j) => j.locale))];
+  if (!aiEnabled()) return { offline: true, untranslated: languages(jobs) };
+  const done = await Promise.all(
+    jobs.map(async (j) => {
+      // The model budget is the operator's: a day's cap per organisation, as for the drafts.
+      if (!(await rateLimit(`ai-translate-day:t:${v.tenant.id}`, 200, 24 * 60 * 60_000)).ok) return null;
+      // A failed insert (the module deleted meanwhile) counts as untranslated, like a failed call.
+      return translateScenes({ title: pick(m.title, j.from), subtitle: pick(m.subtitle, j.from), lesson: j.lesson, scenes: j.scenes }, j.from, j.locale)
+        .then(async (out) => {
+          if (out) await db().insert(t.lessonContents).values({ lessonId: j.lessonId, locale: j.locale, scenes: out.scenes }).onConflictDoNothing();
+          return out;
+        })
+        .catch((e: unknown) => {
+          log.warn(`[studio] translation into ${j.locale} failed: ${e instanceof Error ? e.name : "error"}`);
+          return null;
+        });
+    }),
+  );
+  const title = { ...m.title };
+  const subtitle = { ...m.subtitle };
+  const lessonTitles = new Map(lessons.map((l) => [l.id, { ...l.title }]));
+  done.forEach((out, i) => {
+    if (!out) return;
+    title[jobs[i].locale] = out.title;
+    subtitle[jobs[i].locale] = out.subtitle;
+    lessonTitles.get(jobs[i].lessonId)![jobs[i].locale] = out.lesson;
+  });
+  await db().update(t.modules).set({ title, subtitle }).where(eq(t.modules.id, moduleId));
+  for (const [id, title] of lessonTitles) await db().update(t.lessons).set({ title }).where(eq(t.lessons.id, id));
+  const failed = languages(jobs.filter((_, i) => !done[i]));
+  return { translated: languages(jobs).filter((l) => !failed.includes(l)), ...(failed.length ? { untranslated: failed } : {}) };
+}
+
+export async function setModuleStatusAction(id: string, status: "published" | "draft"): Promise<Result & Translation> {
   const v = await actionViewer("studio.write");
   const m = await ownModule(v, id);
   if (!m || (status !== "published" && status !== "draft")) return { ok: false };
   await db().update(t.modules).set({ status }).where(eq(t.modules.id, m.id));
-  if (status === "published") await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "module.published", targetType: "module", targetId: m.id, meta: { title: pick(m.title, v.tenant.settings.defaultLocale) } });
+  if (status === "draft") {
+    refresh();
+    return { ok: true };
+  }
+  const translation = await translateModule(v, m.id);
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "module.published", targetType: "module", targetId: m.id, meta: { title: pick(m.title, v.tenant.settings.defaultLocale), ...translation } });
   refresh();
-  return { ok: true };
+  return { ok: true, ...translation };
 }
 
 /**
