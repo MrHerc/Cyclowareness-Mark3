@@ -1,7 +1,6 @@
 import "server-only";
 import { and, asc, eq, gte, ne, or, sql } from "drizzle-orm";
 import { db, t } from "../db";
-import { campaignStats } from "../services/campaigns";
 
 const DAY = 86_400_000;
 
@@ -67,7 +66,18 @@ export async function platformMetrics(now = new Date()): Promise<OrganisationMet
       .innerJoin(t.users, eq(t.users.id, t.moduleProgress.userId))
       .where(and(notOperator, eq(t.moduleProgress.status, "completed")))
       .groupBy(t.users.tenantId),
-    db().select({ id: t.campaigns.id, tenantId: t.campaigns.tenantId }).from(t.campaigns),
+    // Summed in SQL per organisation: a list of every campaign id would outgrow the 65,535 bind parameters of one statement.
+    db()
+      .select({
+        tenantId: t.campaigns.tenantId,
+        sent: sql<number>`count(${t.campaignRecipients.sentAt})`,
+        opened: sql<number>`count(${t.campaignRecipients.openedAt})`,
+        clicked: sql<number>`count(${t.campaignRecipients.clickedAt})`,
+        reported: sql<number>`count(${t.campaignRecipients.reportedAt})`,
+      })
+      .from(t.campaignRecipients)
+      .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
+      .groupBy(t.campaigns.tenantId),
     db()
       .select({ tenantId: t.certificates.tenantId, n: sql<number>`count(*)` })
       .from(t.certificates)
@@ -75,14 +85,7 @@ export async function platformMetrics(now = new Date()): Promise<OrganisationMet
       .where(and(notOperator, eq(t.certificates.evidence, "server_verified")))
       .groupBy(t.certificates.tenantId),
   ]);
-  const stats = await campaignStats(db(), campaigns.map((c) => c.id));
-  const funnel = new Map<string, { sent: number; opened: number; clicked: number; reported: number }>();
-  for (const c of campaigns) {
-    const s = stats.get(c.id);
-    if (!s) continue;
-    const f = funnel.get(c.tenantId) ?? { sent: 0, opened: 0, clicked: 0, reported: 0 };
-    funnel.set(c.tenantId, { sent: f.sent + s.sent, opened: f.opened + s.opened, clicked: f.clicked + s.clicked, reported: f.reported + s.reported });
-  }
+  const funnel = new Map(campaigns.map((r) => [r.tenantId, { sent: Number(r.sent), opened: Number(r.opened), clicked: Number(r.clicked), reported: Number(r.reported) }]));
   const lessonsBy = new Map(lessons.map((r) => [r.tenantId, r]));
   const modulesBy = new Map(modules.map((r) => [r.tenantId, Number(r.n)]));
   const certificatesBy = new Map(certificates.map((r) => [r.tenantId, Number(r.n)]));

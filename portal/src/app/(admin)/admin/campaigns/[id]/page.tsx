@@ -129,7 +129,11 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
             <CardBody className="pt-3">
               <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-body-sm">
                 <dt className="text-ink-muted">{tr("audience")}</dt>
-                <dd className="font-semibold">{c.audience === "all" ? tr("wholeOrg") : c.audience === "person" ? tr("loop.person") : (dept[0]?.name ?? "—")}</dd>
+                {/* A re-simulation's name never holds its person: they are read here, through campaigns.user_id. */}
+                <dd className="font-semibold">
+                  {c.audience === "all" ? tr("wholeOrg") : c.audience === "person" ? tr("loop.person") : (dept[0]?.name ?? "—")}
+                  {c.audience === "person" && audience[0] ? <span className="block font-normal text-ink-muted">{audience[0].name}</span> : null}
+                </dd>
                 <dt className="text-ink-muted">{tr("peopleInAudience")}</dt>
                 <dd className="font-semibold">{c.launchedAt ? recipients.length : audience.length}</dd>
                 <dt className="text-ink-muted">{tr("sendTime")}</dt>

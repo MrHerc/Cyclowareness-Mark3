@@ -4,7 +4,7 @@ import { connect as tlsConnect } from "node:tls";
 import { createSocket } from "node:dgram";
 import type { LookupAddress } from "node:dns";
 import { hostname } from "node:os";
-import { and, asc, eq, gte, inArray, isNotNull, isNull, lt, lte, ne, notInArray, or, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNotNull, isNull, like, lt, lte, ne, notInArray, or, sql } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import type { DB } from "./db/client";
@@ -26,7 +26,7 @@ import { recomputeRisk, snapshotTenant } from "./services/risk";
 import { targetTraining } from "./services/secops";
 import { teachableTick } from "./services/teachable";
 import { dayKey } from "../lib/domain/gamification";
-import { MIN_AUDIT_MONTHS, featuresFor, withDefaults } from "../lib/tenant-defaults";
+import { MIN_AUDIT_MONTHS, TEACHABLE_PREFIX, featuresFor, withDefaults } from "../lib/tenant-defaults";
 import { dayPlus, todayIn, zonedTime } from "../lib/time";
 import { zonedParts } from "../lib/baku-clock";
 import { LOCALES, isLocale, pick } from "../i18n/config";
@@ -704,9 +704,11 @@ async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number
     .from(t.modules)
     .where(and(eq(t.modules.slug, "phishing-email"), eq(t.modules.status, "published"), or(isNull(t.modules.tenantId), eq(t.modules.tenantId, tenant.id))));
   const fallback = fallbacks.find((m) => m.tenantId === tenant.id) ?? fallbacks[0];
+  // A teachable micro-lesson (already assigned after a click) is never the month's refresher: two minutes would use it up.
+  const micro = new Set((await db.select({ id: t.modules.id }).from(t.modules).where(and(eq(t.modules.tenantId, tenant.id), like(t.modules.slug, `${TEACHABLE_PREFIX}%`)))).map((m) => m.id));
   const byModule = new Map<string, string[]>();
   for (const r of candidates) {
-    const open = [...(assigned.get(r.id)?.values() ?? [])].filter((m) => !doneSet.has(`${r.id}:${m.moduleId}`)).sort((a, b) => (a.due ?? "9999").localeCompare(b.due ?? "9999"));
+    const open = [...(assigned.get(r.id)?.values() ?? [])].filter((m) => !micro.has(m.moduleId) && !doneSet.has(`${r.id}:${m.moduleId}`)).sort((a, b) => (a.due ?? "9999").localeCompare(b.due ?? "9999"));
     const moduleId = open[0]?.moduleId ?? (fallback && !doneSet.has(`${r.id}:${fallback.id}`) ? fallback.id : undefined);
     if (!moduleId) continue;
     byModule.set(moduleId, [...(byModule.get(moduleId) ?? []), r.id]);

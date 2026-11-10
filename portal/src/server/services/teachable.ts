@@ -1,6 +1,7 @@
 import { and, eq, gte, inArray, isNull, lte, ne, notExists, or } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import type { DB } from "../db/client";
+import { logFailure } from "../db/errors";
 import * as t from "../db/schema";
 import type { TenantSettings } from "../db/schema";
 import type { LessonDraft } from "../ai";
@@ -153,41 +154,46 @@ export async function teachableTick(db: DB, tenant: { id: string; settings: Tena
   for (const c of clicks) {
     const tpl = TEMPLATE_BY_KEY.get(c.templateKey);
     if (!tpl) continue;
-    // One transaction per click: the loop row is the claim later ticks skip, so it never stands without its module, lesson and assignment.
-    const created = await db.transaction(async (tx) => {
-      const mod = await microModule(tx, tenant.id, tpl, [...tenant.settings.locales, c.locale]);
-      const [loop] = await tx
-        .insert(t.teachableLoops)
-        .values({ tenantId: tenant.id, userId: c.userId, sourceCampaignId: c.campaignId, sourceRecipientId: c.recipientId, microModuleId: mod.id, assignedAt: now })
-        .onConflictDoNothing()
-        .returning({ id: t.teachableLoops.id });
-      if (!loop) return false;
-      const due = dayPlus(TEACHABLE_DAYS.lesson, tz, now);
-      const [assignment] = await tx
-        .insert(t.assignments)
-        .values({ tenantId: tenant.id, moduleId: mod.id, scope: "user", userId: c.userId, dueKind: "fixed", dueDate: due, reason: "teachable" })
-        .returning({ id: t.assignments.id });
-      // A person who already took this lesson in an earlier loop takes it again: otherwise the new assignment counts as done at once.
-      await tx
-        .update(t.moduleProgress)
-        .set({ status: "in_progress", completedAt: null })
-        .where(and(eq(t.moduleProgress.userId, c.userId), eq(t.moduleProgress.moduleId, mod.id), eq(t.moduleProgress.status, "completed")));
-      // The click's risk now asks for this lesson: finishing it closes the risk (progress.ts completeLesson).
-      await tx
-        .update(t.behaviorRisks)
-        .set({ moduleId: mod.id, dueDate: due })
-        .where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.userId, c.userId), eq(t.behaviorRisks.sourceRef, c.campaignId), eq(t.behaviorRisks.kind, "phishing_click"), eq(t.behaviorRisks.status, "open")));
-      const link = `/learn/${mod.slug}`;
-      await notifyUsers(tx, tenant.id, [c.userId], "assignment", { module: (l) => pick(mod.title, l), dueDate: due, link }, { href: link }, { defer: true });
-      await audit(tx, { tenantId: tenant.id, actorId: null, action: "assignment.created", targetType: "assignment", targetId: assignment.id, meta: { teachable: true, campaign: c.campaignId, template: tpl.key } });
-      return true;
-    });
-    if (created) started++;
+    // One click that fails must not hold up the others, the due re-simulations and the results: the next tick retries it.
+    try {
+      // One transaction per click: the loop row is the claim later ticks skip, so it never stands without its module, lesson and assignment.
+      const created = await db.transaction(async (tx) => {
+        const mod = await microModule(tx, tenant.id, tpl, [...tenant.settings.locales, c.locale]);
+        const [loop] = await tx
+          .insert(t.teachableLoops)
+          .values({ tenantId: tenant.id, userId: c.userId, sourceCampaignId: c.campaignId, sourceRecipientId: c.recipientId, microModuleId: mod.id, assignedAt: now })
+          .onConflictDoNothing()
+          .returning({ id: t.teachableLoops.id });
+        if (!loop) return false;
+        const due = dayPlus(TEACHABLE_DAYS.lesson, tz, now);
+        const [assignment] = await tx
+          .insert(t.assignments)
+          .values({ tenantId: tenant.id, moduleId: mod.id, scope: "user", userId: c.userId, dueKind: "fixed", dueDate: due, reason: "teachable" })
+          .returning({ id: t.assignments.id });
+        // A person who already took this lesson in an earlier loop takes it again: otherwise the new assignment counts as done at once.
+        await tx
+          .update(t.moduleProgress)
+          .set({ status: "in_progress", completedAt: null })
+          .where(and(eq(t.moduleProgress.userId, c.userId), eq(t.moduleProgress.moduleId, mod.id), eq(t.moduleProgress.status, "completed")));
+        // The click's risk now asks for this lesson: finishing it closes the risk (progress.ts completeLesson).
+        await tx
+          .update(t.behaviorRisks)
+          .set({ moduleId: mod.id, dueDate: due })
+          .where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.userId, c.userId), eq(t.behaviorRisks.sourceRef, c.campaignId), eq(t.behaviorRisks.kind, "phishing_click"), eq(t.behaviorRisks.status, "open")));
+        const link = `/learn/${mod.slug}`;
+        await notifyUsers(tx, tenant.id, [c.userId], "assignment", { module: (l) => pick(mod.title, l), dueDate: due, link }, { href: link }, { defer: true });
+        await audit(tx, { tenantId: tenant.id, actorId: null, action: "assignment.created", targetType: "assignment", targetId: assignment.id, meta: { teachable: true, campaign: c.campaignId, template: tpl.key } });
+        return true;
+      });
+      if (created) started++;
+    } catch (error) {
+      logFailure("[teachable] click failed", error, { tenantId: tenant.id, recipientId: c.recipientId });
+    }
   }
 
   // 2. Re-simulations that are due, only while the organisation can send on that channel (otherwise the loop waits).
   const waiting = !on ? [] : await db
-    .select({ loop: t.teachableLoops, templateKey: t.campaigns.templateKey, person: t.users.name, active: t.users.status, phone: t.users.phone })
+    .select({ loop: t.teachableLoops, templateKey: t.campaigns.templateKey, active: t.users.status, phone: t.users.phone })
     .from(t.teachableLoops)
     .innerJoin(t.campaigns, eq(t.campaigns.id, t.teachableLoops.sourceCampaignId))
     .innerJoin(t.users, eq(t.users.id, t.teachableLoops.userId))
@@ -197,44 +203,50 @@ export async function teachableTick(db: DB, tenant: { id: string; settings: Tena
     const [org] = await db.select({ plan: t.tenants.plan, features: t.tenants.features }).from(t.tenants).where(eq(t.tenants.id, tenant.id));
     const features = featuresFor(org.plan, org.features);
     const tr = createTranslator({ ...(await messagesFor(tenant.settings.defaultLocale)), namespace: "admin.campaigns.loop" });
-    for (const { loop, templateKey, person, active, phone } of due) {
-      const tpl = TEMPLATE_BY_KEY.get(templateKey);
-      if (!tpl || !canResim(templateKey)) {
-        await db.update(t.teachableLoops).set({ status: "closed" }).where(eq(t.teachableLoops.id, loop.id));
-        continue;
+    for (const { loop, templateKey, active, phone } of due) {
+      try {
+        const tpl = TEMPLATE_BY_KEY.get(templateKey);
+        if (!tpl || !canResim(templateKey)) {
+          await db.update(t.teachableLoops).set({ status: "closed" }).where(eq(t.teachableLoops.id, loop.id));
+          continue;
+        }
+        const next = resimTemplate(tpl, features);
+        // A text message never reaches a person without a phone: the loop ends without a re-simulation.
+        if (next?.channel === "sms" && !phone) {
+          await db.update(t.teachableLoops).set({ status: "closed" }).where(eq(t.teachableLoops.id, loop.id));
+          continue;
+        }
+        if (active !== "active" || !next || (await launchBlocker(db, tenant.id, next.channel, 1))) continue;
+        // One re-simulation at a time per person: another loop waits for a later tick.
+        const [recent] = await db
+          .select({ id: t.campaigns.id })
+          .from(t.campaigns)
+          .where(
+            and(
+              eq(t.campaigns.tenantId, tenant.id),
+              eq(t.campaigns.audience, "person"),
+              eq(t.campaigns.userId, loop.userId),
+              or(inArray(t.campaigns.status, ["scheduled", "running"]), gte(t.campaigns.createdAt, new Date(now.getTime() - RESIM_GAP_DAYS * DAY))),
+            ),
+          )
+          .limit(1);
+        if (recent) continue;
+        // Never the person's name: it would travel to webhooks, syslog, risks and reports. campaigns.user_id links the person.
+        const name = tr("campaignName", { template: templateText(next.name, tenant.settings.defaultLocale) });
+        // Scheduled now: the next tick's campaignTick launches it through launchCampaign, the normal sending path.
+        // Campaign and loop together, so a failure between them can never leave a second re-simulation to the next tick.
+        await db.transaction(async (tx) => {
+          const [campaign] = await tx
+            .insert(t.campaigns)
+            .values({ tenantId: tenant.id, name, channel: next.channel, templateKey: next.key, audience: "person", userId: loop.userId, status: "scheduled", scheduledAt: now })
+            .returning({ id: t.campaigns.id });
+          await tx.update(t.teachableLoops).set({ resimCampaignId: campaign.id, status: "resim" }).where(eq(t.teachableLoops.id, loop.id));
+          await audit(tx, { tenantId: tenant.id, actorId: null, action: "campaign.created", targetType: "campaign", targetId: campaign.id, meta: { name, template: next.key, teachable: true } });
+        });
+      } catch (error) {
+        // One loop that fails must not hold up the others or the results.
+        logFailure("[teachable] re-simulation failed", error, { tenantId: tenant.id, loopId: loop.id });
       }
-      const next = resimTemplate(tpl, features);
-      // A text message never reaches a person without a phone: the loop ends without a re-simulation.
-      if (next?.channel === "sms" && !phone) {
-        await db.update(t.teachableLoops).set({ status: "closed" }).where(eq(t.teachableLoops.id, loop.id));
-        continue;
-      }
-      if (active !== "active" || !next || (await launchBlocker(db, tenant.id, next.channel, 1))) continue;
-      // One re-simulation at a time per person: another loop waits for a later tick.
-      const [recent] = await db
-        .select({ id: t.campaigns.id })
-        .from(t.campaigns)
-        .where(
-          and(
-            eq(t.campaigns.tenantId, tenant.id),
-            eq(t.campaigns.audience, "person"),
-            eq(t.campaigns.userId, loop.userId),
-            or(inArray(t.campaigns.status, ["scheduled", "running"]), gte(t.campaigns.createdAt, new Date(now.getTime() - RESIM_GAP_DAYS * DAY))),
-          ),
-        )
-        .limit(1);
-      if (recent) continue;
-      const name = tr("campaignName", { template: templateText(next.name, tenant.settings.defaultLocale), person });
-      // Scheduled now: the next tick's campaignTick launches it through launchCampaign, the normal sending path.
-      // Campaign and loop together, so a failure between them can never leave a second re-simulation to the next tick.
-      await db.transaction(async (tx) => {
-        const [campaign] = await tx
-          .insert(t.campaigns)
-          .values({ tenantId: tenant.id, name, channel: next.channel, templateKey: next.key, audience: "person", userId: loop.userId, status: "scheduled", scheduledAt: now })
-          .returning({ id: t.campaigns.id });
-        await tx.update(t.teachableLoops).set({ resimCampaignId: campaign.id, status: "resim" }).where(eq(t.teachableLoops.id, loop.id));
-        await audit(tx, { tenantId: tenant.id, actorId: null, action: "campaign.created", targetType: "campaign", targetId: campaign.id, meta: { name, template: next.key, teachable: true } });
-      });
     }
   }
 
