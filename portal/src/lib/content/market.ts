@@ -91,8 +91,8 @@ type Pool = (typeof POOLS)[number];
 type Person = "female" | "male" | "family";
 type Hit = { kind: Pool | "brands" | "code" | "other" | "phrase"; key: string };
 
-/** An Azerbaijani IBAN: AZ, two check digits, a four-letter bank code, twenty digits. */
-const AZ_IBAN = /\bAZ\d{2}[A-Z]{4}\d{20}\b/g;
+/** An Azerbaijani IBAN: AZ, two check digits, a four-letter bank code, twenty digits, also in groups of four. */
+const AZ_IBAN = /\bAZ\d{2} ?[A-Z]{4}(?: ?\d{4}){5}\b/g;
 /** The country left in prose: ".az", "-az.com", a parcel number ending in AZ. */
 const AZ_SUFFIX = /(?<![\p{L}\p{N}])[.-]az(?![\p{L}\p{N}])|\d+AZ(?!\p{L})/gu;
 
@@ -137,6 +137,15 @@ function addressPeople(world: AzWorld): Map<string, { kind: Person; key: string 
   const out = new Map<string, { kind: Person; key: string }>();
   for (const kind of ["female", "male", "family"] as const)
     for (const [key, list] of Object.entries(world[kind])) for (const f of list) if (/^\p{Script=Latin}/u.test(f)) out.set(addressForm(f), { kind, key });
+  return out;
+}
+
+type Place = { kind: "cities" | "districts"; key: string; form: string };
+/** Every Latin city and district form of the world as an address writes it ("free-wifi-baku.top"), with its pool, key and form. */
+function addressPlaces(world: AzWorld): Map<string, Place> {
+  const out = new Map<string, Place>();
+  for (const kind of ["cities", "districts"] as const)
+    for (const [key, list] of Object.entries(world[kind])) for (const f of list) if (/^\p{Script=Latin}/u.test(f) && !out.has(addressForm(f))) out.set(addressForm(f), { kind, key, form: f });
   return out;
 }
 
@@ -264,14 +273,23 @@ function addressMapper(pack: MarketPack, world: AzWorld, cast: Cast): (token: st
     if (slug) for (const s of slugs) words.set(s.toLowerCase(), slug);
   }
   for (const [w, to] of Object.entries(pack.addresses)) words.set(w.toLowerCase(), to);
+  // A place follows the text: the pack's phrase for its form ("Baku" → "Berlin"), else the lesson's cast.
+  const phrases = new Map(pack.phrases);
+  for (const [form, place] of addressPlaces(world)) {
+    const to = phrases.get(place.form) ?? cast.picked[place.kind].get(place.key);
+    if (to) words.set(form, addressForm(to));
+  }
   // An initial before a family name (r.kerimov@) or after a given name (kamran.h@) follows the pair.
   const re = new RegExp(`(?<!\\p{L})(?:(\\p{L})\\.)?(${[...words.keys(), ...people.keys()].sort(byLength).map(esc).join("|")})(?:\\.(\\p{L})(?!\\p{L}))?(?!\\p{L})`, "giu");
   const slug = (key: string | undefined) => {
     for (const kind of ["female", "male", "family"] as const) if (key && cast.picked[kind].has(key)) return addressForm(cast.picked[kind].get(key)!);
   };
   const caseLike = (from: string, to: string) => (/\p{Lu}/u.test(from[0]) ? to[0].toUpperCase() + to.slice(1) : to);
+  // A piece cut after "gov." ("https://vetendasportal.gov." + "az-arayis.example") takes the label the pack gives gov.az ("bund.").
+  const gov = pack.addresses["gov.az"]?.split(".")[0];
+  const official = (out: string) => (gov && out.endsWith(".gov.") ? `${out.slice(0, -"gov.".length)}${gov}.` : out);
   return (token) =>
-    token.replace(re, (whole: string, before: string | undefined, form: string, after: string | undefined) => {
+    official(token.replace(re, (whole: string, before: string | undefined, form: string, after: string | undefined) => {
       const person = people.get(form.toLowerCase());
       if (!person) return `${before ? `${before}.` : ""}${caseLike(form, words.get(form.toLowerCase())!)}${after ? `.${after}` : ""}`;
       const to = slug(person.key);
@@ -280,7 +298,7 @@ function addressMapper(pack: MarketPack, world: AzWorld, cast: Cast): (token: st
       if (before && person.kind === "family" && pair) before = pair[0];
       if (after && person.kind !== "family" && pair) after = pair[0];
       return `${before ? `${before}.` : ""}${caseLike(form, to)}${after ? `.${after}` : ""}`;
-    });
+    }));
 }
 
 /** Rewrites the addresses of `text` where they still equal the English value's (`en`); any other text stays. */
@@ -346,7 +364,11 @@ export function applyMarket<T>(doc: T, seed: string, pack: MarketPack, world: Az
       out += before + pre + to + s;
       last = m.index + whole.length;
     }
-    return (out + part.slice(last)).replace(phoneRe, phone).replace(AZ_IBAN, (m) => fill(pack.iban, m.replace(/\D/g, "")));
+    return (out + part.slice(last)).replace(phoneRe, phone).replace(AZ_IBAN, (m) => {
+      // A grouped source IBAN stays grouped.
+      const iban = fill(pack.iban, m.replace(/\D/g, ""));
+      return m.includes(" ") ? iban.replace(/(.{4})(?=.)/g, "$1 ") : iban;
+    });
   };
   const texted = mapText(doc, (text, _en, key) => (key === "href" ? text : outsideAddresses(text, local)));
   const map = addressMapper(pack, world, cast);
@@ -364,7 +386,7 @@ const AZ_LETTERS = /[əƏıİğĞşŞ]/u;
 export function marketTokenErrors(doc: unknown, world: AzWorld, pack?: MarketPack): string[] {
   const { re } = matcher(world);
   const kept = (w: string) => pack?.addresses[w]?.toLowerCase() === w.toLowerCase();
-  const inAddresses = pack && addressRegex([...addressPeople(world).keys(), ...Object.values(world.brandSlugs).flat(), ...world.addressWords.filter((w) => !kept(w))]);
+  const inAddresses = pack && addressRegex([...addressPeople(world).keys(), ...addressPlaces(world).keys(), ...Object.values(world.brandSlugs).flat(), ...world.addressWords.filter((w) => !kept(w))]);
   const errors: string[] = [];
   mapText(doc, (text, _en, key, path) => {
     const tokens: string[] = [];

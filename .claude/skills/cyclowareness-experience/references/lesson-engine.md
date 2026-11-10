@@ -877,6 +877,18 @@ afterwards (`moduleSlug` in `src/lib/campaigns/templates.ts`). `qr_trap` (profes
 templates in the campaign wizard, on save and at every launch (since the 2026-10-27 hardening, ADR-033);
 there is no `teachable_moment` entry at all even though the original listed it as a flag.
 
+**Module mini-lab (wave D3).** Not part of the lesson player either: each module has a short scenario of 3
+to 5 decisions in `content/library/labs/<module>.<lang>.json` (schema `labScenarioSchema` and
+`labScenarioErrors` in `src/lib/content/lab-scenario.ts`; artifacts `email`, `web`, `file`, `sms`, `call`,
+`dialog`, each decision with options, one `safe` id, a `risk` tag and an explanation). The page
+`/lab/mini/<slug>` (`src/app/(learner)/lab/mini/[slug]/page.tsx`, only for a module in the viewer's catalog)
+renders `MiniLab` (`src/components/lab/labs/mini-lab.tsx`) inside the virtual machine: the decision card sits
+above the desktop, an e-mail, web page or file opens in its app (`ARTIFACT_APP`), the inbox and the browser
+tabs hold only the decisions reached so far, and the next card's prompt takes focus a frame after the window
+manager. A translation keeps every id of the English file (`tests/mini-labs.test.ts`; the checker's
+`--coverage` line counts them); the learner's language falls back to English (`labScenario` in
+`src/server/lab/scenarios.ts`).
+
 ### 3.11 Captions, AI subtitles and transcript
 
 ADR-029, ADR-030. Files: `src/components/player/captions.tsx`, `media-controls.tsx` (`SubtitleSelect`,

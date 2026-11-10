@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, like, ne, not, or, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { db, t } from "../db";
@@ -8,6 +8,7 @@ import { actionViewer, hasFeature } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
 import { parseDay } from "../../lib/day";
 import { departmentKey } from "../../lib/departments";
+import { TEACHABLE_PREFIX } from "../../lib/tenant-defaults";
 import { isUniqueViolation } from "../db/errors";
 import { audit } from "../services/audit";
 import { notifyUsers } from "../services/notify";
@@ -192,7 +193,11 @@ export async function createAssignmentAction(input: z.infer<typeof assignSchema>
   if (a.dueKind === "fixed" && !a.dueDate) return { ok: false };
   if (a.dueKind === "after_joining" && !a.dueDays) return { ok: false };
   if (a.target === "module") {
-    const [m] = await db().select({ id: t.modules.id }).from(t.modules).where(and(eq(t.modules.id, a.targetId), or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id))));
+    // A teachable-moment lesson is assigned only by its loop (services/teachable.ts).
+    const [m] = await db()
+      .select({ id: t.modules.id })
+      .from(t.modules)
+      .where(and(eq(t.modules.id, a.targetId), or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)), not(like(t.modules.slug, `${TEACHABLE_PREFIX}%`))));
     if (!m) return { ok: false };
   } else {
     const [pth] = await db().select({ id: t.learningPaths.id }).from(t.learningPaths).where(and(eq(t.learningPaths.id, a.targetId), or(isNull(t.learningPaths.tenantId), eq(t.learningPaths.tenantId, v.tenant.id))));

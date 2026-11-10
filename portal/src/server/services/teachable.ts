@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, isNull, lte, ne, notExists } from "drizzle-orm";
+import { and, eq, gte, inArray, isNull, lte, ne, notExists, or } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
@@ -25,6 +25,8 @@ const DAY = 86_400_000;
 const LEVELS = ["Easy", "Medium", "Hard"] as const;
 /** Voice has no telephony adapter and a USB drop is a physical kit: neither can be re-sent to one person automatically. */
 const RESIM_CHANNELS: ReadonlySet<CampaignTemplate["channel"]> = new Set(["email", "sms"]);
+/** Days a person waits between two re-simulations, so loops due on the same tick do not send them together. */
+const RESIM_GAP_DAYS = 7;
 /** The micro-lesson's single lesson. */
 export const TEACHABLE_LESSON = "lesson-1";
 
@@ -185,7 +187,7 @@ export async function teachableTick(db: DB, tenant: { id: string; settings: Tena
 
   // 2. Re-simulations that are due, only while the organisation can send on that channel (otherwise the loop waits).
   const waiting = !on ? [] : await db
-    .select({ loop: t.teachableLoops, templateKey: t.campaigns.templateKey, person: t.users.name, active: t.users.status })
+    .select({ loop: t.teachableLoops, templateKey: t.campaigns.templateKey, person: t.users.name, active: t.users.status, phone: t.users.phone })
     .from(t.teachableLoops)
     .innerJoin(t.campaigns, eq(t.campaigns.id, t.teachableLoops.sourceCampaignId))
     .innerJoin(t.users, eq(t.users.id, t.teachableLoops.userId))
@@ -195,14 +197,33 @@ export async function teachableTick(db: DB, tenant: { id: string; settings: Tena
     const [org] = await db.select({ plan: t.tenants.plan, features: t.tenants.features }).from(t.tenants).where(eq(t.tenants.id, tenant.id));
     const features = featuresFor(org.plan, org.features);
     const tr = createTranslator({ ...(await messagesFor(tenant.settings.defaultLocale)), namespace: "admin.campaigns.loop" });
-    for (const { loop, templateKey, person, active } of due) {
+    for (const { loop, templateKey, person, active, phone } of due) {
       const tpl = TEMPLATE_BY_KEY.get(templateKey);
       if (!tpl || !canResim(templateKey)) {
         await db.update(t.teachableLoops).set({ status: "closed" }).where(eq(t.teachableLoops.id, loop.id));
         continue;
       }
       const next = resimTemplate(tpl, features);
+      // A text message never reaches a person without a phone: the loop ends without a re-simulation.
+      if (next?.channel === "sms" && !phone) {
+        await db.update(t.teachableLoops).set({ status: "closed" }).where(eq(t.teachableLoops.id, loop.id));
+        continue;
+      }
       if (active !== "active" || !next || (await launchBlocker(db, tenant.id, next.channel, 1))) continue;
+      // One re-simulation at a time per person: another loop waits for a later tick.
+      const [recent] = await db
+        .select({ id: t.campaigns.id })
+        .from(t.campaigns)
+        .where(
+          and(
+            eq(t.campaigns.tenantId, tenant.id),
+            eq(t.campaigns.audience, "person"),
+            eq(t.campaigns.userId, loop.userId),
+            or(inArray(t.campaigns.status, ["scheduled", "running"]), gte(t.campaigns.createdAt, new Date(now.getTime() - RESIM_GAP_DAYS * DAY))),
+          ),
+        )
+        .limit(1);
+      if (recent) continue;
       const name = tr("campaignName", { template: templateText(next.name, tenant.settings.defaultLocale), person });
       // Scheduled now: the next tick's campaignTick launches it through launchCampaign, the normal sending path.
       // Campaign and loop together, so a failure between them can never leave a second re-simulation to the next tick.
@@ -219,14 +240,15 @@ export async function teachableTick(db: DB, tenant: { id: string; settings: Tena
 
   // 3. Results of the re-simulations sent: a click (or a submitted form) fails it, no click until the campaign ends passes it.
   const sent = await db
-    .select({ id: t.teachableLoops.id, result: t.teachableLoops.resimResult, campaign: t.campaigns.status, r: { clickedAt: t.campaignRecipients.clickedAt, submittedAt: t.campaignRecipients.submittedAt, reportedAt: t.campaignRecipients.reportedAt } })
+    .select({ id: t.teachableLoops.id, result: t.teachableLoops.resimResult, campaign: t.campaigns.status, r: { sentAt: t.campaignRecipients.sentAt, clickedAt: t.campaignRecipients.clickedAt, submittedAt: t.campaignRecipients.submittedAt, reportedAt: t.campaignRecipients.reportedAt } })
     .from(t.teachableLoops)
     .innerJoin(t.campaigns, eq(t.campaigns.id, t.teachableLoops.resimCampaignId))
     .leftJoin(t.campaignRecipients, and(eq(t.campaignRecipients.campaignId, t.teachableLoops.resimCampaignId), eq(t.campaignRecipients.userId, t.teachableLoops.userId)))
     .where(and(eq(t.teachableLoops.tenantId, tenant.id), eq(t.teachableLoops.status, "resim")));
   for (const s of sent) {
     const ended = s.campaign === "completed" || s.campaign === "cancelled";
-    const result = s.r?.submittedAt ? "submitted" : s.r?.clickedAt ? "clicked" : s.r?.reportedAt ? "reported" : s.campaign === "completed" ? "passed" : null;
+    // Passed only when it reached the person: an SMS that was never sent ends with no result.
+    const result = s.r?.submittedAt ? "submitted" : s.r?.clickedAt ? "clicked" : s.r?.reportedAt ? "reported" : s.campaign === "completed" && s.r?.sentAt ? "passed" : null;
     if (result !== s.result || ended) await db.update(t.teachableLoops).set({ resimResult: result, status: ended ? "closed" : "resim" }).where(eq(t.teachableLoops.id, s.id));
   }
   return started;

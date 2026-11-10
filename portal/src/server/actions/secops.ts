@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, eq, inArray, isNull, ne, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, like, ne, not, or } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
@@ -22,6 +22,7 @@ import { isLocale, LOCALES, pick } from "../../i18n/config";
 import { AUDIENCES, CATEGORIES } from "../../lib/domain/catalog";
 import { LAB_IDS } from "../../lib/domain/labs";
 import { parseDay } from "../../lib/day";
+import { TEACHABLE_PREFIX } from "../../lib/tenant-defaults";
 import { isForeignKeyViolation } from "../db/errors";
 
 const uuid = z.string().uuid();
@@ -676,7 +677,11 @@ export async function savePathAction(input: z.input<typeof pathSchema>): Promise
   // The editor shows the texts in the admin's interface language, so that is the translation they change.
   const ui = await getLocale();
   const lang = isLocale(ui) ? ui : v.tenant.settings.defaultLocale;
-  const known = await db().select({ slug: t.modules.slug }).from(t.modules).where(and(inArray(t.modules.slug, d.moduleSlugs), or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id))));
+  // A teachable-moment lesson never goes into a path: only its loop assigns it (services/teachable.ts).
+  const known = await db()
+    .select({ slug: t.modules.slug })
+    .from(t.modules)
+    .where(and(inArray(t.modules.slug, d.moduleSlugs), or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)), not(like(t.modules.slug, `${TEACHABLE_PREFIX}%`))));
   const ok = new Set(known.map((k) => k.slug));
   const slugs = [...new Set(d.moduleSlugs)].filter((s) => ok.has(s));
   if (!slugs.length) return { ok: false, error: "invalid" };

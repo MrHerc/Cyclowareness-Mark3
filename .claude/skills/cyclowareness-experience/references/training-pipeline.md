@@ -758,6 +758,15 @@ the ranking `TREND_DAYS = 7` earlier; reporting counts simulations sent in `REPO
 
 Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en → az → first value`.
 
+**Module mini-lab (wave D3).** The module page's «Practise it» lists the module's mini-lab first
+(`modulePractice` in `src/components/lab/model/labs.ts`, id `mini:<slug>`, href `/lab/mini/<slug>`), then the
+module's labs; all wait until the module's lessons are done (`lessonsDone`), and neither completion nor
+attestation waits for them. A finished run goes to `completeVmLabAction` (`src/server/lab/vm-action.ts`): it
+needs the `lab` feature and the module in the viewer's catalog, replays only the chosen option ids against the
+English scenario (`miniLabDef`, `replay`, `scoreRun`) and stores one `lab_attempts` row with XP scaled by the
+score on the first run of the organisation's day (`recordLabAttempt`; full XP `miniLabXp`: 10 for three
+decisions, 15 for five). Content format: lesson-engine.md §3.10.
+
 ---
 
 ## 7. Conventions and gotchas

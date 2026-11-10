@@ -10,6 +10,7 @@ import { actionViewer, privileged, type Viewer } from "../auth/viewer";
 import { rateLimit } from "../rate-limit";
 import { queueEmail, renderEmailHtml } from "../mail";
 import { appUrl } from "../env";
+import { assignedForUser } from "../services/assignments";
 import { attestModule, completeLesson, issueCertificate, reachScene, startLesson, touchModule } from "../services/progress";
 import { recomputeRisk } from "../services/risk";
 import { emitEvent } from "../services/events";
@@ -34,13 +35,22 @@ async function moduleBySlug(v: Viewer, slug: string) {
     );
   const mod = rows.find((r) => r.tenantId) ?? rows[0] ?? null;
   // A teachable-moment lesson (services/teachable.ts) is only for the people one of its loops assigned it to: its slug is guessable.
+  // As in the catalog, an assignment or progress on it also opens it (an assignment made before the admin pickers refused them).
   if (mod?.slug.startsWith(TEACHABLE_PREFIX)) {
-    const [loop] = await db()
-      .select({ id: t.teachableLoops.id })
-      .from(t.teachableLoops)
-      .where(and(eq(t.teachableLoops.userId, v.user.id), eq(t.teachableLoops.microModuleId, mod.id)))
-      .limit(1);
-    if (!loop) return null;
+    const [[loop], [progress], assigned] = await Promise.all([
+      db()
+        .select({ id: t.teachableLoops.id })
+        .from(t.teachableLoops)
+        .where(and(eq(t.teachableLoops.userId, v.user.id), eq(t.teachableLoops.microModuleId, mod.id)))
+        .limit(1),
+      db()
+        .select({ moduleId: t.moduleProgress.moduleId })
+        .from(t.moduleProgress)
+        .where(and(eq(t.moduleProgress.userId, v.user.id), eq(t.moduleProgress.moduleId, mod.id)))
+        .limit(1),
+      assignedForUser(db(), v.tenant.id, v.user.id),
+    ]);
+    if (!loop && !progress && !assigned.has(mod.id)) return null;
   }
   return mod;
 }

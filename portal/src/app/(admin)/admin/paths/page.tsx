@@ -13,6 +13,7 @@ import { DeletePath, PathEditor, type PathDraft } from "@/components/secops/stud
 import { AssignDialog } from "@/components/admin/assign-dialog";
 import { pick } from "@/i18n/config";
 import { isLabId, LAB_IDS } from "@/lib/domain/labs";
+import { TEACHABLE_PREFIX } from "@/lib/tenant-defaults";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -33,7 +34,8 @@ export default async function PathsAdminPage() {
     db().select({ pathId: t.assignments.pathId }).from(t.assignments).where(and(eq(t.assignments.tenantId, v.tenant.id), isNotNull(t.assignments.pathId))),
     formOptions(v.tenant.id, locale),
   ]);
-  const titleBySlug = new Map(modules.map((m) => [m.slug, pick(m.title, locale)]));
+  // A teachable-moment lesson is assigned only by its loop, never through a path.
+  const titleBySlug = new Map(modules.filter((m) => !m.slug.startsWith(TEACHABLE_PREFIX)).map((m) => [m.slug, pick(m.title, locale)]));
   const moduleOptions = [...titleBySlug.entries()].map(([slug, label]) => ({ slug, label })).sort((a, b) => a.label.localeCompare(b.label, locale));
   const labsOn = hasFeature(v, "lab");
   const labOptions = labsOn ? LAB_IDS.map((id) => ({ id, label: tlab(`games.${id}.title`) })) : [];

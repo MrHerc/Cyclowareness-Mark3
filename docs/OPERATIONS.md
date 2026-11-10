@@ -93,6 +93,27 @@ sends something nobody meant to send (a simulation to the wrong people, a wrong 
 | <prevent it: code, test, alert, runbook> | <name> | <date> |
 ```
 
+## Narration clips
+
+The recorded lesson voice is not in git and not made by the Dockerfile or CI: an image built the usual way
+plays the browser's voice (Web Speech) only. Nothing breaks without the clips, but the recorded voice is
+lost, so make them on the build machine before every release image. Details: `portal/README.md`,
+"Narration voice".
+
+1. **Tools, once per build machine.** Python 3.9+ with `piper-tts[alignment]`, ffmpeg with libmp3lame
+   (on PATH, or `FFMPEG=<path>`), and the voice `en_US-ljspeech-high` downloaded into `portal/.voices`
+   (the generator checks its SHA-256).
+2. **Generate before `docker build`.** `cd portal && npm run narration -- --lang en --provider piper --concurrency 3`.
+   A full run takes about 5.5 to 9 hours; it resumes where it stopped and stops after 10 failed clips in a row.
+3. **Check.** `portal/public/generated/tts/en` holds about 3,778 MP3 files (about 140 MB); `COPY public`
+   puts them in the image.
+4. **Manifests.** The run rewrites `portal/content/narration/en/*.json`; leave them uncommitted unless the
+   lesson text changed.
+5. **Azerbaijani and Russian** wait for an Azure Speech S0 key: `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`
+   go in `portal/.env.local` on the build machine only, never in the compose `.env`. Then
+   `npm run narration -- --lang az,ru --provider azure`.
+6. **Missing clips** fall back to Web Speech sentence by sentence; a manifest whose clips are missing is ignored.
+
 ## Backups and recovery
 
 - **Nightly dump.** From the `portal` folder: `sh scripts/backup.sh` writes

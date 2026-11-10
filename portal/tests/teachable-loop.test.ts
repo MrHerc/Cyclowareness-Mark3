@@ -25,12 +25,14 @@ vi.mock("next-intl/server", () => ({
   getLocale: async () => locale,
   getTranslations: async (o: { locale: string; namespace: string }) => createTranslator({ ...(await messagesFor(o.locale)), namespace: o.namespace as never }),
 }));
-vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => viewer, allowed: () => false, privileged: () => false }));
+vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => viewer, allowed: () => false, privileged: () => false, hasFeature: () => true }));
 
 const { campaignTick, launchCampaign, recordClick, setCampaignStatus } = await import("../src/server/services/campaigns");
 const { microLesson, resimAt, resimTemplate, teachableTick } = await import("../src/server/services/teachable");
 const { getCatalog } = await import("../src/server/queries/catalog");
 const learning = await import("../src/server/actions/learning");
+const workspace = await import("../src/server/actions/workspace");
+const secops = await import("../src/server/actions/secops");
 
 beforeAll(async () => {
   await ready();
@@ -185,6 +187,23 @@ describe("click → micro-lesson", () => {
     expect(mod.tenantId).toBe(b.tenant.id);
   }, 60_000);
 
+  it("is refused as an administrator's assignment or path module, and an assignment made before that can still be completed", async () => {
+    const { tenant, people } = await org({ people: 2 });
+    const [p, other] = people;
+    const { token } = await clickable(tenant.id);
+    await recordClick(db, token(p.id), "link");
+    await teachableTick(db, tenant, new Date());
+    const [mod] = await db.select().from(t.modules).where(and(eq(t.modules.tenantId, tenant.id), eq(t.modules.slug, "teachable:payslip")));
+    viewer = asViewer(tenant, await addUser(db, tenant.id, { role: "tenant_admin" }));
+    const assign = { target: "module" as const, targetId: mod.id, scope: "everyone" as const, departmentId: null, userId: null, dueKind: "none" as const, dueDate: null, dueDays: null, reason: null };
+    expect(await workspace.createAssignmentAction(assign)).toEqual({ ok: false });
+    const path = { sourceId: null, title: "Onboarding", description: "", audience: "", recurrence: "", standards: "", mandatory: false, labIds: [] };
+    expect(await secops.savePathAction({ ...path, id: null, moduleSlugs: [mod.slug] })).toMatchObject({ ok: false });
+    // An older assignment to someone without a loop opens the lesson, as the catalog shows it.
+    await db.insert(t.assignments).values({ tenantId: tenant.id, moduleId: mod.id, scope: "user", userId: other.id });
+    expect(await finish(tenant, other)).toMatchObject({ ok: true, moduleStatus: "completed" });
+  }, 60_000);
+
   it("creates nothing while the organisation has switched the loop off", async () => {
     const { tenant, people } = await org({ teachable: false });
     const { token } = await clickable(tenant.id);
@@ -274,6 +293,43 @@ describe("re-simulation", () => {
     expect(await setCampaignStatus(db, tenant.id, resim.id, "completed")).toBe(true);
     await teachableTick(db, off, new Date());
     expect((await loopsOf(tenant.id))[0]).toMatchObject({ resimResult: "clicked", status: "closed" });
+  }, 60_000);
+
+  it("ends an SMS loop without a re-simulation for a person without a phone, and never records an unsent one as passed", async () => {
+    const { tenant, people } = await org({ people: 2 });
+    const [noPhone, p] = people;
+    const { token } = await clickable(tenant.id, "parcel-sms");
+    await recordClick(db, token(noPhone.id), "link");
+    await recordClick(db, token(p.id), "link");
+    await teachableTick(db, tenant, new Date());
+    await db.update(t.users).set({ phone: null }).where(eq(t.users.id, noPhone.id));
+    await db.update(t.teachableLoops).set({ assignedAt: new Date(Date.now() - 30 * 86_400_000) }).where(eq(t.teachableLoops.tenantId, tenant.id));
+    await teachableTick(db, tenant, new Date());
+    const resims = await personCampaigns(tenant.id);
+    expect(resims.map((c) => c.userId)).toEqual([p.id]);
+    expect((await loopsOf(tenant.id)).find((l) => l.userId === noPhone.id)).toMatchObject({ status: "closed", resimCampaignId: null });
+
+    // Launched, but the text message never went out (no gateway run): the campaign ends without a result.
+    await campaignTick(db);
+    expect(await setCampaignStatus(db, tenant.id, resims[0].id, "completed")).toBe(true);
+    await teachableTick(db, tenant, new Date());
+    expect((await loopsOf(tenant.id)).find((l) => l.userId === p.id)).toMatchObject({ resimResult: null, status: "closed" });
+  }, 60_000);
+
+  it("sends one person one re-simulation at a time when two of their loops are due on the same tick", async () => {
+    const { tenant, people } = await org();
+    const [p] = people;
+    for (const key of ["payslip", "invoice"]) {
+      const { token } = await clickable(tenant.id, key);
+      await recordClick(db, token(p.id), "link");
+    }
+    await teachableTick(db, tenant, new Date());
+    expect(await loopsOf(tenant.id)).toHaveLength(2);
+    await db.update(t.teachableLoops).set({ assignedAt: new Date(Date.now() - 30 * 86_400_000) }).where(eq(t.teachableLoops.tenantId, tenant.id));
+    await teachableTick(db, tenant, new Date());
+    await teachableTick(db, tenant, new Date(Date.now() + 3_600_000));
+    expect(await personCampaigns(tenant.id)).toHaveLength(1);
+    expect((await loopsOf(tenant.id)).map((l) => l.status).sort()).toEqual(["assigned", "resim"]);
   }, 60_000);
 
   it("picks the same channel at the next difficulty, staying at Hard and on the plan", () => {

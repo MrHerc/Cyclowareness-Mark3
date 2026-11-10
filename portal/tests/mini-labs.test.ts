@@ -6,10 +6,11 @@ import { ARTIFACT_APP, miniLabDef, miniLabId, miniLabSlug, modulePractice, repla
 import { lessonsDone } from "../src/lib/domain/labs";
 import { localeParityErrors } from "../src/lib/content/locale-parity";
 
-const state = vi.hoisted(() => ({ features: new Set(["lab"]), attempts: [] as { exercise: string; score: number; max: number; fullXp: number }[] }));
+const state = vi.hoisted(() => ({ features: new Set(["lab"]), catalog: ["phishing-email", "quishing"], attempts: [] as { exercise: string; score: number; max: number; fullXp: number }[] }));
 vi.mock("next/cache", () => ({ refresh: () => {} }));
 vi.mock("../src/server/db", () => ({ db: () => ({}) }));
-vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => ({ tenant: { id: "t1", features: state.features }, user: { id: "u1" } }) }));
+vi.mock("../src/server/auth/viewer", () => ({ actionViewer: async () => ({ tenant: { id: "t1", features: state.features }, user: { id: "u1" } }), allowed: () => false }));
+vi.mock("../src/server/queries/catalog", () => ({ getCatalog: async () => state.catalog.map((slug) => ({ slug })) }));
 vi.mock("../src/server/rate-limit", () => ({ rateLimit: async () => ({ ok: true }) }));
 vi.mock("../src/server/lab/attempts", () => ({
   recordLabAttempt: async (_db: unknown, p: { exercise: string; score: number; max: number; fullXp: number }) => {
@@ -147,6 +148,7 @@ describe("mini-lab runs", () => {
 describe("mini-lab result on the server", () => {
   beforeEach(() => {
     state.features = new Set(["lab"]);
+    state.catalog = ["phishing-email", "quishing"];
     state.attempts = [];
   });
 
@@ -167,6 +169,12 @@ describe("mini-lab result on the server", () => {
     expect(await completeVmLabAction("mini:quishing", [["choose", 7]])).toEqual({ error: "invalid" });
     state.features = new Set();
     expect(await completeVmLabAction("mini:quishing", [])).toEqual({ error: "forbidden" });
+    expect(state.attempts).toEqual([]);
+  });
+
+  it("refuses the mini-lab of a module outside the viewer's catalog", async () => {
+    state.catalog = ["quishing"];
+    expect(await completeVmLabAction("mini:phishing-email", [])).toEqual({ error: "forbidden" });
     expect(state.attempts).toEqual([]);
   });
 });

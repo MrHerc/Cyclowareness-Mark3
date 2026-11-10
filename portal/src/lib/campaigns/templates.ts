@@ -450,9 +450,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "Stimate partener,\n\nÎn urma unui audit ne-am schimbat contul. Vă rugăm să efectuați următoarea plată în noul IBAN: AZ21 NABZ 0000 0000 1370 1000 1944. Contul vechi se închide săptămâna aceasta. Vă rugăm să nu ne sunați: liniile telefonice sunt în curs de modernizare.",
       ka: "პატივცემულო პარტნიორო,\n\nაუდიტის შემდეგ ანგარიში შევცვალეთ. გთხოვთ, შემდეგი გადახდა ახალ IBAN-ზე გადმორიცხოთ: AZ21 NABZ 0000 0000 1370 1000 1944. ძველი ანგარიში ამ კვირაში დაიხურება. გთხოვთ, არ დაგვირეკოთ: სატელეფონო ხაზები ახლდება.",
       uk: "Шановний партнере!\n\nПісля аудиту ми змінили рахунок. Будь ласка, наступний платіж надішліть на новий IBAN: AZ21 NABZ 0000 0000 1370 1000 1944. Старий рахунок закривається цього тижня. Просимо не телефонувати: наші телефонні лінії оновлюються.",
-      de: "Sehr geehrte Damen und Herren,\n\nnach einer Prüfung haben wir unser Konto geändert. Bitte überweisen Sie die nächste Zahlung auf die neue IBAN: AZ21 NABZ 0000 0000 1370 1000 1944. Das alte Konto wird diese Woche geschlossen. Bitte rufen Sie nicht an, unsere Telefonleitungen werden gerade umgestellt.",
-      fr: "Madame, Monsieur,\n\nÀ la suite d’un audit, nous avons changé de compte. Merci d’effectuer le prochain paiement sur le nouvel IBAN : AZ21 NABZ 0000 0000 1370 1000 1944. L’ancien compte sera clôturé cette semaine. Merci de ne pas nous appeler, nos lignes téléphoniques sont en cours de mise à niveau.",
-      ar: "عزيزنا الشريك،\n\nبعد عملية تدقيق، قمنا بتغيير حسابنا. يرجى تحويل الدفعة القادمة إلى رقم الآيبان الجديد: AZ21 NABZ 0000 0000 1370 1000 1944. سيغلق الحساب القديم هذا الأسبوع. نرجو عدم الاتصال بنا، فخطوطنا الهاتفية قيد التحديث.",
+      de: "Sehr geehrte Damen und Herren,\n\nnach einer Prüfung haben wir unser Konto geändert. Bitte überweisen Sie die nächste Zahlung auf die neue IBAN: DE21 0000 0000 1370 1000 1944. Das alte Konto wird diese Woche geschlossen. Bitte rufen Sie nicht an, unsere Telefonleitungen werden gerade umgestellt.",
+      fr: "Madame, Monsieur,\n\nÀ la suite d’un audit, nous avons changé de compte. Merci d’effectuer le prochain paiement sur le nouvel IBAN : FR21 0000 0000 1370 1000 1944. L’ancien compte sera clôturé cette semaine. Merci de ne pas nous appeler, nos lignes téléphoniques sont en cours de mise à niveau.",
+      ar: "عزيزنا الشريك،\n\nبعد عملية تدقيق، قمنا بتغيير حسابنا. يرجى تحويل الدفعة القادمة إلى رقم الآيبان الجديد: SA21 0000 0000 1370 1000 1944. سيغلق الحساب القديم هذا الأسبوع. نرجو عدم الاتصال بنا، فخطوطنا الهاتفية قيد التحديث.",
     },
     redFlags: [
       {
@@ -884,7 +884,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       ar: "مكالمة بصوت المدير (التزييف العميق)",
     },
     sender: {
-      name: { az: "Kamran Babayev", en: "Kamran Babayev", ru: "Камран Бабаев", tr: "Kamran Babayev", ro: "Kamran Babayev", ka: "ქამრან ბაბაევი", uk: "Камран Бабаєв", de: "Kamran Babayev", fr: "Kamran Babayev", ar: "كامران باباييف" },
+      name: { az: "Kamran Babayev", en: "Kamran Babayev", ru: "Камран Бабаев", tr: "Kamran Babayev", ro: "Kamran Babayev", ka: "ქამრან ბაბაევი", uk: "Камран Бабаєв", de: "Sebastian Becker", fr: "Vincent Michel", ar: "سلطان العمري" },
       address: { ...same("+994 50 000 77 12"), de: "+49 151 000 77 12", fr: "+33 6 00 00 77 12", ar: "+966 55 000 7712" },
     },
     subject: CALL,
@@ -896,9 +896,9 @@ export const TEMPLATES: CampaignTemplate[] = [
       ro: "Bună, sunt Kamran. Sunt într-o ședință și nu pot vorbi. Avem nevoie urgent de un transfer către un partener, îți trimit detaliile acum prin mesaj. Nu spune nimănui, e un proiect-surpriză.",
       ka: "გამარჯობა, ქამრანი ვარ. შეხვედრაზე ვარ და ვერ ვლაპარაკობ. პარტნიორისთვის სასწრაფოდ თანხის გადარიცხვაა საჭირო, რეკვიზიტებს ახლავე მოგწერ. არავის უთხრა, საიდუმლო პროექტია.",
       uk: "Привіт, це Камран. Я на нараді, не можу говорити. Потрібен терміновий переказ партнерові, реквізити надішлю повідомленням. Нікому не кажи, це секретний проєкт.",
-      de: "Hallo, hier ist Kamran. Ich bin in einem Meeting und kann nicht sprechen. Wir brauchen dringend eine Überweisung an einen Partner, ich schicke Ihnen die Daten gleich per Nachricht. Bitte sagen Sie niemandem etwas, es ist ein Überraschungsprojekt.",
-      fr: "Bonjour, c’est Kamran. Je suis en réunion, je ne peux pas parler. Il faut faire un virement urgent à un partenaire, je vous envoie les coordonnées par message. N’en parlez à personne, c’est un projet confidentiel.",
-      ar: "مرحبًا، أنا كامران. أنا في اجتماع ولا أستطيع الكلام. نحتاج إلى تحويل عاجل لأحد الشركاء، وسأرسل لك التفاصيل في رسالة الآن. لا تخبر أحدًا، إنه مشروع سري.",
+      de: "Hallo, hier ist Sebastian. Ich bin in einem Meeting und kann nicht sprechen. Wir brauchen dringend eine Überweisung an einen Partner, ich schicke Ihnen die Daten gleich per Nachricht. Bitte sagen Sie niemandem etwas, es ist ein Überraschungsprojekt.",
+      fr: "Bonjour, c’est Vincent. Je suis en réunion, je ne peux pas parler. Il faut faire un virement urgent à un partenaire, je vous envoie les coordonnées par message. N’en parlez à personne, c’est un projet confidentiel.",
+      ar: "مرحبًا، أنا سلطان. أنا في اجتماع ولا أستطيع الكلام. نحتاج إلى تحويل عاجل لأحد الشركاء، وسأرسل لك التفاصيل في رسالة الآن. لا تخبر أحدًا، إنه مشروع سري.",
     },
     redFlags: [
       {

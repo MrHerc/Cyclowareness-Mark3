@@ -14,6 +14,7 @@ import { AssignmentRowActions } from "@/components/admin/assignment-row-actions"
 import type { Category } from "@/lib/domain/catalog";
 import { dayAt } from "@/lib/time";
 import { pick } from "@/i18n/config";
+import { TEACHABLE_PREFIX } from "@/lib/tenant-defaults";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -69,7 +70,7 @@ export default async function AssignmentsPage() {
         actions={
           canWrite ? (
             <AssignDialog
-              modules={modules.map((m) => ({ id: m.id, title: pick(m.title, locale), meta: tc("units.min", { count: m.minutes }) }))}
+              modules={modules.filter((m) => !m.slug.startsWith(TEACHABLE_PREFIX)).map((m) => ({ id: m.id, title: pick(m.title, locale), meta: tc("units.min", { count: m.minutes }) }))}
               paths={paths.map((p) => ({ id: p.id, title: pick(p.title, locale), meta: tc("units.modules", { count: p.moduleSlugs.length }) }))}
               departments={departments.map((d) => ({ id: d.id, name: d.name }))}
               people={people.sort((a, b) => a.name.localeCompare(b.name, locale))}

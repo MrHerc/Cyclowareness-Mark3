@@ -5,7 +5,7 @@ import { applyMarket, azWorldSchema, brandName, marketPackSchema, marketSource, 
 import { localeParityErrors } from "@/lib/content/locale-parity";
 import type { Brand } from "@/lib/content/types";
 import { brandsFor } from "@/server/brands";
-import { TEMPLATE_BY_KEY, templateText } from "@/lib/campaigns/templates";
+import { TEMPLATES, TEMPLATE_BY_KEY, templateText } from "@/lib/campaigns/templates";
 
 const MARKET = path.join(__dirname, "..", "content", "market");
 const LESSONS = path.join(__dirname, "..", "content", "library", "lessons");
@@ -162,6 +162,16 @@ describe("the lesson checker's market rule", () => {
     const errors = marketTokenErrors({ to: "Anna Fischer <leyla.hasanova@rxagentlik.az>", href: "https://ulduzbank.az/giris" }, world, packs.de);
     for (const word of ["leyla", "hasanova", "rxagentlik", "az", "ulduzbank", "giris"]) expect(errors.some((e) => e.includes(`"${word}" in`)), word).toBe(true);
     expect(marketTokenErrors({ to: "Anna Fischer <anna.fischer@rx-amt.de>", href: "https://wifi-paket.test" }, world, packs.de)).toEqual([]);
+    const left = marketTokenErrors({ text: "https://free-wifi-baku.top/login", label: "IBAN AZ21 NABZ 0000 0000 1370 1000 1944", href: "https://x.example.net/viza" }, world, packs.de);
+    for (const word of ['"baku" in', "AZ21 NABZ", '"viza" in']) expect(left.some((e) => e.includes(word)), word).toBe(true);
+  });
+
+  it("maps a city inside an address like the text, a grouped IBAN to a grouped one, and a URL piece cut after gov.", () => {
+    expect(applyMarket({ text: "https://free-wifi-baku.top/login" }, "x", packs.de, world).text).toBe("https://free-wifi-berlin.top/login");
+    expect(applyMarket({ text: "IBAN AZ21 NABZ 0000 0000 1370 1000 1944" }, "x", packs.de, world).text).toBe("IBAN DE00 0000 0013 7010 0019 44");
+    expect(applyMarket({ url: [{ text: "https://vetendasportal.gov." }, { text: "az-arayis.example" }] }, "x", packs.fr, world).url.map((p) => p.text).join("")).toBe(
+      "https://portail-citoyen.gouv.fr-attestation.example",
+    );
   });
 
   it.each(READY)("passes every committed %s lesson, which a second run leaves unchanged", (lang) => {
@@ -203,5 +213,13 @@ describe("brand names per language", () => {
     expect(templateText(sms.sender.address, "az")).toBe("SuretKargo");
     expect(templateText(TEMPLATE_BY_KEY.get("invoice")!.sender.name, "de")).toBe("BüroBedarf GmbH");
     expect(templateText(TEMPLATE_BY_KEY.get("bank-sms")!.body, "fr")).toContain("Banque Étoile");
+  });
+
+  it.each(READY)("leaves no token of the Azerbaijani world in any %s simulation template", (lang) => {
+    for (const tpl of TEMPLATES) {
+      const values = [tpl.name, tpl.sender.name, tpl.sender.address, tpl.subject, tpl.body, tpl.cta, tpl.attachment?.name, tpl.attachment?.size, ...tpl.redFlags];
+      const points = values.flatMap((v) => (v ? [templateText(v, lang)] : []));
+      expect(marketTokenErrors({ points }, world, packs[lang]), tpl.key).toEqual([]);
+    }
   });
 });

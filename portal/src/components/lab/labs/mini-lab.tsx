@@ -49,7 +49,8 @@ function MiniRun({ sc, lang, today, back, onAgain }: { sc: LabScenario; lang: st
   }, [sc, today, tv]);
   const [shell, runLocal] = useLocalShell(machine);
   const webs = sc.decisions.filter((d): d is LabDecision & { artifact: Web } => d.artifact.kind === "web");
-  const [tabs, setTabs] = useState<string[]>(() => (webs.length ? webs.map((d) => d.id) : ["new-1"]));
+  // Like the inbox, a decision's tab opens when the decision is reached (show() and openTab() add it).
+  const [tabs, setTabs] = useState<string[]>(() => (sc.decisions[0].artifact.kind === "web" ? [sc.decisions[0].id] : ["new-1"]));
   const [active, setActive] = useState(tabs[0]);
   const [seq, setSeq] = useState(2);
   const [reportedTabs, setReportedTabs] = useState<string[]>([]);
@@ -215,8 +216,11 @@ function DecisionCard({ d, n, total, lang, picked, focusOnMount, onChoose, onSho
   const heading = useRef<HTMLHeadingElement>(null);
   const verdictId = useId();
   const explainId = useId();
+  // A frame later: Next also opens the next artifact's app, whose window takes the focus in the same commit.
   useEffect(() => {
-    if (focusOnMount) heading.current?.focus();
+    if (!focusOnMount) return;
+    const id = requestAnimationFrame(() => heading.current?.focus());
+    return () => cancelAnimationFrame(id);
   }, [focusOnMount]);
   const ok = picked === d.safe;
   const app = ARTIFACT_APP[d.artifact.kind];
