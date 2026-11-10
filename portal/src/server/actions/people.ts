@@ -384,6 +384,26 @@ async function anonymise(v: Viewer, u: { id: string; email: string }, action: "p
       .update(t.auditLog)
       .set({ meta: sql`${t.auditLog.meta} - 'email'` })
       .where(and(eq(t.auditLog.tenantId, v.tenant.id), eq(t.auditLog.targetType, "user"), eq(t.auditLog.targetId, userId)));
+    // So is the name: re-simulations made for the person alone may be named after them (and so their audit entries),
+    // and manager alerts and the deletion request about them point at an account that no longer exists.
+    const resims = (
+      await tx
+        .select({ id: t.campaigns.id })
+        .from(t.campaigns)
+        .where(and(eq(t.campaigns.tenantId, v.tenant.id), eq(t.campaigns.audience, "person"), eq(t.campaigns.userId, userId)))
+    ).map((c) => c.id);
+    if (resims.length) {
+      await tx.update(t.campaigns).set({ name: "—" }).where(inArray(t.campaigns.id, resims));
+      await tx
+        .update(t.auditLog)
+        .set({ meta: sql`${t.auditLog.meta} - 'name'` })
+        .where(and(eq(t.auditLog.tenantId, v.tenant.id), eq(t.auditLog.targetType, "campaign"), inArray(t.auditLog.targetId, resims)));
+    }
+    await tx
+      .delete(t.notifications)
+      .where(and(eq(t.notifications.tenantId, v.tenant.id), inArray(t.notifications.kind, ["manager", "deletion"]), inArray(t.notifications.href, [`/admin/users/${userId}`, `/admin/users/${userId}#training`])));
+    // And the sign-in data: the IP of every entry the person made themselves (sign-ins among them).
+    await tx.update(t.auditLog).set({ ip: null }).where(and(eq(t.auditLog.tenantId, v.tenant.id), eq(t.auditLog.actorId, userId)));
   });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action, targetType: "user", targetId: userId, ip: await clientIp() });
 }
@@ -400,7 +420,8 @@ export async function deletePersonAction(userId: string): Promise<{ ok: boolean 
 export async function decideDeletionAction(userId: string, approve: boolean): Promise<{ ok: boolean }> {
   const v = await actionViewer("people.write");
   const u = await target(v, userId);
-  if (!u || !u.deletionRequestedAt) return { ok: false };
+  // Not one's own request, as deletePersonAction: the profile withdraws it, and another administrator decides it.
+  if (!u || u.id === v.user.id || !u.deletionRequestedAt) return { ok: false };
   if (approve) await anonymise(v, u, "person.deletion_approved");
   else {
     await db().update(t.users).set({ deletionRequestedAt: null }).where(eq(t.users.id, u.id));
@@ -530,7 +551,7 @@ const IMPORT_TEXT_MAX = 120;
 export async function importPeopleAction(csv: string, commit: boolean): Promise<ImportPreview> {
   const v = await actionViewer("people.write");
   // A check reports which of up to 5,000 addresses exist somewhere, so an administrator gets a bounded number of them
-  // (the commit of a checked file is not another probe).
+  // (the clean commit of a checked file is not another probe; one that reports problems is charged below).
   if (!commit && !(await rateLimit(`people-import:${v.user.id}`, 20, 60 * 60_000)).ok) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "rateLimited" };
   if (importTooBig(csv)) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "tooBig" };
   const table = parseCsv(csv);
@@ -604,6 +625,8 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
     else if (department && !deptByName.has(key) && !newDepartments.has(key)) newDepartments.set(key, { name: department, line });
     rows.push({ line, name, email, department, jobTitle: short(get("job_title")), role: role ?? "learner", manager: get("manager_email").toLowerCase().slice(0, 254), phone, locale: language ?? v.tenant.settings.defaultLocale });
   });
+  // The server cannot tell a commit was checked: one that reports problems answers the same lookups as a check.
+  if (commit && problems.length && !(await rateLimit(`people-import:${v.user.id}`, 20, 60 * 60_000)).ok) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "rateLimited" };
   if (!commit || problems.length) return { ok: problems.length === 0, rows: rows.length, problems: problems.slice(0, 200), newDepartments: newDepartmentNames() };
 
   // All or nothing: a file lands completely or not at all, so a conflict halfway (someone added one of

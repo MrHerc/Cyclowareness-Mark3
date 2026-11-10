@@ -8,7 +8,7 @@ import { RelativeTime } from "@/components/relative-time";
 import { Bell, Building2, FileUp, KeyRound, Link2, Mail, Plus, Search, UserX } from "lucide-react";
 import { addPersonAction, createLinkAction, emailInvitesAction, importPeopleAction, moveDepartmentAction, remindPeopleAction, setStatusAction, type ImportPreview, type PersonState } from "@/server/actions/people";
 import { remindAwaitingAction } from "@/server/actions/admin-overview";
-import { ConfirmPasswordField, useStepUpError } from "@/components/admin/person-actions";
+import { ConfirmPasswordField, useLinkRefused } from "@/components/admin/person-actions";
 import { CreatedLinkDialog, copyOrShow } from "@/components/admin/created-link";
 import { Avatar } from "@/components/ui/avatar";
 import { Button, TextButton } from "@/components/ui/button";
@@ -146,12 +146,12 @@ export function PeopleTable({
   const [resetFor, setResetFor] = useState<PeopleRow | null>(null);
   const [password, setPassword] = useState("");
   const [pwError, setPwError] = useState<string | null>(null);
-  const stepUpError = useStepUpError();
   const closeReset = () => {
     setResetFor(null);
     setPassword("");
     setPwError(null);
   };
+  const linkRefused = useLinkRefused(setPwError, closeReset);
 
   const [createdLink, setCreatedLink] = useState<string | null>(null);
   const copyLink = (id: string, kind: "invite" | "reset") =>
@@ -160,7 +160,7 @@ export function PeopleTable({
       if (res.ok && res.url) {
         closeReset();
         await copyOrShow(res.url, () => toast(t("linkCopied")), setCreatedLink);
-      } else setPwError(stepUpError(res.error));
+      } else linkRefused(res.error);
     });
 
   return (

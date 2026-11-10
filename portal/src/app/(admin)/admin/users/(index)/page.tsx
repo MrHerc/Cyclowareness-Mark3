@@ -43,7 +43,7 @@ export default async function PeoplePage({ searchParams }: PageProps<"/admin/use
   const page = pageParam(str("page"));
   const rows = filtered.slice((page - 1) * PAGE, page * PAGE);
   const canWrite = allowed(v, "people.write");
-  const pending = all.filter((p) => p.deletionRequestedAt && p.status !== "deleted");
+  const pending = all.filter((p) => p.deletionRequestedAt && p.status !== "deleted" && p.id !== v.user.id);
   const pageHref = (n: number) => {
     const next = new URLSearchParams(Object.entries(sp).filter(([, val]) => typeof val === "string") as [string, string][]);
     next.set("page", String(n));

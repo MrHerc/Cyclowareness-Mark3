@@ -15,11 +15,11 @@ import { LOCALES, LOCALE_NAMES } from "@/i18n/config";
 const ROLES = ["learner", "department_head", "executive", "analyst", "campaign_manager", "content_creator", "tenant_admin"] as const;
 
 /** The actor's own password before an action that can take over an account (the server's step-up). */
-export function ConfirmPasswordField({ id, value, onChange, error }: { id: string; value: string; onChange: (v: string) => void; error: string | null }) {
+export function ConfirmPasswordField({ id, value, onChange, error, autoFocus = true }: { id: string; value: string; onChange: (v: string) => void; error: string | null; autoFocus?: boolean }) {
   const t = useTranslations("admin.person");
   return (
     <Field label={t("confirmPassword")} htmlFor={id} hint={t("confirmPasswordHint")} error={error}>
-      <Input id={id} type="password" autoComplete="current-password" value={value} onChange={(e) => onChange(e.target.value)} required autoFocus aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : `${id}-hint`} />
+      <Input id={id} type="password" autoComplete="current-password" value={value} onChange={(e) => onChange(e.target.value)} required autoFocus={autoFocus} aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : `${id}-hint`} />
     </Field>
   );
 }
@@ -29,6 +29,23 @@ export function useStepUpError() {
   const t = useTranslations("admin.person");
   const tc = useTranslations("common");
   return (error: string | undefined) => (error === "wrongPassword" ? t("wrongPassword") : error === "rateLimited" ? tc("errors.rateLimited") : null);
+}
+
+/**
+ * A refused invite or reset link: a step-up refusal stays on the password field; any other (the person was activated
+ * or removed meanwhile) closes the dialog with a message and refreshes the stale view.
+ */
+export function useLinkRefused(setPwError: (message: string) => void, close: () => void) {
+  const stepUpError = useStepUpError();
+  const tc = useTranslations("common");
+  const router = useRouter();
+  return (error: string | undefined) => {
+    const message = stepUpError(error);
+    if (message) return setPwError(message);
+    close();
+    toast(tc("errors.generic"), "error");
+    router.refresh();
+  };
 }
 
 export function PersonActions({
@@ -73,13 +90,14 @@ export function PersonActions({
     router.refresh();
   };
   const [createdLink, setCreatedLink] = useState<string | null>(null);
+  const linkRefused = useLinkRefused(setPwError, close);
   const copy = (kind: "invite" | "reset") =>
     start(async () => {
       const res = await createLinkAction(person.id, kind, password);
       if (res.ok && res.url) {
         close();
         await copyOrShow(res.url, () => toast(tp("linkCopied")), setCreatedLink);
-      } else setPwError(stepUpError(res.error));
+      } else linkRefused(res.error);
     });
 
   return (
@@ -171,7 +189,8 @@ export function PersonActions({
               ))}
             </Select>
           </Field>
-          {newPhone ? <ConfirmPasswordField id="edit-pw" value={password} onChange={setPassword} error={pwError} /> : null}
+          {/* Mounted by the keystroke that changes the number, so it must not take the focus from the phone field. */}
+          {newPhone ? <ConfirmPasswordField id="edit-pw" autoFocus={false} value={password} onChange={setPassword} error={pwError} /> : null}
           <Button type="submit" disabled={pending || (newPhone && !password)}>
             {tc("save")}
           </Button>

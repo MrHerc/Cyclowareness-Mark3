@@ -119,6 +119,53 @@ describe("deleting a person", () => {
     expect(meta.get(ids.admin)).toEqual({ email: "admin@platform.test", role: "tenant_admin" });
     expect((await row(ids.learner)).email).toBe(`deleted+${ids.learner}@invalid.local`);
   });
+
+  it("removes their name from their re-simulations, manager alerts and deletion request, and the IP of what they did", async () => {
+    actor = { id: ids.admin, role: "tenant_admin" };
+    const name = "Nigar Quliyeva";
+    const [person] = await db.insert(t.users).values({ tenantId, email: "nigar@platform.test", name }).returning();
+    const [resim, other] = await db
+      .insert(t.campaigns)
+      .values([
+        { tenantId, name: `Invoice: re-simulation for ${name}`, channel: "email", templateKey: "invoice", audience: "person", userId: person.id },
+        { tenantId, name: "Quarterly drill", channel: "email", templateKey: "invoice", audience: "all" },
+      ])
+      .returning();
+    await db.insert(t.auditLog).values([
+      { tenantId, action: "campaign.created", targetType: "campaign", targetId: resim.id, meta: { name: resim.name, template: "invoice", teachable: true } },
+      { tenantId, actorId: ids.admin, action: "campaign.created", targetType: "campaign", targetId: other.id, meta: { name: other.name }, ip: "198.51.100.1" },
+      { tenantId, actorId: person.id, action: "auth.sign_in", ip: "203.0.113.9", meta: { method: "password" } },
+    ]);
+    await db.insert(t.notifications).values([
+      { tenantId, userId: ids.admin, kind: "manager", title: name, href: `/admin/users/${person.id}` },
+      { tenantId, userId: ids.admin, kind: "manager", title: name, href: `/admin/users/${person.id}#training` },
+      { tenantId, userId: ids.admin, kind: "deletion", title: name, href: `/admin/users/${person.id}` },
+      { tenantId, userId: ids.admin, kind: "manager", title: "Someone else", href: `/admin/users/${ids.learner}` },
+    ]);
+
+    expect(await people.deletePersonAction(person.id)).toEqual({ ok: true });
+
+    const campaigns = await db.select({ id: t.campaigns.id, name: t.campaigns.name }).from(t.campaigns);
+    expect(campaigns.find((c) => c.id === resim.id)?.name).toBe("—");
+    expect(campaigns.find((c) => c.id === other.id)?.name).toBe("Quarterly drill");
+    const entries = await db.select().from(t.auditLog);
+    expect(entries.filter((e) => JSON.stringify(e.meta ?? {}).includes(name))).toEqual([]);
+    expect(entries.find((e) => e.targetId === resim.id)?.meta).toEqual({ template: "invoice", teachable: true });
+    expect(entries.find((e) => e.targetId === other.id)).toMatchObject({ meta: { name: "Quarterly drill" }, ip: "198.51.100.1" });
+    expect(entries.find((e) => e.actorId === person.id)?.ip).toBeNull();
+    expect((await db.select({ title: t.notifications.title }).from(t.notifications)).map((n) => n.title)).toEqual(["Someone else"]);
+  });
+});
+
+describe("a deletion request", () => {
+  it("is not approved or declined by the administrator who made it", async () => {
+    actor = { id: ids.admin, role: "tenant_admin" };
+    const before = await row(ids.admin);
+    expect(before.deletionRequestedAt).not.toBeNull();
+    expect(await people.decideDeletionAction(ids.admin, true)).toEqual({ ok: false });
+    expect(await people.decideDeletionAction(ids.admin, false)).toEqual({ ok: false });
+    expect(await row(ids.admin)).toEqual(before);
+  });
 });
 
 describe("unlinking single sign-on", () => {
