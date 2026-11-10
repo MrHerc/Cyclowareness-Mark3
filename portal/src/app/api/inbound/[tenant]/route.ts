@@ -57,10 +57,23 @@ export async function POST(request: Request, { params }: { params: Promise<{ ten
   }
   if (!(await rateLimit(`inbound:${row.id}`, PER_MINUTE, 60_000)).ok) return new Response("Too many requests", { status: 429, headers: { "retry-after": "60" } });
 
-  // Refuse a declared oversize body before buffering it; the length check after reading is the backstop.
-  if (Number(request.headers.get("content-length")) > MAX_BODY) return new Response("Payload too large", { status: 413 });
-  const raw = await request.text();
-  if (raw.length > MAX_BODY) return new Response("Payload too large", { status: 413 });
+  // Refuse a declared oversize body before buffering it; the capped read covers a body without (or lying about) its length.
+  const tooLarge = () => new Response("Payload too large", { status: 413 });
+  if (Number(request.headers.get("content-length")) > MAX_BODY) return tooLarge();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  const reader = request.body?.getReader();
+  while (reader) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > MAX_BODY) {
+      await reader.cancel();
+      return tooLarge();
+    }
+    chunks.push(value);
+  }
+  const raw = Buffer.concat(chunks).toString("utf8");
   let body: unknown;
   try {
     body = JSON.parse(raw);

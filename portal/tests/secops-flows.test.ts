@@ -53,6 +53,7 @@ const { advanceLoop, assignIncidentTraining, closeLoop, createIncident, createLo
 const { rotateInboundSecretAction, saveIntegrationsAction } = await import("../src/server/actions/settings");
 const inbound = await import("../src/app/api/inbound/[tenant]/route");
 const { rateLimit } = await import("../src/server/rate-limit");
+const { sha256Hex } = await import("../src/server/crypto");
 const { randomToken } = await import("../src/server/services/progress");
 const { saveStudioLessonAction, setModuleStatusAction, updateStudioLessonAction } = await import("../src/server/actions/secops");
 
@@ -398,6 +399,15 @@ describe("inbound report address (/api/inbound/[tenant])", () => {
   }
   const reports = (tenantId: string) => db.select().from(t.threatReports).where(eq(t.threatReports.tenantId, tenantId));
 
+  it("keeps only the hash of a new inbound secret and audits the rotation", async () => {
+    const { tenant, auth } = await inboundOrg();
+    const secret = auth.slice("Bearer ".length);
+    const [{ settings }] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenant.id));
+    expect(withDefaults(settings).integrations.inboundSecretHash).toBe(sha256Hex(secret));
+    expect(JSON.stringify(settings)).not.toContain(secret);
+    expect(await db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenant.id), eq(t.auditLog.action, "settings.inbound_secret")))).toHaveLength(1);
+  });
+
   it("files a forwarded simulation mail as a matched report of the person who forwarded it", async () => {
     const { tenant, auth } = await inboundOrg();
     // Saving the form keeps the secret (it has no field) and stores the address the learners see.
@@ -477,6 +487,23 @@ describe("inbound report address (/api/inbound/[tenant])", () => {
     expect(await reports(a.tenant.id)).toEqual([]);
   });
 
+  it("files nothing for a person over the report form's own limit, with the same answer", async () => {
+    const { tenant, auth } = await inboundOrg();
+    const person = await addUser(db, tenant.id);
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-10T10:30:00Z"));
+    try {
+      // The route's window: 20 reports per person and hour, shared with the web form.
+      for (let i = 0; i < 20; i++) await rateLimit(`threat-report:${person.id}`, 20, 3_600_000);
+      expect((await post(tenant.slug, { from: person.email, subject: "Invoice", text: "Pay now" }, auth)).status).toBe(202);
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(await reports(tenant.id)).toEqual([]);
+    const [u] = await db.select({ xp: t.users.xp }).from(t.users).where(eq(t.users.id, person.id));
+    expect(u.xp).toBe(person.xp);
+  });
+
   it("refuses a flood per organisation", async () => {
     const { tenant, auth } = await inboundOrg();
     const person = await addUser(db, tenant.id);
@@ -516,6 +543,22 @@ describe("inbound report address (/api/inbound/[tenant])", () => {
       { params: Promise.resolve({ tenant: tenant.slug }) },
     );
     expect((await big).status).toBe(413);
+
+    // A body without a declared length is read up to the limit, not buffered whole.
+    const chunk = new TextEncoder().encode(" ".repeat(256_000));
+    let sent = 0;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(c) {
+        if (sent++ < 8) c.enqueue(chunk);
+        else c.close();
+      },
+    });
+    const streamed = await inbound.POST(
+      new Request(`https://portal.example/api/inbound/${tenant.slug}`, { method: "POST", headers: { "content-type": "application/json", authorization: auth }, body: stream, duplex: "half" } as RequestInit),
+      { params: Promise.resolve({ tenant: tenant.slug }) },
+    );
+    expect(streamed.status).toBe(413);
+    expect(sent).toBeLessThan(8);
   });
 });
 
@@ -705,6 +748,25 @@ describe("Studio lessons", () => {
     } finally {
       ai.during = null;
     }
+  });
+
+  it("stops translating at the organisation's daily AI cap and says which languages were left out", async () => {
+    const tenant = await studio(["en", "ru", "az"]);
+    ai.key = "test-key";
+    ai.fail = "";
+    ai.calls = [];
+    const { slug } = await saveStudioLessonAction(LESSON);
+    const { mod } = await lessonOf(tenant.id, slug!);
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-10T10:00:00Z"));
+    try {
+      for (let i = 0; i < 200; i++) await rateLimit(`ai-translate-day:t:${tenant.id}`, 200, 24 * 60 * 60_000);
+      expect(await setModuleStatusAction(mod.id, "published")).toEqual({ ok: true, translated: [], untranslated: ["ru", "az"] });
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(ai.calls).toEqual([]);
+    expect((await lessonOf(tenant.id, slug!)).locales).toEqual(["en"]);
   });
 
   it("places hotspot signs by one rule for the form and the server: on one line, without overlap", () => {

@@ -76,6 +76,7 @@ import { readableOn } from "@/lib/color";
 import { cn } from "@/lib/cn";
 import { endpointKey } from "@/lib/stored-secret";
 import { useStepUpError } from "@/components/admin/person-actions";
+import { writeClipboard } from "@/components/admin/created-link";
 
 /*
  * Settings as the browser receives them: stored secrets (encrypted) stay on the server, the tabs
@@ -180,7 +181,10 @@ export function BrandingTab({
       () => setRecord(""),
     );
   }, []);
-  const copy = (v: string) => navigator.clipboard.writeText(v).then(() => toast(tc("copied")));
+  const copy = async (v: string) => {
+    if (await writeClipboard(v)) toast(tc("copied"));
+    else toast(tc("errors.generic"), "error");
+  };
   const checkDomain = () =>
     startCheck(async () => {
       const res = await verifyDomainAction(proofDomain);
@@ -525,7 +529,10 @@ export function IdentityTab({
     s.ssoEnabled !== initial.ssoEnabled ||
     (initial.requireAdmin2fa && !s.requireAdmin2fa);
   const needsPassword = trustChanged || pwAsked;
-  const copy = (v: string) => navigator.clipboard.writeText(v).then(() => toast(tc("copied")));
+  const copy = async (v: string) => {
+    if (await writeClipboard(v)) toast(tc("copied"));
+    else toast(tc("errors.generic"), "error");
+  };
   const [checked, setChecked] = useState<boolean | null>(null);
   const checkSettings = () => {
     let ok = false;
@@ -1594,10 +1601,17 @@ function ApiTokensCard({ tokens, canMint }: { tokens: ApiTokenView[]; canMint: b
   const [permissions, setPermissions] = useState<ApiTokenPermission[]>(["reports.read"]);
   const [token, setToken] = useState<string | null>(null);
   const [busy, start] = useTransition();
+  // Shown once: focus it, so it is announced and ready to copy (the Create button is disabled by then).
+  useEffect(() => {
+    if (token) document.getElementById("k-token")?.focus();
+  }, [token]);
   const full = tokens.length >= MAX_API_TOKENS;
   const permKey = (p: ApiTokenPermission) => p.replace(".", "_") as "reports_read";
   const toggle = (p: ApiTokenPermission) => setPermissions(permissions.includes(p) ? permissions.filter((x) => x !== p) : [...permissions, p]);
-  const copy = (v: string) => navigator.clipboard.writeText(v).then(() => toast(tc("copied")));
+  const copy = async (v: string) => {
+    if (await writeClipboard(v)) toast(tc("copied"));
+    else toast(tc("errors.generic"), "error");
+  };
   const create = () =>
     start(async () => {
       const res = await createApiTokenAction({ name: name.trim(), permissions });
@@ -1648,7 +1662,7 @@ function ApiTokensCard({ tokens, canMint }: { tokens: ApiTokenView[]; canMint: b
         {token ? (
           <Notice tone="warn" title={t("tokenShown")}>
             <div className="mt-2 flex gap-2">
-              <Input value={token} readOnly dir="ltr" aria-label={t("apiTokens")} className="font-mono text-caption" />
+              <Input id="k-token" value={token} readOnly dir="ltr" aria-label={t("apiTokens")} className="font-mono text-caption" onFocus={(e) => e.currentTarget.select()} />
               <Button variant="secondary" size="icon" aria-label={tc("copy")} onClick={() => copy(token)}>
                 <Copy />
               </Button>
@@ -1659,11 +1673,12 @@ function ApiTokensCard({ tokens, canMint }: { tokens: ApiTokenView[]; canMint: b
         {canMint ? (
           <>
             <Field label={t("tokenName")} htmlFor="k-name" hint={t("tokenNameHint")}>
-              <Input id="k-name" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} />
+              <Input id="k-name" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} aria-describedby="k-name-hint" />
             </Field>
             <fieldset className="grid gap-2 sm:grid-cols-3">
               <legend className="mb-2 text-body-sm font-medium text-ink">{t("tokenReads")}</legend>
-              {API_TOKEN_PERMISSIONS.map((p) => (
+              {/* audit.read opens no endpoint yet (docs/API.md); existing tokens still list it. */}
+              {API_TOKEN_PERMISSIONS.filter((p) => p !== "audit.read").map((p) => (
                 <Checkbox key={p} label={t(`tokenPermissions.${permKey(p)}`)} description={<code className="font-mono text-tab">{p}</code>} checked={permissions.includes(p)} onChange={() => toggle(p)} />
               ))}
             </fieldset>
@@ -1722,7 +1737,13 @@ export function IntegrationsTab({
   const [secret, setSecret] = useState<string | null>(null);
   const [inboundSecret, setInboundSecret] = useState<string | null>(null);
   const hasInboundSecret = Boolean(integrations.hasInboundSecret || inboundSecret);
-  const copy = (v: string) => navigator.clipboard.writeText(v).then(() => toast(tc("copied")));
+  useEffect(() => {
+    if (inboundSecret) document.getElementById("in-secret")?.focus();
+  }, [inboundSecret]);
+  const copy = async (v: string) => {
+    if (await writeClipboard(v)) toast(tc("copied"));
+    else toast(tc("errors.generic"), "error");
+  };
   const [busy, start] = useTransition();
   const hasSecret = Boolean(integrations.hasWebhookSecret || secret);
   const toggleEvent = (e: string) => setS({ ...s, webhookEvents: s.webhookEvents.includes(e) ? s.webhookEvents.filter((x) => x !== e) : [...s.webhookEvents, e] });
@@ -1768,11 +1789,11 @@ export function IntegrationsTab({
           <CardHeader icon={<Mail />} title={t("inbound")} description={t("inboundBody")} />
           <CardBody className="grid gap-4">
             <Field label={t("inboundAddress")} htmlFor="in-address" hint={t("inboundAddressHint")}>
-              <Input id="in-address" type="email" dir="ltr" value={s.inboundAddress} onChange={(e) => setS({ ...s, inboundAddress: e.target.value })} placeholder="report@bank.example.az" />
+              <Input id="in-address" aria-describedby="in-address-hint" type="email" dir="ltr" value={s.inboundAddress} onChange={(e) => setS({ ...s, inboundAddress: e.target.value })} placeholder="report@bank.example.az" />
             </Field>
             <Field label={t("inboundEndpoint")} htmlFor="in-endpoint" hint={t("inboundEndpointHint")}>
               <div className="flex gap-2">
-                <Input id="in-endpoint" dir="ltr" value={inboundEndpoint} readOnly className="font-mono text-caption" />
+                <Input id="in-endpoint" aria-describedby="in-endpoint-hint" dir="ltr" value={inboundEndpoint} readOnly className="font-mono text-caption" />
                 <Button variant="secondary" size="icon" aria-label={tc("copy")} onClick={() => copy(inboundEndpoint)}>
                   <Copy />
                 </Button>
@@ -1793,7 +1814,7 @@ export function IntegrationsTab({
             {inboundSecret ? (
               <Notice tone="warn" title={t("secretShown")}>
                 <div className="mt-2 flex gap-2">
-                  <Input aria-label={t("inboundSecret")} dir="ltr" value={inboundSecret} readOnly className="font-mono text-caption" />
+                  <Input id="in-secret" aria-label={t("inboundSecret")} dir="ltr" value={inboundSecret} readOnly className="font-mono text-caption" onFocus={(e) => e.currentTarget.select()} />
                   <Button variant="secondary" size="icon" aria-label={tc("copy")} onClick={() => copy(inboundSecret)}>
                     <Copy />
                   </Button>

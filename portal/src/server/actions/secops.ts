@@ -487,7 +487,6 @@ function slugify(s: string): string {
   return base || "lesson";
 }
 
-/** Saves a studio lesson as a draft module with one lesson (intro, tutor steps, optional swipe and hotspot, question, recap). */
 /** A Studio draft's scenes, written in the library's lesson format and checked by the schema the player's content passes; null when either check fails. */
 function checkedScenes(d: z.infer<typeof lessonSchema>): Scene[] | null {
   const built = studioScenes(d);
@@ -495,6 +494,7 @@ function checkedScenes(d: z.infer<typeof lessonSchema>): Scene[] | null {
   return file?.success ? (file.data.scenes as Scene[]) : null;
 }
 
+/** Saves a studio lesson as a draft module with one lesson (intro, tutor steps, optional swipe and hotspot, question, recap). */
 export async function saveStudioLessonAction(input: z.infer<typeof lessonSchema>): Promise<Result & { slug?: string }> {
   const v = await actionViewer("studio.write");
   const p = lessonSchema.safeParse(input);
