@@ -6,7 +6,7 @@
   "decisions": [
     {
       "id": "redeliver-sms",
-      "title": "Message from +994 51 000 83 17",
+      "title": "Courier redelivery fee",
       "prompt": "A familiar courier name and a small amount. What do you do with this message?",
       "artifact": {
         "kind": "sms",
@@ -32,13 +32,17 @@
     },
     {
       "id": "fake-fine-page",
-      "title": "e-xidmet-cerime.example.net",
-      "prompt": "Look at the address bar. What do you do on this page?",
+      "title": "Fine page from a link",
+      "prompt": "A link about an unpaid fine opened this page. Look at the address bar. What do you do?",
       "artifact": {
         "kind": "web",
-        "title": "e-xidmet-cerime.example.net",
+        "title": "Unpaid fine: 80 AZN",
         "url": "https://e-xidmet-cerime.example.net/odenis",
-        "body": []
+        "body": [
+          "50% off if you pay today: 40 AZN.",
+          "Offer ends at midnight."
+        ],
+        "button": "Pay with the discount"
       },
       "options": [
         {
@@ -51,12 +55,12 @@
         }
       ],
       "safe": "close",
-      "explain": "This is not the portal's own domain. Now open the portal yourself.",
+      "explain": "This is not the portal's own domain. Close it and open the portal yourself.",
       "risk": "money"
     },
     {
       "id": "bank-code",
-      "title": "Message from SahilBank",
+      "title": "Bank code for 412 AZN",
       "prompt": "Your bank sent a code. Look at the amount. What do you do with this message?",
       "artifact": {
         "kind": "sms",
@@ -82,13 +86,15 @@
     },
     {
       "id": "real-fines",
-      "title": "e-xidmet.example",
-      "prompt": "Is this page genuine or fake?",
+      "title": "Fines page from your bookmark",
+      "prompt": "You opened the portal from your bookmark. Is this page genuine or fake?",
       "artifact": {
         "kind": "web",
         "title": "e-Xidmət Portalı",
         "url": "https://e-xidmet.example/cerimeler",
-        "body": [],
+        "body": [
+          "Fines and payments. Sign in to see your fines."
+        ],
         "fields": [
           "Personal ID code",
           "Password"
@@ -111,13 +117,16 @@
     },
     {
       "id": "fake-discount",
-      "title": "e-xidmet-endirim.example.net",
+      "title": "Fine page with 50% off",
       "prompt": "Is this page genuine or fake?",
       "artifact": {
         "kind": "web",
         "title": "e-Xidmət Portalı",
         "url": "https://e-xidmet-endirim.example.net/cerime",
-        "body": [],
+        "body": [
+          "Unpaid fine: 80 AZN. Pay today with 50% off.",
+          "Enter your card details and the SMS code."
+        ],
         "fields": [
           "Card number",
           "Expiry date",

@@ -19,6 +19,8 @@ const artifact = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("email"),
     from: z.object({ name: text, address: text }),
+    /** The To line ("Leyla Həsənova <leyla@…>"), for the learner's own draft or sent mail; the learner's inbox otherwise. */
+    to: text.optional(),
     subject: text,
     time,
     body: paras,
@@ -32,8 +34,8 @@ const artifact = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("call"), name: text, number: text, body: paras }),
   /** A downloaded file: `text` says where it came from. */
   z.object({ kind: z.literal("file"), name: text, size: text, text }),
-  /** A browser tab: a page with optional form fields and a button. */
-  z.object({ kind: z.literal("web"), title: text, url: z.url(), body: z.array(text), fields: z.array(text).optional(), button: text.optional() }),
+  /** A browser tab: a page with text (what the decision tests must be on it), optional form fields and a button. */
+  z.object({ kind: z.literal("web"), title: text, url: z.url(), body: paras, fields: z.array(text).optional(), button: text.optional() }),
   /** A window or notification on the screen (a system prompt, a meeting app, a pop-up). */
   z.object({ kind: z.literal("dialog"), title: text, body: paras }),
 ]);
@@ -68,6 +70,8 @@ export type LabArtifact = LabDecision["artifact"];
 export function labScenarioErrors(s: LabScenario): string[] {
   const errors: string[] = [];
   if (new Set(s.decisions.map((d) => d.id)).size !== s.decisions.length) errors.push("duplicate decision id");
+  // The title names the moment in the checklist, the toast and the debrief, so two alike cannot be told apart.
+  if (new Set(s.decisions.map((d) => d.title)).size !== s.decisions.length) errors.push("duplicate decision title");
   for (const d of s.decisions) {
     const ids = d.options.map((o) => o.id);
     if (new Set(ids).size !== ids.length) errors.push(`${d.id}: duplicate option id`);

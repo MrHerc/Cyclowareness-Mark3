@@ -36,7 +36,7 @@
     },
     {
       "id": "ticket-password",
-      "title": "Message from Ticket 4821",
+      "title": "Server password in a ticket",
       "prompt": "Is this a safe practice?",
       "artifact": {
         "kind": "sms",
@@ -62,13 +62,17 @@
     },
     {
       "id": "env-in-repo",
-      "title": "git.idare.example",
-      "prompt": "Is this a safe practice?",
+      "title": "Keys file in the repository",
+      "prompt": "A colleague committed this file to the deploy repository. Is this a safe practice?",
       "artifact": {
         "kind": "web",
-        "title": "git.idare.example",
+        "title": ".env (infra/deploy, branch main)",
         "url": "https://git.idare.example/infra/deploy/-/blob/main/.env",
-        "body": []
+        "body": [
+          "DB_PASSWORD=Pr0d-Db-2026!",
+          "MAIL_API_KEY=a7f3••••••••91c2",
+          "Committed 2 days ago."
+        ]
       },
       "options": [
         {
@@ -82,11 +86,11 @@
       ],
       "safe": "trap",
       "explain": "The .env file was committed to the repository. Keys stay in history, so deleting the file is not enough. Rotate them now.",
-      "risk": "account"
+      "risk": "credentials"
     },
     {
       "id": "shared-admin",
-      "title": "Message from Kamran (network)",
+      "title": "Admin password before a holiday",
       "prompt": "Is this a safe practice?",
       "artifact": {
         "kind": "sms",

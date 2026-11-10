@@ -122,6 +122,7 @@ export function LabRunner<S>({ def, texts, host, apps, notes, stage, back, onAga
       elapsed={formatElapsed(elapsedSec)}
       onFinish={finish}
       announce={seen.toast?.text ?? ""}
+      lang={texts.lang}
       className={phone ? "min-h-full" : "rounded-xl border border-line shadow-xs"}
     />
   );
@@ -130,7 +131,7 @@ export function LabRunner<S>({ def, texts, host, apps, notes, stage, back, onAga
     <div className={cn("grid grid-cols-1 gap-5", !phone && "lg:grid-cols-[minmax(0,1fr)_16rem] xl:grid-cols-[minmax(0,1fr)_17rem] 2xl:grid-cols-[minmax(0,1fr)_19rem]")}>
       <div className="grid min-w-0 gap-4">
         {stage?.({ run, send, wm, act })}
-        <div className="relative min-w-0">
+        <div id="lab-machine" className="relative min-w-0 scroll-mt-24">
           <VmShell apps={apps({ run, send, wm, act })} wm={wm} act={act} panel={panel} phone={phone} host={host} label={t("screen")} tasksBadge={`${done}/${def.objectives.length}`} />
           {seen.toast ? (
             <div key={seen.toast.id} aria-hidden className={cn("pointer-events-none absolute top-6 left-1/2 z-[60] flex max-w-[calc(100%-2rem)] -translate-x-1/2 animate-rise items-center gap-2 rounded-pill px-4 py-2 text-caption font-semibold shadow-overlay", seen.toast.tone === "ok" ? "bg-safe-600 text-white" : "bg-risk-600 text-white", phone && "top-auto bottom-20")}>

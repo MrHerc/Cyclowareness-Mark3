@@ -21,7 +21,7 @@ export default async function MiniLabPage({ params }: PageProps<"/lab/mini/[slug
   if (!found || !m) notFound();
   return (
     <div className="grid gap-2">
-      <PageHeader title={found.scenario.title} subtitle={found.scenario.intro} back={{ href: `/learn/${slug}`, label: m.title }} className="sm:mb-6" />
+      <PageHeader title={<span lang={found.lang}>{found.scenario.title}</span>} subtitle={<span lang={found.lang}>{found.scenario.intro}</span>} back={{ href: `/learn/${slug}`, label: m.title }} className="sm:mb-6" />
       <MiniLab scenario={found.scenario} lang={found.lang} today={dayKey(new Date(), v.tenant.settings.timeZone)} back={{ href: `/learn/${slug}`, label: m.title }} />
     </div>
   );

@@ -15,10 +15,9 @@ import { LAB_ICON, LAB_TINT } from "@/components/learner/lab-visual";
 import { AttestCard, CertificateLink, RateModule } from "./module-actions";
 import { moduleForPage } from "./module";
 import { DEFAULT_ATTESTATION } from "@/lib/tenant-defaults";
-import { LAB_XP } from "@/lib/domain/gamification";
-import { labPassed, labsForModule, lessonsDone } from "@/lib/domain/labs";
+import { labPassed, labsForModule } from "@/lib/domain/labs";
 import { miniLabXp } from "@/lib/content/lab-scenario";
-import { miniLabId } from "@/components/lab/model/labs";
+import { modulePractice } from "@/components/lab/model/labs";
 import { labScenario } from "@/server/lab/scenarios";
 import { learningPoints } from "@/lib/content/learning-points";
 import { pickLessonContent } from "@/lib/content/lesson-locale";
@@ -83,12 +82,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
   const attestText = v.tenant.settings.attestationText[locale] ?? pick(DEFAULT_ATTESTATION, locale);
   const overdue = !!m.due && m.due < todayIn(v.tenant.settings.timeZone) && m.status !== "completed";
   const done = m.lessons.filter((l) => l.completed).length;
-  const practiceOpen = lessonsDone(m.status);
-  // The module's own mini-lab first, then the labs that practise it. Practice is optional: none of it counts toward completion.
-  const practiceItems = [
-    ...(mini ? [{ id: miniLabId(m.slug), href: `/lab/mini/${m.slug}`, title: mini.scenario.title, lang: mini.lang === locale ? undefined : mini.lang, xp: miniLabXp(mini.scenario), Icon: MousePointerClick, chip: "bg-brand-600" }] : []),
-    ...practice.map((id) => ({ id, href: `/lab/${id}`, title: tlab(`games.${id}.title`), lang: undefined, xp: LAB_XP[id], Icon: LAB_ICON[id], chip: LAB_TINT[id].split(" ")[1] })),
-  ];
+  const { open: practiceOpen, items: practiceItems } = modulePractice(m.slug, m.status, practice, mini && { title: mini.scenario.title, lang: mini.lang, xp: miniLabXp(mini.scenario) }, locale);
 
   // Path context: arriving from a path (?from=/paths/<key>) links back to it and on to its next module; without one,
   // the next module comes from a path assigned to the viewer. Only the viewer's own paths match, so links use their keys.
@@ -321,8 +315,9 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
             </h2>
             <p className="mt-1 mb-3 text-caption text-ink-muted">{practiceOpen ? tr("practiceHint") : tr("practiceLocked")}</p>
             <ul className="grid gap-2.5 sm:grid-cols-2">
-              {practiceItems.map(({ id, href, title, lang, xp, Icon: LabIcon, chip }) => {
-                const Icon = practiceOpen ? LabIcon : Lock;
+              {practiceItems.map(({ id, href, lab, title, lang, xp }) => {
+                const Icon = !practiceOpen ? Lock : lab ? LAB_ICON[lab] : MousePointerClick;
+                const chip = lab ? LAB_TINT[lab].split(" ")[1] : "bg-brand-600";
                 const b = best.get(id) ?? null;
                 const body = (
                   <>
@@ -331,7 +326,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
                     </span>
                     <span className="min-w-0 flex-1">
                       <span lang={lang} className={cn("block text-body-sm font-semibold", !practiceOpen && "text-ink-muted")}>
-                        {title}
+                        {title ?? tlab(`games.${lab}.title`)}
                       </span>
                       <span className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-tab text-ink-subtle">
                         <span className="inline-flex items-center gap-1">

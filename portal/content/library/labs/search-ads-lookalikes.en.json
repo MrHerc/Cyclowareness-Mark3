@@ -6,13 +6,16 @@
   "decisions": [
     {
       "id": "results",
-      "title": "tapan.example",
-      "prompt": "At the top is an ad, and below it is the app's own site. What do you do on this page?",
+      "title": "Searching for the Gorush app",
+      "prompt": "You search for the Gorush app. Which result do you open?",
       "artifact": {
         "kind": "web",
-        "title": "tapan.example",
+        "title": "Search: gorus yukle",
         "url": "https://tapan.example/axtar?q=gorus+yukle",
-        "body": []
+        "body": [
+          "Sponsored · gorus-app-download.example.net: Gorush, free download",
+          "gorus.example: Gorush, official site. Download for Windows and phone."
+        ]
       },
       "options": [
         {
@@ -25,18 +28,21 @@
         }
       ],
       "safe": "organic",
-      "explain": "You skipped the ad and opened the app's own site.",
+      "explain": "The ad leads to another site; the app's own site is the result below it.",
       "risk": "impersonation"
     },
     {
       "id": "search-ad",
-      "title": "tapan.example",
-      "prompt": "The first search result is an ad. What do you do on this page?",
+      "title": "Searching for the citizen portal",
+      "prompt": "You search for the citizen portal. Which result do you open?",
       "artifact": {
         "kind": "web",
-        "title": "tapan.example",
+        "title": "Search: vetendas portali arayis",
         "url": "https://tapan.example/axtar?q=vetendas+portali+arayis",
-        "body": []
+        "body": [
+          "Sponsored · vetendasportal-gov.example: Vatandash Portal, official site",
+          "vetendasportal.gov.az: Vatandash Portal, online certificates"
+        ]
       },
       "options": [
         {
@@ -49,18 +55,21 @@
         }
       ],
       "safe": "official",
-      "explain": "You skipped the ad and chose the result whose address ends in gov.az.",
+      "explain": "The ad leads to a look-alike; the official result is the one whose address ends in gov.az.",
       "risk": "account"
     },
     {
       "id": "fake-site",
-      "title": "gorus-app-download.example.net",
-      "prompt": "The page looks a lot like the real site. Look at the address. What do you do on this page?",
+      "title": "Gorush download page",
+      "prompt": "The ad opened this page, which looks like the real site. Look at the address. What do you do?",
       "artifact": {
         "kind": "web",
-        "title": "gorus-app-download.example.net",
+        "title": "Gorush: free download",
         "url": "https://gorus-app-download.example.net/yukle",
-        "body": []
+        "body": [
+          "Video meetings for everyone. Download GorusSetup_2026.exe."
+        ],
+        "button": "Download"
       },
       "options": [
         {
@@ -78,13 +87,15 @@
     },
     {
       "id": "fake-login",
-      "title": "vetendasportal.gov.az-arayis.example",
-      "prompt": "On a phone only the start of the address shows. Read it to the end. What do you do on this page?",
+      "title": "Citizen portal sign-in on a phone",
+      "prompt": "On a phone only the start of the address shows. Read it to the end. What do you do?",
       "artifact": {
         "kind": "web",
         "title": "Vatandash Portal",
         "url": "https://vetendasportal.gov.az-arayis.example/giris",
-        "body": [],
+        "body": [
+          "Vatandash Portal. Sign in with your FIN code."
+        ],
         "fields": [
           "FIN code",
           "Password"
@@ -107,7 +118,7 @@
     },
     {
       "id": "fake-file",
-      "title": "GorusSetup_2026.exe",
+      "title": "Downloaded Gorush installer",
       "prompt": "The file has downloaded. Will you open it?",
       "artifact": {
         "kind": "file",
@@ -127,7 +138,7 @@
       ],
       "safe": "delete",
       "explain": "Delete the file, tell technical support, and get the app from the official site.",
-      "risk": "credentials"
+      "risk": "malware"
     }
   ]
 }

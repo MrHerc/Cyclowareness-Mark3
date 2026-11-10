@@ -1,4 +1,5 @@
 import { LAB_XP } from "@/lib/domain/gamification";
+import { lessonsDone, type LabId } from "@/lib/domain/labs";
 import type { LabArtifact, LabScenario } from "@/lib/content/lab-scenario";
 import { BEACON_IP, BEACON_PID, BEACON_STARTUP, workstation } from "./machines";
 import { exec, initialShell, type ShellState } from "./shell";
@@ -176,32 +177,50 @@ export const miniLabSlug = (lab: string) => (lab.startsWith("mini:") ? lab.slice
 /** The app that shows an artifact; texts, calls and windows are shown in the decision card itself. */
 export const ARTIFACT_APP: Record<LabArtifact["kind"], AppId> = { email: "mail", web: "browser", file: "files", sms: "mail", call: "mail", dialog: "mail" };
 
-export type MiniState = { answers: Record<string, string> };
+export type MiniState = { answers: Record<string, string>; finished: boolean };
 
 /**
  * One objective per decision, reached when its safe option is chosen; the 100 points are shared out evenly. The
- * learner's event is ["choose", "<decision id>:<option id>"], and only the first answer to a decision counts.
+ * learner's event is ["choose", "<decision id>:<option id>"], and only the first answer to a decision counts. The run
+ * ends on ["finish"] once every decision is answered, so the last explanation stays on screen until the learner moves on.
  */
 export function miniLabDef(sc: LabScenario): LabDef<MiniState> {
   const n = sc.decisions.length;
   const base = Math.floor(LAB_MAX / n);
+  const answeredAll = (s: MiniState) => sc.decisions.every((d) => Object.hasOwn(s.answers, d.id));
   return {
     id: miniLabId(sc.module),
     primary: ARTIFACT_APP[sc.decisions[0].artifact.kind],
     objectives: sc.decisions.map((d, i) => ({ id: d.id, points: base + (i < LAB_MAX - base * n ? 1 : 0) })),
     rules: [],
     hints: 0,
-    init: () => ({ answers: {} }),
+    init: () => ({ answers: {}, finished: false }),
     apply: (s, [type, arg]) => {
+      if (type === "finish") return answeredAll(s) ? { ...s, finished: true } : s;
       if (type !== "choose" || !arg) return s;
       const [id, option] = arg.split(":");
       const d = sc.decisions.find((x) => x.id === id);
       if (!d || Object.hasOwn(s.answers, d.id) || !d.options.some((o) => o.id === option)) return s;
-      return { answers: { ...s.answers, [d.id]: option } };
+      return { ...s, answers: { ...s.answers, [d.id]: option } };
     },
     achieved: (s) => sc.decisions.filter((d) => s.answers[d.id] === d.safe).map((d) => d.id),
     broken: () => [],
-    done: (s) => sc.decisions.every((d) => Object.hasOwn(s.answers, d.id)),
+    done: (s) => s.finished,
+  };
+}
+
+/**
+ * A module page's practice list: the module's own mini-lab first, then the labs that practise it, all open once the
+ * module's lessons are done. Practice is optional: none of it counts toward completion or the attestation.
+ * `mini` is the mini-lab in the language it is shown in (`lang`, set only when it is not the page's).
+ */
+export function modulePractice(slug: string, status: string | undefined, labs: readonly LabId[], mini: { title: string; lang: string; xp: number } | null, locale: string) {
+  return {
+    open: lessonsDone(status),
+    items: [
+      ...(mini ? [{ id: miniLabId(slug), href: `/lab/mini/${slug}`, lab: null, title: mini.title, lang: mini.lang === locale ? undefined : mini.lang, xp: mini.xp }] : []),
+      ...labs.map((id) => ({ id, href: `/lab/${id}`, lab: id, title: null, lang: undefined, xp: LAB_XP[id] })),
+    ],
   };
 }
 

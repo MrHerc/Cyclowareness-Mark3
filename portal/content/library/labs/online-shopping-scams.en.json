@@ -6,7 +6,7 @@
   "decisions": [
     {
       "id": "prepay",
-      "title": "Message from Serin Klimat Sale",
+      "title": "Seller asks for prepayment",
       "prompt": "The seller asks for prepayment straight away. What do you do with this message?",
       "artifact": {
         "kind": "sms",
@@ -28,18 +28,21 @@
         }
       ],
       "safe": "ask-cod",
-      "explain": "Good question. A real shop usually agrees to payment on delivery.",
+      "explain": "A real shop usually agrees to payment on delivery; a scammer wants the money first.",
       "risk": "money"
     },
     {
       "id": "landing",
-      "title": "alsat-odenis.example.net",
-      "prompt": "Look at the address bar. What do you do on this page?",
+      "title": "Buyer's link to receive money",
+      "prompt": "You are selling an item and the buyer sent this link to receive the payment. Look at the address bar. What do you do?",
       "artifact": {
         "kind": "web",
-        "title": "alsat-odenis.example.net",
+        "title": "Money is waiting for you: 260.00 AZN",
         "url": "https://alsat-odenis.example.net/qebul",
-        "body": []
+        "body": [
+          "The buyer has paid. Press the button and enter your card to receive the money."
+        ],
+        "button": "Receive money"
       },
       "options": [
         {
@@ -52,12 +55,12 @@
         }
       ],
       "safe": "close",
-      "explain": "The address was strange, so type nothing on that page.",
+      "explain": "This is not the classifieds site, and a page that wants your card does not pay you. Type nothing there.",
       "risk": "money"
     },
     {
       "id": "deposit",
-      "title": "Message from Serin Klimat Sale",
+      "title": "Seller now wants a deposit",
       "prompt": "Here comes the excuse: now it wants a deposit. What do you do with this message?",
       "artifact": {
         "kind": "sms",
@@ -108,7 +111,7 @@
     },
     {
       "id": "rush",
-      "title": "Message from Serin Klimat Sale",
+      "title": "Only 3 left, card payment only",
       "prompt": "Safe, or a risk?",
       "artifact": {
         "kind": "sms",

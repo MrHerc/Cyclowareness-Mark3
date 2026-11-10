@@ -1,5 +1,5 @@
 import "server-only";
-import { and, count, eq, isNotNull, sql } from "drizzle-orm";
+import { and, count, eq, isNotNull, notLike, sql } from "drizzle-orm";
 import { db, t } from "../db";
 import { earnedBadges, type BadgeFacts } from "../../lib/domain/gamification";
 
@@ -10,7 +10,8 @@ export async function badgeFacts(userId: string, tenantId: string): Promise<Badg
     db().select({ n: count() }).from(t.moduleProgress).where(and(eq(t.moduleProgress.userId, userId), eq(t.moduleProgress.status, "completed"))),
     db().select({ n: count() }).from(t.threatReports).where(eq(t.threatReports.reporterId, userId)),
     db().select({ longest: t.users.streakLongest }).from(t.users).where(eq(t.users.id, userId)),
-    db().select({ n: sql<number>`count(distinct ${t.labAttempts.exercise})` }).from(t.labAttempts).where(eq(t.labAttempts.userId, userId)),
+    // The lab explorer badge counts the lab games and machine labs; a module mini-lab ("mini:<slug>") is practice for its module.
+    db().select({ n: sql<number>`count(distinct ${t.labAttempts.exercise})` }).from(t.labAttempts).where(and(eq(t.labAttempts.userId, userId), notLike(t.labAttempts.exercise, "mini:%"))),
     db().select({ n: count() }).from(t.certificates).where(eq(t.certificates.userId, userId)),
     db().select({ n: count() }).from(t.certificates).where(and(eq(t.certificates.userId, userId), isNotNull(t.certificates.pathId))),
   ]);

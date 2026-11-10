@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { labScenarioErrors, labScenarioSchema, miniLabXp, type LabScenario } from "../src/lib/content/lab-scenario";
-import { ARTIFACT_APP, miniLabDef, miniLabId, miniLabSlug, replay, scoreRun, type LabEvent } from "../src/components/lab/model/labs";
+import { ARTIFACT_APP, miniLabDef, miniLabId, miniLabSlug, modulePractice, replay, scoreRun, type LabEvent } from "../src/components/lab/model/labs";
 import { lessonsDone } from "../src/lib/domain/labs";
 import { localeParityErrors } from "../src/lib/content/locale-parity";
 
@@ -70,6 +70,8 @@ describe("mini-lab scenarios on disk", () => {
       expect(miniLabXp(parsed)).toBeLessThanOrEqual(15);
       // A translation that copies the file passes the lessons' parity rules, so the same checker covers it.
       expect(localeParityErrors(raw, structuredClone(raw))).toEqual([]);
+      // A decision about the recipient shows the recipient.
+      for (const d of parsed.decisions) if (/recipient/i.test(d.prompt) && d.artifact.kind === "email") expect(d.artifact.to, d.id).toBeTruthy();
     });
   }
 
@@ -96,6 +98,17 @@ describe("mini-lab scenario schema", () => {
     expect(labScenarioErrors(broken)).toEqual(["duplicate decision id", "mail: safe option ignore missing", "mail: link after a missing paragraph"]);
   });
 
+  it("refuses a web page with nothing on it and two decisions with the same title, and takes a recipient", () => {
+    const page = { kind: "web", title: "tapan.example", url: "https://tapan.example/axtar", body: [] };
+    expect(labScenarioSchema.safeParse({ ...fixture, decisions: [{ ...fixture.decisions[0], artifact: page }, ...fixture.decisions.slice(1)] }).success).toBe(false);
+    expect(labScenarioSchema.safeParse({ ...fixture, decisions: [{ ...fixture.decisions[0], artifact: { ...page, body: ["Sponsored: pay-now.example"] } }, ...fixture.decisions.slice(1)] }).success).toBe(true);
+    const same = structuredClone(fixture);
+    same.decisions[2].title = same.decisions[1].title;
+    expect(labScenarioErrors(same)).toEqual(["duplicate decision title"]);
+    const draft = labScenarioSchema.parse({ ...fixture, decisions: [{ ...fixture.decisions[0], artifact: { ...fixture.decisions[0].artifact, to: "Leyla <leyla@poct.example>" } }, ...fixture.decisions.slice(1)] });
+    expect(draft.decisions[0].artifact).toMatchObject({ to: "Leyla <leyla@poct.example>" });
+  });
+
   it("prices a mini-lab at 10 to 15 XP by its number of decisions", () => {
     const withN = (n: number) => ({ ...fixture, decisions: Array.from({ length: n }, (_, i) => ({ ...fixture.decisions[0], id: `d${i}` })) });
     expect([3, 4, 5].map((n) => miniLabXp(withN(n)))).toEqual([10, 13, 15]);
@@ -114,12 +127,14 @@ describe("mini-lab runs", () => {
     expect(miniLabSlug("phishing-anatomy")).toBeNull();
   });
 
-  it("scores the safe choices and finishes when every decision is answered", () => {
-    const run = replay(def, [choose("mail", "report"), choose("text", "open")]);
+  it("scores the safe choices and finishes on the learner's finish once every decision is answered", () => {
+    const run = replay(def, [choose("mail", "report"), choose("text", "open"), ["finish"]]);
     expect(run.done).toBe(false);
     const all = replay(def, [choose("mail", "report"), choose("text", "open"), choose("box", "update")]);
-    expect(all.done).toBe(true);
+    // The last explanation stays on screen until the learner asks for the results.
+    expect(all.done).toBe(false);
     expect(scoreRun(def, all)).toMatchObject({ score: 67, max: 100, achieved: ["mail", "box"], broken: [] });
+    expect(replay(def, [...all.events, ["finish"]]).done).toBe(true);
   });
 
   it("keeps the first answer and ignores unknown decisions, options and events", () => {
@@ -160,5 +175,21 @@ describe("mini-lab on the module page", () => {
   it("opens once the module's lessons are done; completion and attestation do not wait for it", () => {
     expect(["not_started", "in_progress", undefined].map(lessonsDone)).toEqual([false, false, false]);
     expect(["awaiting_attestation", "completed"].map(lessonsDone)).toEqual([true, true]);
+  });
+
+  it("lists the mini-lab first, then the labs that practise the module, locked until the lessons are done", () => {
+    const sc = labScenario("phishing-email", "az")!;
+    const mini = { title: sc.scenario.title, lang: sc.lang, xp: miniLabXp(sc.scenario) };
+    const locked = modulePractice("phishing-email", "in_progress", ["inbox-triage", "phishing-anatomy"], mini, "az");
+    expect(locked.open).toBe(false);
+    expect(locked.items).toEqual([
+      { id: "mini:phishing-email", href: "/lab/mini/phishing-email", lab: null, title: sc.scenario.title, lang: "en", xp: miniLabXp(sc.scenario) },
+      { id: "inbox-triage", href: "/lab/inbox-triage", lab: "inbox-triage", title: null, lang: undefined, xp: 20 },
+      { id: "phishing-anatomy", href: "/lab/phishing-anatomy", lab: "phishing-anatomy", title: null, lang: undefined, xp: 30 },
+    ]);
+    expect(modulePractice("phishing-email", "awaiting_attestation", [], mini, "az").open).toBe(true);
+    // Shown in the page's language, the title needs no lang of its own; a module without a mini-lab lists only its labs.
+    expect(modulePractice("phishing-email", "completed", [], { ...mini, lang: "en" }, "en").items[0].lang).toBeUndefined();
+    expect(modulePractice("quishing", "completed", [], null, "en")).toEqual({ open: true, items: [] });
   });
 });
