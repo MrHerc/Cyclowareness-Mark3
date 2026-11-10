@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Ban, Check, ChevronRight, FlaskConical, Pencil, Recycle, X } from "lucide-react";
@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Checkbox, Field, Input, Select, Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 
 const SEVERITIES = ["low", "medium", "high", "critical"] as const;
 type Option = { id: string; label: string };
@@ -43,12 +44,26 @@ export function ReportActions({
   const t = useTranslations("secops.threats");
   const tc = useTranslations("common");
   const tv = useTranslations("security.sandbox");
-  const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState(report.subject);
   const [sev, setSev] = useState(report.severity ?? "medium");
   const [incident, setIncident] = useState(false);
   const router = useRouter();
+  const triage = useAction(triageReportAction, { successToast: t("triaged") });
+  const analyze = useAction(analyzeReportUrlAction, {
+    // The verdict sets the tone: anything but clean is shown as a warning.
+    onSuccess: (res) => toast(t("analyzed", { number: res.number!, verdict: tv(`verdict.${res.verdict as "clean"}`) }), res.verdict === "clean" ? "success" : "error"),
+  });
+  const dismiss = useAction(dismissReportAction, { successToast: t("dismissed") });
+  const convert = useAction(convertReportAction, {
+    successToast: t("converted"),
+    onSuccess: (res) => {
+      setOpen(false);
+      router.push(res.incidentId ? `/admin/incidents/${res.incidentId}` : `/admin/loops/${res.loopId}`);
+    },
+    errorMap: { already: t("errors.already"), plan: t("errors.plan") },
+  });
+  const pending = triage.pending || analyze.pending || dismiss.pending || convert.pending;
   const done = report.status === "converted" || report.status === "dismissed";
 
   return (
@@ -59,7 +74,7 @@ export function ReportActions({
           className="h-9 w-32 pointer-coarse:h-11"
           value={report.severity ?? ""}
           disabled={pending}
-          onChange={(e) => start(async () => void ((await triageReportAction(report.id, e.target.value)).ok && toast(t("triaged"))))}
+          onChange={(e) => triage.run(report.id, e.target.value)}
         >
           <option value="" disabled>
             {t("triage")}
@@ -77,13 +92,7 @@ export function ReportActions({
           variant="ghost"
           icon={<FlaskConical />}
           disabled={pending}
-          onClick={() =>
-            start(async () => {
-              const res = await analyzeReportUrlAction(report.id);
-              if (res.ok) toast(t("analyzed", { number: res.number!, verdict: tv(`verdict.${res.verdict as "clean"}`) }), res.verdict === "clean" ? "success" : "error");
-              else toast(res.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.generic"), "error");
-            })
-          }
+          onClick={() => analyze.run(report.id)}
         >
           {t("analyze")}
         </Button>
@@ -95,7 +104,7 @@ export function ReportActions({
               {t("convert")}
             </Button>
           ) : null}
-          <Button size="sm" variant="ghost" icon={<Ban />} disabled={pending} onClick={() => start(async () => void ((await dismissReportAction(report.id)).ok && toast(t("dismissed"))))} title={t("dismissBody")}>
+          <Button size="sm" variant="ghost" icon={<Ban />} disabled={pending} onClick={() => dismiss.run(report.id)} title={t("dismissBody")}>
             {t("dismiss")}
           </Button>
         </>
@@ -113,15 +122,7 @@ export function ReportActions({
               </Button>
               <Button
                 disabled={pending || title.trim().length < 3}
-                onClick={() =>
-                  start(async () => {
-                    const res = await convertReportAction(report.id, { title, severity: sev as "medium", incident });
-                    if (!res.ok) return toast(res.error === "already" || res.error === "plan" ? t(`errors.${res.error}`) : tc("errors.generic"), "error");
-                    setOpen(false);
-                    toast(t("converted"));
-                    router.push(res.incidentId ? `/admin/incidents/${res.incidentId}` : `/admin/loops/${res.loopId}`);
-                  })
-                }
+                onClick={() => convert.run(report.id, { title, severity: sev as "medium", incident })}
               >
                 {t("convert")}
               </Button>
@@ -155,18 +156,19 @@ export function LoopActions({ id, next, verdict, closed }: { id: string; next: s
   const t = useTranslations("secops.loops");
   const ts = useTranslations("secops");
   const tc = useTranslations("common");
-  const [pending, start] = useTransition();
   const [mode, setMode] = useState<"advance" | "close" | null>(null);
   const [note, setNote] = useState("");
-  if (closed) return null;
-  const submit = () =>
-    start(async () => {
-      const res = mode === "close" ? await closeLoopAction(id, note) : await advanceLoopAction(id, next!, note);
-      if (!res.ok) return toast(tc("errors.generic"), "error");
-      toast(mode === "close" ? t("closedToast") : t("moved"));
+  const move = useAction((loopId: string, closing: boolean, text: string) => (closing ? closeLoopAction(loopId, text) : advanceLoopAction(loopId, next!, text)), {
+    successToast: mode === "close" ? t("closedToast") : t("moved"),
+    onSuccess: () => {
       setMode(null);
       setNote("");
-    });
+    },
+  });
+  const setVerdict = useAction(setLoopVerdictAction, { successToast: t("moved") });
+  const pending = move.pending || setVerdict.pending;
+  if (closed) return null;
+  const submit = () => move.run(id, mode === "close", note);
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Select
@@ -174,7 +176,7 @@ export function LoopActions({ id, next, verdict, closed }: { id: string; next: s
         className="h-10 w-40 pointer-coarse:h-11"
         value={verdict}
         disabled={pending}
-        onChange={(e) => start(async () => void ((await setLoopVerdictAction(id, e.target.value)).ok && toast(t("moved"))))}
+        onChange={(e) => setVerdict.run(id, e.target.value)}
       >
         {(["pending", "malicious", "suspicious", "benign"] as const).map((v) => (
           <option key={v} value={v}>
@@ -220,16 +222,17 @@ export function LoopActions({ id, next, verdict, closed }: { id: string; next: s
 export function MaterialDecision({ id, status, title, body }: { id: string; status: "pending" | "second_approval"; title: string; body: string }) {
   const t = useTranslations("secops.approvals");
   const tc = useTranslations("common");
-  const [pending, start] = useTransition();
   const [mode, setMode] = useState<"reject" | "edit" | null>(null);
   const [reason, setReason] = useState("");
   const [draft, setDraft] = useState({ title, body });
-  const approve = () =>
-    start(async () => {
-      const res = await decideMaterialAction(id, "approve");
-      if (!res.ok) return toast(res.error === "sameApprover" ? t("sameApprover") : tc("errors.generic"), "error");
-      toast(res.stage === "second_approval" ? t("firstApproved") : t("approved", { count: res.count ?? 0 }));
-    });
+  const decideApprove = useAction(decideMaterialAction, {
+    successToast: (res) => (res.stage === "second_approval" ? t("firstApproved") : t("approved", { count: res.count ?? 0 })),
+    errorMap: { sameApprover: t("sameApprover") },
+  });
+  const decideReject = useAction(decideMaterialAction, { successToast: t("rejected"), onSuccess: () => setMode(null) });
+  const edit = useAction(editMaterialAction, { successToast: t("edited"), onSuccess: () => setMode(null), errorMap: () => tc("errors.invalid") });
+  const pending = decideApprove.pending || decideReject.pending || edit.pending;
+  const approve = () => decideApprove.run(id, "approve");
   return (
     <div className="flex flex-wrap gap-2">
       <Button variant="safe" icon={<Check />} onClick={approve} disabled={pending}>
@@ -255,28 +258,14 @@ export function MaterialDecision({ id, status, title, body }: { id: string; stat
               <Button
                 variant="danger"
                 disabled={pending || !reason.trim()}
-                onClick={() =>
-                  start(async () => {
-                    const res = await decideMaterialAction(id, "reject", reason);
-                    if (!res.ok) return toast(tc("errors.generic"), "error");
-                    toast(t("rejected"));
-                    setMode(null);
-                  })
-                }
+                onClick={() => decideReject.run(id, "reject", reason)}
               >
                 {t("reject")}
               </Button>
             ) : (
               <Button
                 disabled={pending || draft.title.trim().length < 3 || draft.body.trim().length < 10}
-                onClick={() =>
-                  start(async () => {
-                    const res = await editMaterialAction(id, draft);
-                    if (!res.ok) return toast(tc("errors.invalid"), "error");
-                    toast(t("edited"));
-                    setMode(null);
-                  })
-                }
+                onClick={() => edit.run(id, draft)}
               >
                 {t("saveEdit")}
               </Button>
@@ -326,27 +315,22 @@ export function IntelActions({
   const t = useTranslations("secops.intel");
   const ts = useTranslations("secops");
   const tc = useTranslations("common");
-  const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
   const [moduleId, setModuleId] = useState("");
   const [departmentId, setDepartmentId] = useState("");
   const router = useRouter();
-  if (status === "converted" || (!canConvert && !canReview)) return null;
-  const convert = () =>
-    start(async () => {
-      if (kind === "policy") {
-        const res = await convertPolicyIntelAction(id);
-        if (!res.ok) return toast(tc("errors.generic"), "error");
-        toast(t("convertedPolicy"));
-        router.push(`/admin/policies/${res.policyId}`);
-        return;
-      }
-      const res = await convertThreatIntelAction(id, { moduleId: moduleId || null, departmentId: departmentId || null });
-      if (!res.ok) return toast(tc("errors.generic"), "error");
+  const toPolicy = useAction(convertPolicyIntelAction, { successToast: t("convertedPolicy"), onSuccess: (res) => router.push(`/admin/policies/${res.policyId}`) });
+  const toThreat = useAction(convertThreatIntelAction, {
+    successToast: t("convertedThreat"),
+    onSuccess: (res) => {
       setOpen(false);
-      toast(t("convertedThreat"));
       router.push(`/admin/loops/${res.loopId}`);
-    });
+    },
+  });
+  const review = useAction(setIntelStatusAction, { successToast: t("updated") });
+  const pending = toPolicy.pending || toThreat.pending || review.pending;
+  if (status === "converted" || (!canConvert && !canReview)) return null;
+  const convert = () => (kind === "policy" ? toPolicy.run(id) : toThreat.run(id, { moduleId: moduleId || null, departmentId: departmentId || null }));
   return (
     <div className="flex flex-wrap gap-2">
       {canConvert ? (
@@ -355,12 +339,12 @@ export function IntelActions({
         </Button>
       ) : null}
       {canReview && status === "new" ? (
-        <Button size="sm" variant="secondary" icon={<Check />} disabled={pending} onClick={() => start(async () => void ((await setIntelStatusAction(id, "reviewed")).ok && toast(t("updated"))))}>
+        <Button size="sm" variant="secondary" icon={<Check />} disabled={pending} onClick={() => review.run(id, "reviewed")}>
           {t("review")}
         </Button>
       ) : null}
       {canReview && status !== "dismissed" ? (
-        <Button size="sm" variant="ghost" icon={<Ban />} disabled={pending} onClick={() => start(async () => void ((await setIntelStatusAction(id, "dismissed")).ok && toast(t("updated"))))}>
+        <Button size="sm" variant="ghost" icon={<Ban />} disabled={pending} onClick={() => review.run(id, "dismissed")}>
           {t("dismiss")}
         </Button>
       ) : null}

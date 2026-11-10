@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { unstable_rethrow } from "next/navigation";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, BookOpen, Check, CircleDashed, CircleSlash, Eye, Loader2, PlugZap, RotateCcw, Save, ShieldCheck, Sparkles, X } from "lucide-react";
 import { generateTrainingAction, libraryTrainingAction, saveTrainingDraftAction, type TrainingInput, type TrainingResult } from "@/server/actions/ai-training";
@@ -10,7 +9,7 @@ import type { Scene } from "@/lib/content/types";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, Input, Segmented, Select, Textarea } from "@/components/ui/field";
 import { Pill } from "@/components/ui/pill";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { LOCALE_NAMES, langAttrs } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 
@@ -30,14 +29,28 @@ export function AiTrainer({ aiOn, locales, defaultLocale, categories }: { aiOn: 
     minutes: 6,
     lessons: 1,
   });
-  const [working, start] = useTransition();
-  const [saving, startSave] = useTransition();
   const [mode, setMode] = useState<"ai" | "library">("ai");
   const [result, setResult] = useState<TrainingResult | null>(null);
   const [saved, setSaved] = useState<{ href: string } | null>(null);
   // The typed text, so "1" on the way to "15" is not clamped to 2; clamped on blur and on submit.
   const [minutes, setMinutes] = useState(String(f.minutes));
   const valid = f.prompt.trim().length >= 10;
+  const generate = useAction(
+    async (which: "ai" | "library", input: TrainingInput) => {
+      const res = await (which === "ai" ? generateTrainingAction(input) : libraryTrainingAction(input));
+      setResult(res);
+      return res;
+    },
+    // A rate limit takes the common message; the other refusals have their own.
+    { errorMap: (res) => (res.error === "rateLimited" ? undefined : t(`errors.${res.error ?? "failed"}`)) },
+  );
+  const saveDraft = useAction(saveTrainingDraftAction, {
+    successToast: t("saved"),
+    onSuccess: (res) => setSaved({ href: `/learn/${res.slug}/${res.lessonKey ?? "lesson-1"}` }),
+    errorMap: () => t("errors.failed"),
+  });
+  const working = generate.pending;
+  const saving = saveDraft.pending;
 
   const fixMinutes = () => {
     const n = Math.max(2, Math.min(45, Math.round(Number(minutes)) || 2));
@@ -51,17 +64,7 @@ export function AiTrainer({ aiOn, locales, defaultLocale, categories }: { aiOn: 
     setMode(which);
     setSaved(null);
     setResult(null);
-    start(async () => {
-      try {
-        const res = await (which === "ai" ? generateTrainingAction(input) : libraryTrainingAction(input));
-        setResult(res);
-        if (!res.ok) toast(res.error === "rateLimited" ? tc("errors.rateLimited") : t(`errors.${res.error ?? "failed"}`), "error");
-      } catch (error) {
-        // A rejected action (connection, permission, database) stays on the page; redirects still go through.
-        unstable_rethrow(error);
-        toast(t("errors.failed"), "error");
-      }
-    });
+    generate.run(which, input);
   };
 
   // A library match keeps the language it was found in; an AI draft is written in the chosen one.
@@ -70,24 +73,7 @@ export function AiTrainer({ aiOn, locales, defaultLocale, categories }: { aiOn: 
   const save = () => {
     const r = result;
     if (!r?.draft || !r.source || !r.verification) return;
-    startSave(async () => {
-      try {
-        const res = await saveTrainingDraftAction({
-          draft: r.draft,
-          contentLocale,
-          category: f.category,
-          difficulty: f.difficulty,
-          origin: r.source!.kind,
-          verdict: r.verification!.verdict,
-        });
-        if (!res.ok || !res.slug) return toast(t("errors.failed"), "error");
-        setSaved({ href: `/learn/${res.slug}/${res.lessonKey ?? "lesson-1"}` });
-        toast(t("saved"));
-      } catch (error) {
-        unstable_rethrow(error);
-        toast(t("errors.failed"), "error");
-      }
-    });
+    saveDraft.run({ draft: r.draft, contentLocale, category: f.category, difficulty: f.difficulty, origin: r.source.kind, verdict: r.verification.verdict });
   };
 
   const set = <K extends keyof TrainingInput>(k: K, value: TrainingInput[K]) => setF((x) => ({ ...x, [k]: value }));

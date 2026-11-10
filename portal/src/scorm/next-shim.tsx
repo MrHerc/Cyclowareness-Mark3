@@ -16,3 +16,6 @@ export function useSearchParams() {
 export function useRouter() {
   return { refresh() {} };
 }
+
+/** useAction lets Next's redirect errors through; the package has no server to send one. */
+export function unstable_rethrow() {}

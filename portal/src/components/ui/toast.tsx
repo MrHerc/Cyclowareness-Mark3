@@ -4,19 +4,22 @@ import { useSyncExternalStore } from "react";
 import { CheckCircle2, AlertTriangle, Info, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
+import { TextButton } from "@/components/ui/button";
 
-type Toast = { id: number; tone: "success" | "error" | "info"; message: string };
+export type ToastAction = { label: string; onClick: () => void };
+type Toast = { id: number; tone: "success" | "error" | "info"; message: string; action?: ToastAction };
 
 let toasts: Toast[] = [];
 let nextId = 1;
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 
-export function toast(message: string, tone: Toast["tone"] = "success", ms = 4200) {
+export function toast(message: string, tone: Toast["tone"] = "success", ms = 4200, action?: ToastAction) {
   const id = nextId++;
-  toasts = [...toasts, { id, tone, message }].slice(-4);
+  toasts = [...toasts, { id, tone, message, action }].slice(-4);
   emit();
-  setTimeout(() => dismiss(id), ms);
+  // A toast with an action stays until dismissed, so a keyboard or screen-reader user can still reach the button (WCAG 2.2.1).
+  if (!action) setTimeout(() => dismiss(id), ms);
 }
 
 function dismiss(id: number) {
@@ -54,6 +57,18 @@ export function Toaster() {
           ) : null}
           {t.tone === "success" ? <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-safe-600" /> : t.tone === "error" ? <AlertTriangle className="mt-0.5 size-5 shrink-0" /> : <Info className="mt-0.5 size-5 shrink-0 text-brand-600" />}
           <p className="flex-1">{t.message}</p>
+          {t.action ? (
+            <TextButton
+              tone="danger"
+              className="shrink-0"
+              onClick={() => {
+                dismiss(t.id);
+                t.action?.onClick();
+              }}
+            >
+              {t.action.label}
+            </TextButton>
+          ) : null}
           <button type="button" onClick={() => dismiss(t.id)} className="text-ink-subtle hover:text-ink" aria-label={tc("close")}>
             <X className="size-4" />
           </button>

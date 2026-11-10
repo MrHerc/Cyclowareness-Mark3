@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CornerDownRight, FolderTree, Merge, MoveRight, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { deleteDepartmentAction, mergeDepartmentAction, saveDepartmentAction } from "@/server/actions/workspace";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select } from "@/components/ui/field";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { searchFold } from "@/components/secops/search-fold";
 
 export type Dept = { id: string; name: string; parentId: string | null; headUserId: string | null; headName: string | null; people: number };
@@ -19,7 +19,18 @@ export function DepartmentsTree({ departments, people }: { departments: Dept[]; 
   const [edit, setEdit] = useState<null | { id?: string; name: string; parentId: string | null; headUserId: string | null; mode: "add" | "rename" | "move" }>(null);
   const [del, setDel] = useState<Dept | null>(null);
   const [merge, setMerge] = useState<null | { source: Dept; targetId: string }>(null);
-  const [pending, start] = useTransition();
+  const save = useAction(saveDepartmentAction, {
+    successToast: edit?.mode === "add" ? t("created") : edit?.mode === "move" ? t("moved") : t("renamed"),
+    onSuccess: () => setEdit(null),
+    errorMap: (res) => (res.error === "cycle" ? t("cycle") : res.error === "duplicate" ? t("duplicate") : tc("errors.invalid")),
+  });
+  const remove = useAction(deleteDepartmentAction, { successToast: t("deleted"), onSuccess: () => setDel(null) });
+  const join = useAction(mergeDepartmentAction, {
+    successToast: t("merged"),
+    onSuccess: () => setMerge(null),
+    errorMap: (res) => (res.error === "cycle" ? t("cycle") : tc("errors.invalid")),
+  });
+  const pending = save.pending || remove.pending || join.pending;
   const children = useMemo(() => {
     const m = new Map<string | null, Dept[]>();
     for (const d of departments) m.set(d.parentId, [...(m.get(d.parentId) ?? []), d]);
@@ -99,13 +110,7 @@ export function DepartmentsTree({ departments, people }: { departments: Dept[]; 
             className="grid gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              start(async () => {
-                const res = await saveDepartmentAction({ id: edit.id, name: edit.name, parentId: edit.parentId, headUserId: edit.headUserId });
-                if (res.ok) {
-                  toast(edit.mode === "add" ? t("created") : edit.mode === "move" ? t("moved") : t("renamed"));
-                  setEdit(null);
-                } else toast(res.error === "cycle" ? t("cycle") : res.error === "duplicate" ? t("duplicate") : tc("errors.invalid"), "error");
-              });
+              save.run({ id: edit.id, name: edit.name, parentId: edit.parentId, headUserId: edit.headUserId });
             }}
           >
             {edit.mode !== "move" ? (
@@ -150,7 +155,7 @@ export function DepartmentsTree({ departments, people }: { departments: Dept[]; 
         title={del ? t("deleteTitle", { name: del.name }) : ""}
         size="sm"
         footer={
-          <Button variant="danger" disabled={pending} onClick={() => del && start(async () => void ((await deleteDepartmentAction(del.id)).ok && (toast(t("deleted")), setDel(null))))}>
+          <Button variant="danger" disabled={pending} onClick={() => del && remove.run(del.id)}>
             {t("delete")}
           </Button>
         }
@@ -167,16 +172,7 @@ export function DepartmentsTree({ departments, people }: { departments: Dept[]; 
           <Button
             variant="danger"
             disabled={pending || !merge?.targetId}
-            onClick={() =>
-              merge &&
-              start(async () => {
-                const res = await mergeDepartmentAction(merge.source.id, merge.targetId);
-                if (res.ok) {
-                  toast(t("merged"));
-                  setMerge(null);
-                } else toast(res.error === "cycle" ? t("cycle") : tc("errors.invalid"), "error");
-              })
-            }
+            onClick={() => merge && join.run(merge.source.id, merge.targetId)}
           >
             {t("mergeConfirm")}
           </Button>

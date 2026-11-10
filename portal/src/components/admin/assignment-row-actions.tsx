@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { CalendarClock, Trash2 } from "lucide-react";
 import { removeAssignmentAction, updateDueAction } from "@/server/actions/workspace";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input, Segmented } from "@/components/ui/field";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 
 export function AssignmentRowActions({ id, dueKind, dueDate, dueDays }: { id: string; dueKind: "none" | "fixed" | "after_joining"; dueDate: string | null; dueDays: number | null }) {
   const t = useTranslations("admin.assignments");
@@ -16,7 +16,10 @@ export function AssignmentRowActions({ id, dueKind, dueDate, dueDays }: { id: st
   const [kind, setKind] = useState(dueKind);
   const [date, setDate] = useState(dueDate ?? "");
   const [days, setDays] = useState(dueDays ?? 30);
-  const [pending, start] = useTransition();
+  const close = () => setOpen(null);
+  const updateDue = useAction(updateDueAction, { successToast: t("updated"), onSuccess: close, errorMap: () => tc("errors.invalid") });
+  const remove = useAction(removeAssignmentAction, { successToast: t("removed"), onSuccess: close });
+  const pending = updateDue.pending || remove.pending;
   return (
     <div className="flex gap-2">
       <Button size="sm" variant="ghost" icon={<CalendarClock />} onClick={() => setOpen("due")}>
@@ -39,7 +42,7 @@ export function AssignmentRowActions({ id, dueKind, dueDate, dueDays }: { id: st
           />
           {kind === "fixed" ? <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label={t("fixedDate")} /> : null}
           {kind === "after_joining" ? <Input type="number" min={1} max={365} value={days} onChange={(e) => setDays(Number(e.target.value))} aria-label={t("days")} /> : null}
-          <Button disabled={pending} onClick={() => start(async () => void ((await updateDueAction(id, kind, date || null, days)).ok ? (toast(t("updated")), setOpen(null)) : toast(tc("errors.invalid"), "error")))}>
+          <Button disabled={pending} onClick={() => updateDue.run(id, kind, date || null, days)}>
             {tc("save")}
           </Button>
         </div>
@@ -50,7 +53,7 @@ export function AssignmentRowActions({ id, dueKind, dueDate, dueDays }: { id: st
         title={t("removeTitle")}
         size="sm"
         footer={
-          <Button variant="danger" disabled={pending} onClick={() => start(async () => void ((await removeAssignmentAction(id)).ok && (toast(t("removed")), setOpen(null))))}>
+          <Button variant="danger" disabled={pending} onClick={() => remove.run(id)}>
             {t("remove")}
           </Button>
         }

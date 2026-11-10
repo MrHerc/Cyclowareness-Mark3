@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useSyncExternalStore, useTransition } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, ChevronRight, Copy, Download, ImagePlus, KeyRound, MessageSquareWarning, MonitorSmartphone, ShieldCheck, ShieldOff, Signpost, Trash2 } from "lucide-react";
@@ -10,6 +10,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Segmented, Switch } from "@/components/ui/field";
 import { Pill } from "@/components/ui/pill";
 import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { ProblemForm } from "@/components/learner/problem-form";
 import { setPreferencesAction } from "@/server/actions/preferences";
 import {
@@ -31,7 +32,9 @@ import { cn } from "@/lib/cn";
 export function PhotoEditor({ name, src }: { name: string; src: string | null }) {
   const t = useTranslations("learner.profile");
   const input = useRef<HTMLInputElement>(null);
-  const [pending, start] = useTransition();
+  const upload = useAction(setAvatarAction, { successToast: t("photoSaved"), errorMap: () => t("photoError") });
+  const remove = useAction(setAvatarAction);
+  const pending = upload.pending || remove.pending;
 
   const onFile = (file: File | undefined) => {
     if (!file) return;
@@ -48,11 +51,7 @@ export function PhotoEditor({ name, src }: { name: string; src: string | null })
       canvas.width = canvas.height = 256;
       canvas.getContext("2d")!.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 256, 256);
       URL.revokeObjectURL(url);
-      const data = canvas.toDataURL("image/jpeg", 0.86);
-      start(async () => {
-        const res = await setAvatarAction(data);
-        toast(res.ok ? t("photoSaved") : t("photoError"), res.ok ? "success" : "error");
-      });
+      upload.run(canvas.toDataURL("image/jpeg", 0.86));
     };
     img.onerror = () => toast(t("photoError"), "error");
     img.src = url;
@@ -77,7 +76,7 @@ export function PhotoEditor({ name, src }: { name: string; src: string | null })
           {src ? t("changePhoto") : t("addPhoto")}
         </Button>
         {src ? (
-          <TextButton tone="danger" size="tab" disabled={pending} onClick={() => start(async () => void (await setAvatarAction(null)))}>
+          <TextButton tone="danger" size="tab" disabled={pending} onClick={() => remove.run(null)}>
             {t("removePhoto")}
           </TextButton>
         ) : null}
@@ -270,7 +269,6 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
   const [qr, setQr] = useState<{ svg: string; secret: string } | null>(null);
   const [codes, setCodes] = useState<string[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [pending, start] = useTransition();
   const close = () => {
     setOpen(null);
     setStep(1);
@@ -282,6 +280,26 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
     router.refresh();
   };
   const err = (e: string) => setError(e === "wrongPassword" ? t("errors.wrongPassword") : e === "wrongCode" ? t("errors.wrongCode") : e === "required" ? t("requiredNote") : tc("errors.generic"));
+  const setup = useAction(startTotpAction, {
+    onSuccess: (res) => {
+      setQr({ svg: res.qrSvg, secret: res.secret });
+      setError(null);
+      setStep(2);
+    },
+    onError: err,
+  });
+  const confirmCode = useAction(confirmTotpAction, {
+    successToast: t("enabled"),
+    onSuccess: (res) => {
+      setCodes(res.codes);
+      setError(null);
+      setStep(3);
+    },
+    onError: err,
+  });
+  const disable = useAction(disableTotpAction, { successToast: t("disabled"), onSuccess: close, onError: err });
+  const regenerate = useAction(regenerateBackupCodesAction, { successToast: t("regenerated"), onSuccess: (res) => setCodes(res.codes), onError: err });
+  const pending = setup.pending || confirmCode.pending || disable.pending || regenerate.pending;
 
   return (
     <div>
@@ -323,13 +341,7 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
             className="grid gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              start(async () => {
-                const res = await startTotpAction(password);
-                if (!res.ok) return err(res.error);
-                setQr({ svg: res.qrSvg, secret: res.secret });
-                setError(null);
-                setStep(2);
-              });
+              setup.run(password);
             }}
           >
             <p className="text-body-sm font-semibold">{t("passwordTitle")}</p>
@@ -346,14 +358,7 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
             className="grid gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              start(async () => {
-                const res = await confirmTotpAction(code);
-                if (!res.ok) return err(res.error);
-                setCodes(res.codes);
-                setError(null);
-                setStep(3);
-                toast(t("enabled"));
-              });
+              confirmCode.run(code);
             }}
           >
             <p className="text-body-sm font-semibold">{t("scanTitle")}</p>
@@ -378,12 +383,7 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
           className="grid gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            start(async () => {
-              const res = await disableTotpAction(password);
-              if (!res.ok) return err(res.error ?? "generic");
-              toast(t("disabled"));
-              close();
-            });
+            disable.run(password);
           }}
         >
           <Field label={t("passwordLabel")} htmlFor="pw-off" error={error}>
@@ -403,12 +403,7 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
             className="grid gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              start(async () => {
-                const res = await regenerateBackupCodesAction(password);
-                if (!res.ok) return err(res.error);
-                setCodes(res.codes);
-                toast(t("regenerated"));
-              });
+              regenerate.run(password);
             }}
           >
             <Field label={t("passwordLabel")} htmlFor="pw-codes" error={error}>
@@ -426,7 +421,7 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
 
 export function OtherDevices() {
   const t = useTranslations("learner.profile");
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(signOutOtherDevicesAction, { successToast: t("signedOutOthers") });
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-start gap-3">
@@ -438,7 +433,7 @@ export function OtherDevices() {
           <p className="text-caption text-ink-muted">{t("signOutOthersBody")}</p>
         </div>
       </div>
-      <Button variant="secondary" size="sm" disabled={pending} onClick={() => start(async () => void (await signOutOtherDevicesAction(), toast(t("signedOutOthers"))))}>
+      <Button variant="secondary" size="sm" disabled={pending} onClick={() => run()}>
         {t("signOutOthers")}
       </Button>
     </div>
@@ -458,7 +453,6 @@ export function ChangePassword({ email, name }: { email: string; name: string })
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [pending, start] = useTransition();
   const score = useMemo(() => (next ? checkPassword(next, [email, name]).score : 0), [next, email, name]);
   const rules = [
     { ok: next.length >= PASSWORD_MIN, label: ta("rules.length", { min: PASSWORD_MIN }) },
@@ -474,6 +468,7 @@ export function ChangePassword({ email, name }: { email: string; name: string })
     setError(null);
   };
   const errText = (e: string) => (e === "wrongPassword" ? t2("errors.wrongPassword") : ["required", "tooShort", "tooLong", "sameAsEmail", "mismatch", "weak"].includes(e) ? ta(`errors.${e as "weak"}`, { min: PASSWORD_MIN }) : tc("errors.generic"));
+  const { run, pending } = useAction(changePasswordAction, { successToast: t("passwordChanged"), onSuccess: close, onError: (e) => setError(errText(e)) });
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-start gap-3">
@@ -493,12 +488,7 @@ export function ChangePassword({ email, name }: { email: string; name: string })
           className="grid gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            start(async () => {
-              const res = await changePasswordAction(current, next, confirm);
-              if (!res.ok) return setError(errText(res.error ?? "generic"));
-              toast(t("passwordChanged"), "success");
-              close();
-            });
+            run(current, next, confirm);
           }}
         >
           <input type="text" name="username" autoComplete="username" value={email} readOnly hidden />
@@ -531,7 +521,9 @@ export function ChangePassword({ email, name }: { email: string; name: string })
 export function DataSection({ pendingSince }: { pendingSince: string | null }) {
   const t = useTranslations("learner.profile");
   const [open, setOpen] = useState(false);
-  const [pending, start] = useTransition();
+  const cancel = useAction(cancelDeletionAction);
+  const request = useAction(requestDeletionAction, { onSuccess: () => setOpen(false) });
+  const pending = cancel.pending || request.pending;
   return (
     <div className="grid gap-3">
       <a href="/api/me/export" download className="flex items-center gap-3 rounded-lg border border-line p-4 hover:bg-sunken">
@@ -544,7 +536,7 @@ export function DataSection({ pendingSince }: { pendingSince: string | null }) {
       {pendingSince ? (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-warn-100 bg-warn-50 p-4">
           <p className="text-caption text-warn-700">{t("deletionPending", { date: pendingSince })}</p>
-          <Button size="sm" variant="secondary" disabled={pending} onClick={() => start(async () => void (await cancelDeletionAction()))}>
+          <Button size="sm" variant="secondary" disabled={pending} onClick={() => cancel.run()}>
             {t("deletionCancel")}
           </Button>
         </div>
@@ -566,12 +558,7 @@ export function DataSection({ pendingSince }: { pendingSince: string | null }) {
           <Button
             variant="danger"
             disabled={pending}
-            onClick={() =>
-              start(async () => {
-                await requestDeletionAction();
-                setOpen(false);
-              })
-            }
+            onClick={() => request.run()}
           >
             {t("deletionConfirm")}
           </Button>

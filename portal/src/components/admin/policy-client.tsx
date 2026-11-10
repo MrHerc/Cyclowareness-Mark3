@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Archive, ArchiveRestore, Bell, Plus, Send } from "lucide-react";
@@ -8,7 +8,7 @@ import { archivePolicyAction, createPolicyAction, publishVersionAction, remindPo
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Textarea } from "@/components/ui/field";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { langAttrs, type Locale } from "@/i18n/config";
 
 export function NewPolicy() {
@@ -17,7 +17,7 @@ export function NewPolicy() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(createPolicyAction, { onSuccess: (res) => router.push(`/admin/policies/${res.id}`), errorMap: () => tc("errors.invalid") });
   return (
     <>
       <Button icon={<Plus />} onClick={() => setOpen(true)}>
@@ -28,11 +28,7 @@ export function NewPolicy() {
           className="grid gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            start(async () => {
-              const res = await createPolicyAction(name);
-              if (res.ok && res.id) router.push(`/admin/policies/${res.id}`);
-              else toast(tc("errors.invalid"), "error");
-            });
+            run(name);
           }}
         >
           <Field label={t("name")} htmlFor="pol-name">
@@ -67,7 +63,14 @@ export function VersionEditor({ policyId, nextVersion, base, initial }: { policy
     return n > 0 && n < 20;
   });
   const [confirm, setConfirm] = useState(false);
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(publishVersionAction, {
+    successToast: t("publishedToast"),
+    onSuccess: () => {
+      setConfirm(false);
+      router.refresh();
+    },
+    errorMap: () => tc("errors.invalid"),
+  });
   return (
     <div className="grid gap-4">
       <p className="text-caption text-ink-muted">{t("newVersionHint")}</p>
@@ -113,16 +116,7 @@ export function VersionEditor({ policyId, nextVersion, base, initial }: { policy
         footer={
           <Button
             disabled={pending}
-            onClick={() =>
-              start(async () => {
-                const res = await publishVersionAction({ policyId, ...v });
-                if (res.ok) {
-                  toast(t("publishedToast"));
-                  setConfirm(false);
-                  router.refresh();
-                } else toast(tc("errors.invalid"), "error");
-              })
-            }
+            onClick={() => run({ policyId, ...v })}
           >
             {t("publish")}
           </Button>
@@ -136,17 +130,19 @@ export function VersionEditor({ policyId, nextVersion, base, initial }: { policy
 
 export function PolicyHeaderActions({ policyId, archived, versionId }: { policyId: string; archived: boolean; versionId: string | null }) {
   const t = useTranslations("admin.policies");
-  const [pending, start] = useTransition();
+  const remind = useAction(remindPolicyAction, { successToast: (res) => t("reminded", { count: res.count }) });
+  const archive = useAction(archivePolicyAction);
+  const pending = remind.pending || archive.pending;
   // Long labels ("Remind people who haven't signed") wrap inside the button on narrow phones instead of widening the page.
   const fit = "h-auto min-h-11 max-w-full whitespace-normal py-2.5 text-start";
   return (
     <div className="flex max-w-full flex-wrap gap-2">
       {versionId ? (
-        <Button variant="secondary" className={fit} icon={<Bell />} disabled={pending} onClick={() => start(async () => toast(t("reminded", { count: (await remindPolicyAction(versionId)).count })))}>
+        <Button variant="secondary" className={fit} icon={<Bell />} disabled={pending} onClick={() => remind.run(versionId)}>
           {t("remind")}
         </Button>
       ) : null}
-      <Button variant="secondary" className={fit} icon={archived ? <ArchiveRestore /> : <Archive />} disabled={pending} onClick={() => start(async () => void (await archivePolicyAction(policyId, !archived)))}>
+      <Button variant="secondary" className={fit} icon={archived ? <ArchiveRestore /> : <Archive />} disabled={pending} onClick={() => archive.run(policyId, !archived)}>
         {archived ? t("restore") : t("archive")}
       </Button>
     </div>

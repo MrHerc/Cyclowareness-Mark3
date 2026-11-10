@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowDown, ArrowUp, Copy, Eye, Pencil, Plus, Send, Sparkles, Trash2, Upload, X } from "lucide-react";
@@ -16,7 +16,7 @@ import {
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/components/ui/field";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { LOCALE_NAMES, langAttrs } from "@/i18n/config";
 import type { Category } from "@/lib/domain/catalog";
 import type { LabId } from "@/lib/domain/labs";
@@ -35,8 +35,6 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
   const t = useTranslations("secops.studio");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
-  const [pending, start] = useTransition();
-  const [drafting, startDraft] = useTransition();
   const [topic, setTopic] = useState("");
   const [fromAi, setFromAi] = useState(false);
   const blank = {
@@ -68,11 +66,10 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
     f.options.filter((o) => o.correct && o.label.trim()).length === 1 &&
     lines(f.recap).length >= 2;
 
-  const draft = () =>
-    startDraft(async () => {
-      const res = await draftLessonAction(topic, f.locale);
-      if (!res.ok || !res.draft) return toast(res.error === "offline" ? t("form.aiOffline") : res.error === "rateLimited" ? tc("errors.rateLimited") : t("form.aiFailed"), "error");
-      const d = res.draft;
+  const drafter = useAction(draftLessonAction, {
+    successToast: t("form.aiDone"),
+    onSuccess: (res) => {
+      const d = res.draft!;
       setF({
         ...f,
         title: d.title,
@@ -84,32 +81,40 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
         recap: d.recap.join("\n"),
       });
       setFromAi(true);
-      toast(t("form.aiDone"));
-    });
-
-  const save = () =>
-    start(async () => {
-      const options = f.options.filter((o) => o.label.trim() && o.feedback.trim()).map((o) => ({ label: o.label.trim(), correct: o.correct, feedback: o.feedback.trim() }));
-      const res = await saveStudioLessonAction({
-        locale: f.locale as "az",
-        title: f.title.trim(),
-        subtitle: f.subtitle.trim(),
-        category: f.category as Category,
-        difficulty: f.difficulty,
-        minutes: f.minutes,
-        intro: f.intro.trim(),
-        points: lines(f.points),
-        question: { prompt: f.prompt.trim(), options },
-        recap: lines(f.recap),
-        ai: fromAi,
-      });
-      if (!res.ok) return toast(tc("errors.invalid"), "error");
-      toast(t("saved"));
+    },
+    // A rate limit takes the common message.
+    errorMap: (res) => (res.error === "offline" ? t("form.aiOffline") : res.error === "rateLimited" ? undefined : t("form.aiFailed")),
+  });
+  const saver = useAction(saveStudioLessonAction, {
+    successToast: t("saved"),
+    onSuccess: () => {
       setOpen(false);
       setF(blank);
       setTopic("");
       setFromAi(false);
+    },
+    errorMap: () => tc("errors.invalid"),
+  });
+  const pending = saver.pending;
+  const drafting = drafter.pending;
+  const draft = () => drafter.run(topic, f.locale);
+
+  const save = () => {
+    const options = f.options.filter((o) => o.label.trim() && o.feedback.trim()).map((o) => ({ label: o.label.trim(), correct: o.correct, feedback: o.feedback.trim() }));
+    saver.run({
+      locale: f.locale as "az",
+      title: f.title.trim(),
+      subtitle: f.subtitle.trim(),
+      category: f.category as Category,
+      difficulty: f.difficulty,
+      minutes: f.minutes,
+      intro: f.intro.trim(),
+      points: lines(f.points),
+      question: { prompt: f.prompt.trim(), options },
+      recap: lines(f.recap),
+      ai: fromAi,
     });
+  };
 
   return (
     <>
@@ -217,8 +222,10 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
 export function ModuleRowActions({ id, status, previewHref }: { id: string; status: "draft" | "published"; previewHref: string | null }) {
   const t = useTranslations("secops.studio");
   const tc = useTranslations("common");
-  const [pending, start] = useTransition();
   const [confirm, setConfirm] = useState(false);
+  const publish = useAction(setModuleStatusAction, { successToast: status === "draft" ? t("published") : t("unpublished") });
+  const remove = useAction(deleteModuleAction, { successToast: t("deleted"), onSuccess: () => setConfirm(false), errorMap: { in_use: t("deleteInUse") } });
+  const pending = publish.pending || remove.pending;
   return (
     <div className="flex flex-wrap gap-2">
       {previewHref ? (
@@ -231,7 +238,7 @@ export function ModuleRowActions({ id, status, previewHref }: { id: string; stat
         variant={status === "draft" ? "primary" : "secondary"}
         icon={status === "draft" ? <Upload /> : undefined}
         disabled={pending}
-        onClick={() => start(async () => void ((await setModuleStatusAction(id, status === "draft" ? "published" : "draft")).ok && toast(status === "draft" ? t("published") : t("unpublished"))))}
+        onClick={() => publish.run(id, status === "draft" ? "published" : "draft")}
       >
         {status === "draft" ? t("publish") : t("unpublish")}
       </Button>
@@ -252,14 +259,7 @@ export function ModuleRowActions({ id, status, previewHref }: { id: string; stat
             <Button
               variant="danger"
               disabled={pending}
-              onClick={() =>
-                start(async () => {
-                  const res = await deleteModuleAction(id);
-                  if (!res.ok) return toast(res.error === "in_use" ? t("deleteInUse") : tc("errors.generic"), "error");
-                  toast(t("deleted"));
-                  setConfirm(false);
-                })
-              }
+              onClick={() => remove.run(id)}
             >
               {t("delete")}
             </Button>
@@ -277,8 +277,15 @@ export function MaterialForm({ modules, departments }: { modules: Option[]; depa
   const ts = useTranslations("secops");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
-  const [pending, start] = useTransition();
   const [f, setF] = useState({ title: "", body: "", moduleId: "", departmentId: "", requiresTwo: false });
+  const { run, pending } = useAction(createMaterialAction, {
+    successToast: t("material.sent"),
+    onSuccess: () => {
+      setOpen(false);
+      setF({ title: "", body: "", moduleId: "", departmentId: "", requiresTwo: false });
+    },
+    errorMap: () => tc("errors.invalid"),
+  });
   return (
     <>
       <Button variant="secondary" icon={<Send />} onClick={() => setOpen(true)}>
@@ -296,15 +303,7 @@ export function MaterialForm({ modules, departments }: { modules: Option[]; depa
             </Button>
             <Button
               disabled={pending || f.title.trim().length < 3 || f.body.trim().length < 10}
-              onClick={() =>
-                start(async () => {
-                  const res = await createMaterialAction({ title: f.title, body: f.body, moduleId: f.moduleId || null, departmentId: f.departmentId || null, requiresTwo: f.requiresTwo });
-                  if (!res.ok) return toast(tc("errors.invalid"), "error");
-                  toast(t("material.sent"));
-                  setOpen(false);
-                  setF({ title: "", body: "", moduleId: "", departmentId: "", requiresTwo: false });
-                })
-              }
+              onClick={() => run({ title: f.title, body: f.body, moduleId: f.moduleId || null, departmentId: f.departmentId || null, requiresTwo: f.requiresTwo })}
             >
               {t("material.send")}
             </Button>
@@ -357,9 +356,16 @@ export function PathEditor({ initial, modules, labs, trigger }: { initial: PathD
   const t = useTranslations("secops.paths");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
-  const [pending, start] = useTransition();
   const empty: PathDraft = { id: null, title: "", description: "", audience: "", recurrence: "", standards: "", mandatory: false, moduleSlugs: [], labIds: [] };
   const [f, setF] = useState<PathDraft>(initial ?? empty);
+  const { run, pending } = useAction(savePathAction, {
+    successToast: t("saved"),
+    onSuccess: () => {
+      setOpen(false);
+      if (!f.id) setF(initial ?? empty);
+    },
+    errorMap: () => tc("errors.invalid"),
+  });
   const [query, setQuery] = useState("");
   const bySlug = useMemo(() => new Map(modules.map((m) => [m.slug, m.label])), [modules]);
   const matches = useMemo(() => {
@@ -391,15 +397,7 @@ export function PathEditor({ initial, modules, labs, trigger }: { initial: PathD
             </Button>
             <Button
               disabled={pending || f.title.trim().length < 3 || !f.moduleSlugs.length}
-              onClick={() =>
-                start(async () => {
-                  const res = await savePathAction(f);
-                  if (!res.ok) return toast(tc("errors.invalid"), "error");
-                  toast(t("saved"));
-                  setOpen(false);
-                  if (!f.id) setF(initial ?? empty);
-                })
-              }
+              onClick={() => run(f)}
             >
               {t("form.save")}
             </Button>
@@ -494,8 +492,15 @@ export function DeletePath({ id }: { id: string }) {
   const t = useTranslations("secops.paths");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
-  const [pending, start] = useTransition();
   const router = useRouter();
+  const { run, pending } = useAction(deletePathAction, {
+    successToast: t("deleted"),
+    onSuccess: () => {
+      setOpen(false);
+      router.refresh();
+    },
+    errorMap: { in_use: t("deleteInUse") },
+  });
   return (
     <>
       <Button size="icon-sm" variant="ghost" aria-label={t("delete")} onClick={() => setOpen(true)}>
@@ -515,15 +520,7 @@ export function DeletePath({ id }: { id: string }) {
             <Button
               variant="danger"
               disabled={pending}
-              onClick={() =>
-                start(async () => {
-                  const res = await deletePathAction(id);
-                  if (!res.ok) return toast(res.error === "in_use" ? t("deleteInUse") : tc("errors.generic"), "error");
-                  toast(t("deleted"));
-                  setOpen(false);
-                  router.refresh();
-                })
-              }
+              onClick={() => run(id)}
             >
               {t("delete")}
             </Button>

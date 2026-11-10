@@ -4,13 +4,14 @@ import { useActionState, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, Star } from "lucide-react";
-import { createTicketAction, sendFeedbackAction, type FeedbackState, type TicketState } from "@/server/actions/engage";
+import { createTicketAction, sendFeedbackAction, type TicketState } from "@/server/actions/engage";
 import { Field, Input, Select, Textarea, Checkbox } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/layout";
 import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { cn } from "@/lib/cn";
 
 export function NewTicket() {
@@ -111,17 +112,16 @@ export function FeedbackForm() {
   const tc = useTranslations("common");
   const [rating, setRating] = useState(0);
   const form = useRef<HTMLFormElement>(null);
-  const [pending, startSubmit] = useTransition();
-  const submit = (data: FormData) =>
-    startSubmit(async () => {
-      // A thrown action (server unreachable) is reported like any other failure; the comment stays.
-      const res = await sendFeedbackAction(undefined, data).catch((): FeedbackState => ({ error: "generic" }));
-      if (res?.ok) {
-        toast(t("feedbackThanks"));
-        form.current?.reset();
-        setRating(0);
-      } else toast(formErrorMessage(res?.error ?? "", tc), "error");
-    });
+  // A failed call or a refusal is a toast; the comment that was typed stays.
+  const { run, pending } = useAction(sendFeedbackAction, {
+    successToast: t("feedbackThanks"),
+    onSuccess: () => {
+      form.current?.reset();
+      setRating(0);
+    },
+    errorMap: { invalid: tc("errors.generic") },
+  });
+  const submit = (data: FormData) => run(undefined, data);
   return (
     // Submitted through a transition rather than the form action, so a rejected form keeps the comment that was typed.
     <form

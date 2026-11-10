@@ -1,6 +1,5 @@
 "use client";
 
-import { useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -10,7 +9,7 @@ import { TextButton, textLinkClass } from "@/components/ui/button";
 import { Select } from "@/components/ui/field";
 import { Ring } from "@/components/ui/progress";
 import { Pill } from "@/components/ui/pill";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { cn } from "@/lib/cn";
 
 export function DepartmentFilter({ departments, label }: { departments: { id: string; name: string }[]; label: string }) {
@@ -45,7 +44,9 @@ type Step = { key: string; done: boolean; href: string; skippable?: boolean; opt
 
 export function SetupGuide({ steps, skipped, canEdit }: { steps: Step[]; skipped: string[]; canEdit: boolean }) {
   const t = useTranslations("admin.overview");
-  const [pending, start] = useTransition();
+  const hide = useAction(hideSetupAction);
+  const skip = useAction(skipSetupStepAction);
+  const pending = hide.pending || skip.pending;
   const counted = steps.filter((s) => !s.optional);
   const done = counted.filter((s) => s.done || skipped.includes(s.key)).length;
   return (
@@ -61,7 +62,7 @@ export function SetupGuide({ steps, skipped, canEdit }: { steps: Step[]; skipped
           <p className="text-caption text-ink-muted">{t("setupDone", { done, total: counted.length })}</p>
         </div>
         {canEdit ? (
-          <button type="button" disabled={pending} onClick={() => start(() => hideSetupAction(true))} className="rounded-pill px-3 py-1.5 text-caption font-semibold text-ink-muted hover:bg-sunken pointer-coarse:min-h-11">
+          <button type="button" disabled={pending} onClick={() => hide.run(true)} className="rounded-pill px-3 py-1.5 text-caption font-semibold text-ink-muted hover:bg-sunken pointer-coarse:min-h-11">
             {t("hide")}
           </button>
         ) : null}
@@ -79,7 +80,7 @@ export function SetupGuide({ steps, skipped, canEdit }: { steps: Step[]; skipped
                 </Link>
                 <p className="text-tab text-ink-subtle">{t(`setup.${s.key as "people"}.body`)}</p>
                 {s.skippable && !ok && canEdit ? (
-                  <TextButton size="tab" className="mt-1" disabled={pending} onClick={() => start(() => skipSetupStepAction(s.key))}>
+                  <TextButton size="tab" className="mt-1" disabled={pending} onClick={() => skip.run(s.key)}>
                     {t("markNotNeeded")}
                   </TextButton>
                 ) : null}
@@ -95,14 +96,14 @@ export function SetupGuide({ steps, skipped, canEdit }: { steps: Step[]; skipped
 
 export function RemindButton({ moduleId, moduleTitle, count }: { moduleId: string; moduleTitle: string; count: number }) {
   const t = useTranslations("admin.overview");
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(remindAwaitingAction, { successToast: (res) => t("reminded", { count: res.count }) });
   return (
     <button
       type="button"
       disabled={pending}
       aria-label={t("remindWaiting", { module: moduleTitle })}
       title={t("remindWaiting", { module: moduleTitle })}
-      onClick={() => start(async () => toast(t("reminded", { count: (await remindAwaitingAction(moduleId)).count })))}
+      onClick={() => run(moduleId)}
       className="inline-flex items-center gap-1.5 rounded-pill px-2 py-1 text-caption font-semibold text-reward-ink hover:bg-reward-100 pointer-coarse:min-h-11"
     >
       <Bell className="size-3.5" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, Copy, GraduationCap, Pencil, Plus, RotateCcw, Search } from "lucide-react";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { cn } from "@/lib/cn";
 import { searchFold } from "./search-fold";
 
@@ -41,7 +42,14 @@ export function NewIncident({
   const tc = useTranslations("common");
   const router = useRouter();
   const [open, setOpen] = useState(defaultOpen);
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(createIncidentAction, {
+    successToast: (res) => t("created", { number: res.number! }),
+    onSuccess: (res) => {
+      setOpen(false);
+      router.push(`/admin/incidents/${res.id}`);
+    },
+    errorMap: () => tc("errors.invalid"),
+  });
   const [f, setF] = useState({
     title: prefill?.title ?? "",
     description: prefill?.description ?? "",
@@ -55,24 +63,18 @@ export function NewIncident({
   });
   const [train, setTrain] = useState<TrainingValue>(() => emptyTraining(defaultDue));
   const submit = () =>
-    start(async () => {
-      const res = await createIncidentAction({
-        title: f.title,
-        description: f.description,
-        severity: f.severity,
-        source: f.source,
-        confidential: f.confidential,
-        live: f.live,
-        iocs: f.iocs,
-        mitre: f.mitre,
-        ...trainingInput(train),
-        sandboxId: prefill?.sandboxId ?? null,
-        assignNow: f.assignNow,
-      });
-      if (!res.ok) return toast(tc("errors.invalid"), "error");
-      toast(t("created", { number: res.number! }));
-      setOpen(false);
-      router.push(`/admin/incidents/${res.id}`);
+    run({
+      title: f.title,
+      description: f.description,
+      severity: f.severity,
+      source: f.source,
+      confidential: f.confidential,
+      live: f.live,
+      iocs: f.iocs,
+      mitre: f.mitre,
+      ...trainingInput(train),
+      sandboxId: prefill?.sandboxId ?? null,
+      assignNow: f.assignNow,
     });
   return (
     <>
@@ -274,7 +276,7 @@ export function IncidentTrainingEditor({
   const t = useTranslations("secops.incidents");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(setIncidentTrainingAction, { successToast: t("saved"), onSuccess: () => setOpen(false), errorMap: () => tc("errors.invalid") });
   const [train, setTrain] = useState<TrainingValue>({
     ...emptyTraining(initial.dueDate ?? defaultDue),
     moduleId: initial.moduleId ?? "",
@@ -298,14 +300,7 @@ export function IncidentTrainingEditor({
             </Button>
             <Button
               disabled={pending}
-              onClick={() =>
-                start(async () => {
-                  const res = await setIncidentTrainingAction(id, trainingInput(train));
-                  if (!res.ok) return toast(tc("errors.invalid"), "error");
-                  toast(t("saved"));
-                  setOpen(false);
-                })
-              }
+              onClick={() => run(id, trainingInput(train))}
             >
               {tc("save")}
             </Button>
@@ -320,22 +315,17 @@ export function IncidentTrainingEditor({
 
 export function IncidentControls({ id, status, live, canAssign }: { id: string; status: "open" | "investigating" | "resolved"; live: boolean; canAssign: boolean }) {
   const t = useTranslations("secops.incidents");
-  const tc = useTranslations("common");
-  const [pending, start] = useTransition();
-  const update = (input: Parameters<typeof updateIncidentAction>[1]) => start(async () => void ((await updateIncidentAction(id, input)).ok ? toast(t("saved")) : toast(tc("errors.generic"), "error")));
+  const save = useAction(updateIncidentAction, { successToast: t("saved") });
+  const assign = useAction(assignIncidentTrainingAction, { successToast: (res) => t("assigned", { count: res.count ?? 0 }) });
+  const pending = save.pending || assign.pending;
+  const update = (input: Parameters<typeof updateIncidentAction>[1]) => save.run(id, input);
   return (
     <div className="flex flex-wrap gap-2">
       {canAssign ? (
         <Button
           icon={<GraduationCap />}
           disabled={pending}
-          onClick={() =>
-            start(async () => {
-              const res = await assignIncidentTrainingAction(id);
-              if (!res.ok) return toast(tc("errors.generic"), "error");
-              toast(t("assigned", { count: res.count ?? 0 }));
-            })
-          }
+          onClick={() => assign.run(id)}
         >
           {t("assignNow")}
         </Button>

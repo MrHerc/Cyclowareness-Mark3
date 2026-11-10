@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, useTransition } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { KeyRound, Mail, MessageSquareText, Play } from "lucide-react";
@@ -9,7 +9,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Field, Segmented, Select } from "@/components/ui/field";
 import { Pill } from "@/components/ui/pill";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 import { cn } from "@/lib/cn";
 
 export type DrillTemplateOption = {
@@ -47,22 +47,12 @@ export function DrillSetup({
   const [scope, setScope] = useState<"all" | "department">("all");
   const [departmentId, setDepartmentId] = useState(departments[0]?.id ?? "");
   const [speed, setSpeed] = useState<"quick" | "standard">("quick");
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(startDrillAction, { onSuccess: (res) => router.push(`/admin/drill/${res.id}`), errorMap: (res) => t(`errors.${res.reason}`) });
   const tpl = templates.find((x) => x.key === templateKey);
   const reach = scope === "all" ? audience.all : (audience.departments[departmentId] ?? { all: 0, sms: 0 });
   const count = tpl?.channel === "sms" ? reach.sms : scope === "all" ? everyone : reach.all;
 
-  const submit = () =>
-    start(async () => {
-      try {
-        const res = await startDrillAction({ templateKey, audience: scope, departmentId: scope === "department" ? departmentId : null, speed });
-        if (res.ok) router.push(`/admin/drill/${res.id}`);
-        else toast(t(`errors.${res.reason}`), "error");
-      } catch {
-        // Network or server failure: the form stays, with a message instead of the error page.
-        toast(t("errors.unknown"), "error");
-      }
-    });
+  const submit = () => run({ templateKey, audience: scope, departmentId: scope === "department" ? departmentId : null, speed });
 
   return (
     <Card>

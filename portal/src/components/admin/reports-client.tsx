@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useClientFormat, useOrgTimeZone } from "@/lib/client-format";
@@ -10,7 +10,7 @@ import { removeScheduleAction, saveScheduleAction } from "@/server/actions/repor
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select } from "@/components/ui/field";
-import { toast } from "@/components/ui/toast";
+import { useAction } from "@/components/ui/use-action";
 
 /** A period the reports can apply: each date empty or an existing day, the start not after the end. */
 const validPeriod = (from: string, to: string) => (!from || !!parseDay(from)) && (!to || !!parseDay(to)) && !(from && to && from > to);
@@ -141,7 +141,15 @@ export function Schedules({
   const [day, setDay] = useState(1);
   const [recipients, setRecipients] = useState("");
   const [dept, setDept] = useState("");
-  const [pending, start] = useTransition();
+  const remove = useAction(removeScheduleAction, { successToast: t("scheduleRemoved") });
+  const save = useAction(saveScheduleAction, {
+    successToast: t("scheduleSaved"),
+    onSuccess: () => {
+      setOpen(false);
+      setRecipients("");
+    },
+    errorMap: () => tc("errors.invalid"),
+  });
   const title = (k: string) => kinds.find((x) => x.key === k)?.title ?? k;
   // Weekly: weekday 1–7 (Monday first). Monthly: day of the month 1–28, so every month has it.
   const dayLabel = (frequency: string, d: number) => (frequency === "weekly" ? t(`weekdays.${d as 1}`) : t("dayOfMonth", { day: d }));
@@ -166,12 +174,7 @@ export function Schedules({
                 variant="ghost"
                 className="text-risk-600"
                 aria-label={tc("remove")}
-                onClick={() =>
-                  start(async () => {
-                    const res = await removeScheduleAction(s.id);
-                    toast(res.ok ? t("scheduleRemoved") : tc("errors.generic"), res.ok ? "success" : "error");
-                  })
-                }
+                onClick={() => remove.run(s.id)}
               >
                 <Trash2 />
               </Button>
@@ -242,17 +245,8 @@ export function Schedules({
           </Field>
           <p className="text-caption text-ink-muted">{t("scheduleHint", { zone: timeZone })}</p>
           <Button
-            disabled={!recipients.trim() || pending}
-            onClick={() =>
-              start(async () => {
-                const res = await saveScheduleAction({ kind, format: fmt, frequency: freq, day, recipients, departmentId: dept || null });
-                if (res.ok) {
-                  toast(t("scheduleSaved"));
-                  setOpen(false);
-                  setRecipients("");
-                } else toast(tc("errors.invalid"), "error");
-              })
-            }
+            disabled={!recipients.trim() || save.pending || remove.pending}
+            onClick={() => save.run({ kind, format: fmt, frequency: freq, day, recipients, departmentId: dept || null })}
           >
             {tc("save")}
           </Button>

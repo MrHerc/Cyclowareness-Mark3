@@ -14,6 +14,7 @@ import { twoFactorRequired } from "../auth/permissions";
 import { audit } from "../services/audit";
 import { clientIp } from "../request";
 import { rateLimit } from "../rate-limit";
+import type { ActionResult } from "@/lib/action-result";
 
 async function checkPassword(userId: string, password: string): Promise<boolean> {
   if (!(await rateLimit(`pw-confirm:${userId}`, 10, 15 * 60_000)).ok) return false;
@@ -21,7 +22,7 @@ async function checkPassword(userId: string, password: string): Promise<boolean>
 }
 
 /** Step 1 of 2FA setup: confirm the password, create a key and show it as a QR code. */
-export async function startTotpAction(password: string): Promise<{ ok: false; error: string } | { ok: true; qrSvg: string; secret: string; uri: string }> {
+export async function startTotpAction(password: string): Promise<ActionResult<{ qrSvg: string; secret: string; uri: string }>> {
   const v = await actionViewer();
   if (v.user.totpEnabled) return { ok: false, error: "alreadyOn" };
   if (!(await checkPassword(v.user.id, password))) return { ok: false, error: "wrongPassword" };
@@ -34,7 +35,7 @@ export async function startTotpAction(password: string): Promise<{ ok: false; er
 }
 
 /** Step 2: the first code turns it on and returns the one-time backup codes. */
-export async function confirmTotpAction(code: string): Promise<{ ok: false; error: string } | { ok: true; codes: string[] }> {
+export async function confirmTotpAction(code: string): Promise<ActionResult<{ codes: string[] }>> {
   const v = await actionViewer();
   const [u] = await db().select({ secret: t.users.totpSecret, enabled: t.users.totpEnabled }).from(t.users).where(eq(t.users.id, v.user.id));
   if (!u?.secret || u.enabled) return { ok: false, error: "generic" };
@@ -74,7 +75,7 @@ export async function disableTotpAction(password: string): Promise<{ ok: boolean
   return { ok: true };
 }
 
-export async function regenerateBackupCodesAction(password: string): Promise<{ ok: false; error: string } | { ok: true; codes: string[] }> {
+export async function regenerateBackupCodesAction(password: string): Promise<ActionResult<{ codes: string[] }>> {
   const v = await actionViewer();
   if (!v.user.totpEnabled) return { ok: false, error: "generic" };
   if (!(await checkPassword(v.user.id, password))) return { ok: false, error: "wrongPassword" };

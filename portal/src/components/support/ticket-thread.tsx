@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useClientFormat } from "@/lib/client-format";
 import { Send } from "lucide-react";
@@ -8,6 +8,7 @@ import { replyTicketAction } from "@/server/actions/engage";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/field";
+import { useAction } from "@/components/ui/use-action";
 import { cn } from "@/lib/cn";
 
 export type ThreadMessage = { id: string; authorName: string; mine: boolean; staff: boolean; body: string; at: string };
@@ -16,7 +17,7 @@ export function TicketThread({ ticketId, messages, closed }: { ticketId: string;
   const t = useTranslations("learner.help");
   const format = useClientFormat();
   const [body, setBody] = useState("");
-  const [pending, start] = useTransition();
+  const { run, pending } = useAction(replyTicketAction, { onSuccess: () => setBody("") });
   return (
     <div className="grid gap-4">
       <ol className="grid gap-3">
@@ -39,10 +40,7 @@ export function TicketThread({ ticketId, messages, closed }: { ticketId: string;
           className="grid gap-2"
           onSubmit={(e) => {
             e.preventDefault();
-            start(async () => {
-              const res = await replyTicketAction(ticketId, body);
-              if (res.ok) setBody("");
-            });
+            run(ticketId, body);
           }}
         >
           <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder={t("replyPlaceholder")} aria-label={t("reply")} maxLength={5000} />
