@@ -1,4 +1,5 @@
 import { and, count, eq, sql } from "drizzle-orm";
+import { PgDatabase } from "drizzle-orm/pg-core";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import { featuresFor, reportAddress, withDefaults } from "../src/lib/tenant-defaults";
@@ -684,6 +685,22 @@ describe("Studio lessons", () => {
     expect(await saveStudioLessonAction({ ...LESSON, swipe: safeOnly })).toEqual({ ok: false, error: "invalid" });
     const missing = { ...HOTSPOT, targets: [{ ...HOTSPOT.targets[0], text: "within 2 hours" }] };
     expect(await saveStudioLessonAction({ ...LESSON, hotspot: missing })).toEqual({ ok: false, error: "invalid" });
+  });
+
+  it("leaves no draft module behind when its lesson's scenes cannot be stored", async () => {
+    const tenant = await studio(["en"]);
+    const insert = PgDatabase.prototype.insert;
+    const failing = vi.spyOn(PgDatabase.prototype, "insert").mockImplementation(function (this: PgDatabase<never>, table: Parameters<typeof insert>[0]) {
+      if (table === t.lessonContents) throw new Error("lesson_contents insert failed");
+      return insert.call(this, table);
+    } as typeof insert);
+    try {
+      await expect(saveStudioLessonAction(LESSON)).rejects.toThrow("lesson_contents insert failed");
+    } finally {
+      failing.mockRestore();
+    }
+    expect(await db.select().from(t.modules).where(eq(t.modules.tenantId, tenant.id))).toEqual([]);
+    expect(await db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenant.id), eq(t.auditLog.action, "module.created")))).toEqual([]);
   });
 
   it("edits a saved lesson in place: the same scene ids, a published module stays published and is translated again", async () => {

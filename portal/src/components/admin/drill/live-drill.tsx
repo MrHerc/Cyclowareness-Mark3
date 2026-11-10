@@ -193,7 +193,8 @@ function Hero({ view, sim, finished, offline, pending, onSkip }: { view: DrillVi
               {t(`channel.${view.template.channel}`)}
             </Pill>
             <Pill tone={view.template.difficulty === "Easy" ? "safe" : view.template.difficulty === "Medium" ? "warn" : "risk"}>{t(`difficulty.${view.template.difficulty}`)}</Pill>
-            {offline ? <span className="text-tab text-warn-700">{t("reconnecting")}</span> : null}
+            {/* Mounted from the start, so the notice is announced when it appears. */}
+            <span role="status" className="text-tab text-warn-700">{offline ? t("reconnecting") : null}</span>
           </div>
           <div className="min-w-0 rounded-lg border border-line bg-sunken/60 p-4">
             <p className="text-tab-sm font-bold tracking-wider text-ink-subtle uppercase">{t("lure")}</p>

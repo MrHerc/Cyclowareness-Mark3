@@ -505,13 +505,17 @@ export async function saveStudioLessonAction(input: z.infer<typeof lessonSchema>
   if (!scenes) return { ok: false, error: "invalid" };
   const slug = `own-${slugify(d.title)}-${Date.now().toString(36).slice(-4)}`;
   const label = { [d.locale]: d.title };
-  const [mod] = await db()
-    .insert(t.modules)
-    .values({ tenantId: v.tenant.id, slug, category: d.category, audiences: [AUDIENCES[0]], title: label, subtitle: { [d.locale]: d.subtitle }, minutes: d.minutes, xp: 40 + d.minutes * 5, difficulty: d.difficulty, origin: d.ai ? "ai" : "custom", status: "draft", sortOrder: 1000, createdBy: v.user.id })
-    .returning({ id: t.modules.id });
-  const [lesson] = await db().insert(t.lessons).values({ moduleId: mod.id, key: "lesson-1", title: label, minutes: d.minutes, position: 1 }).returning({ id: t.lessons.id });
-  await db().insert(t.lessonContents).values({ lessonId: lesson.id, locale: d.locale, scenes });
-  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "module.created", targetType: "module", targetId: mod.id, meta: { title: d.title, origin: d.ai ? "ai" : "custom" } });
+  // One transaction: a draft module without its lesson or scenes could not be edited in the Studio.
+  const modId = await db().transaction(async (tx) => {
+    const [mod] = await tx
+      .insert(t.modules)
+      .values({ tenantId: v.tenant.id, slug, category: d.category, audiences: [AUDIENCES[0]], title: label, subtitle: { [d.locale]: d.subtitle }, minutes: d.minutes, xp: 40 + d.minutes * 5, difficulty: d.difficulty, origin: d.ai ? "ai" : "custom", status: "draft", sortOrder: 1000, createdBy: v.user.id })
+      .returning({ id: t.modules.id });
+    const [lesson] = await tx.insert(t.lessons).values({ moduleId: mod.id, key: "lesson-1", title: label, minutes: d.minutes, position: 1 }).returning({ id: t.lessons.id });
+    await tx.insert(t.lessonContents).values({ lessonId: lesson.id, locale: d.locale, scenes });
+    return mod.id;
+  });
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "module.created", targetType: "module", targetId: modId, meta: { title: d.title, origin: d.ai ? "ai" : "custom" } });
   refresh();
   return { ok: true, slug };
 }

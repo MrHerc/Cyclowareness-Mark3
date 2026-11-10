@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import fs, { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { labScenarioErrors, labScenarioSchema, miniLabXp, type LabScenario } from "../src/lib/content/lab-scenario";
@@ -94,6 +94,17 @@ describe("mini-lab scenarios on disk", () => {
     expect(labScenario("no-such-module")).toBeNull();
     expect(labScenario("../modules")).toBeNull();
     expect(labScenario("phishing-email", "../x")).toBeNull();
+  });
+
+  it("reads only the files that ship, so slugs from requests are never read or cached", () => {
+    const read = vi.spyOn(fs, "readFileSync");
+    try {
+      expect(labScenario("x".repeat(10_000))).toBeNull();
+      expect(labScenario("no-such-module-at-all", "ar")).toBeNull();
+      expect(read).not.toHaveBeenCalled();
+    } finally {
+      read.mockRestore();
+    }
   });
 });
 

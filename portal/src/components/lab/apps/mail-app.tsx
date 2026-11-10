@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft, CheckCircle2, FileCode2, FileText, Info, Paperclip, Reply, ShieldAlert, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { dirOf } from "@/i18n/config";
+import { langProps } from "@/components/player/rich";
 
 export type MailMsg = {
   id: string;
@@ -77,7 +78,7 @@ export function MailApp({ msgs, reported, onEvent, ranText }: { msgs: MailMsg[];
                 <span className={cn("mt-0.5 grid size-8 shrink-0 place-items-center rounded-full text-tab-sm font-bold text-white", m.tone)} aria-hidden>
                   {initials(m.fromName, locale)}
                 </span>
-                <span lang={m.lang} className="min-w-0 flex-1">
+                <span {...langProps(m.lang)} className="min-w-0 flex-1">
                   <span className="flex items-baseline gap-2">
                     <span className={cn("min-w-0 flex-1 truncate text-caption", read.includes(m.id) ? "font-medium" : "font-bold")}>{m.fromName}</span>
                     <span className="shrink-0 text-tab-sm text-ink-subtle tabular-nums">{m.time}</span>
@@ -187,7 +188,7 @@ function Reader({ msg, view, setView, reported, onEvent, onBack, ranText }: { ms
       ) : (
         // The message is in the learner's language: it reads in that direction inside the left-to-right VM.
         <div dir={dirOf(msg.lang ?? locale)} className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
-          <h3 lang={msg.lang} className="text-body font-bold break-words">
+          <h3 {...langProps(msg.lang)} className="text-body font-bold break-words">
             {msg.subject}
           </h3>
           <div className="mt-2 flex items-start gap-2.5">
@@ -206,7 +207,7 @@ function Reader({ msg, view, setView, reported, onEvent, onBack, ranText }: { ms
               </p>
             </div>
           </div>
-          <div lang={msg.lang} className="mt-3 grid gap-2.5 text-caption leading-relaxed text-ink">
+          <div {...langProps(msg.lang)} className="mt-3 grid gap-2.5 text-caption leading-relaxed text-ink">
             {msg.body.map((p, i) => (
               <div key={i} className="grid gap-2.5">
                 <p className="break-words">{p}</p>

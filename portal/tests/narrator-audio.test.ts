@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { SILENT_CLIP, armAudioUnlock, clipFor, nextClipUrl, volumeIsFixed } from "@/components/player/narrator";
+import { SILENT_CLIP, armAudioUnlock, clipFailure, clipFor, nextClipUrl, volumeIsFixed } from "@/components/player/narrator";
 import type { NarrationClips } from "@/lib/tts/clips";
 
 const clip = (c: string) => ({ url: `/generated/tts/en/${c.repeat(64)}.mp3`, durationMs: 1000, words: [] });
@@ -9,6 +9,15 @@ describe("clip or speech engine", () => {
   it("plays the lesson's clip for a text it has in the clips' language", () => {
     expect(clipFor(clips, "Hello.", "en", "en")).toBe(clips["Hello."]);
     expect(clipFor(clips, "Hello.", "en-US", "en")).toBe(clips["Hello."]);
+  });
+
+  it("speaks a line through the engine when its clip fails, reports a blocked one and ignores an aborted one", () => {
+    // null: the element's "error" event (a 404 or an undecodable file, e.g. a pruned mp3 still in the manifest).
+    expect(clipFailure(null)).toBe("engine");
+    expect(clipFailure("NotSupportedError")).toBe("engine");
+    expect(clipFailure("")).toBe("engine");
+    expect(clipFailure("NotAllowedError")).toBe("not-allowed");
+    expect(clipFailure("AbortError")).toBe("ignore");
   });
 
   it("leaves to Web Speech a text without a clip, another language, or a lesson without clips", () => {

@@ -69,46 +69,51 @@ export async function startDrill(db: DB, p: StartDrillInput): Promise<StartDrill
 
   const now = new Date();
   const durationMs = DRILL_SPEEDS[p.speed];
-  const [campaign] = await db
-    .insert(t.campaigns)
-    .values({
-      tenantId: p.tenantId,
-      name: p.campaignName.slice(0, 160),
-      channel: tpl.channel,
-      templateKey: tpl.key,
-      audience: p.audience,
-      departmentId: p.audience === "department" ? p.departmentId : null,
-      status: "running",
-      launchedAt: now,
-      createdBy: p.actorId,
-    })
-    .returning({ id: t.campaigns.id });
-  const recipients = await db
-    .insert(t.campaignRecipients)
-    .values(audience.map((u) => ({ campaignId: campaign.id, userId: u.id, token: randomToken(16), sentAt: null })))
-    .returning({ id: t.campaignRecipients.id, userId: t.campaignRecipients.userId });
-  const scores = await db.select({ id: t.users.id, risk: t.users.riskScore }).from(t.users).where(inArray(t.users.id, audience.map((u) => u.id)));
-  const riskOf = new Map(scores.map((s) => [s.id, s.risk]));
-  const people = recipients.map((r) => ({ userId: r.userId, recipientId: r.id, risk: riskOf.get(r.userId) ?? 50 }));
-  const events = planDrill(people, tpl, { seed: seedFrom(campaign.id), durationMs, simMinutes: DRILL_SIM_MINUTES });
-  const avgRisk = Math.round(people.reduce((s, x) => s + x.risk, 0) / people.length);
-  const [run] = await db
-    .insert(t.drillRuns)
-    .values({
-      tenantId: p.tenantId,
-      campaignId: campaign.id,
-      templateKey: tpl.key,
-      durationMs,
-      simMinutes: DRILL_SIM_MINUTES,
-      events,
-      baseline: { avgRisk, scores: Object.fromEntries(people.map((x) => [x.userId, x.risk])) },
-      riskTrail: [{ sim: 0, risk: avgRisk }],
-      startedAt: now,
-      createdBy: p.actorId,
-    })
-    .returning({ id: t.drillRuns.id });
-  await audit(db, { tenantId: p.tenantId, actorId: p.actorId, action: "drill.started", targetType: "campaign", targetId: campaign.id, meta: { template: tpl.key, recipients: recipients.length, speed: p.speed } });
-  return { ok: true, id: run.id, recipients: recipients.length };
+  // One transaction: the drill_runs row is what keeps the SMS job and the teachable-moment job away from these
+  // recipients, so the running campaign must never be visible, or left behind, without it.
+  const { runId, count } = await db.transaction(async (tx) => {
+    const [campaign] = await tx
+      .insert(t.campaigns)
+      .values({
+        tenantId: p.tenantId,
+        name: p.campaignName.slice(0, 160),
+        channel: tpl.channel,
+        templateKey: tpl.key,
+        audience: p.audience,
+        departmentId: p.audience === "department" ? p.departmentId : null,
+        status: "running",
+        launchedAt: now,
+        createdBy: p.actorId,
+      })
+      .returning({ id: t.campaigns.id });
+    const recipients = await tx
+      .insert(t.campaignRecipients)
+      .values(audience.map((u) => ({ campaignId: campaign.id, userId: u.id, token: randomToken(16), sentAt: null })))
+      .returning({ id: t.campaignRecipients.id, userId: t.campaignRecipients.userId });
+    const scores = await tx.select({ id: t.users.id, risk: t.users.riskScore }).from(t.users).where(inArray(t.users.id, audience.map((u) => u.id)));
+    const riskOf = new Map(scores.map((s) => [s.id, s.risk]));
+    const people = recipients.map((r) => ({ userId: r.userId, recipientId: r.id, risk: riskOf.get(r.userId) ?? 50 }));
+    const events = planDrill(people, tpl, { seed: seedFrom(campaign.id), durationMs, simMinutes: DRILL_SIM_MINUTES });
+    const avgRisk = Math.round(people.reduce((s, x) => s + x.risk, 0) / people.length);
+    const [run] = await tx
+      .insert(t.drillRuns)
+      .values({
+        tenantId: p.tenantId,
+        campaignId: campaign.id,
+        templateKey: tpl.key,
+        durationMs,
+        simMinutes: DRILL_SIM_MINUTES,
+        events,
+        baseline: { avgRisk, scores: Object.fromEntries(people.map((x) => [x.userId, x.risk])) },
+        riskTrail: [{ sim: 0, risk: avgRisk }],
+        startedAt: now,
+        createdBy: p.actorId,
+      })
+      .returning({ id: t.drillRuns.id });
+    await audit(tx, { tenantId: p.tenantId, actorId: p.actorId, action: "drill.started", targetType: "campaign", targetId: campaign.id, meta: { template: tpl.key, recipients: recipients.length, speed: p.speed } });
+    return { runId: run.id, count: recipients.length };
+  });
+  return { ok: true, id: runId, recipients: count };
 }
 
 type Run = typeof t.drillRuns.$inferSelect;
@@ -161,9 +166,14 @@ async function applyEvent(db: DB, ctx: ApplyContext, e: DrillEvent) {
       await recordSubmit(db, r.token);
       return;
     case "report": {
-      // Applied at most once per person, also when a request died after the report and before its bookkeeping.
-      const [already] = await db.select({ at: t.campaignRecipients.reportedAt }).from(t.campaignRecipients).where(eq(t.campaignRecipients.id, e.recipientId));
-      if (already?.at) return;
+      // Claimed before the report is filed: a replayed step, or a second lease holder after a takeover, files nothing.
+      // submitThreatReport still links the report by its tracking link. A report that fails after the claim stays unfiled (logged).
+      const [claimed] = await db
+        .update(t.campaignRecipients)
+        .set({ reportedAt: new Date() })
+        .where(and(eq(t.campaignRecipients.id, e.recipientId), isNull(t.campaignRecipients.reportedAt)))
+        .returning({ id: t.campaignRecipients.id });
+      if (!claimed) return;
       // The Report button: matched to this simulation by its tracking link, triaged without an analyst.
       await submitThreatReport(db, {
         tenantId,

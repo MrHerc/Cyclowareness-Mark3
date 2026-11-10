@@ -22,7 +22,7 @@ import { labScenario } from "@/server/lab/scenarios";
 import { learningPoints } from "@/lib/content/learning-points";
 import { pickLessonContent } from "@/lib/content/lesson-locale";
 import { safePath } from "@/lib/safe-path";
-import { pick } from "@/i18n/config";
+import { langAttrs, pick } from "@/i18n/config";
 import { dayAt, todayIn } from "@/lib/time";
 import { cn } from "@/lib/cn";
 
@@ -216,7 +216,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
             </h2>
             <ul className="grid gap-2.5 sm:grid-cols-2">
               {points.map((p) => (
-                <li key={p.text} lang={p.lang} className="flex items-start gap-3 rounded-xl bg-surface p-4 shadow-xs ring-1 ring-line">
+                <li key={p.text} {...(p.lang ? langAttrs(p.lang) : {})} className="flex items-start gap-3 rounded-xl bg-surface p-4 shadow-xs ring-1 ring-line">
                   <span aria-hidden className="grid size-6 shrink-0 place-items-center rounded-full bg-safe-50 text-safe-600">
                     <Check className="size-3.5" strokeWidth={3} />
                   </span>
@@ -325,7 +325,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
                       <Icon className="size-5" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span lang={lang} className={cn("block text-body-sm font-semibold", !practiceOpen && "text-ink-muted")}>
+                      <span {...(lang ? langAttrs(lang) : {})} className={cn("block text-body-sm font-semibold", !practiceOpen && "text-ink-muted")}>
                         {title ?? tlab(`games.${lab}.title`)}
                       </span>
                       <span className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-tab text-ink-subtle">

@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AppWindow, CheckCircle2, ChevronRight, FileText, Globe, Mail, MessageSquare, PhoneIncoming, ShieldAlert } from "lucide-react";
 import type { LabArtifact, LabDecision, LabScenario } from "@/lib/content/lab-scenario";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { cn } from "@/lib/cn";
+import { langAttrs } from "@/i18n/config";
 import { BrowserApp, type BrowserTab } from "../apps/browser-app";
 import { FilesApp } from "../apps/files-app";
 import { MailApp, type MailMsg } from "../apps/mail-app";
@@ -227,10 +228,10 @@ function DecisionCard({ d, n, total, lang, picked, focusOnMount, onChoose, onSho
   return (
     <Card className="p-4 sm:p-5">
       <p className="text-caption font-semibold text-ink-muted">{t("mini.decision", { n, total })}</p>
-      <h2 ref={heading} tabIndex={-1} lang={lang} className="mt-1.5 text-body font-bold text-balance outline-none">
+      <h2 ref={heading} tabIndex={-1} {...langAttrs(lang)} className="mt-1.5 text-body font-bold text-balance outline-none">
         {d.prompt}
       </h2>
-      <div lang={lang}>
+      <div {...langAttrs(lang)}>
         <InlineArtifact a={d.artifact} says={t("mini.says")} />
       </div>
       {d.artifact.kind === "email" || d.artifact.kind === "web" || d.artifact.kind === "file" ? (
@@ -240,7 +241,7 @@ function DecisionCard({ d, n, total, lang, picked, focusOnMount, onChoose, onSho
               <>
                 <Mail aria-hidden />
                 <span className="min-w-0">
-                  <span lang={lang} className="block truncate">
+                  <span {...langAttrs(lang)} className="block truncate">
                     <bdi>{d.artifact.from.name}</bdi> · {d.artifact.subject}
                   </span>
                   {d.artifact.to ? (
@@ -272,7 +273,7 @@ function DecisionCard({ d, n, total, lang, picked, focusOnMount, onChoose, onSho
           </Button>
         </div>
       ) : null}
-      <div role="group" aria-label={t("mini.choices")} lang={lang} className="mt-4 grid gap-2 sm:grid-cols-2">
+      <div role="group" aria-label={t("mini.choices")} {...langAttrs(lang)} className="mt-4 grid gap-2 sm:grid-cols-2">
         {d.options.map((o) => (
           <button
             key={o.id}
@@ -314,7 +315,7 @@ function Feedback({ ok, verdictId, explainId, risk, explain, lang, action, onAct
         </p>
         <Pill>{risk}</Pill>
       </div>
-      <p id={explainId} lang={lang} className="mt-1 text-caption text-ink-muted">
+      <p id={explainId} {...langAttrs(lang)} className="mt-1 text-caption text-ink-muted">
         {explain}
       </p>
       <Button ref={button} size="sm" className="mt-3" iconRight={<ChevronRight />} onClick={onAction}>
@@ -326,6 +327,8 @@ function Feedback({ ok, verdictId, explainId, risk, explain, lang, action, onAct
 
 /** A text message, a call or a window, shown in the decision card itself. */
 function InlineArtifact({ a, says }: { a: LabArtifact; says: string }) {
+  // The wrapper carries the scenario's language; this label is in the page's.
+  const locale = useLocale();
   if (a.kind === "sms")
     return (
       <div className="mt-3 rounded-lg bg-sunken p-3.5">
@@ -353,7 +356,7 @@ function InlineArtifact({ a, says }: { a: LabArtifact; says: string }) {
             {a.number}
           </span>
         </p>
-        <p className="mt-2 text-tab font-semibold text-ink-subtle">{says}</p>
+        <p {...langAttrs(locale)} className="mt-2 text-tab font-semibold text-ink-subtle">{says}</p>
         {a.body.map((p) => (
           <p key={p} className="mt-1 border-s-2 border-line-strong ps-3 text-body-sm italic">
             {p}
@@ -383,7 +386,7 @@ function InlineArtifact({ a, says }: { a: LabArtifact; says: string }) {
 /** A browser tab's page: heading, text and a form whose fields cannot be typed into (the lab never takes a password). */
 function WebPage({ a, lang }: { a: Web; lang: string }) {
   return (
-    <div lang={lang} className="min-h-full bg-surface p-6">
+    <div {...langAttrs(lang)} className="min-h-full bg-surface p-6">
       <div className="mx-auto grid max-w-sm gap-3">
         <h3 className="text-title-sm font-bold">{a.title}</h3>
         {a.body.map((p) => (

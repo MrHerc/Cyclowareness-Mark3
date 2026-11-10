@@ -83,7 +83,7 @@ export default async function DrillIndexPage() {
                       {tr("historyResult", { clicked: `${format.number(h.totals.clicked)} (${tc("units.percent", { value: format.number(percent(h.totals.clicked, h.totals.delivered)) })})`, reported: format.number(h.totals.reported), trained: format.number(h.totals.trained) })}
                     </span>
                     {h.cancelled ? <Pill>{tcmp("status.cancelled")}</Pill> : <Pill tone={h.finished ? "safe" : "risk"}>{h.finished ? tr("finished") : tr("live")}</Pill>}
-                    <ChevronRight aria-hidden className="size-4 text-ink-subtle rtl:rotate-180" />
+                    <ChevronRight aria-hidden className="size-4 text-ink-subtle" />
                   </Link>
                 </li>
               ))}
