@@ -320,8 +320,8 @@ export function StudioLessonForm({
                   <Textarea id="st-mail-body" {...content} value={f.hotspot.body} onChange={(e) => setF({ ...f, hotspot: { ...f.hotspot, body: e.target.value } })} maxLength={2000} className="min-h-32" />
                 </Field>
                 {f.hotspot.targets.map((x, i) => {
-                  // This sign cannot be placed after the ones above it: not on one line of the body, or overlapping another.
-                  const missing = signs[i] !== "" && !markTargets(f.hotspot.body.trim(), signs.slice(0, i + 1).filter(Boolean).map((text) => ({ text })));
+                  // This sign cannot be placed after the kept ones above it: not on one line of the body, or overlapping another.
+                  const missing = signs[i] !== "" && !markTargets(f.hotspot.body.trim(), [...filledTargets(f.hotspot.targets.slice(0, i)).map((x) => x.text.trim()), signs[i]].map((text) => ({ text })));
                   return (
                     <div key={i} className="grid gap-2 rounded-lg bg-sunken p-3 sm:grid-cols-2">
                       <Input
@@ -402,7 +402,7 @@ export function ModuleRowActions({ id, status, previewHref }: { id: string; stat
       <span role="status" className="self-center text-caption text-ink-muted">
         {publishing && status === "draft" ? t("translating") : null}
       </span>
-      <Button size="icon-sm" variant="ghost" aria-label={t("delete")} onClick={() => setConfirm(true)}>
+      <Button size="icon-sm" variant="ghost" aria-label={t("delete")} disabled={publishing} onClick={() => setConfirm(true)}>
         <Trash2 />
       </Button>
       <Dialog

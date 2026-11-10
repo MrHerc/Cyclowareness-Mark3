@@ -75,14 +75,23 @@ export function studioScenes(d: LessonDraft): Scene[] | null {
   ];
 }
 
-/** The draft a Studio lesson was built from, to edit it again; null for any other lesson (an AI training, the library). */
+/** Equal as JSON, whatever the key order (jsonb reorders keys) and with undefined fields left out. */
+export const sameJson = (a: unknown, b: unknown) => {
+  const canon = (x: unknown) => JSON.stringify(x, (_, v) => (v && typeof v === "object" && !Array.isArray(v) ? Object.fromEntries(Object.entries(v).sort(([k], [l]) => (k < l ? -1 : 1))) : v));
+  return canon(a) === canon(b);
+};
+
+/**
+ * The draft a Studio lesson was built from, to edit it again; null for any other lesson (an AI training, the library),
+ * including one that only shares the ids: its scenes must rebuild exactly, or saving the form would drop what it cannot show.
+ */
 export function studioDraft(scenes: readonly Scene[], subtitle: string): LessonDraft | null {
   const by = new Map(scenes.map((s) => [s.id, s]));
   const [intro, steps, swipe, hotspot, check, recap] = ["intro", "steps", "swipe", "hotspot", "check", "recap"].map((id) => by.get(id));
   if (intro?.type !== "intro" || steps?.type !== "tutor" || check?.type !== "choice" || recap?.type !== "recap") return null;
   const mail = hotspot?.type === "hotspot" ? (hotspot.artifact as EmailArtifact) : null;
   const spans = mail && Array.isArray(mail.body) ? (mail.body as Span[][]).flat() : [];
-  return {
+  const draft: LessonDraft = {
     title: intro.title,
     subtitle,
     intro: intro.body,
@@ -104,4 +113,5 @@ export function studioDraft(scenes: readonly Scene[], subtitle: string): LessonD
         }
       : {}),
   };
+  return sameJson(studioScenes(draft), scenes) ? draft : null;
 }

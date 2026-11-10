@@ -13,7 +13,7 @@ import { bakuDayPlus } from "../src/lib/time";
 import { DB_SETUP_TIMEOUT, addModule, addTenant, addUser, testDb } from "./helpers/db";
 
 /** The model the Studio translations call: it prefixes every line with the target language, or fails for `fail`. */
-const ai = vi.hoisted(() => ({ key: undefined as string | undefined, fail: "", calls: [] as string[], viewer: null as unknown }));
+const ai = vi.hoisted(() => ({ key: undefined as string | undefined, fail: "", calls: [] as string[], viewer: null as unknown, during: null as null | (() => Promise<unknown>) }));
 vi.mock("../src/server/env", () => ({
   env: {
     isProd: false,
@@ -31,6 +31,7 @@ vi.mock("@anthropic-ai/sdk", () => ({
         finalMessage: async () => {
           const to = /\(([a-z]{2})\)\./.exec(req.system)![1];
           ai.calls.push(to);
+          await ai.during?.();
           const content = req.messages[0].content;
           const lines = JSON.parse(content.slice(content.indexOf("\n") + 1)) as string[];
           return to === ai.fail ? { stop_reason: "end_turn", content: [] } : { stop_reason: "tool_use", content: [{ type: "tool_use", input: { lines: lines.map((l) => `${to}: ${l}`) } }] };
@@ -440,6 +441,9 @@ describe("Studio lessons", () => {
     // The Studio form reads it back as it was written.
     const { title, subtitle, intro, points, question, recap } = LESSON;
     expect(studioDraft(en, subtitle)).toEqual({ title, subtitle, intro, points, question, recap, swipe: SWIPE, hotspot: HOTSPOT });
+    // A lesson that only shares the ids is not the form's: saving it would drop the scene or field the form has no place for.
+    expect(studioDraft([...en, { ...en[1], id: "more" }], subtitle)).toBeNull();
+    expect(studioDraft(en.map((s) => (s.type === "recap" ? { ...s, mood: "happy" } : s)), subtitle)).toBeNull();
 
     const safeOnly = { ...SWIPE, cards: SWIPE.cards.map((c) => ({ ...c, verdict: "safe" as const })) };
     expect(await saveStudioLessonAction({ ...LESSON, swipe: safeOnly })).toEqual({ ok: false, error: "invalid" });
@@ -471,6 +475,13 @@ describe("Studio lessons", () => {
     expect(await db.select().from(t.answers).where(eq(t.answers.lessonId, before.lesson.id))).toHaveLength(1);
     const [log] = await db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, tenant.id), eq(t.auditLog.action, "module.updated")));
     expect(log).toMatchObject({ targetId: before.mod.id, meta: { title: "Courier texts", translated: ["ru"] } });
+
+    // A change of settings only keeps the translations, even with no key to make them again.
+    ai.key = undefined;
+    expect(await updateStudioLessonAction(before.mod.id, { ...edited, minutes: 5 })).toEqual({ ok: true });
+    const kept = await lessonOf(tenant.id, slug!);
+    expect(kept.locales).toEqual(["en", "ru"]);
+    expect(kept.mod).toMatchObject({ minutes: 5, title: { en: "Courier texts", ru: "ru: Courier texts" } });
 
     // A draft keeps no stale translation, and an AI training's lessons are not the form's to rewrite.
     await setModuleStatusAction(before.mod.id, "draft");
@@ -533,6 +544,20 @@ describe("Studio lessons", () => {
     // Editing again starts from the Russian source too, and the form's check is the server's.
     expect(await updateStudioLessonAction(mod.id, { ...LESSON, locale: "ru", title: "Курьер" })).toEqual({ ok: true, translated: ["az", "en"] });
     expect((await lessonOf(tenant.id, slug!)).lesson.title).toEqual({ ru: "Курьер", az: "az: Курьер", en: "en: Курьер" });
+  });
+
+  it("reports a language whose text cannot be stored as untranslated, so the publish still ends", async () => {
+    const tenant = await studio(["en", "ru"]);
+    ai.key = "test-key";
+    const { slug } = await saveStudioLessonAction(LESSON);
+    const { mod } = await lessonOf(tenant.id, slug!);
+    // The module is deleted while the model answers.
+    ai.during = () => db.delete(t.modules).where(eq(t.modules.id, mod.id));
+    try {
+      expect(await setModuleStatusAction(mod.id, "published")).toEqual({ ok: true, translated: [], untranslated: ["ru"] });
+    } finally {
+      ai.during = null;
+    }
   });
 
   it("places hotspot signs by one rule for the form and the server: on one line, without overlap", () => {

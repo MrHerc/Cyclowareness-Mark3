@@ -14,7 +14,7 @@ import { emitEvent } from "../services/events";
 import { departmentClosure } from "../services/assignments";
 import { aiEnabled, draftLesson, lessonDraftSchema, translateScenes, type LessonDraft } from "../ai";
 import { log } from "../log";
-import { studioDraft, studioScenes } from "../../lib/content/studio";
+import { sameJson, studioDraft, studioScenes } from "../../lib/content/studio";
 import type { Scene } from "../../lib/content/types";
 import { rateLimit } from "../rate-limit";
 import { isLocale, LOCALES, pick } from "../../i18n/config";
@@ -514,8 +514,8 @@ async function ownModule(v: Viewer, id: string) {
 }
 
 /**
- * Rewrites a studio lesson in place. Its scene ids stay the same, so answers and progress stay valid; the old
- * translations are dropped, and a published module, which stays published, is translated again at once.
+ * Rewrites a studio lesson in place. Its scene ids stay the same, so answers and progress stay valid; when its text
+ * changed, the old translations are dropped, and a published module, which stays published, is translated again at once.
  */
 export async function updateStudioLessonAction(id: string, input: z.infer<typeof lessonSchema>): Promise<Result & Translation> {
   const v = await actionViewer("studio.write");
@@ -525,13 +525,16 @@ export async function updateStudioLessonAction(id: string, input: z.infer<typeof
   const d = p.data;
   const scenes = studioScenes(d);
   const lessons = await db().select({ id: t.lessons.id }).from(t.lessons).where(eq(t.lessons.moduleId, m.id));
-  const [source] = lessons.length === 1 ? await db().select({ scenes: t.lessonContents.scenes }).from(t.lessonContents).where(eq(t.lessonContents.lessonId, lessons[0].id)).orderBy(asc(t.lessonContents.updatedAt)).limit(1) : [];
+  const [source] = lessons.length === 1 ? await db().select({ locale: t.lessonContents.locale, scenes: t.lessonContents.scenes }).from(t.lessonContents).where(eq(t.lessonContents.lessonId, lessons[0].id)).orderBy(asc(t.lessonContents.updatedAt)).limit(1) : [];
   // Only a lesson the Studio form wrote: an AI training's scenes have other ids.
   if (!scenes || !source || !studioDraft(source.scenes as Scene[], "")) return { ok: false, error: "invalid" };
   const label = { [d.locale]: d.title };
+  // Only the settings changed: the translations still match the text, and dropping them would cost model calls or, without a key, lose them.
+  const sameText = source.locale === d.locale && m.title[d.locale] === d.title && m.subtitle[d.locale] === d.subtitle && sameJson(scenes, source.scenes);
   await db().transaction(async (tx) => {
-    await tx.update(t.modules).set({ title: label, subtitle: { [d.locale]: d.subtitle }, category: d.category, minutes: d.minutes, xp: 40 + d.minutes * 5, difficulty: d.difficulty }).where(eq(t.modules.id, m.id));
-    await tx.update(t.lessons).set({ title: label, minutes: d.minutes }).where(eq(t.lessons.id, lessons[0].id));
+    await tx.update(t.modules).set({ ...(sameText ? {} : { title: label, subtitle: { [d.locale]: d.subtitle } }), category: d.category, minutes: d.minutes, xp: 40 + d.minutes * 5, difficulty: d.difficulty }).where(eq(t.modules.id, m.id));
+    await tx.update(t.lessons).set({ ...(sameText ? {} : { title: label }), minutes: d.minutes }).where(eq(t.lessons.id, lessons[0].id));
+    if (sameText) return;
     await tx.delete(t.lessonContents).where(eq(t.lessonContents.lessonId, lessons[0].id));
     await tx.insert(t.lessonContents).values({ lessonId: lessons[0].id, locale: d.locale, scenes });
   });
@@ -566,12 +569,16 @@ async function translateModule(v: Viewer, moduleId: string): Promise<Translation
     jobs.map(async (j) => {
       // The model budget is the operator's: a day's cap per organisation, as for the drafts.
       if (!(await rateLimit(`ai-translate-day:t:${v.tenant.id}`, 200, 24 * 60 * 60_000)).ok) return null;
-      const out = await translateScenes({ title: pick(m.title, j.from), subtitle: pick(m.subtitle, j.from), lesson: j.lesson, scenes: j.scenes }, j.from, j.locale).catch((e: unknown) => {
-        log.warn(`[studio] translation into ${j.locale} failed: ${e instanceof Error ? e.name : "error"}`);
-        return null;
-      });
-      if (out) await db().insert(t.lessonContents).values({ lessonId: j.lessonId, locale: j.locale, scenes: out.scenes }).onConflictDoNothing();
-      return out;
+      // A failed insert (the module deleted meanwhile) counts as untranslated, like a failed call.
+      return translateScenes({ title: pick(m.title, j.from), subtitle: pick(m.subtitle, j.from), lesson: j.lesson, scenes: j.scenes }, j.from, j.locale)
+        .then(async (out) => {
+          if (out) await db().insert(t.lessonContents).values({ lessonId: j.lessonId, locale: j.locale, scenes: out.scenes }).onConflictDoNothing();
+          return out;
+        })
+        .catch((e: unknown) => {
+          log.warn(`[studio] translation into ${j.locale} failed: ${e instanceof Error ? e.name : "error"}`);
+          return null;
+        });
     }),
   );
   const title = { ...m.title };
