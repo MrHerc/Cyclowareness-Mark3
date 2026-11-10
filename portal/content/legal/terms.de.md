@@ -29,7 +29,7 @@ Regeln für die Nutzung der Plattform: die Parteien, die Kontosicherheit, die zu
 ## 4. Konten und Anmeldung
 
 4.1. Konten werden ausschließlich von der Organisation angelegt: manuell, per Dateiimport oder über ihr eigenes Single-Sign-on-System. Eine offene Registrierung gibt es nicht.
-4.2. Je nach den Einstellungen der Organisation meldet sich der Nutzer mit einer E-Mail-Adresse und einem Passwort von mindestens 12 Zeichen oder über das Single-Sign-on-System der Organisation (OpenID Connect) an. Die Zwei-Faktor-Authentisierung verwendet Einmalcodes aus einer Authenticator-App sowie Backup-Codes; die Organisation kann sie für bestimmte Rollen verbindlich vorschreiben.
+4.2. Je nach den Einstellungen der Organisation meldet sich der Nutzer mit einer E-Mail-Adresse und einem Passwort von mindestens 10 Zeichen oder über das Single-Sign-on-System der Organisation (OpenID Connect) an. Die Zwei-Faktor-Authentisierung verwendet Einmalcodes aus einer Authenticator-App sowie Backup-Codes; die Organisation kann sie für bestimmte Rollen verbindlich vorschreiben.
 4.3. Jedes Konto gehört einer einzigen Person und darf nicht mit anderen geteilt werden.
 4.4. Die Organisation kann die Anzahl der Geräte begrenzen, die gleichzeitig bei einem Konto angemeldet sein können. Ist die Höchstzahl erreicht, wird die älteste Anmeldesitzung beendet.
 4.5. Die Organisation legt die Rolle und die Abteilung des Nutzers fest und kann das Konto sperren oder löschen. Scheidet ein Nutzer aus der Organisation aus, wird sein Zugang in der Regel beendet.
@@ -131,7 +131,7 @@ Regeln für die Nutzung der Plattform: die Parteien, die Kontosicherheit, die zu
 ## 15. Beschränkung der Gewährleistung
 
 15.1. Soweit in diesen Nutzungsbedingungen oder im Kundenvertrag nicht ausdrücklich etwas anderes bestimmt ist und soweit zwingende gesetzliche Vorschriften nichts anderes verlangen, übernimmt der Anbieter keine Gewähr dafür, dass der Dienst fehlerfrei ist, dass die Schulung jeden Sicherheitsvorfall verhindert oder dass die Schulungsmaterialien jede spezifische rechtliche Verpflichtung einer bestimmten Organisation erfüllen.
-15.2. Die Systeme, die die Organisation an den Dienst anbindet (Identitätsanbieter, Verzeichnisdienst, Mailserver, SIEM oder ITSM), liegen außerhalb des Einflussbereichs des Anbieters.
+15.2. Die Systeme, die die Organisation an den Dienst anbindet (Identitätsanbieter, Mailserver, SIEM oder ITSM), liegen außerhalb des Einflussbereichs des Anbieters.
 
 ## 16. Haftungsbeschränkung
 

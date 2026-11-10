@@ -29,7 +29,7 @@ Regulile de utilizare a platformei: părțile, securitatea conturilor, utilizare
 ## 4. Conturi și conectare
 
 4.1. Conturile sunt create numai de Organizație: manual, prin import din fișier sau prin propriul sistem de autentificare unică. Nu există înregistrare liberă.
-4.2. În funcție de setările Organizației, Utilizatorul se conectează cu o adresă de e-mail și o parolă de cel puțin 12 caractere sau prin sistemul de autentificare unică al Organizației (OpenID Connect). Verificarea în doi pași utilizează coduri de unică folosință generate de o aplicație de autentificare, precum și coduri de rezervă; Organizația o poate face obligatorie pentru anumite roluri.
+4.2. În funcție de setările Organizației, Utilizatorul se conectează cu o adresă de e-mail și o parolă de cel puțin 10 caractere sau prin sistemul de autentificare unică al Organizației (OpenID Connect). Verificarea în doi pași utilizează coduri de unică folosință generate de o aplicație de autentificare, precum și coduri de rezervă; Organizația o poate face obligatorie pentru anumite roluri.
 4.3. Fiecare cont aparține unei singure persoane și nu poate fi partajat cu nicio altă persoană.
 4.4. Organizația poate limita numărul de dispozitive care pot fi conectate simultan la același cont. Când limita este atinsă, cea mai veche sesiune este închisă.
 4.5. Organizația stabilește rolul și departamentul Utilizatorului și poate suspenda sau șterge contul. Când Utilizatorul părăsește Organizația, accesul îi este, de regulă, retras.
@@ -131,7 +131,7 @@ Regulile de utilizare a platformei: părțile, securitatea conturilor, utilizare
 ## 15. Limitarea garanțiilor
 
 15.1. Cu excepția celor prevăzute în mod expres în prezenții Termeni sau în Contractul cu clientul și cu excepția cazurilor impuse de dispozițiile imperative ale legii, Furnizorul nu garantează că Serviciul va fi lipsit de erori, că instruirea va preveni orice incident sau că Materialele de instruire vor satisface fiecare obligație legală specifică a unei anumite Organizații.
-15.2. Sistemele pe care Organizația le conectează la Serviciu (furnizorul de identitate, serviciul de director, serverul de e-mail, SIEM sau ITSM) se află în afara controlului Furnizorului.
+15.2. Sistemele pe care Organizația le conectează la Serviciu (furnizorul de identitate, serverul de e-mail, SIEM sau ITSM) se află în afara controlului Furnizorului.
 
 ## 16. Limitarea răspunderii
 

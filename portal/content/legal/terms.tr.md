@@ -29,7 +29,7 @@ Platformun kullanım kuralları: taraflar, hesap güvenliği, kabul edilebilir k
 ## 4. Hesaplar ve giriş
 
 4.1. Hesaplar yalnızca Kuruluş tarafından oluşturulur: elle, dosyadan içe aktarma yoluyla veya Kuruluşun kendi tek oturum açma sistemi aracılığıyla. Açık kayıt imkânı yoktur.
-4.2. Kuruluşun ayarlarına bağlı olarak Kullanıcı; bir e-posta adresi ve en az 12 karakterden oluşan bir parolayla ya da Kuruluşun tek oturum açma sistemi (OpenID Connect) üzerinden giriş yapar. İki adımlı doğrulamada bir kimlik doğrulama uygulamasının ürettiği tek kullanımlık kodlar ve yedek kodlar kullanılır; Kuruluş iki adımlı doğrulamayı belirli roller için zorunlu kılabilir.
+4.2. Kuruluşun ayarlarına bağlı olarak Kullanıcı; bir e-posta adresi ve en az 10 karakterden oluşan bir parolayla ya da Kuruluşun tek oturum açma sistemi (OpenID Connect) üzerinden giriş yapar. İki adımlı doğrulamada bir kimlik doğrulama uygulamasının ürettiği tek kullanımlık kodlar ve yedek kodlar kullanılır; Kuruluş iki adımlı doğrulamayı belirli roller için zorunlu kılabilir.
 4.3. Her hesap tek bir kişiye aittir ve başka biriyle paylaşılamaz.
 4.4. Kuruluş, bir hesapta aynı anda oturum açık olabilecek cihaz sayısını sınırlayabilir. Sınıra ulaşıldığında en eski oturum kapatılır.
 4.5. Kullanıcının rolünü ve departmanını Kuruluş belirler; Kuruluş hesabı askıya alabilir veya silebilir. Kullanıcı Kuruluştan ayrıldığında erişimi genellikle sonlandırılır.
@@ -131,7 +131,7 @@ Platformun kullanım kuralları: taraflar, hesap güvenliği, kabul edilebilir k
 ## 15. Garantilerin sınırlandırılması
 
 15.1. Bu Koşullarda veya Müşteri Sözleşmesinde açıkça belirtilenler ve emredici kanun hükümlerinin gerektirdikleri dışında Sağlayıcı; Hizmetin hatasız olacağını, eğitimin her güvenlik olayını önleyeceğini veya Eğitim Materyallerinin belirli bir Kuruluşun her bir özel hukuki yükümlülüğünü karşılayacağını garanti etmez.
-15.2. Kuruluşun Hizmete bağladığı sistemler (kimlik sağlayıcısı, dizin, e-posta sunucusu, SIEM veya ITSM) Sağlayıcının kontrolü dışındadır.
+15.2. Kuruluşun Hizmete bağladığı sistemler (kimlik sağlayıcısı, e-posta sunucusu, SIEM veya ITSM) Sağlayıcının kontrolü dışındadır.
 
 ## 16. Sorumluluğun sınırlandırılması
 

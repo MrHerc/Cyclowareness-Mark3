@@ -29,7 +29,7 @@ Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, m
 ## 4. Hesablar və sistemə giriş
 
 4.1. Hesabları yalnız Təşkilat yaradır: əllə, faylla idxal etməklə və ya öz vahid giriş sistemi vasitəsilə. Açıq qeydiyyat yoxdur.
-4.2. Təşkilatın ayarlarından asılı olaraq İstifadəçi sistemə elektron poçt ünvanı və ən azı 12 simvoldan ibarət parolla və ya Təşkilatın vahid giriş sistemi (OpenID Connect) vasitəsilə daxil olur. İkiaddımlı giriş autentifikator tətbiqinin birdəfəlik kodlarından və ehtiyat kodlardan istifadə edir; Təşkilat onu bəzi rollar üçün məcburi edə bilər.
+4.2. Təşkilatın ayarlarından asılı olaraq İstifadəçi sistemə elektron poçt ünvanı və ən azı 10 simvoldan ibarət parolla və ya Təşkilatın vahid giriş sistemi (OpenID Connect) vasitəsilə daxil olur. İkiaddımlı giriş autentifikator tətbiqinin birdəfəlik kodlarından və ehtiyat kodlardan istifadə edir; Təşkilat onu bəzi rollar üçün məcburi edə bilər.
 4.3. Hər hesab bir şəxsə məxsusdur və başqası ilə paylaşıla bilməz.
 4.4. Təşkilat bir hesaba eyni vaxtda neçə qurğudan daxil olmağın mümkün olduğunu məhdudlaşdıra bilər. Hədd dolduqda ən köhnə sessiya bağlanır.
 4.5. İstifadəçinin rolunu və şöbəsini Təşkilat müəyyən edir və hesabı dayandıra və ya silə bilər. İstifadəçi Təşkilatdan ayrıldıqda çıxış adətən dayandırılır.
@@ -131,7 +131,7 @@ Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, m
 ## 15. Zəmanətlərin məhdudlaşdırılması
 
 15.1. Bu Şərtlərdə və ya Müştəri müqaviləsində açıq göstərilənlər və məcburi qanun normalarının tələbləri istisna olmaqla, Təminatçı Xidmətin səhvsiz olmasına, təlimin hər bir insidentin qarşısını almasına və ya Təlim materiallarının konkret Təşkilatın hər bir xüsusi hüquqi öhdəliyinə cavab verməsinə zəmanət vermir.
-15.2. Təşkilatın Xidmətə qoşduğu sistemlər (identifikasiya provayderi, kataloq, poçt serveri, SIEM və ya ITSM) Təminatçının nəzarətindən kənardadır.
+15.2. Təşkilatın Xidmətə qoşduğu sistemlər (identifikasiya provayderi, poçt serveri, SIEM və ya ITSM) Təminatçının nəzarətindən kənardadır.
 
 ## 16. Məsuliyyətin məhdudlaşdırılması
 
