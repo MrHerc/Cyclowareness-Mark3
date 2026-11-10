@@ -4,7 +4,7 @@
  * token's permissions only, is refused when revoked, disowned or over its rate limit, and never writes.
  */
 import { createFormatter, createTranslator } from "next-intl";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { Viewer } from "../src/server/auth/viewer";
@@ -25,8 +25,9 @@ vi.mock("next-intl/server", () => ({
   getTranslations: async (namespace: string) => createTranslator({ ...(await messagesFor("en")), namespace: namespace as never }),
 }));
 vi.mock("../src/server/request", () => ({ clientIp: async () => null, currentPath: async () => "/", sameOrigin: () => true }));
-// The real gates (allowed, twoFactorGap, apiTokenViewer); only the signed-in administrator who mints tokens is stubbed.
-vi.mock("../src/server/auth/viewer", async (importOriginal) => ({ ...(await importOriginal<object>()), actionViewer: async () => actor }));
+let session: Viewer | null = null;
+// The real gates (allowed, twoFactorGap, apiTokenViewer); only the signed-in administrator (minting tokens, or downloading from the console) is stubbed.
+vi.mock("../src/server/auth/viewer", async (importOriginal) => ({ ...(await importOriginal<object>()), actionViewer: async () => actor, getViewer: async () => session }));
 
 const { createApiTokenAction, revokeApiTokenAction } = await import("../src/server/actions/settings");
 const { API_TOKEN_RATE_LIMIT } = await import("../src/server/auth/api");
@@ -75,13 +76,16 @@ describe("minting", () => {
     expect(await createApiTokenAction({ name: "x", permissions: ["people.write" as never] })).toMatchObject({ ok: false });
   });
 
-  it("caps active tokens at 20 per organisation; a revoked one frees a slot", async () => {
+  it("caps active tokens at 20 per organisation, also under concurrent creates; a revoked one frees a slot", async () => {
     const org = await addTenant(db, { plan: "professional" });
     const boss = await addUser(db, org.id, { role: "tenant_admin" });
     actor = viewerFor(boss, org);
     try {
       let last = "";
-      for (let i = 0; i < t.MAX_API_TOKENS; i++) last = (await mint(["reports.read"], `t${i}`)).id;
+      for (let i = 0; i < t.MAX_API_TOKENS - 1; i++) last = (await mint(["reports.read"], `t${i}`)).id;
+      const race = await Promise.all([1, 2, 3].map((i) => createApiTokenAction({ name: `race${i}`, permissions: ["reports.read"] })));
+      expect(race.filter((r) => r.ok)).toHaveLength(1);
+      expect(await db.select().from(t.apiTokens).where(and(eq(t.apiTokens.tenantId, org.id), isNull(t.apiTokens.revokedAt)))).toHaveLength(t.MAX_API_TOKENS);
       expect(await createApiTokenAction({ name: "one more", permissions: ["reports.read"] })).toEqual({ ok: false, error: "limit" });
       expect(await revokeApiTokenAction(last)).toEqual({ ok: true });
       expect((await createApiTokenAction({ name: "one more", permissions: ["reports.read"] })).ok).toBe(true);
@@ -166,5 +170,45 @@ describe("bearer access", () => {
     expect(res.status).toBe(429);
     expect(Number(res.headers.get("retry-after"))).toBeGreaterThan(0);
     expect((await reports.GET(bearer("/api/admin/reports/completion", spare.token), ctx("completion"))).status).toBe(200);
+  });
+
+  it("rate-limits a revoked token before auditing its refusals, so a leaked token cannot flood the log", async () => {
+    const { token, id } = await mint(["reports.read"], "leaked");
+    await revokeApiTokenAction(id);
+    const statuses: number[] = [];
+    for (let i = 0; i < API_TOKEN_RATE_LIMIT + 5; i++) statuses.push((await reports.GET(bearer("/api/admin/reports/completion", token), ctx("completion"))).status);
+    expect(statuses.slice(0, API_TOKEN_RATE_LIMIT).every((s) => s === 401)).toBe(true);
+    expect(statuses.slice(API_TOKEN_RATE_LIMIT).every((s) => s === 429)).toBe(true);
+    expect((await audited("api_token.refused")).filter((e) => e.targetId === id && (e.meta as { reason: string }).reason === "revoked")).toHaveLength(API_TOKEN_RATE_LIMIT);
+  });
+
+  it("refuses a token once the plan loses the integrations feature, while revoking it still works", async () => {
+    const org = await addTenant(db, { plan: "professional" });
+    const boss = await addUser(db, org.id, { role: "tenant_admin" });
+    actor = viewerFor(boss, org);
+    try {
+      const { token, id } = await mint(["people.read"], "pre-downgrade");
+      const [downgraded] = await db.update(t.tenants).set({ features: { integrations: false } }).where(eq(t.tenants.id, org.id)).returning();
+      const res = await people.GET(bearer("/api/admin/people/export", token), ctx("export"));
+      expect(res.status).toBe(403);
+      expect(await db.select().from(t.auditLog).where(and(eq(t.auditLog.tenantId, org.id), eq(t.auditLog.action, "api_token.refused")))).toMatchObject([{ actorId: boss.id, targetId: id, meta: { reason: "plan" } }]);
+      actor = viewerFor(boss, downgraded);
+      expect(await revokeApiTokenAction(id)).toEqual({ ok: true });
+      expect(await createApiTokenAction({ name: "after", permissions: ["people.read"] })).toEqual({ ok: false });
+    } finally {
+      actor = viewerFor(admin, tenant);
+    }
+  });
+
+  it("keys the endpoint limiter by token, so a busy token does not lock its creator out of the console", async () => {
+    const { token, id } = await mint(["reports.read"], "busy");
+    for (let i = 0; i < 60; i++) await rateLimit(`report-download:${id}`, 60, 60 * 60_000);
+    expect((await reports.GET(bearer("/api/admin/reports/completion", token), ctx("completion"))).status).toBe(429);
+    session = { ...actor, user: { ...actor.user, totpEnabled: true } };
+    try {
+      expect((await reports.GET(new Request("http://localhost:3000/api/admin/reports/completion"), ctx("completion"))).status).toBe(200);
+    } finally {
+      session = null;
+    }
   });
 });

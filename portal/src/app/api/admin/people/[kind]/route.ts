@@ -33,7 +33,7 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
   const date = todayIn(tz);
 
   if (kind === "export") {
-    if (!(await rateLimit(`people-export:${v.user.id}`, 20, 60 * 60_000)).ok) return new Response("Too many requests", { status: 429 });
+    if (!(await rateLimit(`people-export:${v.apiToken?.id ?? v.user.id}`, 20, 60 * 60_000)).ok) return new Response("Too many requests", { status: 429 });
     const tc = await getTranslations("common");
     const people = await listPeople(v);
     const csv = toCsv(

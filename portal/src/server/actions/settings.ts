@@ -618,15 +618,21 @@ export async function createApiTokenAction(input: z.infer<typeof apiTokenSchema>
   if (!hasFeature(v, "integrations")) return { ok: false };
   const p = apiTokenSchema.safeParse(input);
   if (!p.success) return { ok: false, field: invalid(p).field };
-  const [{ n }] = await db()
-    .select({ n: count() })
-    .from(t.apiTokens)
-    .where(and(eq(t.apiTokens.tenantId, v.tenant.id), isNull(t.apiTokens.revokedAt)));
-  if (n >= MAX_API_TOKENS) return { ok: false, error: "limit" };
   const permissions = [...new Set(p.data.permissions)];
   const token = `cyk_${randomBytes(24).toString("base64url")}`;
   const id = sha256Hex(token);
-  await db().insert(t.apiTokens).values({ id, tenantId: v.tenant.id, name: p.data.name, permissions, createdBy: v.user.id });
+  // The tenant row lock serialises the count with the insert, so two saves at once cannot both pass the cap.
+  const full = await db().transaction(async (tx) => {
+    await tx.select({ id: t.tenants.id }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id)).for("update");
+    const [{ n }] = await tx
+      .select({ n: count() })
+      .from(t.apiTokens)
+      .where(and(eq(t.apiTokens.tenantId, v.tenant.id), isNull(t.apiTokens.revokedAt)));
+    if (n >= MAX_API_TOKENS) return true;
+    await tx.insert(t.apiTokens).values({ id, tenantId: v.tenant.id, name: p.data.name, permissions, createdBy: v.user.id });
+    return false;
+  });
+  if (full) return { ok: false, error: "limit" };
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "api_token.created", targetType: "api_token", targetId: id, ip: await clientIp(), meta: { name: p.data.name, permissions } });
   refresh();
   return { ok: true, token };
@@ -634,7 +640,8 @@ export async function createApiTokenAction(input: z.infer<typeof apiTokenSchema>
 
 export async function revokeApiTokenAction(id: string): Promise<SaveResult> {
   const v = await actionViewer("settings.write");
-  if (!hasFeature(v, "integrations") || !/^[0-9a-f]{64}$/.test(id)) return { ok: false };
+  // No feature check: revoking a credential must stay possible after a plan downgrade removes `integrations`.
+  if (!/^[0-9a-f]{64}$/.test(id)) return { ok: false };
   const [row] = await db()
     .update(t.apiTokens)
     .set({ revokedAt: new Date() })

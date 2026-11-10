@@ -565,7 +565,7 @@ Read-only access for the organisation's own systems (HR, BI, GRC) to the downloa
 | `people.read` | `GET /api/admin/people/export` |
 | `audit.read` | Reserved for an audit-log export; no endpoint yet |
 
-The organisation's plan still applies: a report needs the `reports` feature, as for a person.
+The organisation's plan still applies: a token works only while the plan has the `integrations` feature that minting needs (it can still be revoked without it), and a report needs the `reports` feature, as for a person.
 
 **Request.** Send the token in the `Authorization` header. The endpoints and their query parameters are those of section 4.
 
@@ -582,19 +582,19 @@ curl -sS -H "Authorization: Bearer cyk_..." \
 curl -sS -H "Authorization: Bearer cyk_..." "https://portal.example.az/api/admin/people/export" -o people.csv
 ```
 
-Column headers follow the `Accept-Language` header, or the organisation's default language.
+Column headers follow the `Accept-Language` header; without one they are in English.
 
 **Errors.** Token requests always get the bare status, never a redirect to sign-in.
 
 | Status | Meaning |
 |---|---|
 | `401 Unauthorized` | Unknown token, revoked token, or the creator's account is no longer active |
-| `403 Forbidden` | The token does not hold the permission the endpoint needs, or the endpoint is a write (`POST`) |
+| `403 Forbidden` | The token does not hold the permission the endpoint needs, the endpoint is a write (`POST`), or the plan no longer has the `integrations` feature |
 | `404 Not found` | Unknown report kind, or the plan lacks the feature |
 | `400 Bad request` | Malformed `from`, `to` or `d` (section 4) |
 | `429 Too many requests` | Rate limit, see below; `Retry-After` names the seconds to wait |
 
-**Audit.** Creating and revoking a token write `api_token.created` and `api_token.revoked`. Every download made with a token writes the usual `report.downloaded` or `people.exported` entry with the creator as actor and the token's id in `meta.apiToken`. A refused request with a known token writes `api_token.refused` with the reason (`revoked`, `creator_inactive` or `forbidden`); an unknown token belongs to no organisation and leaves no entry.
+**Audit.** Creating and revoking a token write `api_token.created` and `api_token.revoked`. Every download made with a token writes the usual `report.downloaded` or `people.exported` entry with the creator as actor and the token's id in `meta.apiToken`. A refused request with a known token writes `api_token.refused` with the reason (`revoked`, `creator_inactive`, `plan` or `forbidden`); an unknown token belongs to no organisation and leaves no entry. The per-token rate limit applies before the refusal is written, so a revoked token leaves at most 60 entries a minute.
 
 ## Rate limits
 
@@ -605,9 +605,9 @@ Limits are fixed windows counted in the database and shared by every server inst
 | `POST /api/tutor` | 20 questions per person per 10 minutes |
 | `POST /api/subtitles`, requests | 60 per person per 10 minutes |
 | `POST /api/subtitles`, model calls | 6 per person per 10 minutes, 30 per person per day, 300 per organisation per day |
-| `GET /api/admin/reports/{kind}` | 60 per person per hour |
-| People export and invitation links, combined | 20 per person per hour |
-| Reporting API token, any endpoint | 60 requests per token per minute, on top of the endpoint's own limit, which counts against the token's creator |
+| `GET /api/admin/reports/{kind}` | 60 per person (or per token) per hour |
+| People export and invitation links, combined | 20 per person (or per token) per hour |
+| Reporting API token, any endpoint | 60 requests per token per minute, revoked tokens included, on top of the endpoint's own limit |
 | `GET /api/admin/modules/{id}/scorm` | 30 per person per hour |
 | `GET /api/me/export` | 5 per person per hour |
 | `GET /api/sso/start`, `GET /api/sso/callback/{tenant}` | 60 per client address per minute and 600 per organisation per minute, each |

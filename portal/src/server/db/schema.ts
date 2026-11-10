@@ -13,6 +13,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import type { ApiTokenPermission } from "../../lib/api-tokens";
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -237,11 +238,7 @@ export const sessions = pgTable(
   (t) => [index("sessions_user_idx").on(t.userId), index("sessions_expires_idx").on(t.expiresAt)],
 );
 
-/** What a reporting-API token may read (docs/API.md "Reporting API"); never a write. */
-export const API_TOKEN_PERMISSIONS = ["reports.read", "people.read", "audit.read"] as const;
-export type ApiTokenPermission = (typeof API_TOKEN_PERMISSIONS)[number];
-/** Active tokens an organisation may hold at once. */
-export const MAX_API_TOKENS = 20;
+export { API_TOKEN_PERMISSIONS, MAX_API_TOKENS, type ApiTokenPermission } from "../../lib/api-tokens";
 
 export const apiTokens = pgTable(
   "api_tokens",

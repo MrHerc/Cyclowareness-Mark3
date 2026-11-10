@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { db } from "../db";
 import { audit } from "../services/audit";
 import { rateLimit } from "../rate-limit";
-import { allowed, apiTokenViewer, getViewer, twoFactorGap, type Viewer } from "./viewer";
+import { allowed, apiTokenViewer, getViewer, hasFeature, twoFactorGap, type Viewer } from "./viewer";
 import type { Permission } from "./permissions";
 
 /*
@@ -28,7 +28,9 @@ export async function apiViewer(permission: Permission, request?: Request): Prom
  * Who calls a route handler, before any permission check: the signed-in person, or the reporting-API
  * token in `Authorization: Bearer <token>` (apiTokenViewer); else the response that refuses the request.
  * A token gets bare statuses (its clients are programs), is rate-limited per token, and its refusal is
- * audited when the token is known; an unknown token names no organisation to write the entry to.
+ * audited when the token is known; an unknown token names no organisation to write the entry to. The
+ * limiter runs before the refusal is audited, so a leaked-then-revoked token cannot flood the audit log.
+ * A token is refused while its organisation lacks the `integrations` feature that minting needs.
  */
 export async function apiCaller(request?: Request): Promise<Viewer | Response> {
   const probe = request && rscProbe(request);
@@ -36,12 +38,18 @@ export async function apiCaller(request?: Request): Promise<Viewer | Response> {
   const bearer = request?.headers.get("authorization")?.match(/^Bearer\s+(\S+)$/i)?.[1];
   if (bearer) {
     const found = await apiTokenViewer(bearer);
+    if (!found.ok && found.reason === "unknown") return new Response("Unauthorized", { status: 401 });
+    const id = found.ok ? found.viewer.apiToken!.id : found.id;
+    const limit = await rateLimit(`api-token:${id}`, API_TOKEN_RATE_LIMIT, 60_000);
+    if (!limit.ok) return new Response("Too many requests", { status: 429, headers: { "retry-after": String(Math.ceil(limit.retryAfterMs / 1000)) } });
     if (!found.ok) {
-      if (found.reason !== "unknown") await audit(db(), { tenantId: found.tenantId, actorId: null, action: "api_token.refused", targetType: "api_token", targetId: found.id, meta: { reason: found.reason } });
+      await audit(db(), { tenantId: found.tenantId, actorId: null, action: "api_token.refused", targetType: "api_token", targetId: id, meta: { reason: found.reason } });
       return new Response("Unauthorized", { status: 401 });
     }
-    const limit = await rateLimit(`api-token:${found.viewer.apiToken!.id}`, API_TOKEN_RATE_LIMIT, 60_000);
-    if (!limit.ok) return new Response("Too many requests", { status: 429, headers: { "retry-after": String(Math.ceil(limit.retryAfterMs / 1000)) } });
+    if (!hasFeature(found.viewer, "integrations")) {
+      await audit(db(), { tenantId: found.viewer.tenant.id, actorId: found.viewer.user.id, action: "api_token.refused", targetType: "api_token", targetId: id, meta: { reason: "plan" } });
+      return new Response("Forbidden", { status: 403 });
+    }
     return found.viewer;
   }
   const v = await getViewer();

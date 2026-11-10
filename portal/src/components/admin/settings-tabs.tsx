@@ -58,7 +58,8 @@ import {
   verifyDomainAction,
   verifySimulationDomainAction,
 } from "@/server/actions/settings";
-import { API_TOKEN_PERMISSIONS, MAX_API_TOKENS, type ApiTokenPermission, type TemplateKind, type TenantSettings } from "@/server/db/schema";
+import type { TemplateKind, TenantSettings } from "@/server/db/schema";
+import { API_TOKEN_PERMISSIONS, MAX_API_TOKENS, type ApiTokenPermission } from "@/lib/api-tokens";
 import { DESTINATION_PORTS, SYSLOG_DEFAULT_PORT } from "@/lib/destination-ports";
 import { Card, CardBody, CardHeader, Divider } from "@/components/ui/card";
 import { Button, ButtonAnchor, TextButton, textButtonClass } from "@/components/ui/button";
