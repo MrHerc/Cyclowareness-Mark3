@@ -43,7 +43,7 @@ describe("/admin/campaigns", () => {
       { campaignId: resim.id, userId: a.id, token: `r1${resim.id}`, sentAt: now, reportedAt: now },
     ]);
     const page = (await CampaignsPage({ params: Promise.resolve({}), searchParams: Promise.resolve({}) } as never)) as ReactNode;
-    const html = renderToStaticMarkup(createElement(NextIntlClientProvider, { locale: "en", messages: await messagesFor("en") } as ComponentProps<typeof NextIntlClientProvider>, page));
+    const html = renderToStaticMarkup(createElement(NextIntlClientProvider, (await messagesFor("en")) as ComponentProps<typeof NextIntlClientProvider>, page));
     expect(html).toContain("Quarterly payslip");
     expect(html).not.toContain("re-simulation");
     expect(html).toContain("1 campaign");
