@@ -420,7 +420,8 @@ export async function deletePersonAction(userId: string): Promise<{ ok: boolean 
 export async function decideDeletionAction(userId: string, approve: boolean): Promise<{ ok: boolean }> {
   const v = await actionViewer("people.write");
   const u = await target(v, userId);
-  if (!u || !u.deletionRequestedAt) return { ok: false };
+  // Not one's own request, as deletePersonAction: the profile withdraws it, and another administrator decides it.
+  if (!u || u.id === v.user.id || !u.deletionRequestedAt) return { ok: false };
   if (approve) await anonymise(v, u, "person.deletion_approved");
   else {
     await db().update(t.users).set({ deletionRequestedAt: null }).where(eq(t.users.id, u.id));

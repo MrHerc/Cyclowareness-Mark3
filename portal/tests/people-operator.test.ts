@@ -157,6 +157,17 @@ describe("deleting a person", () => {
   });
 });
 
+describe("a deletion request", () => {
+  it("is not approved or declined by the administrator who made it", async () => {
+    actor = { id: ids.admin, role: "tenant_admin" };
+    const before = await row(ids.admin);
+    expect(before.deletionRequestedAt).not.toBeNull();
+    expect(await people.decideDeletionAction(ids.admin, true)).toEqual({ ok: false });
+    expect(await people.decideDeletionAction(ids.admin, false)).toEqual({ ok: false });
+    expect(await row(ids.admin)).toEqual(before);
+  });
+});
+
 describe("unlinking single sign-on", () => {
   it("clears the bound provider identity and records it", async () => {
     const { audit } = await import("../src/server/services/audit");
