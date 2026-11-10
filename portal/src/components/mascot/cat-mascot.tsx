@@ -125,7 +125,9 @@ export function Mascot({
       autoActs = new Set(Object.keys(mascotAutoWeights({ stage: true, idle: Infinity })).filter((k) => k !== "present"));
       made = createCat(el, { mode: "mascot", aria: false, facing: mirrorForRtl(facing ?? "right", isRtl(el)) });
       setCat(made);
-    });
+    })
+      // The cat is decorative: an engine chunk that fails to load (stale deploy, offline) just leaves the box empty.
+      .catch(() => {});
     return () => {
       gone = true;
       made?.destroy();

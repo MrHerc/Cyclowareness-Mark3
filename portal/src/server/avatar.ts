@@ -9,3 +9,6 @@ import { t } from "./db";
  * changes, so the route's hour-long browser cache never shows an old one.
  */
 export const avatarSrc = sql<string | null>`case when ${t.users.avatarUrl} is null then null else '/api/avatar/' || ${t.users.id} || '?v=' || left(md5(${t.users.avatarUrl}), 8) end`;
+
+/** avatarSrc for a join that can reach people of another organisation (the vendor's operators in a customer's audit log): the route would 404 them, so they get null and their initials. */
+export const avatarSrcIn = (tenantId: string) => sql<string | null>`case when ${t.users.tenantId} = ${tenantId} then ${avatarSrc} end`;
