@@ -89,7 +89,7 @@ A malformed or `null` Origin is refused with `403`.
 | GET | `/api/sandbox/{id}/stix` | Session: the submitter, or `secops.read` | STIX 2.1 bundle |
 | GET | `/api/admin/reports/{kind}` | `reports.read`, session or token | CSV or XLSX report |
 | GET | `/api/admin/people/export` | `people.read`, session or token | CSV of people |
-| GET | `/api/admin/people/template` | Session or token | CSV import template |
+| GET | `/api/admin/people/template` | Session | CSV import template |
 | POST | `/api/admin/people/invite-links` | `people.write` | CSV of fresh invitation links |
 | GET | `/api/admin/policies/{id}/signoffs` | `policies.read` | CSV of policy sign-offs |
 | GET | `/api/admin/campaigns/{id}/usb-kit` | `campaigns.write` | CSV kit for a USB simulation |
@@ -555,7 +555,7 @@ SAML is not connected; only OpenID Connect works.
 
 Read-only access for the organisation's own systems (HR, BI, GRC) to the downloads that administrators already have: the reports and the people list. There is no write endpoint for tokens.
 
-**Tokens.** A tenant administrator creates a token under Settings, Integrations, API tokens: a name and the permissions it may hold. The secret is shown once, in the form `cyk_<32 url-safe characters>`, and never again; the database keeps only its SHA-256 (`api_tokens`, `src/server/db/schema.ts`). An organisation holds at most 20 active tokens. A token can be revoked at any time; a revoked token is refused from the next request on. The token acts for the administrator who created it, limited to the token's permissions: it stops working when that account is suspended or deleted, and when the account's role loses a permission the token also loses it.
+**Tokens.** A tenant administrator creates a token under Settings, Integrations, API tokens: a name and the permissions it may hold. The secret is shown once, in the form `cyk_<32 url-safe characters>`, and never again; the database keeps only its SHA-256 (`api_tokens`, `src/server/db/schema.ts`). An organisation holds at most 20 active tokens. A token can be revoked at any time; a revoked token is refused from the next request on. The token acts for the administrator who created it, limited to the token's permissions: it stops working when that account is suspended or deleted, and when the account's role loses a permission the token also loses it. Settings shows when each token was last used: any request that presents it counts, refused and rate-limited ones included, and the time is updated at most every five minutes.
 
 **Permissions.** A token holds one or more of these; nothing else can be granted.
 
@@ -589,7 +589,7 @@ Column headers follow the `Accept-Language` header; without one they are in Engl
 | Status | Meaning |
 |---|---|
 | `401 Unauthorized` | Unknown token, revoked token, or the creator's account is no longer active |
-| `403 Forbidden` | The token does not hold the permission the endpoint needs, the endpoint is a write (`POST`), or the plan no longer has the `integrations` feature |
+| `403 Forbidden` | The token does not hold the permission the endpoint needs, the endpoint is a write (`POST`) or not listed above (such as the import template), or the plan no longer has the `integrations` feature |
 | `404 Not found` | Unknown report kind, or the plan lacks the feature |
 | `400 Bad request` | Malformed `from`, `to` or `d` (section 4) |
 | `429 Too many requests` | Rate limit, see below; `Retry-After` names the seconds to wait |
@@ -605,8 +605,8 @@ Limits are fixed windows counted in the database and shared by every server inst
 | `POST /api/tutor` | 20 questions per person per 10 minutes |
 | `POST /api/subtitles`, requests | 60 per person per 10 minutes |
 | `POST /api/subtitles`, model calls | 6 per person per 10 minutes, 30 per person per day, 300 per organisation per day |
-| `GET /api/admin/reports/{kind}` | 60 per person (or per token) per hour |
-| People export and invitation links, combined | 20 per person (or per token) per hour |
+| `GET /api/admin/reports/{kind}` | 60 per person per hour, and a separate 60 per hour shared by all the tokens that person created |
+| People export and invitation links, combined | 20 per person per hour, and a separate 20 exports per hour shared by all the tokens that person created |
 | Reporting API token, any endpoint | 60 requests per token per minute, revoked tokens included, on top of the endpoint's own limit |
 | `GET /api/admin/modules/{id}/scorm` | 30 per person per hour |
 | `GET /api/me/export` | 5 per person per hour |

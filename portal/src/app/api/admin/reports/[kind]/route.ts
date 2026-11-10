@@ -31,7 +31,8 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
   if (from === null || to === null || (from && to && from > to) || (departmentId && !isUuid(departmentId))) {
     return new Response("Bad request", { status: 400 });
   }
-  if (!(await rateLimit(`report-download:${v.apiToken?.id ?? v.user.id}`, 60, 60 * 60_000)).ok) return new Response("Too many requests", { status: 429 });
+  // All of a creator's tokens share one bucket, apart from the console's: tokens neither multiply the quota nor lock the person out.
+  if (!(await rateLimit(`report-download:${v.apiToken ? `api:${v.user.id}` : v.user.id}`, 60, 60 * 60_000)).ok) return new Response("Too many requests", { status: 429 });
   const format = url.searchParams.get("format") === "xlsx" ? "xlsx" : "csv";
   const filters = { from, to, departmentId };
   const report = await buildReport(v, kind as ReportKind, filters, await getLocale());

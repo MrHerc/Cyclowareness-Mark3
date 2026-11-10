@@ -1,7 +1,7 @@
 import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Award, Bell, Fingerprint, GraduationCap, Languages, LifeBuoy, Mail, Palette, PenLine, ShieldCheck, Webhook, type LucideIcon } from "lucide-react";
-import { requirePermission } from "@/server/auth/viewer";
+import { hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { appUrl, env } from "@/server/env";
 import { DOMAIN_PROOF_GRACE_DAYS } from "@/server/auth/domain-proof";
@@ -159,6 +159,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
           integrations={integrationsView(s.integrations)}
           deliveries={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))}
           apiTokens={tokens.map((k) => ({ ...k, createdAt: k.createdAt.toISOString(), lastUsedAt: k.lastUsedAt?.toISOString() ?? null }))}
+          canMintTokens={hasFeature(v, "integrations")}
         />
       );
       break;

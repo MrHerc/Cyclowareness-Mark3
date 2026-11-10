@@ -1582,8 +1582,8 @@ export function SecurityTab({ allowedUntil }: { allowedUntil: string | null }) {
 
 /* ───────── integrations ───────── */
 
-/** Reporting-API tokens (docs/API.md): minted here, the secret shown once, revocable. */
-function ApiTokensCard({ tokens }: { tokens: ApiTokenView[] }) {
+/** Reporting-API tokens (docs/API.md): minted here, the secret shown once, revocable. `canMint`: the plan has `integrations`; without it tokens can only be revoked. */
+function ApiTokensCard({ tokens, canMint }: { tokens: ApiTokenView[]; canMint: boolean }) {
   const t = useTranslations("settings.integrations");
   const tc = useTranslations("common");
   const [name, setName] = useState("");
@@ -1599,7 +1599,7 @@ function ApiTokensCard({ tokens }: { tokens: ApiTokenView[] }) {
       const res = await createApiTokenAction({ name: name.trim(), permissions });
       if (!res.ok) {
         toast(res.error === "limit" ? t("tokenLimit", { max: MAX_API_TOKENS }) : tc("errors.invalid"), "error");
-        if (!res.error) markInvalid("k-name");
+        if (res.field === "name") markInvalid("k-name");
         return;
       }
       setToken(res.token ?? null);
@@ -1650,21 +1650,27 @@ function ApiTokensCard({ tokens }: { tokens: ApiTokenView[] }) {
           </Notice>
         ) : null}
         <Divider />
-        <Field label={t("tokenName")} htmlFor="k-name" hint={t("tokenNameHint")}>
-          <Input id="k-name" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} />
-        </Field>
-        <fieldset className="grid gap-2 sm:grid-cols-3">
-          <legend className="mb-2 text-body-sm font-medium text-ink">{t("tokenReads")}</legend>
-          {API_TOKEN_PERMISSIONS.map((p) => (
-            <Checkbox key={p} label={t(`tokenPermissions.${permKey(p)}`)} description={<code className="font-mono text-tab">{p}</code>} checked={permissions.includes(p)} onChange={() => toggle(p)} />
-          ))}
-        </fieldset>
-        {full ? <Notice tone="info">{t("tokenLimit", { max: MAX_API_TOKENS })}</Notice> : null}
-        <div className="flex justify-end">
-          <Button disabled={busy || full || !name.trim() || !permissions.length} onClick={create}>
-            {t("createToken")}
-          </Button>
-        </div>
+        {canMint ? (
+          <>
+            <Field label={t("tokenName")} htmlFor="k-name" hint={t("tokenNameHint")}>
+              <Input id="k-name" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} />
+            </Field>
+            <fieldset className="grid gap-2 sm:grid-cols-3">
+              <legend className="mb-2 text-body-sm font-medium text-ink">{t("tokenReads")}</legend>
+              {API_TOKEN_PERMISSIONS.map((p) => (
+                <Checkbox key={p} label={t(`tokenPermissions.${permKey(p)}`)} description={<code className="font-mono text-tab">{p}</code>} checked={permissions.includes(p)} onChange={() => toggle(p)} />
+              ))}
+            </fieldset>
+            {full ? <Notice tone="info">{t("tokenLimit", { max: MAX_API_TOKENS })}</Notice> : null}
+            <div className="flex justify-end">
+              <Button disabled={busy || full || !name.trim() || !permissions.length} onClick={create}>
+                {t("createToken")}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <Notice tone="info">{t("tokenPlan")}</Notice>
+        )}
       </CardBody>
     </Card>
   );
@@ -1684,10 +1690,12 @@ export function IntegrationsTab({
   integrations,
   deliveries,
   apiTokens,
+  canMintTokens,
 }: {
   integrations: IntegrationsView;
   deliveries: { id: string; event: string; target: string; status: string; responseCode: number | null; createdAt: string }[];
   apiTokens: ApiTokenView[];
+  canMintTokens: boolean;
 }) {
   const t = useTranslations("settings.integrations");
   const tc = useTranslations("common");
@@ -1822,7 +1830,7 @@ export function IntegrationsTab({
             )}
           </CardBody>
         </Card>
-        <ApiTokensCard tokens={apiTokens} />
+        <ApiTokensCard tokens={apiTokens} canMint={canMintTokens} />
       </div>
       <aside className="xl:sticky xl:top-24 xl:self-start">
         <Card>

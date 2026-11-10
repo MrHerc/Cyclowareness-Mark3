@@ -607,7 +607,7 @@ export async function sendTestEventAction(): Promise<{ ok: boolean; error?: "no_
   return { ok: true };
 }
 
-const apiTokenSchema = z.object({ name: z.string().trim().min(1).max(80), permissions: z.array(z.enum(API_TOKEN_PERMISSIONS)).min(1) });
+const apiTokenSchema = z.object({ name: z.string().trim().min(1).max(80), permissions: z.array(z.enum(API_TOKEN_PERMISSIONS)).min(1).max(API_TOKEN_PERMISSIONS.length) });
 
 /**
  * Mints a reporting-API token (docs/API.md "Reporting API"). The secret is returned once and never

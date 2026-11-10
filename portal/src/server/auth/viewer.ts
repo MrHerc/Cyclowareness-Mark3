@@ -146,6 +146,7 @@ export async function apiTokenViewer(token: string): Promise<ApiTokenLookup> {
   const { token: apiToken, user, tenant } = row;
   if (apiToken.revokedAt) return { ok: false, reason: "revoked", id, tenantId: tenant.id };
   if (user.status !== "active") return { ok: false, reason: "creator_inactive", id, tenantId: tenant.id };
+  // Stamped before the rate limit and plan checks on purpose: "last used" also shows a revoked-plan or throttled client still calling.
   const now = new Date();
   if (!apiToken.lastUsedAt || now.getTime() - apiToken.lastUsedAt.getTime() > SEEN_THROTTLE_MS) {
     await db().update(t.apiTokens).set({ lastUsedAt: now }).where(eq(t.apiTokens.id, id));

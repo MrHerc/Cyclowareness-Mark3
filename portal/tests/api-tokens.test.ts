@@ -74,6 +74,7 @@ describe("minting", () => {
     expect(await createApiTokenAction({ name: "  ", permissions: ["reports.read"] })).toEqual({ ok: false, field: "name" });
     expect(await createApiTokenAction({ name: "x", permissions: [] })).toEqual({ ok: false, field: "permissions" });
     expect(await createApiTokenAction({ name: "x", permissions: ["people.write" as never] })).toMatchObject({ ok: false });
+    expect(await createApiTokenAction({ name: "x", permissions: Array(t.API_TOKEN_PERMISSIONS.length + 1).fill("reports.read") })).toEqual({ ok: false, field: "permissions" });
   });
 
   it("caps active tokens at 20 per organisation, also under concurrent creates; a revoked one frees a slot", async () => {
@@ -83,6 +84,7 @@ describe("minting", () => {
     try {
       let last = "";
       for (let i = 0; i < t.MAX_API_TOKENS - 1; i++) last = (await mint(["reports.read"], `t${i}`)).id;
+      // Guards the behaviour only: PGlite runs one transaction at a time, so this passes without the FOR UPDATE lock too.
       const race = await Promise.all([1, 2, 3].map((i) => createApiTokenAction({ name: `race${i}`, permissions: ["reports.read"] })));
       expect(race.filter((r) => r.ok)).toHaveLength(1);
       expect(await db.select().from(t.apiTokens).where(and(eq(t.apiTokens.tenantId, org.id), isNull(t.apiTokens.revokedAt)))).toHaveLength(t.MAX_API_TOKENS);
@@ -155,6 +157,24 @@ describe("bearer access", () => {
     expect((await audited("api_token.refused")).length).toBe(before);
   });
 
+  it("loses a permission, then all access, when its creator is demoted, then suspended, after minting", async () => {
+    const creator = await addUser(db, tenant.id, { role: "tenant_admin" });
+    actor = viewerFor(creator, tenant);
+    const { token, id } = await mint(["reports.read"], "demoted");
+    actor = viewerFor(admin, tenant);
+    await db.update(t.users).set({ role: "learner" }).where(eq(t.users.id, creator.id));
+    expect((await reports.GET(bearer("/api/admin/reports/completion", token), ctx("completion"))).status).toBe(403);
+    expect(await audited("api_token.refused")).toContainEqual(expect.objectContaining({ targetId: id, meta: { reason: "forbidden", permission: "reports.read" } }));
+    await db.update(t.users).set({ role: "tenant_admin", status: "suspended" }).where(eq(t.users.id, creator.id));
+    expect((await reports.GET(bearer("/api/admin/reports/completion", token), ctx("completion"))).status).toBe(401);
+    expect(await audited("api_token.refused")).toContainEqual(expect.objectContaining({ targetId: id, meta: { reason: "creator_inactive" } }));
+  });
+
+  it("does not serve the import template, which no token permission names", async () => {
+    const { token } = await mint(["audit.read"]);
+    expect((await people.GET(bearer("/api/admin/people/template", token), ctx("template"))).status).toBe(403);
+  });
+
   it("never opens a write route: the token cannot hold a write permission", async () => {
     const { token } = await mint(["reports.read", "people.read", "audit.read"]);
     const res = await people.POST(bearer("/api/admin/people/invite-links", token, { method: "POST" }), ctx("invite-links"));
@@ -200,10 +220,14 @@ describe("bearer access", () => {
     }
   });
 
-  it("keys the endpoint limiter by token, so a busy token does not lock its creator out of the console", async () => {
-    const { token, id } = await mint(["reports.read"], "busy");
-    for (let i = 0; i < 60; i++) await rateLimit(`report-download:${id}`, 60, 60 * 60_000);
-    expect((await reports.GET(bearer("/api/admin/reports/completion", token), ctx("completion"))).status).toBe(429);
+  it("gives all of a creator's tokens one endpoint bucket, apart from the console's", async () => {
+    const first = await mint(["reports.read"], "busy");
+    const second = await mint(["reports.read"], "fresh");
+    let status = 200;
+    // Ends at the creator's token bucket (60/h, partly spent above) or, run alone, the per-token 60/min.
+    for (let i = 0; i <= API_TOKEN_RATE_LIMIT && status === 200; i++) status = (await reports.GET(bearer("/api/admin/reports/completion", first.token), ctx("completion"))).status;
+    expect(status).toBe(429);
+    expect((await reports.GET(bearer("/api/admin/reports/completion", second.token), ctx("completion"))).status).toBe(429);
     session = { ...actor, user: { ...actor.user, totpEnabled: true } };
     try {
       expect((await reports.GET(new Request("http://localhost:3000/api/admin/reports/completion"), ctx("completion"))).status).toBe(200);
