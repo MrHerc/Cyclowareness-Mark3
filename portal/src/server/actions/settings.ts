@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { randomBytes } from "node:crypto";
@@ -23,7 +23,7 @@ import { WEBHOOK_EVENTS, isTimeZone, withDefaults } from "../../lib/tenant-defau
 import { svgLogoProblem } from "../svg-safety";
 import { isUuid } from "../../lib/ids";
 import { endpointKey, storedSecretOutcome } from "../../lib/stored-secret";
-import type { TenantSettings } from "../db/schema";
+import { API_TOKEN_PERMISSIONS, MAX_API_TOKENS, type TenantSettings } from "../db/schema";
 import { notificationsSchema } from "../schemas/notifications";
 
 /**
@@ -620,6 +620,52 @@ export async function sendTestEventAction(): Promise<{ ok: boolean; error?: "no_
   if (i.syslogHost) rows.push({ tenantId: v.tenant.id, event: "admin.audit", target: "syslog", payload });
   await db().insert(t.webhookDeliveries).values(rows);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "settings.integration_test" });
+  refresh();
+  return { ok: true };
+}
+
+const apiTokenSchema = z.object({ name: z.string().trim().min(1).max(80), permissions: z.array(z.enum(API_TOKEN_PERMISSIONS)).min(1).max(API_TOKEN_PERMISSIONS.length) });
+
+/**
+ * Mints a reporting-API token (docs/API.md "Reporting API"). The secret is returned once and never
+ * stored: the row keeps its SHA-256 as the id, like sessions. `limit`: MAX_API_TOKENS are active already.
+ */
+export async function createApiTokenAction(input: z.infer<typeof apiTokenSchema>): Promise<{ ok: boolean; field?: string; error?: "limit"; token?: string }> {
+  const v = await actionViewer("settings.write");
+  if (!hasFeature(v, "integrations")) return { ok: false };
+  const p = apiTokenSchema.safeParse(input);
+  if (!p.success) return { ok: false, field: invalid(p).field };
+  const permissions = [...new Set(p.data.permissions)];
+  const token = `cyk_${randomBytes(24).toString("base64url")}`;
+  const id = sha256Hex(token);
+  // The tenant row lock serialises the count with the insert, so two saves at once cannot both pass the cap.
+  const full = await db().transaction(async (tx) => {
+    await tx.select({ id: t.tenants.id }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id)).for("update");
+    const [{ n }] = await tx
+      .select({ n: count() })
+      .from(t.apiTokens)
+      .where(and(eq(t.apiTokens.tenantId, v.tenant.id), isNull(t.apiTokens.revokedAt)));
+    if (n >= MAX_API_TOKENS) return true;
+    await tx.insert(t.apiTokens).values({ id, tenantId: v.tenant.id, name: p.data.name, permissions, createdBy: v.user.id });
+    return false;
+  });
+  if (full) return { ok: false, error: "limit" };
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "api_token.created", targetType: "api_token", targetId: id, ip: await clientIp(), meta: { name: p.data.name, permissions } });
+  refresh();
+  return { ok: true, token };
+}
+
+export async function revokeApiTokenAction(id: string): Promise<SaveResult> {
+  const v = await actionViewer("settings.write");
+  // No feature check: revoking a credential must stay possible after a plan downgrade removes `integrations`.
+  if (!/^[0-9a-f]{64}$/.test(id)) return { ok: false };
+  const [row] = await db()
+    .update(t.apiTokens)
+    .set({ revokedAt: new Date() })
+    .where(and(eq(t.apiTokens.id, id), eq(t.apiTokens.tenantId, v.tenant.id), isNull(t.apiTokens.revokedAt)))
+    .returning({ name: t.apiTokens.name });
+  if (!row) return { ok: false };
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "api_token.revoked", targetType: "api_token", targetId: id, ip: await clientIp(), meta: { name: row.name } });
   refresh();
   return { ok: true };
 }

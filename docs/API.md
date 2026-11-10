@@ -14,15 +14,17 @@ This document lists every interface Cyclowareness exposes to other systems, base
 8. [SMS gateway contract](#8-sms-gateway-contract)
 9. [Single sign-on contract](#9-single-sign-on-contract)
 10. [Inbound report address](#10-inbound-report-address)
-11. [Rate limits](#rate-limits)
+11. [Reporting API](#11-reporting-api)
+12. [Rate limits](#rate-limits)
 
 ## 1. Scope
 
-**There is no public REST API for machine clients.** Every authenticated endpoint uses the browser session cookie that sign-in sets, except the inbound report address (section 10), which takes a per-organisation secret from the mail provider. There are no other API keys, OAuth client credentials or service accounts. A script can call these endpoints only with a valid user session.
+**The only API for machine clients is the read-only Reporting API** (section 11): the report and people-list downloads, called with a scoped bearer token that an administrator mints under Settings, Integrations. The inbound report address (section 10) takes a per-organisation secret from the mail provider. Every other authenticated endpoint uses the browser session cookie that sign-in sets; there are no OAuth client credentials or service accounts, and no endpoint writes data for a token.
 
 | Interface | Who uses it | Stable for integration |
 |---|---|---|
 | Route handlers under `/api` | The web app, and administrators' browsers for downloads | Yes, as documented here |
+| Reporting API (bearer tokens) | The organisation's HR, BI or GRC system, pulling reports and the people list | Yes |
 | Server Actions | The web app's forms and buttons; every write in the product | No. They are internal and change with the interface |
 | Token pages `/t`, `/q`, `/c` | Simulation recipients and certificate verifiers | Yes |
 | Outbound webhooks and syslog | The organisation's SIEM, SOAR or ticketing system | Yes |
@@ -36,7 +38,7 @@ Server Actions are POST requests that Next.js routes by an internal action id. D
 
 **Base URL.** All paths are relative to the installation's public address, the `APP_URL` setting. Links in emails, QR codes and webhooks use that address.
 
-**Authentication.** Endpoints marked "session" read the cookie `__Host-cy_session` in production and `cy_session` in development. The server resolves it to a person, their organisation, role and plan features (`src/server/auth/viewer.ts`).
+**Authentication.** Endpoints marked "session" read the cookie `__Host-cy_session` in production and `cy_session` in development. The server resolves it to a person, their organisation, role and plan features (`src/server/auth/viewer.ts`). Endpoints marked "session or token" also accept `Authorization: Bearer <token>` with a Reporting API token (section 11); the header, when present, is used instead of the cookie.
 
 **Authorisation.** An endpoint that names a permission requires two things:
 
@@ -87,8 +89,8 @@ A malformed or `null` Origin is refused with `403`.
 | POST | `/api/subtitles` | Session, plan feature `ai_tutor` | JSON subtitle map |
 | GET | `/api/me/export` | Session | JSON file with the person's own data |
 | GET | `/api/sandbox/{id}/stix` | Session: the submitter, or `secops.read` | STIX 2.1 bundle |
-| GET | `/api/admin/reports/{kind}` | `reports.read` | CSV or XLSX report |
-| GET | `/api/admin/people/export` | `people.read` | CSV of people |
+| GET | `/api/admin/reports/{kind}` | `reports.read`, session or token | CSV or XLSX report |
+| GET | `/api/admin/people/export` | `people.read`, session or token | CSV of people |
 | GET | `/api/admin/people/template` | Session | CSV import template |
 | POST | `/api/admin/people/invite-links` | `people.write` | CSV of fresh invitation links |
 | GET | `/api/admin/policies/{id}/signoffs` | `policies.read` | CSV of policy sign-offs |
@@ -604,6 +606,51 @@ Authorization: Bearer {inbound secret}
 
 **Trust.** The secret proves the request comes from your mail provider; it cannot prove who wrote the forwarded mail. Let the provider reject mail to the report address that fails SPF, DKIM or DMARC for your own domain, so a forged `From` cannot file a report, or earn XP, in another person's name.
 
+## 11. Reporting API
+
+Read-only access for the organisation's own systems (HR, BI, GRC) to the downloads that administrators already have: the reports and the people list. There is no write endpoint for tokens.
+
+**Tokens.** A tenant administrator creates a token under Settings, Integrations, API tokens: a name and the permissions it may hold. The secret is shown once, in the form `cyk_<32 url-safe characters>`, and never again; the database keeps only its SHA-256 (`api_tokens`, `src/server/db/schema.ts`). An organisation holds at most 20 active tokens. A token can be revoked at any time; a revoked token is refused from the next request on. The token acts for the administrator who created it, limited to the token's permissions: it stops working when that account is suspended or deleted, and when the account's role loses a permission the token also loses it. Settings shows when each token was last used: any request that presents it counts, refused and rate-limited ones included, and the time is updated at most every five minutes.
+
+**Permissions.** A token holds one or more of these; nothing else can be granted.
+
+| Permission | Opens |
+|---|---|
+| `reports.read` | `GET /api/admin/reports/{kind}` (the `secops` report also needs the creator to hold `secops.read`) |
+| `people.read` | `GET /api/admin/people/export` |
+| `audit.read` | Reserved for an audit-log export; no endpoint yet |
+
+The organisation's plan still applies: a token works only while the plan has the `integrations` feature that minting needs (it can still be revoked without it), and a report needs the `reports` feature, as for a person.
+
+**Request.** Send the token in the `Authorization` header. The endpoints and their query parameters are those of section 4.
+
+```bash
+# Completion report for October as CSV
+curl -sS -H "Authorization: Bearer cyk_..." \
+  "https://portal.example.az/api/admin/reports/completion?from=2026-10-01&to=2026-10-31" -o completion.csv
+
+# Risk report as XLSX, one department and its sub-departments
+curl -sS -H "Authorization: Bearer cyk_..." \
+  "https://portal.example.az/api/admin/reports/risk?format=xlsx&d=4f2c...-uuid" -o risk.xlsx
+
+# People list
+curl -sS -H "Authorization: Bearer cyk_..." "https://portal.example.az/api/admin/people/export" -o people.csv
+```
+
+Column headers follow the `Accept-Language` header; without one they are in English.
+
+**Errors.** Token requests always get the bare status, never a redirect to sign-in.
+
+| Status | Meaning |
+|---|---|
+| `401 Unauthorized` | Unknown token, revoked token, or the creator's account is no longer active |
+| `403 Forbidden` | The token does not hold the permission the endpoint needs, the endpoint is a write (`POST`) or not listed above (such as the import template), or the plan no longer has the `integrations` feature |
+| `404 Not found` | Unknown report kind, or the plan lacks the feature |
+| `400 Bad request` | Malformed `from`, `to` or `d` (section 4) |
+| `429 Too many requests` | Rate limit, see below; `Retry-After` names the seconds to wait |
+
+**Audit.** Creating and revoking a token write `api_token.created` and `api_token.revoked`. Every download made with a token writes the usual `report.downloaded` or `people.exported` entry with the creator as actor and the token's id in `meta.apiToken`. A refused request with a known token writes `api_token.refused` with the reason (`revoked`, `creator_inactive`, `plan` or `forbidden`); an unknown token belongs to no organisation and leaves no entry. The per-token rate limit applies before the refusal is written, so a revoked token leaves at most 60 entries a minute.
+
 ## Rate limits
 
 Limits are fixed windows counted in the database and shared by every server instance (`src/server/rate-limit.ts`).
@@ -613,8 +660,9 @@ Limits are fixed windows counted in the database and shared by every server inst
 | `POST /api/tutor` | 20 questions per person per 10 minutes |
 | `POST /api/subtitles`, requests | 60 per person per 10 minutes |
 | `POST /api/subtitles`, model calls | 6 per person per 10 minutes, 30 per person per day, 300 per organisation per day |
-| `GET /api/admin/reports/{kind}` | 60 per person per hour |
-| People export and invitation links, combined | 20 per person per hour |
+| `GET /api/admin/reports/{kind}` | 60 per person per hour, and a separate 60 per hour shared by all the tokens that person created |
+| People export and invitation links, combined | 20 per person per hour, and a separate 20 exports per hour shared by all the tokens that person created |
+| Reporting API token, any endpoint | 60 requests per token per minute, revoked tokens included, on top of the endpoint's own limit |
 | `GET /api/admin/modules/{id}/scorm` | 30 per person per hour |
 | `GET /api/me/export` | 5 per person per hour |
 | `GET /api/sso/start`, `GET /api/sso/callback/{tenant}` | 60 per client address per minute and 600 per organisation per minute, each |

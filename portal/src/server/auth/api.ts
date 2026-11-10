@@ -1,6 +1,9 @@
 import "server-only";
 import { getTranslations } from "next-intl/server";
-import { allowed, getViewer, twoFactorGap, type Viewer } from "./viewer";
+import { db } from "../db";
+import { audit } from "../services/audit";
+import { rateLimit } from "../rate-limit";
+import { allowed, apiTokenViewer, getViewer, hasFeature, twoFactorGap, type Viewer } from "./viewer";
 import type { Permission } from "./permissions";
 
 /*
@@ -8,14 +11,50 @@ import type { Permission } from "./permissions";
  * (i18n/request.ts) reads the session through viewer.ts, so viewer.ts must not import next-intl.
  */
 
+/** Requests per token per minute over the reporting API (docs/API.md "Reporting API"). */
+export const API_TOKEN_RATE_LIMIT = 60;
+
 /** For route handlers: the viewer, or the response to send when the checks fail (see deniedResponse). */
 export async function apiViewer(permission: Permission, request?: Request): Promise<Viewer | Response> {
+  const v = await apiCaller(request);
+  if (v instanceof Response) return v;
+  if (allowed(v, permission)) return v;
+  if (!v.apiToken) return deniedResponse(request, 403);
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "api_token.refused", targetType: "api_token", targetId: v.apiToken.id, meta: { reason: "forbidden", permission } });
+  return new Response("Forbidden", { status: 403 });
+}
+
+/**
+ * Who calls a route handler, before any permission check: the signed-in person, or the reporting-API
+ * token in `Authorization: Bearer <token>` (apiTokenViewer); else the response that refuses the request.
+ * A token gets bare statuses (its clients are programs), is rate-limited per token, and its refusal is
+ * audited when the token is known; an unknown token names no organisation to write the entry to. The
+ * limiter runs before the refusal is audited, so a leaked-then-revoked token cannot flood the audit log.
+ * A token is refused while its organisation lacks the `integrations` feature that minting needs.
+ */
+export async function apiCaller(request?: Request): Promise<Viewer | Response> {
   const probe = request && rscProbe(request);
   if (probe) return probe;
+  const bearer = request?.headers.get("authorization")?.match(/^Bearer\s+(\S+)$/i)?.[1];
+  if (bearer) {
+    const found = await apiTokenViewer(bearer);
+    if (!found.ok && found.reason === "unknown") return new Response("Unauthorized", { status: 401 });
+    const id = found.ok ? found.viewer.apiToken!.id : found.id;
+    const limit = await rateLimit(`api-token:${id}`, API_TOKEN_RATE_LIMIT, 60_000);
+    if (!limit.ok) return new Response("Too many requests", { status: 429, headers: { "retry-after": String(Math.ceil(limit.retryAfterMs / 1000)) } });
+    if (!found.ok) {
+      await audit(db(), { tenantId: found.tenantId, actorId: null, action: "api_token.refused", targetType: "api_token", targetId: id, meta: { reason: found.reason } });
+      return new Response("Unauthorized", { status: 401 });
+    }
+    if (!hasFeature(found.viewer, "integrations")) {
+      await audit(db(), { tenantId: found.viewer.tenant.id, actorId: found.viewer.user.id, action: "api_token.refused", targetType: "api_token", targetId: id, meta: { reason: "plan" } });
+      return new Response("Forbidden", { status: 403 });
+    }
+    return found.viewer;
+  }
   const v = await getViewer();
   if (!v) return deniedResponse(request, 401);
   if (twoFactorGap(v)) return deniedResponse(request, 403, "/profile?section=security&required=1");
-  if (!allowed(v, permission)) return deniedResponse(request, 403);
   return v;
 }
 

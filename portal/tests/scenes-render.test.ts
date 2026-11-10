@@ -195,7 +195,7 @@ describe("settings tabs render", () => {
     ["learning", createElement(tabs.LearningTab, { learning: s.learning }), ["Time limits on questions"]],
     ["protection", createElement(tabs.ProtectionTab, { protection: s.protection, retention: s.retention }), ["Content protection"]],
     ["security", createElement(tabs.SecurityTab, { allowedUntil: null }), ["Support access"]],
-    ["integrations", createElement(tabs.IntegrationsTab, { integrations: { ...s.integrations, hasWebhookSecret: false, hasInboundSecret: false }, inboundEndpoint: "https://app.test/api/inbound/acme", deliveries: [] }), ["Webhook", "Send events"]],
+    ["integrations", createElement(tabs.IntegrationsTab, { integrations: { ...s.integrations, hasWebhookSecret: false, hasInboundSecret: false }, inboundEndpoint: "https://app.test/api/inbound/acme", deliveries: [], apiTokens: [], canMintTokens: true }), ["Webhook", "Send events"]],
   ];
 
   it.each(cases)("%s", (_name, node, expected) => {

@@ -7,6 +7,7 @@ import { avatarSrc } from "../avatar";
 import type { Role, TenantBranding, TenantSettings } from "../db/schema";
 import { can, PERMISSION_FEATURE, twoFactorRequired, type Permission } from "./permissions";
 import { invalidateSession, readSessionToken, renewedExpiry, sessionIdFromToken, shouldRenew } from "./session";
+import { sha256Hex } from "../crypto";
 import { cookies } from "next/headers";
 import { currentPath } from "../request";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, isSiteLocale } from "../../i18n/config";
@@ -51,6 +52,8 @@ export type Viewer = {
     settings: TenantSettings;
     features: Set<Feature>;
   };
+  /** Set when the caller is a reporting-API token (apiTokenViewer): allowed() is then limited to its permissions. */
+  apiToken?: { id: string; permissions: readonly Permission[] };
 };
 
 const SEEN_THROTTLE_MS = 5 * 60_000;
@@ -111,9 +114,15 @@ export const getSession = cache(async (): Promise<Viewer | null> => {
     await db().update(t.users).set({ lastActiveAt: now }).where(eq(t.users.id, user.id));
   }
 
+  return toViewer(user, tenant, { sessionId: id, twoFactorVerified: session.twoFactorVerified });
+});
+
+/** A user as the viewer queries read it (USER_COLUMNS): the photo's address, not the photo. */
+type ViewerUser = Pick<typeof t.users.$inferSelect, Exclude<keyof typeof USER_COLUMNS, "avatarUrl">> & { avatarUrl: string | null };
+
+function toViewer(user: ViewerUser, tenant: typeof t.tenants.$inferSelect, who: Pick<Viewer, "sessionId" | "twoFactorVerified" | "apiToken">): Viewer {
   return {
-    sessionId: id,
-    twoFactorVerified: session.twoFactorVerified,
+    ...who,
     user: {
       id: user.id,
       tenantId: user.tenantId,
@@ -149,7 +158,34 @@ export const getSession = cache(async (): Promise<Viewer | null> => {
       features: featuresFor(tenant.plan, tenant.features),
     },
   };
-});
+}
+
+export type ApiTokenLookup = { ok: true; viewer: Viewer } | { ok: false; reason: "unknown" } | { ok: false; reason: "revoked" | "creator_inactive"; id: string; tenantId: string };
+
+/**
+ * The viewer a reporting-API bearer token stands for: its creator, limited to the token's permissions
+ * (allowed) and never a session. A refusal names the token when it exists, so the caller can audit it.
+ */
+export async function apiTokenViewer(token: string): Promise<ApiTokenLookup> {
+  if (token.length > 100) return { ok: false, reason: "unknown" };
+  const id = sha256Hex(token);
+  const [row] = await db()
+    .select({ token: t.apiTokens, user: USER_COLUMNS, tenant: t.tenants })
+    .from(t.apiTokens)
+    .innerJoin(t.users, eq(t.users.id, t.apiTokens.createdBy))
+    .innerJoin(t.tenants, eq(t.tenants.id, t.apiTokens.tenantId))
+    .where(eq(t.apiTokens.id, id));
+  if (!row) return { ok: false, reason: "unknown" };
+  const { token: apiToken, user, tenant } = row;
+  if (apiToken.revokedAt) return { ok: false, reason: "revoked", id, tenantId: tenant.id };
+  if (user.status !== "active") return { ok: false, reason: "creator_inactive", id, tenantId: tenant.id };
+  // Stamped before the rate limit and plan checks on purpose: "last used" also shows a revoked-plan or throttled client still calling.
+  const now = new Date();
+  if (!apiToken.lastUsedAt || now.getTime() - apiToken.lastUsedAt.getTime() > SEEN_THROTTLE_MS) {
+    await db().update(t.apiTokens).set({ lastUsedAt: now }).where(eq(t.apiTokens.id, id));
+  }
+  return { ok: true, viewer: toViewer(user, tenant, { sessionId: "", twoFactorVerified: true, apiToken: { id, permissions: apiToken.permissions } }) };
+}
 
 /** Signed in and past two-step verification, or null. */
 export const getViewer = cache(async (): Promise<Viewer | null> => {
@@ -180,13 +216,14 @@ export function hasFeature(v: Viewer, feature: Feature): boolean {
 }
 
 export function allowed(v: Viewer, permission: Permission): boolean {
+  if (v.apiToken && !v.apiToken.permissions.includes(permission)) return false;
   const feature = PERMISSION_FEATURE[permission];
   return can(v.user.role, permission) && (!feature || v.tenant.features.has(feature));
 }
 
-/** Two-step verification is mandatory for this user (twoFactorRequired), who has not set it up yet. */
+/** Two-step verification is mandatory for this user (twoFactorRequired), who has not set it up yet. A machine client has no second step. */
 export function twoFactorGap(v: Viewer): boolean {
-  return twoFactorRequired(v.user.role, v.tenant.settings.identity.requireAdmin2fa) && !v.user.totpEnabled;
+  return !v.apiToken && twoFactorRequired(v.user.role, v.tenant.settings.identity.requireAdmin2fa) && !v.user.totpEnabled;
 }
 
 /** A console permission exercised inside a self-service action: the permission plus the tenant's "admins use 2FA" rule, as actionViewer(permission) applies. */

@@ -13,6 +13,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import type { ApiTokenPermission } from "../../lib/api-tokens";
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -239,6 +240,25 @@ export const sessions = pgTable(
     createdAt: createdAt(),
   },
   (t) => [index("sessions_user_idx").on(t.userId), index("sessions_expires_idx").on(t.expiresAt)],
+);
+
+export { API_TOKEN_PERMISSIONS, MAX_API_TOKENS, type ApiTokenPermission } from "../../lib/api-tokens";
+
+export const apiTokens = pgTable(
+  "api_tokens",
+  {
+    id: text("id").primaryKey(), // sha256(token), hex
+    tenantId: tenantRef(),
+    name: text("name").notNull(),
+    permissions: jsonb("permissions").$type<ApiTokenPermission[]>().notNull(),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: createdAt(),
+    lastUsedAt: ts("last_used_at"),
+    revokedAt: ts("revoked_at"),
+  },
+  (t) => [index("api_tokens_tenant_idx").on(t.tenantId)],
 );
 
 export const AUTH_TOKEN_KINDS = ["invite", "reset", "phone_otp"] as const;
