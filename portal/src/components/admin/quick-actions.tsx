@@ -37,7 +37,7 @@ export function QuickActions({ title, actions }: { title: string; actions: { key
                 <span className={cn("grid size-9 shrink-0 place-items-center rounded-lg", ai ? "bg-brand-600 text-brand-on" : "bg-sunken text-ink-muted")}>
                   <Icon aria-hidden className="size-[1.15rem]" />
                 </span>
-                <span className="min-w-0 text-balance">{label}</span>
+                <span className="min-w-0 text-balance break-words hyphens-auto">{label}</span>
               </Link>
             </li>
           );
