@@ -1,7 +1,7 @@
 # B9-metrics-seats
 
 branch: worktree-wf_42496c94-3d0-9
-worktree: C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-9
+worktree: <repo>\.claude\worktrees\wf_42496c94-3d0-9
 commits: 0dadd07 Operator usage metrics page and seat export ; be22967 Seats leave out operator accounts; lesson note says started or completed
 fix commits: e9931d4 Metrics leave operator usage out; note says modules and certificates are all time
 reviews: 2 (approve, approve)
@@ -67,7 +67,7 @@ portal/tests/platform-metrics.test.ts
 
 ## reviews
 approve
-I reviewed commits 0dadd07 and be22967 in C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-9. The branch contains 1a45970 and the tree is clean, with nothing under portal/drizzle committed and no schema change. I reran the checks there: typecheck passes, eslint on the touched files passes, and vitest passes on platform-metrics, server-helpers (audit labels), i18n and rtl-logical (213 tests).
+I reviewed commits 0dadd07 and be22967 in <repo>\.claude\worktrees\wf_42496c94-3d0-9. The branch contains 1a45970 and the tree is clean, with nothing under portal/drizzle committed and no schema change. I reran the checks there: typecheck passes, eslint on the touched files passes, and vitest passes on platform-metrics, server-helpers (audit labels), i18n and rtl-logical (213 tests).
 
 Every acceptance item holds:
 - /super/metrics is protected by requirePermission("platform.manage") and shows per-organisation aggregates only. The table has scope=col/row headers, logical CSS and getFormatter numbers inside a ScrollRegion. The tab appears in all three super pages.

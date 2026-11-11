@@ -1,7 +1,7 @@
 # B2-secrets
 
 branch: worktree-wf_42496c94-3d0-2
-worktree: C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-2
+worktree: <repo>\.claude\worktrees\wf_42496c94-3d0-2
 commits: aa24f2c Key versioning and rotation for APP_SECRET, stable domain-proof key, one verified domain per organisation
 fix commits: e27d347 Rotation script: refuse when verified domains have no domain-proof key of their own; runbook names the compose command; backup codes of the previous key tested through sign-in
 reviews: 2 (approve, approve)
@@ -79,7 +79,7 @@ Not checked: the full test suite (the orchestrator runs it), and running scripts
 
 ## fix
 fixed:
-Finding 1 (secret-rotation.ts): rotationRefusal now takes a verifiedDomains count and refuses when APP_DOMAIN_PROOF_SECRET is unset while any tenant has domain_verified_at set, naming step 1 of the runbook; new countVerifiedDomains(db) helper; scripts/rotate-secret.ts checks it after opening the database (C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-2/portal/src/server/services/secret-rotation.ts, portal/scripts/rotate-secret.ts). Test on the in-memory DB in portal/tests/crypto.test.ts ('refuses a rotation that would break published domain proofs').
+Finding 1 (secret-rotation.ts): rotationRefusal now takes a verifiedDomains count and refuses when APP_DOMAIN_PROOF_SECRET is unset while any tenant has domain_verified_at set, naming step 1 of the runbook; new countVerifiedDomains(db) helper; scripts/rotate-secret.ts checks it after opening the database (<repo>/.claude/worktrees/wf_42496c94-3d0-2/portal/src/server/services/secret-rotation.ts, portal/scripts/rotate-secret.ts). Test on the in-memory DB in portal/tests/crypto.test.ts ('refuses a rotation that would break published domain proofs').
 Findings 2 and 5 (Dockerfile / OPERATIONS.md step 3): the runbook now says the runtime image ships neither tsx nor the TypeScript scripts, to run the script from a checkout of the deployed version (npm ci) with DATABASE_URL, both keys and APP_DOMAIN_PROOF_SECRET exported, and gives the compose command `docker compose --profile tools run --rm seed npx tsx scripts/rotate-secret.ts` (the seed service is built from the builder stage and reads .env); it also documents the new domain-proof refusal. One comment line on the compose seed service points at this use (docs/OPERATIONS.md, portal/docker-compose.yml). No compiled rotate-secret.mjs was shipped.
 Finding 4 (crypto.test.ts backup codes): portal/tests/auth-security.test.ts gets a case that stores two codes hashed with APP_SECRET_PREVIOUS, runs verifySecondFactorAction with rotation on (first code accepted once, second attempt refused), then with rotation off (the other code refused and still stored). The env mock there became a hoisted object so previousSecret can be toggled.
 rejected:

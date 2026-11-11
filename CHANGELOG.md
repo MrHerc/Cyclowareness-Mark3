@@ -53,7 +53,8 @@ All notable changes to this project are recorded here. The format follows
   organisation. Without an open window the operator cannot create a link for an administrator.
   (`portal/src/server/actions/settings.ts`, `portal/src/server/actions/platform.ts`, test: `tests/step-up.test.ts`)
 - **Per-organisation data retention.** Settings → Protection → Data retention sets audit and learning
-  retention in months (0 to 120, 0 keeps everything and is the default). The daily clean-up deletes that
+  retention in months (0 to 120, 0 keeps everything and is the default; audit retention is 0 or at
+  least 12 months). The daily clean-up deletes that
   organisation's older audit entries, answers and closed behaviour risks within its time budget and
   records each purge as `retention.purged`; lesson progress, XP, attestations, certificates and open
   risks are never deleted. `docs/OPERATIONS.md` has a retention and residency section.
@@ -82,12 +83,66 @@ All notable changes to this project are recorded here. The format follows
   `tests/platform-metrics.test.ts`)
 - **Customer and English engineering documents.** `docs/ADMIN-GUIDE.md`, `docs/LEARNER-QUICKSTART.md`,
   `docs/SECURITY-WHITEPAPER.md`, an English index at the top of `docs/build/DECISIONS.md` and
-  `docs/build/OPEN-QUESTIONS.en.md`. The whitepaper was written before step-up, key rotation and
-  retention settings were merged and still lists them as not provided.
+  `docs/build/OPEN-QUESTIONS.en.md`. The whitepaper was updated after step-up, key rotation and
+  retention settings were merged and describes them as the code does.
 - **Cross-organisation test suite.** `portal/scripts/inventory-surface.ts` lists every exported server
   action and API route method with its guard (`portal/tests/fixtures/surface.json`), and
   `tests/cross-tenant.test.ts` calls each one with another organisation's ids and with a lower role and
   checks that the other organisation's rows stay unchanged; an entry point without a row fails the suite.
+- **Read-only reporting API.** Settings → Integrations → API tokens mints bearer tokens holding
+  `reports.read` or `people.read`, shown once and stored as SHA-256, at most 20 per organisation. A token
+  acts as its creator limited to its own permissions, opens only the report downloads and the people
+  export, never a write route, and is refused without the `integrations` plan feature (it can still be
+  revoked). Each token has its own rate limit; a creator's tokens share one quota apart from the console.
+  `docs/API.md` section 11. Whether a token should act as its creator is still an owner decision
+  (OPEN-QUESTIONS 60). (`portal/src/server/auth/api.ts`, `portal/src/server/auth/viewer.ts`, test:
+  `tests/api-tokens.test.ts`)
+- **Inbound report address.** Settings → Integrations creates a per-organisation secret (shown once,
+  stored as SHA-256) for `POST /api/inbound/{slug}`: a forwarded suspicious mail from an active employee
+  becomes an email threat report, and every other sender gets the same empty 202. 120 messages a minute,
+  the body read is capped at 1 MB, and only `APP_URL` tracking links count (Safe Links wrappers decoded
+  once). `docs/API.md` section 10. The mail provider per customer and forged From addresses are owner
+  items (OPEN-QUESTIONS 61). (`portal/src/app/api/inbound/[tenant]/route.ts`, test: `tests/secops-flows.test.ts`)
+- **Studio: edit after save, AI translation on publish, swipe and hotspot exercises.** One scene builder
+  serves save and edit; only a lesson it rebuilds exactly can be edited, and an edit that changes no text
+  keeps the translations. Publishing translates each lesson into the organisation's missing languages
+  (parity-checked, 200 calls per organisation per day, no per-language human review); a language that was
+  not translated shows the source text and the author is told. Sending customer lessons to the AI
+  provider for translation is an owner decision (OPEN-QUESTIONS 62).
+  (`portal/src/lib/content/studio.ts`, test: `tests/secops-flows.test.ts`)
+- **Market packs for German, French and Arabic.** `portal/scripts/apply-market.ts` applies
+  `content/market/<lang>.json` (Germany, France and Saudi Arabia; tr, ro, ka, uk and ru are skeletons) to
+  the committed de, fr and ar lesson files: local people, places, currency (amounts keep their value),
+  phones, IBANs, authorities, fictional brand analogues and addresses mapped from the English cast,
+  deterministic per lesson and idempotent. The lesson checker fails a market language that keeps an
+  Azerbaijani-world token. The packs were reviewed by AI only; native reviewers, the target countries and
+  the analogue names and domains are owner items (OPEN-QUESTIONS 66, 67).
+  (`portal/src/lib/content/market.ts`, test: `tests/market.test.ts`)
+- **Teachable-moment loop.** Within the hour after a simulation click, the person gets a hidden 90-second
+  micro-lesson built from the template's own texts (no AI, due in 7 days; completing it closes the click's
+  risk), then one harder e-mail or SMS re-simulation to that person only: 14 days after the lesson (21
+  after the assignment if it is not done), at 10:00 local time, at most one per person per 7 days. A
+  refused re-simulation launch cancels the campaign and closes the loop without a result; each click and
+  due loop is isolated, so one failure does not stop the others; the monthly refresher never picks a
+  micro-lesson. On by default (Settings → Learning, every plan), with a home card; the loops are in
+  "Download my data". The delays and the plan placement are owner items (OPEN-QUESTIONS 68).
+  (`portal/src/server/services/teachable.ts`, tests: `tests/teachable-loop.test.ts`, `tests/jobs-ops.test.ts`)
+- **A mini-lab for every module.** `content/library/labs/<module>.en.json` (`formatVersion` 1, 3 to 5
+  decisions from the module's own lesson artifacts) runs at `/lab/mini/<slug>` in the VM lab engine. The
+  chosen options are replayed on the server against the English file (10 to 15 XP); a mini-lab is optional
+  and never counts toward completion or certificates. Only shipped scenario files are read, so slugs from
+  requests never reach the cache. English only so far (0 of 477 translations), and 52 of the 53 scenarios
+  were drafted by a script and spot-reviewed. (`portal/src/lib/content/lab-scenario.ts`, test:
+  `tests/mini-labs.test.ts`)
+- **Narration clips with any provider.** `npm run narration -- --lang <lang> --provider
+  piper|azure|elevenlabs` makes clips and word timings with the build machine's ffmpeg. The 106 English
+  manifests (3,778 clips, made with Piper) are committed; the clips are git-ignored and made on the build
+  machine before `docker build` (`docs/OPERATIONS.md`). The player plays a clip first, reads a line whose
+  clip fails with the browser voice and notes the synthetic voice. Azerbaijani and Russian clips are not
+  made: they need the owner's Azure Speech key (`AZURE_SPEECH_KEY`, OPEN-QUESTIONS 2); the other seven
+  languages keep the browser voice. (`portal/scripts/generate-narration.ts`,
+  `portal/src/components/player/narrator.ts`, tests: `tests/narration-providers.test.ts`,
+  `tests/narration-manifests.test.ts`, `tests/narrator-audio.test.ts`)
 
 ### Changed
 
@@ -155,6 +210,64 @@ All notable changes to this project are recorded here. The format follows
 - **The operator overview's people count leaves out platform operator accounts**, the same count the
   seat export uses.
 - **The Azerbaijani quick-start block was removed from `portal/README.md`**; its English equivalents remain.
+- **Database migration `portal/drizzle/0005_wave_c.sql` (additive).** Tables `api_tokens` (reporting-API
+  tokens) and `job_runs` (when each hourly job last ran per organisation).
+- **Database migration `portal/drizzle/0006_wave_d.sql` (additive).** Table `teachable_loops` (one row per
+  clicked recipient) and the nullable `campaigns.user_id` of one-person re-simulations (set to null when
+  the person is deleted).
+- **Database migration `portal/drizzle/0007_phase5.sql`.** `api_tokens.expires_at` is added nullable,
+  filled with `created_at` + 365 days and then set NOT NULL, so existing tokens expire a year after their
+  creation; five indexes for clicked recipients, one-person campaigns, drill runs by campaign and the
+  teachable loops' campaigns. No migration renames re-simulations made before this release: no deployed
+  database holds them.
+- **Lesson format version 1 and strict scene schemas.** Every lesson file starts with `formatVersion: 1`,
+  which the schema requires and every writer stamps, Studio included; scene schemas list every key and
+  drop unknown ones. The library import writes only changed rows. (`portal/src/lib/content/validate.ts`,
+  `portal/scripts/add-format-version.ts`, tests: `tests/studio-lesson-format.test.ts`,
+  `tests/library-sync.test.ts`)
+- **Background jobs at scale.** Risk scores are written in one row-locked statement per 500 people;
+  reminders, manager alerts and refreshers run at most once an hour per organisation, so they can go out
+  up to 59 minutes later; launches insert recipients in chunks of 500; an assignment change rescores only
+  the people it affects (over 2,000 on the next tick). The k6 load test has not been run (OPEN-QUESTIONS
+  58). (`portal/src/server/jobs.ts`, `portal/src/server/services/risk.ts`, test: `tests/jobs-scale.test.ts`)
+- **Smaller pages.** Each route group ships only the message namespaces its client code reads, and the
+  mascot engine loads after mount: the first load of `/sign-in` is 42 KB and of `/app` 40 KB smaller
+  (gzip), while `/admin` carries about 2 % more message JSON. Profile photos reach the browser only through
+  `GET /api/avatar/{userId}` within the viewer's organisation, no longer as data URLs (they are still stored
+  as data URLs, OPEN-QUESTIONS 59). (`portal/src/i18n/messages.ts`, `portal/src/components/intl-scope.tsx`,
+  tests: `tests/client-messages.test.ts`, `tests/avatar-route.test.ts`)
+- **One result shape for server actions.** Forms report refusals through `useAction`, with a toast and a
+  Retry that repeats the exact call; a toast with an action stays until dismissed; the learner, admin and
+  operator segments have error boundaries that retry with a refetch. (`portal/src/components/ui/use-action.ts`,
+  `portal/src/lib/action-result.ts`, tests: `tests/use-action.test.ts`, `tests/toast.test.ts`)
+- **Lesson player and campaign wizard.** Scene callbacks keep one identity and no `exhaustive-deps`
+  suppression is left; campaign templates are resolved and previewed on the server; the refresher and
+  blocked-campaign texts moved out of code into `admin.json`. (`portal/src/components/player/player.tsx`,
+  tests: `tests/scenes-render.test.ts`, `tests/campaign-wizard.test.ts`)
+- **Legal texts name only the sign-in and integrations that exist.** LDAP, Active Directory, SAML and the
+  directory-report retention row are gone in ten languages; section 9 describes the per-organisation
+  checks instead of row-level security; AI Sel questions and answers are kept up to 12 months; Terms 4.2
+  states the 10-character password minimum. The editions stay Privacy v3 and Terms v2, still subject to the
+  lawyer's review (OPEN-QUESTIONS 63). (test: `tests/legal-content.test.ts`)
+- **The leadership risk trend compares one population.** Both ends average today's people in scope, today's
+  chart point reads the live scores, and only published modules are recommended.
+  (`portal/src/server/queries/risk-story.ts`, test: `tests/risk-story.test.ts`)
+- **Key ring follow-ups.** The key id is labelled (first 8 hex of `sha256("kid:" + secret)`);
+  `APP_SECRET_PREVIOUS` equal to `APP_SECRET` is refused by the app and by the rotation script, which also
+  runs as `npm run secret:rotate` and skips an organisation deleted mid-run; month cut-offs clamp to the
+  month's end. (`portal/src/server/crypto.ts`, `portal/src/server/env.ts`, tests: `tests/crypto.test.ts`,
+  `tests/env.test.ts`)
+- **Copy and accessibility.** Change-password refusals appear on their own field; the Support access text
+  says "password reset link" in ten languages; the simulation landing page announces its loading state to
+  screen readers; saving an unproven simulation sender names the sender field.
+  (tests: `tests/change-password-errors.test.ts`, `tests/teachable-beacon.test.ts`, `tests/simulation-sender.test.ts`)
+- **Learning-data retention covers simulation results.** When learning retention is set, the daily
+  clean-up also deletes closed teachable loops, the recipient rows of finished or cancelled campaigns,
+  daily risk snapshots and sandbox analyses (not an unresolved incident's evidence or the latest
+  analysis), and clears the forwarded text of handled threat reports (the report and its number stay). Progress, XP, attestations, certificates, lab
+  attempts and earned badges are never deleted. The setting's label says so in ten languages and
+  `docs/OPERATIONS.md` follows; the matching Privacy §8 sentence waits for the lawyer (OPEN-QUESTIONS 72).
+  (`portal/src/server/jobs.ts`, test: `tests/jobs-ops.test.ts`)
 
 ### Fixed
 
@@ -181,6 +294,41 @@ All notable changes to this project are recorded here. The format follows
   over 900 KB are now refused with a message. (test: `tests/people-import.test.ts`)
 - **Mail scanners and link prefetches recorded simulation clicks** because opening the page counted;
   known scanner user agents are now refused at the click beacon. (test: `tests/simulation-tracking.test.ts`)
+- **Large organisations could pass PostgreSQL's limit of 65,535 parameters per statement.** The daily risk
+  snapshot bound four values per person, and risk scoring, KPIs, the department league, the reports, the
+  compliance pack, the monthly refresher and targeted training bound one id per person. They now use
+  subqueries or one `INSERT … SELECT`; `notifyUsers`, `recomputeRisk` and `targetTraining` work in slices
+  of 1,000; campaign funnels are summed in SQL. An empty report scope now resolves nobody. Tests count the
+  bound parameters (1,200 people) and run the code at scale (8,200 to 70,000 rows).
+  (`portal/src/server/services/risk.ts`, `portal/src/server/reports/build.ts`, tests: `tests/jobs-scale.test.ts`, `tests/risk-story.test.ts`,
+  `tests/secops-flows.test.ts`, `tests/platform-metrics.test.ts`)
+- **A campaign launch that failed part-way left recipients behind**, and one failing campaign kept
+  `campaignTick` from launching the others; `launchCampaign` is one transaction and each campaign is
+  isolated with `logFailure`. (`portal/src/server/services/campaigns.ts`, test: `tests/campaign-flows.test.ts`)
+- **A drill could leave a campaign without its run**; `startDrill` creates the campaign, recipients and run
+  in one transaction, and two lease holders applying the same step file one report.
+  (`portal/src/server/services/drill.ts`, test: `tests/drill-service.test.ts`)
+- **A lesson completion or a Studio save that failed part-way left partial rows**; each is one transaction,
+  so nothing is stored and the same attempt can finish. (tests: `tests/learning-actions.test.ts`,
+  `tests/secops-flows.test.ts`)
+- **A branding colour change and a logo upload at the same moment lost one of them**; branding saves under a
+  row lock. (test: `tests/branding-settings.test.ts`)
+- **The simulation-sender domain check could fail a correct setup after a key change**; it checks the same
+  record the screen shows. (`portal/src/server/auth/domain-proof.ts`, test: `tests/simulation-sender.test.ts`)
+- **The person dialog's password field took the focus from the phone input**, and a refused invite or reset
+  link that was not about the password did nothing; it is now reported. (test: `tests/person-dialogs.test.ts`)
+- **A created invite or reset link was lost when the clipboard refused it**; a dialog shows it in a
+  read-only field with a copy button. (test: `tests/created-link.test.ts`)
+- **A lost lesson-attempt start was not sent again**; the player sends it with the next scene report.
+  (test: `tests/player-attempt.test.ts`)
+- **Drill pages**: the drill history chevron was mirrored twice on right-to-left pages, and the live drill's
+  reconnecting notice was not announced. (tests: `tests/rtl-logical.test.ts`, `tests/live-drill.test.ts`)
+- **The Georgian admin overview was 7 px wider than a 375 px screen**; the quick-action labels break long
+  words.
+- **The platform operator's CSV import silently demoted administrator rows**; it keeps their role, as the
+  add dialog does. (test: `tests/people-import.test.ts`)
+- **The English whaling-board lesson's legitimate sender wrote from another person's mailbox**, a false cue;
+  fixed in English and the six translations that copied it (az, ru, tr, ro, ka, uk).
 
 ### Security
 
@@ -226,6 +374,84 @@ All notable changes to this project are recorded here. The format follows
 - **Lesson slugs and keys over 100 characters are refused** before any query, and **the sign-off CSV
   shows IP addresses only to roles with audit access**.
   (tests: `tests/learning-actions.test.ts`, `tests/signoffs-route.test.ts`)
+- **Security audit of 2026-11-10.** Seven areas were audited and every finding was challenged by two
+  verifiers: the 16 confirmed findings were closed with tests, 5 were kept as intended and 229 controls
+  were verified present, complete and tested. Report: `docs/SECURITY-AUDIT-2026-11.md`; the entries below
+  list the changes. Plain-HTTP production, an idle timeout for administrators and the other kept items are
+  owner decisions (OPEN-QUESTIONS 53 to 57).
+- **More actions ask for the actor's own password.** Giving a person a new phone number (they get an in-app
+  notice), unlinking their single sign-on and re-pointing the organisation's sign-in (issuer, client id,
+  email claim, auto-create, the SSO switch, dropping the administrators' two-step rule). Console
+  permissions used inside self-service actions follow the administrators' two-step rule, and the SSO
+  settings test needs a session past two-step verification. (`portal/src/server/actions/people.ts`,
+  `portal/src/server/actions/settings.ts`, tests: `tests/step-up.test.ts`, `tests/viewer-gates.test.ts`,
+  `tests/sso-routes.test.ts`)
+- **Per-organisation ceilings.** Sign-in codes by SMS are capped at 500 per organisation and hour, without
+  telling the requester; AI Sel (2,000 calls), AI trainings (50) and AI lesson drafts (100) have daily
+  budgets per organisation, and cached answers stay free; an anonymous SSO start opens a rate-limit bucket
+  only for an organisation that exists. (tests: `tests/auth-security.test.ts`,
+  `tests/ai-tenant-budget.test.ts`, `tests/sso-routes.test.ts`)
+- **Audit trail.** Audit retention is 0 or at least 12 months, in the settings and in the clean-up job; the
+  entries that record a retention change or a purge are never purged; downloading the USB drop kit and
+  viewing a certificate while signed in are audited (`campaign.usb_kit_downloaded`,
+  `certificate.downloaded`), anonymous verifications are not. (tests: `tests/retention-settings.test.ts`,
+  `tests/jobs-ops.test.ts`, `tests/export-audit.test.ts`)
+- **SVG logos are read three ways.** The check compares the raw text, the XML parser's reading and the CSS
+  reading of that, and refuses whatever makes them differ: SMIL animation, refused names under any prefix,
+  a DOCTYPE beyond the plain form, unknown entity references, `xml:base`, the XHTML and MathML namespaces,
+  CSS `image-set(`, `image(` and `src(`. It runs in linear time. Some legitimate files are refused on
+  purpose (embedded raster images, old Illustrator exports, logos inside a link, embedded fonts;
+  OPEN-QUESTIONS 55). (`portal/src/server/svg-safety.ts`, tests: `tests/svg-sanitize.test.ts`,
+  `tests/regex-dos.test.ts`)
+- **Sandbox e-mail indicators are capped at 254 characters**, and **Markdown renders a protocol-relative
+  link disguised as a path as text**. (`portal/src/server/sandbox/analyze.ts`, `portal/src/lib/markdown.tsx`,
+  tests: `tests/sandbox.test.ts`, `tests/rendering.test.ts`)
+- **Security regression tests prove the guard they name.** Cross-organisation rows pass the earlier gates,
+  so a refusal can only come from the organisation check; the department-head scope, the production CSP,
+  the client-header override and the build-time headers are pinned. (tests: `tests/cross-tenant.test.ts`,
+  `tests/proxy-hsts.test.ts`)
+- **Phase 5 follow-up review of 2026-11-11.** Seven reviewers looked at the branch after wave D, and
+  verifiers who tried to refute each finding checked it: 44 findings were confirmed and closed with tests,
+  and 6 were refuted. Report: `docs/SECURITY-AUDIT-2026-11.md`, section "Phase 5 follow-up review
+  (2026-11-11)"; the entries below list the changes. The owner decisions are OPEN-QUESTIONS 70 to 74.
+- **Reporting-API tokens expire and end with their creator's sessions.** A lifetime of 30, 90, 180 or 365
+  days is chosen in the settings (any whole number up to 365 through the action; 90 by default); an
+  expired token gets 401 `expired`, is audited and frees its slot. Minting asks for the actor's password, so an administrator who signs in only by SSO cannot mint,
+  and notifies the other active administrators. A password change or reset, a two-step reset, signing out
+  other devices, a suspension or a role change revokes the creator's live tokens, each with an
+  `api_token.revoked` entry and its reason; turning on two-step verification keeps them, and restoring the
+  role or reactivating the account does not revive them. The revocation scope and the default lifetime are
+  owner decisions (OPEN-QUESTIONS 70). (`portal/src/lib/api-tokens.ts`, `portal/src/server/auth/session.ts`,
+  tests: `tests/api-tokens.test.ts`, `tests/step-up.test.ts`)
+- **One-person re-simulations carry no name.** A re-simulation is named "{template}: re-simulation" in the
+  organisation's language and linked to the person only through `campaigns.user_id`, so its name, audit
+  entry, click risk and webhook payload name no one. The leadership risk story and the campaigns list leave
+  re-simulations out, while the page's totals still count them. Payloads already delivered cannot be
+  recalled. The campaigns-page totals and the cancelled page's missing reason are owner items
+  (OPEN-QUESTIONS 74). (`portal/src/server/services/teachable.ts`, tests: `tests/teachable-loop.test.ts`,
+  `tests/campaigns-index.test.ts`, `tests/risk-story.test.ts`)
+- **Account deletion removes more.** `anonymise()` also renames the person's one-person campaigns to "—",
+  scrubs that name from click-risk titles and their audit entries, deletes the manager and deletion notices
+  and the queued manager-alert e-mails that link to the person (mail already sent stays until the 90-day
+  outbox retention) and nulls the IP of the audit entries the person made. Takeover security notices stay
+  as a trace. Manager alerts lock the person's row `FOR SHARE`, so a deletion commits first or removes the
+  notice afterwards; PGlite cannot test this against a real concurrent deletion. An administrator cannot
+  decide their own deletion request. The takeover notices and the IP nulling are owner decisions
+  (OPEN-QUESTIONS 71). (`portal/src/server/actions/people.ts`, tests: `tests/people-operator.test.ts`,
+  `tests/manager-alerts.test.ts`)
+- **Backups are for the owner only and can be encrypted.** `backup.sh` sets `umask 077` and `chmod 700`;
+  with `BACKUP_AGE_RECIPIENT` set, each dump is encrypted with age on its way to disk. `restore.sh` needs
+  `BACKUP_AGE_IDENTITY` for such a dump and stops before emptying the database if decryption fails. Keep
+  `APP_SECRET` and the age identity apart from the dumps. Encryption at rest is a hosting decision
+  (OPEN-QUESTIONS 73). (`portal/scripts/backup.sh`, `portal/scripts/restore.sh`, test:
+  `tests/backup-script.test.ts`, whose shell tests skip on Windows without `sh`)
+- **SMTP failure logs carry no address**, only `<address>` and the nodemailer error codes (`code`,
+  `responseCode`). (`portal/src/server/mail.ts`, test: `tests/outbox-redact.test.ts`)
+- **A CSV import commit that reports problems is rate-limited too** (a clean commit stays free) and no
+  longer reveals which addresses exist, **webhook and syslog destination changes are audited** (a webhook
+  by its origin only), and **a draft module's mini-lab counts only for an author who meets the
+  administrators' two-step rule**.
+  (tests: `tests/people-import.test.ts`, `tests/secops-flows.test.ts`, `tests/mini-labs.test.ts`)
 
 ## Phase 0 - CI, tests and ten fixes (merged 2026-11-05, unreleased)
 

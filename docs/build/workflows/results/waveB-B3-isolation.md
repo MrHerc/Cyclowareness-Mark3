@@ -1,9 +1,9 @@
 # B3-isolation
 
 branch: worktree-wf_42496c94-3d0-3
-worktree: C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-3
+worktree: <repo>\.claude\worktrees\wf_42496c94-3d0-3
 commits: 1681edd Tutor cache per organisation, capped lesson keys, sign-off IPs for audit roles only ; 83e2722 Generated cross-organisation and lower-role suite over the whole server surface
-fix commits: 262dd17 Cross-tenant suite: inventory by "use server" directive, gate-level learner pass, wider snapshot (branch worktree-wf_42496c94-3d0-3, on top of 83e2722 and 1681edd; worktree C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-3; files: portal/scripts/inventory-surface.ts, portal/tests/cross-tenant.test.ts, portal/tests/fixtures/surface.json)
+fix commits: 262dd17 Cross-tenant suite: inventory by "use server" directive, gate-level learner pass, wider snapshot (branch worktree-wf_42496c94-3d0-3, on top of 83e2722 and 1681edd; worktree <repo>\.claude\worktrees\wf_42496c94-3d0-3; files: portal/scripts/inventory-surface.ts, portal/tests/cross-tenant.test.ts, portal/tests/fixtures/surface.json)
 reviews: 2 (changes_required, changes_required)
 
 ## summary
@@ -38,7 +38,7 @@ portal/tests/tutor.test.ts: tutorCacheId changes with the organisation
 
 ## reviews
 changes_required
-Reviewed read-only in C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-3 (HEAD 83e2722, contains 1a45970). Verified myself in that worktree: `npm run typecheck` exit 0, `npx eslint src tests scripts --max-warnings=0` exit 0, `npx vitest run` on the five touched/added files: 5 files, 186 tests passed (cross-tenant.test.ts included, ~20 s).
+Reviewed read-only in <repo>/.claude/worktrees/wf_42496c94-3d0-3 (HEAD 83e2722, contains 1a45970). Verified myself in that worktree: `npm run typecheck` exit 0, `npx eslint src tests scripts --max-warnings=0` exit 0, `npx vitest run` on the five touched/added files: 5 files, 186 tests passed (cross-tenant.test.ts included, ~20 s).
 
 Attacker pass on the three code changes, nothing found: (S-10) tutorCacheId puts v.tenant.id first in the sha256 input with `|` separators and the route inserts tenantId from the viewer, so a library-lesson answer can no longer be replayed to another organisation; subtitles cache (not in scope) stays keyed by lesson text only, which is lesson content, not tenant data. (S-11 c) lessonOf rejects non-string or >100-char slug/lessonKey before any query and still resolves the key against the module's own lessons, for start, reach and complete alike; reachSceneAction keeps its index bounds and rate limit. (S-11 d) `can(role, "audit.read")` is equivalent to `allowed()` here because audit.read has no PERMISSION_FEATURE entry; content_creator (policies.read) loses the IP header and value, analyst/tenant_admin keep them; tenant predicate on the policy and users unchanged.
 

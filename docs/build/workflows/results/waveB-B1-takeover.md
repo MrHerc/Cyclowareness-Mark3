@@ -1,7 +1,7 @@
 # B1-takeover
 
 branch: worktree-wf_42496c94-3d0-1
-worktree: C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-1
+worktree: <repo>\.claude\worktrees\wf_42496c94-3d0-1
 commits: 7d76156 Step-up password, notices and a consented support window for account-takeover tooling (S-06)
 fix commits: d1c6750 S-06 review fixes: invite links only for never-activated accounts, suspended targets notified, step-up failures name the target (branch worktree-wf_42496c94-3d0-1, on top of 7d76156)
 reviews: 2 (changes_required, approve)

@@ -1,7 +1,7 @@
 # B6-docs-en
 
 branch: worktree-wf_42496c94-3d0-6
-worktree: C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-6
+worktree: <repo>\.claude\worktrees\wf_42496c94-3d0-6
 commits: 324b8aa English engineering index, customer guides and whitepaper, report-mail copy
 fix commits: 2d1c463 Whitepaper and quickstart: narrow the GET claim, state who must use 2FA
 reviews: 2 (approve, approve)

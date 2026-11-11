@@ -1,7 +1,7 @@
 # B5-retention
 
 branch: worktree-wf_42496c94-3d0-5
-worktree: C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-5
+worktree: <repo>\.claude\worktrees\wf_42496c94-3d0-5
 commits: 4507973 Per-organisation data retention enforced by the daily clean-up (L-03)
 fix commits: 4507973 Per-organisation data retention enforced by the daily clean-up (L-03) ; 21c13b1 Retention purges are audited, answers indexed by organisation and time (L-03 review) ; 7c0bd45 Retention: restore LF line endings, test the clean-up time budget (L-03 review)
 reviews: 2 (changes_required, changes_required)

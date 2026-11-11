@@ -10,6 +10,8 @@
 
 Previous review: `docs/SECURITY_REVIEW.md` (2026-11-05). Decisions: ADR-052 to ADR-058 in `docs/build/DECISIONS.md`. Owner questions: items 53 to 57 in `docs/build/OPEN-QUESTIONS.md` (English mirror `OPEN-QUESTIONS.en.md`).
 
+Follow-up: the section "Phase 5 follow-up review (2026-11-11)" at the end of this file (44 confirmed findings, all closed; ADR-075 to ADR-081; OPEN-QUESTIONS 70 to 74).
+
 ## Summary
 
 This was a defensive control audit of the portal after wave B. Seven areas of security controls were read against the code at `a139d56`. For each control the auditors asked three things: is it present, is it complete, and is it tested. 229 controls passed all three (Appendix A). The auditor for Server Actions found no cross-tenant read or write and no action without its permission check; findings 1 to 3 were missing step-up and two-step checks on actions an administrator is allowed to take.
@@ -535,3 +537,94 @@ The 229 controls the auditors verified as present, complete and tested, in the o
 227. Audit entries written for every privileged mutation reviewed: people (`person.*`, people.imported and exported, invite links, 2fa_reset, sso.unlinked), platform (tenant.created and changed, platform.admin_link), settings through saveSettings (`settings.*`), workspace (`department.*`, `assignment.*`, `policy.*`), campaigns, drill, reports, secops, incidents and loops, Studio modules, paths and sessions — server/actions/people.ts:166-393, platform.ts:50-183, settings.ts:45-586, workspace.ts:67-411, secops.ts:43-744; server/services/secops.ts:49-224 [export entries added by finding 16]
 228. Audit meta sanitised (U+0000 removed), so no entry fails to write — server/services/audit.ts:143-174
 229. Risk recomputation emits risk.threshold_crossed once, through a conditional update — server/services/risk.ts:126-133
+
+## Phase 5 follow-up review (2026-11-11)
+
+A final review of the branch after wave D, on `3eccb2c`. Like the audit above, it was defensive: controls were read, traced and tested in code. Decisions: ADR-075 to ADR-081 in `docs/build/DECISIONS.md`. Owner questions: items 70 to 74 in `docs/build/OPEN-QUESTIONS.md` (English mirror `OPEN-QUESTIONS.en.md`).
+
+### Method
+
+Workflow `wf_71af126a-b7f` ran seven independent reviewers. Each is an installed agent type with its own lens. All ran on Claude Opus, as the owner chose when Mythos was not available.
+
+| Reviewer | Lens | Finding ids |
+|---|---|---|
+| `ecc:security-reviewer` | Security | SEC |
+| `agent-skills:security-auditor` | Threat model and hardening | TM |
+| `ecc:code-reviewer` | Code | F |
+| `ecc:react-reviewer` | React | R |
+| `ecc:typescript-reviewer` | TypeScript | TS |
+| `ecc:database-reviewer` | Database | DB |
+| `agent-skills:test-engineer` | Test coverage | T |
+
+Each finding of severity minor or above then went to verifiers told to refute it: one verifier for a minor, two for a major or blocker. A finding counted only when every verifier confirmed it. The run used 77 agents with 0 errors. 50 findings were verified: 44 were confirmed (12 major and 32 minor, by the verifiers' own ratings) and 6 were refuted (SEC-03, SEC-04, TM-05, TM-09, TM-10, TS-09). 7 nits were not verified. A second-model review with Codex CLI was tried once, but `codex exec` still crashes on this computer (exit 139, OPEN-QUESTIONS 24), so the review rests on the seven reviewers.
+
+### Security-relevant findings and how they are closed
+
+Severity is the verifiers' rating. Every confirmed finding is closed with a test.
+
+| Id | Severity | Missing or incomplete control | How it is enforced now | Commit(s) | ADR |
+|---|---|---|---|---|---|
+| SEC-01, SEC-02, TM-07 | Minor | A reporting-API token outlived every credential reset of its creator. It was minted with a session alone, nobody was told, and it never expired. | A lifetime is chosen at minting: 30, 90, 180 or 365 days in the settings (the action accepts any whole number of days up to 365), 90 by default (`api_tokens.expires_at`). An expired token gets 401, is audited as `api_token.refused` with reason `expired`, and frees its slot under the 20-token cap. Minting takes the actor's password (step-up), so an SSO-only administrator cannot mint, and the other active administrators get an in-app security notice. Revocation: see below. | `821ceda`, `ec3365f`, `a420aec` | ADR-075 |
+| TM-03 | Major | Account deletion left the person's name in re-simulation campaigns, click risks, audit meta and manager alerts, and kept the IP of the person's own audit entries. | Deletion scope: see below. | `6dfb243`, `8f5a5c4`, `32ead44`, `a420aec` | ADR-076 |
+| TM-01, TM-02 | Major | A one-person re-simulation carried the person's full name in its campaign name, and so in webhooks, syslog, audit entries, reports and the leadership risk story. | The name is neutral (`{template}: re-simulation` in the organisation's language). The person is linked only through `campaigns.user_id` and shown on the campaign page at render. Re-simulations are left out of the risk story's campaign comparison. | `475b2b6`, `32ead44` | ADR-079 |
+| TM-04 | Major | The learning-data retention did not cover per-person simulation results, teachable loops, daily risk snapshots, reported mail text or sandbox analyses. | Retention: see below. | `b96f6e7`, `304dd4c`, `a420aec` | ADR-077 |
+| TS-01 | Major | The simulation-sender domain proof checked a TXT value derived from `APP_SECRET`, not the one the screen shows. A correct setup failed after a key change (the check failed closed). | `verifySimulationDomainAction` checks `domainProofRecords()`, the same records as the other domain-proof checks, the previous key included during a rotation. | `821ceda` | — |
+| TS-02 | Major | A CSV import called with `commit=true` skipped the import rate limit but still answered which addresses exist. | A commit that reports problems is charged against the same limit as a check (20 per hour per administrator). Once the limit is used up, the answer is `rateLimited` with no problem list. A clean commit stays free. | `6dfb243` | — |
+| SEC-07 | Minor | Learner-side pages showed draft Studio modules to authors who did not meet the administrators' two-step rule. | The module, lesson and mini-lab pages and the VM-lab action show drafts only when `privileged(v, "studio.write")` holds, which applies the two-step rule. | `821ceda` | — |
+| SEC-05, F2 | Major | The mini-lab scenario cache kept an entry for every slug a request supplied, misses included, before any rate limit or catalog check. | Only shipped scenario files are looked up. The file list is read once at start, and an unknown slug never reaches the file system or the cache. | `a6cbc53` | — |
+| SEC-06 | Minor | A change of the webhook or syslog destination was audited without the destination. | The change is audited with the destination, a webhook by its origin only (hook URLs often carry a token). | `821ceda` | — |
+| TM-06 | Minor | Backups held every organisation in plain text with default file permissions, and the script comment said to copy them together with `APP_SECRET`. | Backups: see below. | `b96f6e7` | ADR-080 |
+| TM-08 | Minor | SMTP failure messages with recipient addresses went to the production log. | Addresses in the logged message are replaced by `<address>`; the nodemailer codes stay. | `b96f6e7` | ADR-080 |
+
+**Token revocation (SEC-01).** `invalidateUserSessions` (`src/server/auth/session.ts`) takes a reason and has no default. With a reason, it also revokes the creator's live tokens and writes one `api_token.revoked` entry per token, with no actor and `meta.reason`: `password_change`, `password_reset`, `2fa_reset`, `other_devices_signed_out`, `suspended` or `role_changed`. Turning on two-step verification signs the other sessions out but keeps the tokens (reason `null`). A restored role or a reactivation does not revive a revoked token. ADR-064 item 3 now applies only to a demotion that ends no sessions. Migration `0007_phase5` gave existing tokens an expiry one year after their creation (ADR-081).
+
+**Deletion scope (TM-03).** `anonymise()` (`src/server/actions/people.ts`) runs in one transaction. Besides the users row, sessions, sign-in links, mail to the person and sign-off IPs, it now also:
+
+- scrubs the stored campaign name from click-risk titles, renames the person's one-person campaigns to "—" and drops `meta.name` from their audit entries;
+- deletes the manager and deletion notices that link to the person, and any queued manager-alert e-mails;
+- sets to null the IP of every audit entry the person made as actor (one reading of Privacy §8).
+
+Mail already sent stays until the 90-day outbox retention. Security notices about a takeover-level action (`notifyTakeover`, kind `security`) stay as a trace. Manager alerts check the person and write their notice in one transaction, with the person's row locked `FOR SHARE`, so a deletion either commits first or removes the notice afterwards. An administrator cannot decide their own deletion request (`decideDeletionAction`, `8f5a5c4`).
+
+**Retention (TM-04).** The per-organisation learning-data period (`learningMonths`, `cleanup()` in `src/server/jobs.ts`) now also deletes closed teachable loops, the recipient rows of finished or cancelled campaigns (their loops cascade), daily per-person risk snapshots, and sandbox analyses. The evidence of an unresolved incident and the analysis with the highest SB number stay. A handled threat report loses only its forwarded text and link; the row and its TR number stay. Progress, XP, attestations, certificates, lab attempts and earned badges are never deleted. The first version also deleted lab attempts, which badges and path progress are earned from; `304dd4c` reverted that. Each new kind is counted in `retention.purged`. The setting's label and hint were updated in ten languages, and so was `docs/OPERATIONS.md`.
+
+**Backups (TM-06).** `scripts/backup.sh` sets `umask 077` and `chmod 700` on the backup folder. With `BACKUP_AGE_RECIPIENT` set, it encrypts each dump with age on its way to disk, so no plain-text copy is written. A marker file makes up for `sh` having no `pipefail`, and pruning covers both file extensions. `scripts/restore.sh` needs `BACKUP_AGE_IDENTITY` for an encrypted dump and stops before emptying the database if decryption fails. The header comment now says to keep `APP_SECRET` apart from the dumps; the age identity is kept apart the same way. Without `BACKUP_AGE_RECIPIENT`, the dumps are plain text, as before.
+
+The other 29 confirmed findings were code, React, TypeScript, database and test findings. Among them: bind-parameter limits at organisation scale (ADR-078), an atomic campaign launch and isolated failures in the campaign and teachable ticks (ADR-079), an atomic drill start, a branding save under a row lock (TS-07), and the step-up password field that took focus from the phone input (R1).
+
+### Fixes, merges and recheck
+
+- **Fix run.** Workflow `wf_b7730449-a42`: five packages, each in its own worktree reset to `3eccb2c`, all on Opus, 20 agents, 0 errors. P1 accounts and tokens, P2 people and privacy, P3 teachable loop and campaigns, P4 scale, retention and operations, P5 drill, lab and player. Two lenses reviewed each package. P1, P2 and P5 were approved by both. P3 (line endings of the admin message files) and P4 (retention deleted lab attempts) got a major each, fixed in their fix round (`32ead44`, `304dd4c`).
+- **Merges.** In the order P1, P4, P2, P3, P5 (`99b496b`, `156d7c1`, `3bda8f2`, `d2e1d35`, `fba4bec`). Migration `0007_phase5.sql` (`61e53f1`) adds `api_tokens.expires_at` as nullable, fills it with `created_at` + 365 days, then sets it NOT NULL; this was checked on an in-memory database holding a token. The same file adds five indexes (ADR-081).
+- **Recheck.** Workflow `wf_3ec78853-ecb`: six read-only rechecks on Opus. All 44 findings were found closed with tests, and every package was approved. The merges lens found that P1 and P2 treated role changes and tokens differently, plus minors. A new fixer and checker (`wf_f20ec4d4-3c6`) and a last pass (`wf_bdc2235b-fae`) closed them, and the orchestrator added the scrub of queued manager-alert e-mails. Result: a role change revokes the creator's tokens, and `invalidateUserSessions` has no default reason. Commit `a420aec`.
+
+### Checks at `a420aec`
+
+| Check | Result |
+|---|---|
+| Typecheck (`npm --prefix portal run typecheck`) | Clean |
+| Lint (`npx eslint src tests scripts --max-warnings=0`) | Clean, 0 warnings |
+| Unit tests (`npx vitest run`) | 151 files, 3708 tests pass |
+| Lesson translations (`scripts/check-lesson-locales.ts --coverage`) | 954 of 954 |
+| Production build | Passes, with the post-build check (at `61e53f1`) |
+| Playwright smoke suite | 6 of 6 pass (at `85e475c`) |
+
+### Limits of this review
+
+- PGlite runs one connection, so no test runs the `FOR SHARE` lock against a real concurrent deletion. The reasoning holds for PostgreSQL READ COMMITTED.
+- The bind-parameter test helper sees only queries outside a transaction.
+- Webhook or syslog payloads already delivered with a person's name cannot be recalled.
+- On Windows the backup-script shell tests skip when `sh` is not on PATH, and the permission checks run only on POSIX. The scripts have not been run on a live compose stack.
+- The limits of the audit above still apply: no external penetration test, and no attack against a deployed instance.
+
+### What remains for the owner
+
+These are owner decisions. They are not closed:
+
+- OPEN-QUESTIONS 70: the token revocation scope (a role change revokes, turning on two-step verification keeps) and the default lifetime of 90 days. Whose identity a token carries stays question 60.
+- OPEN-QUESTIONS 71: after a deletion, the takeover security notices kept as a trace, and the nulled actor IPs (Privacy §8).
+- OPEN-QUESTIONS 72: a Privacy §8 sentence for the extended learning-data retention, for the lawyer (with question 65).
+- OPEN-QUESTIONS 73: encryption of backups at rest as a hosting decision, and where the age identity is kept (with questions 12 and 33).
+- OPEN-QUESTIONS 74: re-simulations in the campaigns-page totals, and the missing refusal reason on a cancelled re-simulation's page.
+- OPEN-QUESTIONS 24 (the Codex CLI crash) and 69 (a DOM test environment for component tests) stay open.
+- Every commit is local and the branch has not been pushed; the push is the owner's step.

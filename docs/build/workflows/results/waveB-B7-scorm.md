@@ -1,7 +1,7 @@
 # B7-scorm
 
 branch: worktree-wf_42496c94-3d0-7
-worktree: C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-7
+worktree: <repo>\.claude\worktrees\wf_42496c94-3d0-7
 commits: c645aba B7-scorm: SCORM 1.2 export of a module with an offline player
 fix commits: 53a835d B7-scorm review fixes: stable lesson on finish, export list and errors, stale bundle
 reviews: 2 (changes_required, changes_required)

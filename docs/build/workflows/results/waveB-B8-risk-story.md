@@ -1,7 +1,7 @@
 # B8-risk-story
 
 branch: worktree-wf_42496c94-3d0-8
-worktree: C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-8
+worktree: <repo>\.claude\worktrees\wf_42496c94-3d0-8
 commits: aced5b2 Leadership risk story: data-driven sentences in ten languages, also in the compliance pack ; 3bfc60d Risk story: share the department-filter narrowing with the reports, wrap long tile labels
 fix commits: 036fb0f Risk story: as-of title in the compliance pack, skip modules already assigned, wrap department name
 reviews: 2 (changes_required, approve)

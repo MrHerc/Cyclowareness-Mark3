@@ -39,24 +39,26 @@ Two published values still need action:
 
 | ID | Severity | Finding | OWASP / ASVS | Status |
 |---|---|---|---|---|
-| H-1 | High | Published demo password opens every seeded account, including the platform operator | A07, ASVS 2.1, 14.1 | Mitigated in code; rotation required |
+| H-1 | High | Published demo password opens every seeded account, including the platform operator | A07, ASVS 2.1, 14.1 | Mitigated in code; rotation required (owner, OPEN-QUESTIONS 28) |
 | M-1 | Medium | No automated dependency or secret scanning | A06, ASVS 14.2.1 | Fixed |
 | L-1 | Low | Vulnerable `minimatch` in the ESLint toolchain (8 npm audit entries) | A06 | Fixed |
 | L-2 | Low | People CSV import stores unbounded field lengths | A04, ASVS 5.1.4 | Fixed |
 | L-3 | Low | Studio training draft accepted any amount of extra JSON | A04, ASVS 5.1.4 | Fixed |
-| L-4 | Low | SMS gateway over plain HTTP accepted silently | A02, ASVS 9.2.1 | Mitigated |
-| L-5 | Low | Tenant admins can tell whether an email or phone has an account in any tenant | A01, ASVS 2.2 | Open |
-| L-6 | Low | Developer machine paths, user name and agent session IDs published | A05 | Open |
-| L-7 | Low | A tenant admin can take over a peer tenant admin's account | A01, A07 | Open (design) |
-| L-8 | Low | Signed-in people cannot change their password | ASVS 2.1.5, 2.1.6 | Open |
-| L-9 | Low | No rate limit on domain verification and test email | A04, ASVS 11.1.4 | Open |
+| L-4 | Low | SMS gateway over plain HTTP accepted silently | A02, ASVS 9.2.1 | Mitigated (production warns at start-up; `http://` is not refused) |
+| L-5 | Low | Tenant admins can tell whether an email or phone has an account in any tenant | A01, ASVS 2.2 | Mitigated (wave A): a neutral `cannotAdd` answer for another organisation's address or number, and rate limits on adding, phone changes and the import; OPEN-QUESTIONS 41 |
+| L-6 | Low | Developer machine paths, user name and agent session IDs published | A05 | Fixed: in wave A for the files named; the 14 files added later under `docs/build/workflows/` use the `<repo>` placeholder since 2026-11-11 (git history keeps the old values, as the remediation accepts) |
+| L-7 | Low | A tenant admin can take over a peer tenant admin's account | A01, A07 | Mitigated (wave B): step-up, and an in-app notice and email to the person (ADR-044); no second approver (OPEN-QUESTIONS 42) |
+| L-8 | Low | Signed-in people cannot change their password | ASVS 2.1.5, 2.1.6 | Fixed (wave A) |
+| L-9 | Low | No rate limit on domain verification and test email | A04, ASVS 11.1.4 | Fixed (wave A) |
 | I-1 | Info | Notification placeholders could print inherited object members | A03 | Fixed |
-| I-2 | Info | A TOTP code can be reused within its 90-second window | ASVS 2.8.4 (L2) | Open |
+| I-2 | Info | A TOTP code can be reused within its 90-second window | ASVS 2.8.4 (L2) | Fixed (wave A) |
 | I-3 | Info | CSP allows inline styles | A05 | Accepted |
-| I-4 | Info | Docker base image pinned by tag, not digest | A08 | Open |
+| I-4 | Info | Docker base image pinned by tag, not digest | A08 | Fixed (wave B) |
 | I-5 | Info | Development mode uses a public fallback secret and relaxes outbound checks | A05 | Accepted |
-| I-6 | Info | LDAP settings are stored without destination checks | A10 | Open |
+| I-6 | Info | LDAP settings are stored without destination checks | A10 | Open (no LDAP client exists yet) |
 | I-7 | Info | Framework patch releases are available | A06 | Open |
+
+**Status at HEAD `85e475c` (2026-11-11).** Only the Status column above was updated, after checking each finding in the code. The rest of this review is unchanged: its summary counts, file and line references and next steps describe the code of 2026-11-05. At HEAD the 18 findings stand at: High 1 mitigated; Medium 1 fixed; Low 6 fixed, 3 mitigated; Info 3 fixed, 2 accepted, 2 open (I-6, I-7). The later reviews are in `docs/SECURITY-AUDIT-2026-11.md`: the defensive control audit of 2026-11-10 (16 findings, all closed) and its section "Phase 5 follow-up review (2026-11-11)" (44 confirmed findings, all closed; owner questions 70 to 74 in `docs/build/OPEN-QUESTIONS.md`).
 
 ### H-1 Published demo password opens every seeded account (High)
 
@@ -224,7 +226,7 @@ The LDAP URL, bind DN and filter in Settings (`settings.ts:192`) are saved witho
 | A02 Cryptographic Failures | AES-256-GCM for stored secrets, Argon2id, HSTS; L-4 for the SMS gateway |
 | A03 Injection | None found; I-1 fixed |
 | A04 Insecure Design | L-2 and L-3 fixed; L-9 open |
-| A05 Security Misconfiguration | Strong production defaults; L-6 open; I-5 accepted |
+| A05 Security Misconfiguration | Strong production defaults; L-6 fixed; I-5 accepted |
 | A06 Vulnerable and Outdated Components | L-1 fixed; scanning and updates added (M-1) |
 | A07 Identification and Authentication Failures | H-1 mitigated, rotation required; L-8 open |
 | A08 Software and Data Integrity Failures | Actions pinned by SHA, lockfile signatures checked in CI; I-4 open |

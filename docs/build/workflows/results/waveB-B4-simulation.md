@@ -1,7 +1,7 @@
 # B4-simulation
 
 branch: worktree-wf_42496c94-3d0-4
-worktree: C:\Users\Safar\Desktop\Cyclowareness- Vol2\.claude\worktrees\wf_42496c94-3d0-4
+worktree: <repo>\.claude\worktrees\wf_42496c94-3d0-4
 commits: fea9051 Simulation clicks by beacon, simulation sender on a proven look-alike domain, delivery guide, image digests
 fix commits: b8152e2 Review fixes: lesson link without JavaScript, via known limit noted (branch worktree-wf_42496c94-3d0-4, on top of cd4717e and fea9051)
 reviews: 2 (approve, approve)
@@ -78,8 +78,8 @@ Not checked: I did not exercise the UI in a browser, and I did not run the full 
 
 ## fix
 fixed:
-Finding 3 (teachable.tsx beacon stage blank without JavaScript): the beacon stage now renders a <noscript> line with the lesson title and a link to /learn/<moduleSlug> (existing site.teach keys, no new strings), so a client without JavaScript or a failed hydration still reaches the teaching content; its click stays uncounted as the brief accepts. File: C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-4/portal/src/components/site/teachable.tsx
-Finding 1 (via chosen by the client): accepted as a known limit with a shortcut comment on simulationClickAction in C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-4/portal/src/server/actions/campaigns.ts. The suggested separate simulationScanAction was not added: a server action is a public endpoint, so a /t token could be posted to it just as easily; only encoding the channel in the token itself would move the decision to the server, and the impact is one mislabelled event name for that recipient (risk entry and click are identical).
+Finding 3 (teachable.tsx beacon stage blank without JavaScript): the beacon stage now renders a <noscript> line with the lesson title and a link to /learn/<moduleSlug> (existing site.teach keys, no new strings), so a client without JavaScript or a failed hydration still reaches the teaching content; its click stays uncounted as the brief accepts. File: <repo>/.claude/worktrees/wf_42496c94-3d0-4/portal/src/components/site/teachable.tsx
+Finding 1 (via chosen by the client): accepted as a known limit with a shortcut comment on simulationClickAction in <repo>/.claude/worktrees/wf_42496c94-3d0-4/portal/src/server/actions/campaigns.ts. The suggested separate simulationScanAction was not added: a server action is a public endpoint, so a /t token could be posted to it just as easily; only encoding the channel in the token itself would move the decision to the server, and the impact is one mislabelled event name for that recipient (risk entry and click are identical).
 Finding 4 (failed beacon loses click and submit): no code change, as the finding says. ADR trade-off sentence for the orchestrator: 'A click is counted only by the JavaScript beacon; a scanner that fetches the page records nothing, and the price is that a browser whose beacon request fails (or that runs no JavaScript) is counted neither as a click nor, since recordSubmit requires a recorded click, as a submit — it still sees the fake sign-in and then the lesson, or, without JavaScript, a direct link to the lesson.'
 rejected:
 Finding 2 (simulation-domain proof is sticky and never re-checked): rejected as not cheap and already an owner decision in left_open. The proposed hardening needs two new TenantSettings keys (simulation check timestamp and failing-since), a second concurrency-safe loop in jobs.ts recheckDomains with the same grace-period logic and its own audit entries, plus tests; clearing the address on a single missed lookup without grace would drop the sender on any transient DNS failure. The guide (docs/SIMULATION-DELIVERY.md) already tells admins to clear the simulation sender when a look-alike domain is given up. Open question for the owner stays: should the look-alike domain proof be re-checked daily with the 7-day grace like the organisation domain?

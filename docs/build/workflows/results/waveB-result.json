@@ -6,7 +6,7 @@
    "impl": {
     "wp": "B1-takeover",
     "branch": "worktree-wf_42496c94-3d0-1",
-    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-1",
+    "worktree": "<repo>\\.claude\\worktrees\\wf_42496c94-3d0-1",
     "commits": [
      "7d76156 Step-up password, notices and a consented support window for account-takeover tooling (S-06)"
     ],
@@ -113,7 +113,7 @@
    "impl": {
     "wp": "B2-secrets",
     "branch": "worktree-wf_42496c94-3d0-2",
-    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-2",
+    "worktree": "<repo>\\.claude\\worktrees\\wf_42496c94-3d0-2",
     "commits": [
      "aa24f2c Key versioning and rotation for APP_SECRET, stable domain-proof key, one verified domain per organisation"
     ],
@@ -212,7 +212,7 @@
    ],
    "fix": {
     "fixed": [
-     "Finding 1 (secret-rotation.ts): rotationRefusal now takes a verifiedDomains count and refuses when APP_DOMAIN_PROOF_SECRET is unset while any tenant has domain_verified_at set, naming step 1 of the runbook; new countVerifiedDomains(db) helper; scripts/rotate-secret.ts checks it after opening the database (C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-2/portal/src/server/services/secret-rotation.ts, portal/scripts/rotate-secret.ts). Test on the in-memory DB in portal/tests/crypto.test.ts ('refuses a rotation that would break published domain proofs').",
+     "Finding 1 (secret-rotation.ts): rotationRefusal now takes a verifiedDomains count and refuses when APP_DOMAIN_PROOF_SECRET is unset while any tenant has domain_verified_at set, naming step 1 of the runbook; new countVerifiedDomains(db) helper; scripts/rotate-secret.ts checks it after opening the database (<repo>/.claude/worktrees/wf_42496c94-3d0-2/portal/src/server/services/secret-rotation.ts, portal/scripts/rotate-secret.ts). Test on the in-memory DB in portal/tests/crypto.test.ts ('refuses a rotation that would break published domain proofs').",
      "Findings 2 and 5 (Dockerfile / OPERATIONS.md step 3): the runbook now says the runtime image ships neither tsx nor the TypeScript scripts, to run the script from a checkout of the deployed version (npm ci) with DATABASE_URL, both keys and APP_DOMAIN_PROOF_SECRET exported, and gives the compose command `docker compose --profile tools run --rm seed npx tsx scripts/rotate-secret.ts` (the seed service is built from the builder stage and reads .env); it also documents the new domain-proof refusal. One comment line on the compose seed service points at this use (docs/OPERATIONS.md, portal/docker-compose.yml). No compiled rotate-secret.mjs was shipped.",
      "Finding 4 (crypto.test.ts backup codes): portal/tests/auth-security.test.ts gets a case that stores two codes hashed with APP_SECRET_PREVIOUS, runs verifySecondFactorAction with rotation on (first code accepted once, second attempt refused), then with rotation off (the other code refused and still stored). The env mock there became a hoisted object so previousSecret can be toggled."
     ],
@@ -234,7 +234,7 @@
    "impl": {
     "wp": "B3-isolation",
     "branch": "worktree-wf_42496c94-3d0-3",
-    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-3",
+    "worktree": "<repo>\\.claude\\worktrees\\wf_42496c94-3d0-3",
     "commits": [
      "1681edd Tutor cache per organisation, capped lesson keys, sign-off IPs for audit roles only",
      "83e2722 Generated cross-organisation and lower-role suite over the whole server surface"
@@ -288,7 +288,7 @@
        "fix": "Strip // and /* */ comments from fn.body before matching (one replace), and note in the header comment that the guard is the first call found, not proof that it precedes every query."
       }
      ],
-     "notes": "Reviewed read-only in C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-3 (HEAD 83e2722, contains 1a45970). Verified myself in that worktree: `npm run typecheck` exit 0, `npx eslint src tests scripts --max-warnings=0` exit 0, `npx vitest run` on the five touched/added files: 5 files, 186 tests passed (cross-tenant.test.ts included, ~20 s).\n\nAttacker pass on the three code changes, nothing found: (S-10) tutorCacheId puts v.tenant.id first in the sha256 input with `|` separators and the route inserts tenantId from the viewer, so a library-lesson answer can no longer be replayed to another organisation; subtitles cache (not in scope) stays keyed by lesson text only, which is lesson content, not tenant data. (S-11 c) lessonOf rejects non-string or >100-char slug/lessonKey before any query and still resolves the key against the module's own lessons, for start, reach and complete alike; reachSceneAction keeps its index bounds and rate limit. (S-11 d) `can(role, \"audit.read\")` is equivalent to `allowed()` here because audit.read has no PERMISSION_FEATURE entry; content_creator (policies.read) loses the IP header and value, analyst/tenant_admin keep them; tenant predicate on the policy and users unchanged.\n\nThe suite itself: the mocked actionViewer/allowed mirror the real role+feature semantics (two-step gap excluded, as stated); apiViewer from auth/api.ts is real and goes through the mocked viewer; snapshot covers 49 of 53 tables (demo_requests, job_ticks, login_attempts, rate_limit_buckets are platform-wide, correctly skipped) and includes B's tenants row. Rows with legitimately filtered results (createIncidentAction, createMaterialAction, reports ?d=) assert inline. The major finding is about completeness of the gate, not a live leak: both missed actions are guarded today.\n\nMerge note for the orchestrator: cross-tenant.test.ts compares the committed surface.json to the live tree, so any sibling package in this wave that adds or renames an exported server action or route method will fail this test after the merge until surface.json is regenerated (`npx tsx scripts/inventory-surface.ts`) and a ROWS entry is added; that is the intended behaviour, but plan for it in the post-merge run. The implementer's RLS evaluation and owner questions (contractual RLS, per-tenant tutor spend, orphaned tutor_cache rows) are consistent with register S-03/S-10 and need no change.\n\nSkipped: did not run the full vitest suite (orchestrator does), did not re-derive each action's tenant predicate by hand beyond spot checks (drill, usb-kit, stix, subtitles, signoffs, learning), and did not test the ten-locale/RTL rules since no UI string or CSS changed."
+     "notes": "Reviewed read-only in <repo>/.claude/worktrees/wf_42496c94-3d0-3 (HEAD 83e2722, contains 1a45970). Verified myself in that worktree: `npm run typecheck` exit 0, `npx eslint src tests scripts --max-warnings=0` exit 0, `npx vitest run` on the five touched/added files: 5 files, 186 tests passed (cross-tenant.test.ts included, ~20 s).\n\nAttacker pass on the three code changes, nothing found: (S-10) tutorCacheId puts v.tenant.id first in the sha256 input with `|` separators and the route inserts tenantId from the viewer, so a library-lesson answer can no longer be replayed to another organisation; subtitles cache (not in scope) stays keyed by lesson text only, which is lesson content, not tenant data. (S-11 c) lessonOf rejects non-string or >100-char slug/lessonKey before any query and still resolves the key against the module's own lessons, for start, reach and complete alike; reachSceneAction keeps its index bounds and rate limit. (S-11 d) `can(role, \"audit.read\")` is equivalent to `allowed()` here because audit.read has no PERMISSION_FEATURE entry; content_creator (policies.read) loses the IP header and value, analyst/tenant_admin keep them; tenant predicate on the policy and users unchanged.\n\nThe suite itself: the mocked actionViewer/allowed mirror the real role+feature semantics (two-step gap excluded, as stated); apiViewer from auth/api.ts is real and goes through the mocked viewer; snapshot covers 49 of 53 tables (demo_requests, job_ticks, login_attempts, rate_limit_buckets are platform-wide, correctly skipped) and includes B's tenants row. Rows with legitimately filtered results (createIncidentAction, createMaterialAction, reports ?d=) assert inline. The major finding is about completeness of the gate, not a live leak: both missed actions are guarded today.\n\nMerge note for the orchestrator: cross-tenant.test.ts compares the committed surface.json to the live tree, so any sibling package in this wave that adds or renames an exported server action or route method will fail this test after the merge until surface.json is regenerated (`npx tsx scripts/inventory-surface.ts`) and a ROWS entry is added; that is the intended behaviour, but plan for it in the post-merge run. The implementer's RLS evaluation and owner questions (contractual RLS, per-tenant tutor spend, orphaned tutor_cache rows) are consistent with register S-03/S-10 and need no change.\n\nSkipped: did not run the full vitest suite (orchestrator does), did not re-derive each action's tenant predicate by hand beyond spot checks (drill, usb-kit, stix, subtitles, signoffs, learning), and did not test the ten-locale/RTL rules since no UI string or CSS changed."
     },
     {
      "verdict": "changes_required",
@@ -340,7 +340,7 @@
     ],
     "rejected": [],
     "commits": [
-     "262dd17 Cross-tenant suite: inventory by \"use server\" directive, gate-level learner pass, wider snapshot (branch worktree-wf_42496c94-3d0-3, on top of 83e2722 and 1681edd; worktree C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-3; files: portal/scripts/inventory-surface.ts, portal/tests/cross-tenant.test.ts, portal/tests/fixtures/surface.json)"
+     "262dd17 Cross-tenant suite: inventory by \"use server\" directive, gate-level learner pass, wider snapshot (branch worktree-wf_42496c94-3d0-3, on top of 83e2722 and 1681edd; worktree <repo>\\.claude\\worktrees\\wf_42496c94-3d0-3; files: portal/scripts/inventory-surface.ts, portal/tests/cross-tenant.test.ts, portal/tests/fixtures/surface.json)"
     ],
     "checks": {
      "typecheck": true,
@@ -354,7 +354,7 @@
    "impl": {
     "wp": "B4-simulation",
     "branch": "worktree-wf_42496c94-3d0-4",
-    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-4",
+    "worktree": "<repo>\\.claude\\worktrees\\wf_42496c94-3d0-4",
     "commits": [
      "fea9051 Simulation clicks by beacon, simulation sender on a proven look-alike domain, delivery guide, image digests"
     ],
@@ -436,8 +436,8 @@
    ],
    "fix": {
     "fixed": [
-     "Finding 3 (teachable.tsx beacon stage blank without JavaScript): the beacon stage now renders a <noscript> line with the lesson title and a link to /learn/<moduleSlug> (existing site.teach keys, no new strings), so a client without JavaScript or a failed hydration still reaches the teaching content; its click stays uncounted as the brief accepts. File: C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-4/portal/src/components/site/teachable.tsx",
-     "Finding 1 (via chosen by the client): accepted as a known limit with a shortcut comment on simulationClickAction in C:/Users/Safar/Desktop/Cyclowareness- Vol2/.claude/worktrees/wf_42496c94-3d0-4/portal/src/server/actions/campaigns.ts. The suggested separate simulationScanAction was not added: a server action is a public endpoint, so a /t token could be posted to it just as easily; only encoding the channel in the token itself would move the decision to the server, and the impact is one mislabelled event name for that recipient (risk entry and click are identical).",
+     "Finding 3 (teachable.tsx beacon stage blank without JavaScript): the beacon stage now renders a <noscript> line with the lesson title and a link to /learn/<moduleSlug> (existing site.teach keys, no new strings), so a client without JavaScript or a failed hydration still reaches the teaching content; its click stays uncounted as the brief accepts. File: <repo>/.claude/worktrees/wf_42496c94-3d0-4/portal/src/components/site/teachable.tsx",
+     "Finding 1 (via chosen by the client): accepted as a known limit with a shortcut comment on simulationClickAction in <repo>/.claude/worktrees/wf_42496c94-3d0-4/portal/src/server/actions/campaigns.ts. The suggested separate simulationScanAction was not added: a server action is a public endpoint, so a /t token could be posted to it just as easily; only encoding the channel in the token itself would move the decision to the server, and the impact is one mislabelled event name for that recipient (risk entry and click are identical).",
      "Finding 4 (failed beacon loses click and submit): no code change, as the finding says. ADR trade-off sentence for the orchestrator: 'A click is counted only by the JavaScript beacon; a scanner that fetches the page records nothing, and the price is that a browser whose beacon request fails (or that runs no JavaScript) is counted neither as a click nor, since recordSubmit requires a recorded click, as a submit — it still sees the fake sign-in and then the lesson, or, without JavaScript, a direct link to the lesson.'"
     ],
     "rejected": [
@@ -458,7 +458,7 @@
    "impl": {
     "wp": "B5-retention",
     "branch": "worktree-wf_42496c94-3d0-5",
-    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-5",
+    "worktree": "<repo>\\.claude\\worktrees\\wf_42496c94-3d0-5",
     "commits": [
      "4507973 Per-organisation data retention enforced by the daily clean-up (L-03)"
     ],
@@ -580,7 +580,7 @@
    "impl": {
     "wp": "B6-docs-en",
     "branch": "worktree-wf_42496c94-3d0-6",
-    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-6",
+    "worktree": "<repo>\\.claude\\worktrees\\wf_42496c94-3d0-6",
     "commits": [
      "324b8aa English engineering index, customer guides and whitepaper, report-mail copy"
     ],
@@ -678,7 +678,7 @@
    "impl": {
     "wp": "B7-scorm",
     "branch": "worktree-wf_42496c94-3d0-7",
-    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-7",
+    "worktree": "<repo>\\.claude\\worktrees\\wf_42496c94-3d0-7",
     "commits": [
      "c645aba B7-scorm: SCORM 1.2 export of a module with an offline player"
     ],
@@ -798,7 +798,7 @@
    "impl": {
     "wp": "B8-risk-story",
     "branch": "worktree-wf_42496c94-3d0-8",
-    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-8",
+    "worktree": "<repo>\\.claude\\worktrees\\wf_42496c94-3d0-8",
     "commits": [
      "aced5b2 Leadership risk story: data-driven sentences in ten languages, also in the compliance pack",
      "3bfc60d Risk story: share the department-filter narrowing with the reports, wrap long tile labels"
@@ -927,7 +927,7 @@
    "impl": {
     "wp": "B9-metrics-seats",
     "branch": "worktree-wf_42496c94-3d0-9",
-    "worktree": "C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-9",
+    "worktree": "<repo>\\.claude\\worktrees\\wf_42496c94-3d0-9",
     "commits": [
      "0dadd07 Operator usage metrics page and seat export",
      "be22967 Seats leave out operator accounts; lesson note says started or completed"
@@ -977,7 +977,7 @@
        "fix": "The orchestrator should write '54 predicates in 29 files' in the ADR."
       }
      ],
-     "notes": "I reviewed commits 0dadd07 and be22967 in C:\\Users\\Safar\\Desktop\\Cyclowareness- Vol2\\.claude\\worktrees\\wf_42496c94-3d0-9. The branch contains 1a45970 and the tree is clean, with nothing under portal/drizzle committed and no schema change. I reran the checks there: typecheck passes, eslint on the touched files passes, and vitest passes on platform-metrics, server-helpers (audit labels), i18n and rtl-logical (213 tests).\n\nEvery acceptance item holds:\n- /super/metrics is protected by requirePermission(\"platform.manage\") and shows per-organisation aggregates only. The table has scope=col/row headers, logical CSS and getFormatter numbers inside a ScrollRegion. The tab appears in all three super pages.\n- The strings are in all ten locales with key parity and contain no ICU braces and no \"Aİ\". The seats_exported audit label is present in every locale.\n- GET /api/super/seats uses apiViewer(\"platform.manage\", request) exactly like demo-requests: it handles the RSC probe, 2FA and 401/403, sends no-store and attachment headers, and audits seats.exported.\n- Tests cover 401 and 403 with no audit entry, and the operator's 200 with the exact CSV rows and an audit entry.\n- The metrics query test checks two seeded tenants on every column, including operator exclusion, invited and suspended people, the 7/30-day windows, a replay counted by last_completed_at, self-reported certificates left out, and no leakage between tenants.\n- The ADR paragraph is present.\n\nUsing users.last_active_at instead of session rows is reasonable and matches src/server/queries/admin.ts (active7). The overview now leaves super_admin accounts out of its people count; this is a deliberate change of behaviour and consistent with the seat export.\n\nNot checked: the page in a browser (no server may be started) and the full test suite."
+     "notes": "I reviewed commits 0dadd07 and be22967 in <repo>\\.claude\\worktrees\\wf_42496c94-3d0-9. The branch contains 1a45970 and the tree is clean, with nothing under portal/drizzle committed and no schema change. I reran the checks there: typecheck passes, eslint on the touched files passes, and vitest passes on platform-metrics, server-helpers (audit labels), i18n and rtl-logical (213 tests).\n\nEvery acceptance item holds:\n- /super/metrics is protected by requirePermission(\"platform.manage\") and shows per-organisation aggregates only. The table has scope=col/row headers, logical CSS and getFormatter numbers inside a ScrollRegion. The tab appears in all three super pages.\n- The strings are in all ten locales with key parity and contain no ICU braces and no \"Aİ\". The seats_exported audit label is present in every locale.\n- GET /api/super/seats uses apiViewer(\"platform.manage\", request) exactly like demo-requests: it handles the RSC probe, 2FA and 401/403, sends no-store and attachment headers, and audits seats.exported.\n- Tests cover 401 and 403 with no audit entry, and the operator's 200 with the exact CSV rows and an audit entry.\n- The metrics query test checks two seeded tenants on every column, including operator exclusion, invited and suspended people, the 7/30-day windows, a replay counted by last_completed_at, self-reported certificates left out, and no leakage between tenants.\n- The ADR paragraph is present.\n\nUsing users.last_active_at instead of session rows is reasonable and matches src/server/queries/admin.ts (active7). The overview now leaves super_admin accounts out of its people count; this is a deliberate change of behaviour and consistent with the seat export.\n\nNot checked: the page in a browser (no server may be started) and the full test suite."
     },
     {
      "verdict": "approve",
