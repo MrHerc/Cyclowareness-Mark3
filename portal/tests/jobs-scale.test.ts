@@ -1,13 +1,15 @@
 import { and, count, eq, sql } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
-import { runJobs } from "../src/server/jobs";
+import { refreshers, runJobs } from "../src/server/jobs";
 import { dayKey } from "../src/lib/domain/gamification";
+import { withDefaults } from "../src/lib/tenant-defaults";
 import { resolveAssignments } from "../src/server/services/assignments";
 import { computeTenantRisk, INLINE_RECOMPUTE_MAX, recomputeChanged, recomputeRisk } from "../src/server/services/risk";
+import { notifyUsers } from "../src/server/services/notify";
 import { DB_SETUP_TIMEOUT, addDepartment, addModule, addTenant, addUser, assignEveryone, testDb } from "./helpers/db";
 
-const { db, ready } = testDb();
+const { db, pglite, ready } = testDb();
 beforeAll(ready, DB_SETUP_TIMEOUT);
 
 const NOW = new Date("2026-11-09T10:00:00Z");
@@ -20,6 +22,17 @@ async function people(tenantId: string, n: number) {
     .insert(t.users)
     .values(Array.from({ length: n }, (_, i) => ({ tenantId, email: `p${i}-${tenantId}@test.example`, name: `P ${i}`, locale: "en", riskScore: 99 })))
     .returning({ id: t.users.id });
+}
+
+/** The most parameters one SELECT bound while `run` ran (PostgreSQL allows 65,535 per statement). */
+async function maxSelectParams(run: () => Promise<unknown>) {
+  const query = vi.spyOn(pglite, "query");
+  try {
+    await run();
+    return Math.max(0, ...query.mock.calls.filter(([q]) => /^\s*select/i.test(q)).map(([, params]) => params?.length ?? 0));
+  } finally {
+    query.mockRestore();
+  }
 }
 
 const scores = async (tenantId: string) => new Map((await db.select({ id: t.users.id, s: t.users.riskScore }).from(t.users).where(eq(t.users.tenantId, tenantId))).map((u) => [u.id, u.s]));
@@ -48,6 +61,29 @@ describe("recomputeRisk at scale", () => {
     const stored = await scores(tenant.id);
     expect(stored.size).toBe(1_200);
     for (const [id, b] of expected) expect(stored.get(id)).toBe(b.score);
+    // A listed population goes in slices of 1,000 (one parameter per person each) and scores the same.
+    await db.update(t.users).set({ riskScore: 99 }).where(eq(t.users.tenantId, tenant.id));
+    expect(await maxSelectParams(async () => expect((await recomputeRisk(db, tenant.id, users.map((u) => u.id), NOW)).size).toBe(1_200))).toBeLessThan(1_200);
+    const listed = await scores(tenant.id);
+    for (const [id, b] of expected) expect(listed.get(id)).toBe(b.score);
+    // So does notifyUsers: every listed person gets the notice.
+    expect(await maxSelectParams(async () => expect(await notifyUsers(db, tenant.id, users.map((u) => u.id), "assignment", { link: "/learn" }, { href: "/learn" }, { defer: true })).toBe(1_200))).toBeLessThan(1_200);
+    const [notices] = await db.select({ n: count() }).from(t.notifications).where(eq(t.notifications.tenantId, tenant.id));
+    expect(notices.n).toBe(1_200);
+  }, 120_000);
+});
+
+describe("monthly refresher at scale", () => {
+  it("picks 1,200 risky people through a subquery: no SELECT binds one parameter per person", async () => {
+    const tenant = await addTenant(db);
+    await people(tenant.id, 1_200);
+    const mod = await addModule(db, { lessons: 1 });
+    await assignEveryone(db, tenant.id, mod.id);
+    const lite = { id: tenant.id, name: tenant.name, settings: withDefaults(tenant.settings), branding: tenant.branding };
+    expect(lite.settings.learning.refresher).toBe(true);
+    let given = 0;
+    expect(await maxSelectParams(async () => (given = await refreshers(db, lite, NOW)))).toBeLessThan(1_200);
+    expect(given).toBe(1_200);
   }, 120_000);
 });
 

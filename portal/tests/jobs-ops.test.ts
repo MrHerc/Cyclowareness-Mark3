@@ -141,10 +141,21 @@ describe("job runner tick", () => {
         { ...report, number: 3, status: "dismissed", createdAt: recent },
       ]);
       const analysis = { tenantId: tenant.id, kind: "url" as const, objectName: "https://x.example", verdict: "clean" as const, score: 0, findings: [], iocs: [], mitre: [] };
-      // Both old: the highest-numbered one stays, so its SB number is never handed out again.
+      // The evidence of an incident still under investigation stays; that of a resolved one goes.
+      const incident = { tenantId: tenant.id, title: "Phish", severity: "high" as const, source: "sandbox" as const, iocs: [], mitre: [], targetUserIds: [] };
+      const [investigating, resolved] = await db
+        .insert(t.incidents)
+        .values([
+          { ...incident, number: 1, status: "investigating" },
+          { ...incident, number: 2, status: "resolved" },
+        ])
+        .returning();
+      // All old: the highest-numbered one stays, so its SB number is never handed out again.
       await db.insert(t.sandboxAnalyses).values([
         { ...analysis, number: 1, createdAt: old },
-        { ...analysis, number: 2, createdAt: old },
+        { ...analysis, number: 2, createdAt: old, incidentId: investigating.id },
+        { ...analysis, number: 3, createdAt: old, incidentId: resolved.id },
+        { ...analysis, number: 4, createdAt: old },
       ]);
       await db.insert(t.labAttempts).values([
         { tenantId: tenant.id, userId: user.id, exercise: "old", score: 5, max: 10, xp: 20, at: old },
@@ -158,7 +169,7 @@ describe("job runner tick", () => {
         // The tick's own daily snapshot (today) is left out.
         snapshots: (await db.select({ s: t.userRiskSnapshots.score }).from(t.userRiskSnapshots).where(and(eq(t.userRiskSnapshots.tenantId, tenant.id), lt(t.userRiskSnapshots.day, day(now))))).map((r) => r.s),
         reports: (await db.select({ n: t.threatReports.number, details: t.threatReports.details, url: t.threatReports.url }).from(t.threatReports).where(eq(t.threatReports.tenantId, tenant.id))).map((r) => `${r.n}:${r.details && r.url ? "text" : r.details || r.url ? "partial" : "none"}`).sort(),
-        analyses: (await db.select({ n: t.sandboxAnalyses.number }).from(t.sandboxAnalyses).where(eq(t.sandboxAnalyses.tenantId, tenant.id))).map((r) => r.n),
+        analyses: (await db.select({ n: t.sandboxAnalyses.number }).from(t.sandboxAnalyses).where(eq(t.sandboxAnalyses.tenantId, tenant.id))).map((r) => r.n).sort(),
         labs: (await db.select({ e: t.labAttempts.exercise }).from(t.labAttempts).where(eq(t.labAttempts.tenantId, tenant.id))).map((r) => r.e).sort(),
         xp: (await db.select().from(t.xpEvents).where(eq(t.xpEvents.tenantId, tenant.id))).length,
       });
@@ -169,7 +180,7 @@ describe("job runner tick", () => {
       loops: ["ended", "lately", "running"],
       snapshots: [80, 40],
       reports: ["1:text", "2:text", "3:text"],
-      analyses: [1, 2],
+      analyses: [1, 2, 3, 4],
       labs: ["old", "recent"],
       xp: 1,
     };
@@ -180,12 +191,12 @@ describe("job runner tick", () => {
     await runJobs(db, now);
     // Old results of finished campaigns go (with their loop); a running campaign's results, closed loops of the last year and the XP stay.
     // An old handled report keeps its row (badge, TR number) without the mail text; open ones keep theirs. Lab attempts are learner progress and stay.
-    const purged = { recipients: ["ended lately", "still running"], campaigns: 4, loops: ["lately"], snapshots: [40], reports: ["1:none", "2:text", "3:text"], analyses: [2], labs: ["old", "recent"], xp: 1 };
+    const purged = { recipients: ["ended lately", "still running"], campaigns: 4, loops: ["lately"], snapshots: [40], reports: ["1:none", "2:text", "3:text"], analyses: [2, 4], labs: ["old", "recent"], xp: 1 };
     expect(await first()).toEqual(purged);
     expect(await second()).toEqual(purged);
     expect(await keeps()).toEqual(everything);
     const entries = await db.select({ meta: t.auditLog.meta }).from(t.auditLog).where(and(eq(t.auditLog.action, "retention.purged"), eq(t.auditLog.at, now)));
-    const counts = { ...NOTHING_PURGED, recipients: 2, loops: 1, riskSnapshots: 1, reportTexts: 1, sandboxAnalyses: 1, learningBefore: "2025-11-10T10:00:00.000Z" };
+    const counts = { ...NOTHING_PURGED, recipients: 2, loops: 1, riskSnapshots: 1, reportTexts: 1, sandboxAnalyses: 2, learningBefore: "2025-11-10T10:00:00.000Z" };
     expect(entries.map((e) => e.meta)).toEqual([counts, counts]);
   }, 60_000);
 

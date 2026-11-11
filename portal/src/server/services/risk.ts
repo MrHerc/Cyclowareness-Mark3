@@ -122,9 +122,17 @@ export async function computeTenantRisk(db: DB, tenantId: string, now = new Date
 
 /** People per UPDATE statement when scores are written. */
 const WRITE_CHUNK = 500;
+/** Listed people per recompute: each one is a bound parameter in the evidence queries. */
+const READ_CHUNK = 1_000;
 
 /** Persists fresh scores. Call after any event that can move a score. */
 export async function recomputeRisk(db: DB, tenantId: string, userIds?: string[], now = new Date()): Promise<RiskEvidence> {
+  // computeTenantRisk binds one parameter per listed person: a long list goes in slices under PostgreSQL's 65,535 per statement.
+  if (userIds && userIds.length > READ_CHUNK) {
+    const all: RiskEvidence = new Map();
+    for (let i = 0; i < userIds.length; i += READ_CHUNK) for (const [id, b] of await recomputeRisk(db, tenantId, userIds.slice(i, i + READ_CHUNK), now)) all.set(id, b);
+    return all;
+  }
   const evidence = await computeTenantRisk(db, tenantId, now, userIds);
   if (!evidence.size) return evidence;
   const [tenant] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId));

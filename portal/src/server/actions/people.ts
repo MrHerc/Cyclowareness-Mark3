@@ -261,8 +261,8 @@ export async function changeRoleAction(userId: string, role: Role, password?: st
   const refused = await stepUp(v, password, "person.role_changed", u.id);
   if (refused) return { ok: false, error: refused };
   await db().update(t.users).set({ role }).where(eq(t.users.id, u.id));
-  // Privilege changes take effect on the next sign-in.
-  await invalidateUserSessions(u.id);
+  // Privilege changes take effect on the next sign-in; the creator's API tokens are revoked, so a restored role never revives an old one.
+  await invalidateUserSessions(u.id, undefined, "role_changed");
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.role_changed", targetType: "user", targetId: u.id, meta: { from: u.role, to: role } });
   // Peers hear of it when an administrator is made or unmade.
   await notifyTakeover(db(), v.tenant.id, v.user, { ...u, role: role === "tenant_admin" ? role : u.role }, "roleChanged", (locale) => ROLE_NAMES[locale as Locale]?.[role] ?? role);
@@ -278,7 +278,7 @@ export async function resetTwoFactorAction(userId: string, password?: string): P
   const u = await target(v, userId);
   if (!u || u.id === v.user.id) return { ok: false };
   await db().update(t.users).set({ totpSecret: null, totpEnabled: false, totpRecovery: null }).where(eq(t.users.id, u.id));
-  await invalidateUserSessions(u.id);
+  await invalidateUserSessions(u.id, undefined, "2fa_reset");
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.2fa_reset", targetType: "user", targetId: u.id, ip: await clientIp() });
   await notifyTakeover(db(), v.tenant.id, v.user, u, "twoFactorReset");
   refresh();
@@ -355,7 +355,7 @@ export async function setStatusAction(userIds: string[], status: "active" | "sus
     )
     .where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids), ne(t.users.status, "deleted"), reachable(v)))
     .returning({ id: t.users.id });
-  if (status === "suspended") for (const { id } of changed) await invalidateUserSessions(id);
+  if (status === "suspended") for (const { id } of changed) await invalidateUserSessions(id, undefined, "suspended");
   for (const { id } of changed) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: status === "suspended" ? "person.suspended" : "person.reactivated", targetType: "user", targetId: id });
   refresh();
   return { ok: changed.length > 0 };
@@ -385,19 +385,20 @@ async function anonymise(v: Viewer, u: { id: string; email: string; name: string
       .set({ meta: sql`${t.auditLog.meta} - 'email'` })
       .where(and(eq(t.auditLog.tenantId, v.tenant.id), eq(t.auditLog.targetType, "user"), eq(t.auditLog.targetId, userId)));
     // Re-simulations of earlier builds named their person in free text: the campaign name, its click risk and its
-    // creation entry. Only the name goes; the rest of the label stays readable.
+    // creation entry. The click risk quotes the stored campaign name (whatever the person was called then), so that
+    // name goes from the risk first; then the campaign name itself goes.
+    await tx.execute(sql`
+      update ${t.behaviorRisks} br set title = replace(br.title, c.name, '—')
+      from ${t.campaigns} c
+      where c.tenant_id = ${v.tenant.id} and br.tenant_id = c.tenant_id and br.source_ref = c.id::text and c.audience = 'person' and c.user_id = ${userId}`);
     const resims = (
       await tx
-        .select({ id: t.campaigns.id })
-        .from(t.campaigns)
+        .update(t.campaigns)
+        .set({ name: "—" })
         .where(and(eq(t.campaigns.tenantId, v.tenant.id), eq(t.campaigns.audience, "person"), eq(t.campaigns.userId, userId)))
+        .returning({ id: t.campaigns.id })
     ).map((c) => c.id);
     if (resims.length) {
-      await tx.update(t.campaigns).set({ name: sql`replace(${t.campaigns.name}, ${u.name}, '—')` }).where(inArray(t.campaigns.id, resims));
-      await tx
-        .update(t.behaviorRisks)
-        .set({ title: sql`replace(${t.behaviorRisks.title}, ${u.name}, '—')` })
-        .where(and(eq(t.behaviorRisks.tenantId, v.tenant.id), inArray(t.behaviorRisks.sourceRef, resims)));
       await tx
         .update(t.auditLog)
         .set({ meta: sql`${t.auditLog.meta} - 'name'` })
@@ -407,6 +408,10 @@ async function anonymise(v: Viewer, u: { id: string; email: string; name: string
     await tx
       .delete(t.notifications)
       .where(and(eq(t.notifications.tenantId, v.tenant.id), inArray(t.notifications.kind, ["manager", "deletion"]), inArray(t.notifications.href, [`/admin/users/${userId}`, `/admin/users/${userId}#training`])));
+    // The e-mail copy of a manager alert carries the same link; one still queued would mail the head the name.
+    await tx
+      .delete(t.outbox)
+      .where(and(eq(t.outbox.tenantId, v.tenant.id), eq(t.outbox.kind, "manager"), eq(t.outbox.status, "queued"), sql`${t.outbox.text} like ${`%/admin/users/${userId}%`}`));
     // And the sign-in data: the IP of every entry the person made themselves (sign-ins among them).
     await tx.update(t.auditLog).set({ ip: null }).where(and(eq(t.auditLog.tenantId, v.tenant.id), eq(t.auditLog.actorId, userId)));
   });

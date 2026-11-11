@@ -38,7 +38,7 @@ const { createApiTokenAction, revokeApiTokenAction } = await import("../src/serv
 const { changePasswordAction, confirmTotpAction, signOutOtherDevicesAction } = await import("../src/server/actions/profile");
 const { newTotpKey } = await import("../src/server/auth/totp");
 const { setPasswordAction } = await import("../src/server/actions/auth");
-const { resetTwoFactorAction, setStatusAction } = await import("../src/server/actions/people");
+const { changeRoleAction, resetTwoFactorAction, setStatusAction } = await import("../src/server/actions/people");
 const { hashPassword } = await import("../src/server/auth/password");
 const { API_TOKEN_RATE_LIMIT } = await import("../src/server/auth/api");
 const { rateLimit } = await import("../src/server/rate-limit");
@@ -304,8 +304,9 @@ describe("a credential recovery of the creator", () => {
       },
     ],
     ["other_devices_signed_out", (c) => ((actor = viewerFor(c, org)), signOutOtherDevicesAction())],
-    ["sessions_ended", (c) => resetTwoFactorAction(c.id, PW)],
-    ["sessions_ended", (c) => setStatusAction([c.id], "suspended")],
+    ["role_changed", (c) => changeRoleAction(c.id, "learner", PW)],
+    ["2fa_reset", (c) => resetTwoFactorAction(c.id, PW)],
+    ["suspended", (c) => setStatusAction([c.id], "suspended")],
   ];
 
   it.each(recoveries)("revokes the creator's live tokens (%s), audited once each with the reason, and leaves other tokens working", async (reason, recover) => {
@@ -342,5 +343,20 @@ describe("a credential recovery of the creator", () => {
     } finally {
       actor = viewerFor(admin, tenant);
     }
+  });
+
+  it("revokes the creator's tokens on a role change, and a restored role does not revive them", async () => {
+    const creator = await addUser(db, org.id, { role: "tenant_admin" });
+    actor = viewerFor(creator, org);
+    const mine = await mint(["reports.read"], "revoked on role change");
+    actor = viewerFor(boss, org);
+    try {
+      expect(await changeRoleAction(creator.id, "learner", PW)).toMatchObject({ ok: true });
+      expect(await changeRoleAction(creator.id, "tenant_admin", PW)).toMatchObject({ ok: true });
+    } finally {
+      actor = viewerFor(admin, tenant);
+    }
+    expect((await audited("api_token.revoked", org.id)).filter((e) => e.targetId === mine.id)).toMatchObject([{ actorId: null, meta: { reason: "role_changed" } }]);
+    expect((await reports.GET(bearer("/api/admin/reports/completion", mine.token), ctx("completion"))).status).toBe(401);
   });
 });

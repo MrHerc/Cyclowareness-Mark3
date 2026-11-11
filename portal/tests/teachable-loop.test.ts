@@ -1,4 +1,4 @@
-import { and, eq, isNotNull } from "drizzle-orm";
+import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
@@ -414,6 +414,39 @@ describe("re-simulation", () => {
     await teachableTick(db, tenant, new Date(Date.now() + 3_600_000));
     expect(await personCampaigns(tenant.id)).toHaveLength(1);
     expect((await loopsOf(tenant.id)).map((l) => l.status).sort()).toEqual(["assigned", "resim"]);
+  }, 60_000);
+
+  it("isolates a re-simulation that fails: the other due loop still gets one, the results are still recorded, and the next tick retries it", async () => {
+    const { tenant, people } = await org({ people: 3 });
+    const [a, b, c] = people;
+    const { token } = await clickable(tenant.id);
+    // c's re-simulation goes out first; it ends just before the failing tick, whose step 3 records it.
+    await recordClick(db, token(c.id), "link");
+    await teachableTick(db, tenant, new Date());
+    await backdate(tenant.id);
+    await teachableTick(db, tenant, new Date());
+    const [resim] = await personCampaigns(tenant.id);
+    await campaignTick(db);
+    await recordClick(db, token(a.id), "link");
+    await recordClick(db, token(b.id), "link");
+    await teachableTick(db, tenant, new Date());
+    await backdate(tenant.id);
+    expect(await setCampaignStatus(db, tenant.id, resim.id, "completed")).toBe(true);
+    // a's re-simulation cannot be written, as a failing insert would.
+    await db.execute(sql.raw(`create function fail_resim() returns trigger language plpgsql as $$ begin if new.user_id = '${a.id}' then raise exception 'resim refused'; end if; return new; end $$`));
+    await db.execute(sql.raw("create trigger fail_resim before insert on campaigns for each row execute function fail_resim()"));
+    try {
+      await teachableTick(db, tenant, new Date());
+    } finally {
+      await db.execute(sql.raw("drop trigger fail_resim on campaigns"));
+      await db.execute(sql.raw("drop function fail_resim"));
+    }
+    const loops = await loopsOf(tenant.id);
+    expect(loops.find((l) => l.userId === a.id)).toMatchObject({ resimCampaignId: null, status: "assigned" });
+    expect(loops.find((l) => l.userId === b.id)).toMatchObject({ resimCampaignId: expect.any(String), status: "resim" });
+    expect(loops.find((l) => l.userId === c.id)).toMatchObject({ resimResult: "passed", status: "closed" });
+    await teachableTick(db, tenant, new Date());
+    expect((await loopsOf(tenant.id)).find((l) => l.userId === a.id)).toMatchObject({ resimCampaignId: expect.any(String), status: "resim" });
   }, 60_000);
 
   it("names no person: not in the campaign's name, its audit entry, the click's risk or the webhook payload", async () => {

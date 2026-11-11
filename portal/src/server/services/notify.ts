@@ -62,10 +62,16 @@ export async function notifyUsers(
   const [tenant] = await db.select().from(t.tenants).where(eq(t.tenants.id, tenantId));
   if (!tenant) return 0;
   const settings = withDefaults(tenant.settings);
-  const users = await db
-    .select({ id: t.users.id, name: t.users.name, email: t.users.email, locale: t.users.locale })
-    .from(t.users)
-    .where(and(eq(t.users.tenantId, tenantId), inArray(t.users.id, userIds), inArray(t.users.status, opts.statuses ?? ["active"])));
+  // Slice by slice: one parameter per person would pass PostgreSQL's 65,535 per statement for a whole organisation.
+  const users: { id: string; name: string; email: string; locale: string }[] = [];
+  for (let i = 0; i < userIds.length; i += 1000) {
+    users.push(
+      ...(await db
+        .select({ id: t.users.id, name: t.users.name, email: t.users.email, locale: t.users.locale })
+        .from(t.users)
+        .where(and(eq(t.users.tenantId, tenantId), inArray(t.users.id, userIds.slice(i, i + 1000)), inArray(t.users.status, opts.statuses ?? ["active"])))),
+    );
+  }
   const undated = !vars.dueDate && (kind === "assignment" || kind === "reminder") ? DEFAULT_TEMPLATES_NO_DUE[kind] : null;
   const messages = undated ?? (isTemplateKind(kind) ? DEFAULT_TEMPLATES[kind] : FIXED_MESSAGES[kind]);
   const base = appUrl();

@@ -469,7 +469,15 @@ async function cleanup(db: DB, now: Date): Promise<number> {
       }
       // The highest-numbered analysis stays, so the next one never reuses an SB number that audit entries and incidents quote.
       const lastSb = sql`(select max(${t.sandboxAnalyses.number}) from ${t.sandboxAnalyses} where ${t.sandboxAnalyses.tenantId} = ${org.id})`;
-      purged.sandboxAnalyses = await deleteInBatches(db, t.sandboxAnalyses, t.sandboxAnalyses.id, and(eq(t.sandboxAnalyses.tenantId, org.id), lt(t.sandboxAnalyses.createdAt, cut), lt(t.sandboxAnalyses.number, lastSb)), deadline);
+      // An analysis that is the evidence of an unresolved incident stays until the incident is resolved.
+      const unresolved = db.select({ id: t.incidents.id }).from(t.incidents).where(and(eq(t.incidents.tenantId, org.id), ne(t.incidents.status, "resolved")));
+      purged.sandboxAnalyses = await deleteInBatches(
+        db,
+        t.sandboxAnalyses,
+        t.sandboxAnalyses.id,
+        and(eq(t.sandboxAnalyses.tenantId, org.id), lt(t.sandboxAnalyses.createdAt, cut), lt(t.sandboxAnalyses.number, lastSb), or(isNull(t.sandboxAnalyses.incidentId), notInArray(t.sandboxAnalyses.incidentId, unresolved))),
+        deadline,
+      );
       // Lab attempts stay: a path's lab counts as passed, and the lab-explorer badge is earned, from them (learner progress).
     }
     const count = Object.values(purged).reduce((a, b) => a + b, 0);
@@ -623,7 +631,7 @@ async function managerReasons() {
  * Settings → Notifications "overdue for N days" late with assigned training. At most weekly per
  * person and reason; the reason is written in the head's language.
  */
-async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<number> {
+export async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<number> {
   const n = tenant.settings.notifications;
   if (!n.managerAlerts) return 0;
   const since = new Date(now.getTime() - 30 * DAY);
@@ -662,6 +670,14 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
   }
 
   const reasons = await managerReasons();
+  // Each notice goes in one transaction with a re-check of the person, whose row it locks FOR SHARE: anonymise() updates
+  // that row first inside its own transaction, so it either commits first and the check sees the person gone, or waits
+  // for this transaction and its own notifications delete then removes the notice.
+  const ifStillActive = (id: string, notify: (tx: DB) => Promise<number>) =>
+    db.transaction(async (tx) => {
+      const [row] = await tx.select({ id: t.users.id }).from(t.users).where(and(eq(t.users.id, id), eq(t.users.status, "active"))).for("share");
+      return row ? notify(tx) : 0;
+    });
   let count = 0;
   for (const p of people) {
     const head = p.departmentId ? headOf.get(p.departmentId) : null;
@@ -670,13 +686,13 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
     const failHref = `/admin/users/${p.id}`;
     if (times && !alerted.has(failHref)) {
       const reason = (locale: string) => reasons(locale)("failedSimulations", { count: times });
-      count += await notifyUsers(db, tenant.id, [head], "manager", { person: p.name, reason, link: failHref }, { title: p.name, body: reason, href: failHref }, { defer: true });
+      count += await ifStillActive(p.id, (tx) => notifyUsers(tx, tenant.id, [head], "manager", { person: p.name, reason, link: failHref }, { title: p.name, body: reason, href: failHref }, { defer: true }));
     }
     const late = overdueBy.get(p.id);
     const lateHref = `/admin/users/${p.id}#training`;
     if (late && !alerted.has(lateHref)) {
       const reason = (locale: string) => reasons(locale)("overdueTrainings", { count: late, days: n.overdueDays });
-      count += await notifyUsers(db, tenant.id, [head], "manager", { person: p.name, reason, link: lateHref }, { title: p.name, body: reason, href: lateHref }, { defer: true });
+      count += await ifStillActive(p.id, (tx) => notifyUsers(tx, tenant.id, [head], "manager", { person: p.name, reason, link: lateHref }, { title: p.name, body: reason, href: lateHref }, { defer: true }));
     }
   }
   return count;
@@ -695,28 +711,24 @@ async function refresherTitles() {
  * their next open assigned module, else the phishing module, never one they already completed.
  * Whoever already got this month's refresher (open or finished) is left alone until next month.
  */
-async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number> {
+export async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number> {
   const l = tenant.settings.learning;
   if (!l.refresher) return 0;
   const month = todayIn(tenant.settings.timeZone, now).slice(0, 7);
   const ref = `REFRESH-${month}`;
-  const risky = await db
+  // A subquery, not an id list: one parameter per person would pass PostgreSQL's 65,535 per statement.
+  const hadOne = db.select({ userId: t.behaviorRisks.userId }).from(t.behaviorRisks).where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.sourceRef, ref), isNotNull(t.behaviorRisks.userId)));
+  const wanted = db
     .select({ id: t.users.id })
     .from(t.users)
-    .where(and(eq(t.users.tenantId, tenant.id), eq(t.users.status, "active"), ne(t.users.role, "super_admin"), gte(t.users.riskScore, l.riskThreshold)));
-  if (!risky.length) return 0;
-  const already = await db
-    .select({ userId: t.behaviorRisks.userId })
-    .from(t.behaviorRisks)
-    .where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.sourceRef, ref)));
-  const hadOne = new Set(already.map((a) => a.userId));
-  const candidates = risky.filter((r) => !hadOne.has(r.id));
+    .where(and(eq(t.users.tenantId, tenant.id), eq(t.users.status, "active"), ne(t.users.role, "super_admin"), gte(t.users.riskScore, l.riskThreshold), notInArray(t.users.id, hadOne)));
+  const candidates = await wanted;
   if (!candidates.length) return 0;
-  const assigned = await resolveAssignments(db, tenant.id, candidates.map((r) => r.id));
+  const assigned = await resolveAssignments(db, tenant.id, wanted);
   const completed = await db
     .select({ userId: t.moduleProgress.userId, moduleId: t.moduleProgress.moduleId })
     .from(t.moduleProgress)
-    .where(and(inArray(t.moduleProgress.userId, candidates.map((r) => r.id)), eq(t.moduleProgress.status, "completed")));
+    .where(and(inArray(t.moduleProgress.userId, wanted), eq(t.moduleProgress.status, "completed")));
   const doneSet = new Set(completed.map((c) => `${c.userId}:${c.moduleId}`));
   // The organisation's own copy of the phishing module wins over the library one.
   const fallbacks = await db

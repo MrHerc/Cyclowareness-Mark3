@@ -86,9 +86,9 @@ describe("ending sessions", () => {
     const keep = await session.createSession({ ...base, userId: other.id, tenantId: tenant.id });
     await session.invalidateSession(a.id);
     expect((await sessionsOf(user.id)).map((s) => s.id).sort()).toEqual([b.id, c.id].sort());
-    await session.invalidateUserSessions(user.id, c.id);
+    await session.invalidateUserSessions(user.id, c.id, null);
     expect((await sessionsOf(user.id)).map((s) => s.id)).toEqual([c.id]);
-    await session.invalidateUserSessions(user.id);
+    await session.invalidateUserSessions(user.id, undefined, null);
     expect(await sessionsOf(user.id)).toEqual([]);
     expect((await sessionsOf(other.id)).map((s) => s.id)).toEqual([keep.id]);
   });

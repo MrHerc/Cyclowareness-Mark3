@@ -379,12 +379,8 @@ describe("targetTraining", () => {
     expect(targets).toHaveLength(8_200);
     const [risks] = await db.select({ n: count() }).from(t.behaviorRisks).where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.sourceRef, "REFRESH-2026-11")));
     expect(risks.n).toBe(8_200);
-    // Notifying and rescoring bind one parameter per person as well, so past 65,535 targets they must go in chunks too.
-    for (const spy of [vi.mocked(notifyUsers), vi.mocked(recomputeRisk)]) {
-      const sizes = spy.mock.calls.map((c) => (c[2] as string[]).length);
-      expect(sizes.reduce((a, b) => a + b, 0)).toBe(8_200);
-      expect(Math.max(...sizes)).toBeLessThanOrEqual(1_000);
-    }
+    // Notifying and rescoring take the whole list once; they slice it themselves (jobs-scale.test.ts).
+    for (const spy of [vi.mocked(notifyUsers), vi.mocked(recomputeRisk)]) expect(spy.mock.calls.map((c) => (c[2] as string[]).length)).toEqual([8_200]);
   }, 300_000);
 });
 

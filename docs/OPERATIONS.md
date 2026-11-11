@@ -211,7 +211,7 @@ per run; whatever is left is picked up by the next tick).
   - the forwarded mail text and link of threat reports that were converted or dismissed (the report
     itself stays, so its TR number and the reporter's sharp-eye badge stay; reports still new or
     triaged keep their text);
-  - sandbox analyses, except each organisation's highest-numbered one, so an SB number is never reused.
+  - sandbox analyses, except each organisation's highest-numbered one, so an SB number is never reused; analyses linked to an unresolved incident stay.
 
   Every change is in the audit log as `settings.retention`. Deleting answers lowers the figures of the
   module-quality report for that period. The risk score reads simulation results and risky answers of
