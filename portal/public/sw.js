@@ -1,10 +1,10 @@
 /*
  * Cyclowareness service worker: only an offline fallback.
  * Pages and API responses are never cached (they are personal); static build assets are
- * cached on first use so the app shell opens fast. Without a connection, page navigations
- * show /offline.
+ * cached on first use so the app shell opens fast. A page navigation that cannot be fetched (no connection, or
+ * the server does not answer) shows /offline, which tells the two apart and reloads itself when the server is back.
  */
-const VERSION = "cy-v3";
+const VERSION = "cy-v4";
 const OFFLINE = "/offline";
 const PRECACHE = [OFFLINE, "/icons/icon.svg", "/icons/icon-192.png"];
 
