@@ -134,7 +134,7 @@ Everything else is ready and runs locally. The items below need either an extern
 
 ## Before any push
 What only you can do before this branch (`final-pass-2026-10-21`) is pushed or deployed. The details are in the items above.
-- **The push:** every commit is local and the branch has not been pushed; the push is your step (ADR-081).
+- **The push:** the branch was pushed with your approval on 2026-11-11 (`244a471`); merging into `main` and every further push are your steps (ADR-081).
 - **Change the `SEED_PASSWORD` of the presentation copy on 3100:** question 28.
 - **Keys and providers:** the Azure key for az and ru narration (question 2); the Anthropic key (question 1), SMTP (question 3), the SMS provider (question 4).
 - **Native reviewers:** questions 7, 22 and 66.

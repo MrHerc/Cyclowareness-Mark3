@@ -132,7 +132,7 @@ Qalan hər şey hazırdır və lokalda işləyir. Aşağıdakılar ya xarici hes
 
 ## İstənilən push-dan əvvəl
 Bu budaq (`final-pass-2026-10-21`) push və ya deploy olunmazdan əvvəl yalnız sizin edə biləcəyiniz addımlar. Təfərrüat yuxarıdakı maddələrdədir.
-- **Push:** bütün commit-lər lokaldır, budaq push olunmayıb; push sizin addımınızdır (ADR-081).
+- **Push:** budaq 2026-11-11-də sizin razılığınızla push olundu (`244a471`); `main`-ə birləşdirmə və sonrakı push-lar sizin addımınızdır (ADR-081).
 - **3100-dəki təqdimat surətinin `SEED_PASSWORD`-unu dəyişmək:** sual 28.
 - **Açarlar və provayderlər:** az və ru səsləndirməsi üçün Azure açarı (sual 2); Anthropic açarı (sual 1), SMTP (sual 3), SMS provayderi (sual 4).
 - **Doğma rəyçilər:** sual 7, 22 və 66.

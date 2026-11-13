@@ -4,7 +4,7 @@ Məhsulun adı: **Cyclowareness** (2026-10-19-dan; «Cylosof» yalnız orijinal 
 
 Vəziyyət: 2026-10-19. Portal `portal/` qovluğundadır, lokalda tam işləyir (`npm run setup && npm run dev`), prod build (`npm run build`) keçir, Docker paketi hazırdır (`docker compose up -d --build`).
 
-2026-11-11: bağlama dövrəsinin planlaşdırılmış kod işi (dövrə 12–17) bitib. Sahibin addımları qalır: açarlar, hüquqi şəxs, hüquqşünas, hostinq, doğma rəyçilər və push ([OPEN-QUESTIONS](OPEN-QUESTIONS.md), «İstənilən push-dan əvvəl» bölməsi). «Hələ yoxlanılmayıb» bölməsindəki C və D dalğalarının və 5-ci mərhələnin mühəndislik qalıqları da qalır. Commit-lər lokaldır, heç nə push olunmayıb.
+2026-11-11: bağlama dövrəsinin planlaşdırılmış kod işi (dövrə 12–17) bitib. Sahibin addımları qalır: açarlar, hüquqi şəxs, hüquqşünas, hostinq, doğma rəyçilər və `main`-ə birləşdirmə ([OPEN-QUESTIONS](OPEN-QUESTIONS.md), «İstənilən push-dan əvvəl» bölməsi). «Hələ yoxlanılmayıb» bölməsindəki C və D dalğalarının və 5-ci mərhələnin mühəndislik qalıqları da qalır. Budaq 2026-11-11-də sahibin razılığı ilə push olundu (`origin/final-pass-2026-10-21` = `244a471`; `main` dəyişməyib, pull request yoxdur); sonrakı commit-lər lokaldır.
 
 | Mərhələ ([PLAN](PLAN.md)) | Vəziyyət | Qeyd |
 |---|---|---|
