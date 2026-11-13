@@ -49,7 +49,8 @@ export default async function OfflinePage() {
             </div>
           </div>
         ))}
-        <script nonce={nonce} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: SCRIPT }} />
+        {/* public/sw.js serves this page without any other script, so React never hydrates it: the retry button works through SCRIPT. */}
+        <script nonce={nonce} data-offline-script="" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: SCRIPT }} />
       </div>
     </main>
   );
