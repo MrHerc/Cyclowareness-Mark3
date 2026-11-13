@@ -271,11 +271,13 @@ All notable changes to this project are recorded here. The format follows
 
 ### Fixed
 
-- **The offline page said "You're offline" when only the server was down.** The service worker's
-  cached page now tells no network from a server that does not answer, reloads itself as soon as
-  `/api/health` answers, and its retry button works without hydration; worker version `cy-v4`. In
-  development a worker left by a production build is removed. (`src/app/offline/script.ts`, test:
-  `tests/offline-page.test.ts`)
+- **The offline page said "You're offline" when only the server was down, and could turn into
+  "Something went wrong".** The service worker's cached page now tells no network from a server that
+  does not answer (a proxy's 502 or 504 counts as not answering), reloads itself as soon as
+  `/api/health` answers, and is served without the app's scripts, so a chunk that was never cached
+  cannot break it; its retry button works without React. Worker version `cy-v6`. In development a
+  worker left by a production build is removed. (`public/sw.js`, `src/app/offline/script.ts`, tests:
+  `tests/service-worker.test.ts`, `tests/offline-page.test.ts`)
 - **Two lesson completions of one attempt stored two sets of answers**; the attempt is now consumed by
   one conditional statement. (test: `tests/learning-actions.test.ts`)
 - **Concurrent attestations and path certificates could duplicate**; attestation, module completion
