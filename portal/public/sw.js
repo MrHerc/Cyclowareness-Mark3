@@ -4,11 +4,14 @@
  * cached on first use so the app shell opens fast. A page navigation that cannot be fetched (no connection, or
  * the server does not answer) shows /offline, which tells the two apart and reloads itself when the server is back.
  */
-const VERSION = "cy-v5";
+const VERSION = "cy-v6";
 const OFFLINE = "/offline";
 const PRECACHE = [OFFLINE, "/icons/icon.svg", "/icons/icon-192.png"];
-// The offline copy's stylesheets and fonts, so it looks right even if no page has loaded them through this worker yet.
-const LOOKS = /(?:href|src)="(\/_next\/static\/(?:css|media)\/[^"?#]+)"/g;
+// The offline copy's stylesheets, so it is laid out even if no page has loaded them through this worker yet (its
+// fonts come from the runtime cache below; without them the copy falls back to system fonts).
+const LOOKS = /href="(\/_next\/static\/css\/[^"#]+)"/g;
+// A reverse proxy in front of a stopped or restarting server answers 502 or 504 instead of failing the request.
+const GATEWAY_DOWN = new Set([502, 504]);
 // Every script except the offline page's own (data-offline-script). The copy must not start the app: the chunks it
 // would load may not be cached, and a chunk that fails to load turns the page into the error boundary.
 const APP_SCRIPTS = /<script\b(?![^>]*\bdata-offline-script\b)[^>]*>[\s\S]*?<\/script>/gi;
@@ -55,7 +58,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (req.mode === "navigate") {
-    event.respondWith(fetch(req).catch(offlinePage));
+    event.respondWith(fetch(req).then((res) => (GATEWAY_DOWN.has(res.status) ? offlinePage() : res), offlinePage));
     return;
   }
   // Immutable build assets and fonts: cache first.
